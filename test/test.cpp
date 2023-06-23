@@ -1,7 +1,7 @@
-#include "../src/base/HkNode.hpp"
-
+#include "hkTestFw/HkTestBase.hpp"
+#include "tests/base/HkNode.test.hpp"
 
 int main()
 {
-    exit(1);
+    (std::make_unique<HkNodeTCS>())->runTests();
 }

@@ -24,6 +24,7 @@ public:
     GET(uint32_t, Id, id);
     GET(uint32_t, Level, level);
     GET(std::weak_ptr<HkNode>, Parent, parent);
+    GET(std::vector<std::shared_ptr<HkNode>>, Children, children);
 
 private:
     static uint32_t genId();

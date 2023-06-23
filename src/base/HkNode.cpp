@@ -57,7 +57,6 @@ void HkNode::pushChildren(const std::vector<std::shared_ptr<HkNode>>& newChildre
     for (const auto& child : newChildren)
     {
         if (child->isParented) continue;
-        printf("Intra pe aici\n");
         child->setParent(shared_from_this());
         children.push_back(child);
     }
