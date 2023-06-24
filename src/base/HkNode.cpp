@@ -1,7 +1,8 @@
 #include "HkNode.hpp"
+#include <iostream>
 
 HkNode::HkNode(const std::string& name)
-    : name{ name }, id{ getId() } {}
+    : name{ name }, id{ genId() } {}
 
 /**
  * Desc: Reparents list of nodes to new parent. All ties to old parents will be
@@ -40,7 +41,6 @@ void HkNode::removeChildren(const std::set<uint32_t>& rmChildrenIds)
 
     for (const auto& node : interestingNodes)
     {
-        printf("Prima data aici %s\n", node->getName().c_str());
         node->setParent(nullptr);
     }
     children.erase(it, children.end());
@@ -82,10 +82,12 @@ std::shared_ptr<HkNode> HkNode::hasChild(uint32_t childId) const
 */
 void HkNode::printChildren() const
 {
-    printf("Node %s with children:\n", name.c_str());
-    for (const auto& child : children)
+    std::cout << "Node " << name.c_str() << " with children:\n";
+    for (uint32_t curr = 1; const auto & child : children)
     {
-        printf("    -- %s\n", child->name.c_str());
+        std::cout << "    -- " << child->getName().c_str();
+        if (curr++ != children.size())
+            std::cout << "\n";
     }
 }
 
@@ -100,7 +102,7 @@ void HkNode::printBfs(const std::shared_ptr<HkNode> srcNode) const
     std::set<uint32_t> idsVisited;
     queue.push(srcNode);
 
-    printf("%s-%d", srcNode->name.c_str(), srcNode->level);
+    std::cout << srcNode->name.c_str() << "-" << srcNode->level;
 
     uint32_t prevLevel = 0;
     while (!queue.empty())
@@ -118,14 +120,15 @@ void HkNode::printBfs(const std::shared_ptr<HkNode> srcNode) const
 
             if (prevLevel != child->level)
             {
-                printf("\n");
+                std::cout << '\n';
                 prevLevel = child->level;
             }
-            printf("%s-%d    ", child->name.c_str(), child->level);
+            std::cout << child->name.c_str() << "-" << child->level;
+
             queue.push(child);
         }
     }
-    printf("\n");
+    // std::cout << '\n';
 }
 
 /**

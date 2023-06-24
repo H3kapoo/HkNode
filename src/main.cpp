@@ -13,36 +13,38 @@ int main()
     slave7 = std::make_shared<HkNode>("Slave7");
 
     // master->pushChildren({ slave1, slave4 });
+    master->pushChildren({ slave1, slave2 });
+    master->printBfs(master);
+    printf("\n");
+    // slave4->pushChildren({ slave6,slave7 });
 
-    slave4->pushChildren({ slave6,slave7 });
-
-    slave1->pushChildren({ slave2 });
-
-
-    // printf("\n");
-
-    // slave4->removeChildren({ slave4->getId(), slave7->getId() });
-    // slave4->removeChildren({ slave6->getId() });
-    // slave4->removeChildren({ slave4->getId() });
-    HkNode::reParent({ slave2 }, slave4);
-    HkNode::reParent({ slave2 }, slave4);
-
-    // master->printBfs(master);
-    master->printChildren();
-    slave1->printChildren();
-    slave2->printChildren();
-    slave3->printChildren();
-    slave4->printChildren();
-    slave5->printChildren();
-    slave6->printChildren();
-    slave7->printChildren();
+    // slave1->pushChildren({ slave2 });
 
 
-    const auto val = slave2->getParent();
-    if (val.lock())
-    {
-        printf("da\n");
-    }
+    // // printf("\n");
+
+    // // slave4->removeChildren({ slave4->getId(), slave7->getId() });
+    // // slave4->removeChildren({ slave6->getId() });
+    // // slave4->removeChildren({ slave4->getId() });
+    // HkNode::reParent({ slave2 }, slave4);
+    // HkNode::reParent({ slave2 }, slave4);
+
+    // // master->printBfs(master);
+    // master->printChildren();
+    // slave1->printChildren();
+    // slave2->printChildren();
+    // slave3->printChildren();
+    // slave4->printChildren();
+    // slave5->printChildren();
+    // slave6->printChildren();
+    // slave7->printChildren();
+
+
+    // const auto val = slave2->getParent();
+    // if (val.lock())
+    // {
+    //     printf("da\n");
+    // }
     return 0;
 }
 /*
