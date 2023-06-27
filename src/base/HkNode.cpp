@@ -1,5 +1,4 @@
 #include "HkNode.hpp"
-#include <iostream>
 
 HkNode::HkNode(const std::string& name)
     : name{ name }, id{ genId() } {}
@@ -96,13 +95,13 @@ void HkNode::printChildren() const
  * line representing a new level.
  * Returns: Nothing.
 */
-void HkNode::printBfs(const std::shared_ptr<HkNode> srcNode) const
+void HkNode::printBfs() const
 {
-    std::queue<std::shared_ptr<HkNode>> queue;
+    std::queue<std::shared_ptr<const HkNode>> queue;
     std::set<uint32_t> idsVisited;
-    queue.push(srcNode);
+    queue.push(shared_from_this());
 
-    std::cout << srcNode->name.c_str() << "-" << srcNode->level;
+    std::cout << shared_from_this()->name.c_str() << "-" << shared_from_this()->level;
 
     uint32_t prevLevel = 0;
     while (!queue.empty())
@@ -123,12 +122,11 @@ void HkNode::printBfs(const std::shared_ptr<HkNode> srcNode) const
                 std::cout << '\n';
                 prevLevel = child->level;
             }
-            std::cout << child->name.c_str() << "-" << child->level;
+            std::cout << child->name.c_str() << "-" << child->level << " ";
 
             queue.push(child);
         }
     }
-    // std::cout << '\n';
 }
 
 /**
@@ -153,5 +151,28 @@ uint32_t HkNode::genId()
     return currentId++;
 }
 
+// std::ostream& operator<<(std::ostream& os, const std::optional<std::shared_ptr<HkNode>>& node)
+// {
+//     if (!node.has_value())
+//     {
+//         os << "(Node: null, Id=null)";
+//     }
+//     else
+//     {
+//         os << "(Node: " << node.value()->name << ", Id=" << node.value()->id << ")";
+//     }
+//     return os;
+// }
 
+/*Overloads*/
+std::ostream& operator<<(std::ostream& os, const std::shared_ptr<HkNode>& node)
+{
+    os << "(Node: " << node->name << ", Id=" << node->id << ")";
+    return os;
+}
 
+std::ostream& operator<<(std::ostream& os, const HkNode& node)
+{
+    os << "(Node: " << node.name << ", Id=" << node.id << ")";
+    return os;
+}

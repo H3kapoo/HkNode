@@ -5,5 +5,5 @@
 
 int main()
 {
-    (std::make_unique<HkNodeTCS>())->runTests();
+    (std::make_unique<HkNodeTCShould>())->runTests();
 }

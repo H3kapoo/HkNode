@@ -14,7 +14,7 @@ int main()
 
     // master->pushChildren({ slave1, slave4 });
     master->pushChildren({ slave1, slave2 });
-    master->printBfs(master);
+    std::cout << master;
     printf("\n");
     // slave4->pushChildren({ slave6,slave7 });
 

@@ -5,7 +5,9 @@
 #include <string.h>
 #include <functional>
 #include <vector>
+#include <memory>
 #include <sstream>
+#include <optional>
 
 /*Utils*/
 #define CLR "\e[0m"
@@ -27,37 +29,87 @@ void declareSuite()\
     __VA_ARGS__\
 }\
 
+
 #define __EXPECT_EQ_COND(x, y) __expect_sgn_impl(x, y, "==" ,__LINE__, __func__)
 #define __EXPECT_NOT_EQ__COND(x, y) __expect_sgn_impl(x, y, "!=", __LINE__, __func__)
 #define __EXPECT_GT__COND(x, y) __expect_sgn_impl(x, y, ">", __LINE__, __func__)
 #define __EXPECT_LT__COND(x, y) __expect_sgn_impl(x, y, "<", __LINE__, __func__)
-#define __EXPECT_OUTPUT__COND(x, y)\
-    std::stringstream buffer;\
-    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());\
-    x;\
-    std::string text = buffer.str();\
-    std::cout.rdbuf(old);\
-    return __expect_output_impl(text, y, __LINE__, __func__);\
+
+template<class T>
+struct is_shared_pointer_v : std::false_type {};
+
+template<class T>
+struct is_shared_pointer_v<std::shared_ptr<T>> : std::true_type {};
 
 
 /*Testing macros*/
-#define EXPECT_EQ(x, y) if (!__EXPECT_EQ_COND(x, y)) return;
+#define EXPECT_EQ(x, y)\
+    if (!__handle_is_null_ptr_case(x, y)) return;\
+    if (!__EXPECT_EQ_COND(x, y)) return;\
+
+
 #define EXPECT_NOT_EQ(x, y) if (!__EXPECT_NOT_EQ__COND(x, y)) return;
 #define EXPECT_GT(x, y) if (!__EXPECT_GT__COND(x, y)) return;
 #define EXPECT_LT(x, y) if (!__EXPECT_LT__COND(x, y)) return;
 #define EXPECT_OUTPUT(x, y)\
-    std::stringstream buffer;\
-    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());\
+    coutBuffer = std::make_unique<std::stringstream>();\
+    oldCoutBuffer = std::cout.rdbuf(coutBuffer->rdbuf());\
     x;\
-    std::string text = buffer.str();\
-    std::cout.rdbuf(old);\
-    if (!__expect_output_impl(text, y, __LINE__, __func__)) return;\
+    std::cout.rdbuf(oldCoutBuffer);\
+    if (!__expect_output_impl(coutBuffer->str(), y, __LINE__, __func__)) return;\
 
 
 template <typename T>
 class IHkTCS
 {
 public:
+    bool __handle_is_null_ptr_case(auto x, auto y)
+    {
+        /*constexpr needs to be in a function in order for the branch to be cut off*/
+        if constexpr (is_shared_pointer_v<decltype(x)>::value || is_shared_pointer_v<decltype(y)>::value)
+        {
+            bool failed{ false };
+            const char* func = "myFUnc";
+            if (x != (decltype(x))NULL && y != (decltype(y))NULL)
+            {
+                std::cout << "both NOT null, calling classic compare\n";
+                return __EXPECT_EQ_COND(x, y);
+            }
+            if (x == (decltype(x))NULL && y != (decltype(y))NULL)
+            {
+                std::cout << "x null, y not null, false expect\n";
+
+                failed = true;
+                printFailExpectation(func, "EXPECT_EQ: Expected ", x, " to be equal to ", y);
+                // return false;
+            }
+            if (x != (decltype(x))NULL && y == (decltype(y))NULL)
+            {
+                std::cout << "x not null, y null, false expect\n";
+                failed = true;
+                printFailExpectation(func, "EXPECT_EQ: Expected ", x, " to be equal to ", y);
+                // return false;
+            }
+            if (x == (decltype(x))NULL && y == (decltype(y))NULL)
+            {
+                std::cout << "both null, expect matches\n";
+                failed = true;
+                printFailExpectation(func, "EXPECT_EQ: Expected ", x, " to be equal to ", y);
+                // return true;
+            }
+
+            if (failed)
+            {
+                suiteFailed = true;
+                lastTestFailed = true;
+                std::cout << "\n\tFailed at line ";// << line << "\n";
+                return false;
+            }
+        }
+        std::cout << "nothing matched, bailing\n";
+        return true;
+    }
+
     void runTests()
     {
         declareSuite();
@@ -103,14 +155,13 @@ public:
         }
     }
 
-    // template<typename A, typename B>
     bool __expect_output_impl(std::string x, std::string y, long line, const char* func)
     {
         bool failed{ false };
         if (!(x == y))
         {
             failed = true;
-            printFailExpectation(func, "EXPECT_EQ: Expected\n", x, " to be equal to\n", y);
+            printFailExpectation(func, "EXPECT_OUTPUT: Expected\n", x, " to be equal to\n", y);
         }
         if (failed)
         {
@@ -119,6 +170,7 @@ public:
             std::cout << "\n\tFailed at line " << line << "\n";
             return false;
         }
+
         return true;
     }
 
@@ -128,6 +180,7 @@ public:
         bool failed{ false };
         if (strcmp(sgn, "==") == 0 && !(x == y))
         {
+
             failed = true;
             printFailExpectation(func, "EXPECT_EQ: Expected ", x, " to be equal to ", y);
         }
@@ -160,6 +213,7 @@ public:
     template<typename A, typename B>
     void printFailExpectation(const char* func, const char* expectType, A x, const char* text, B y)
     {
+        /*Note that object without << overloaded will produce compile errors*/
         std::cout << RED << "[" << SUITE_NAME << "] Running " << CLR << "\"" << func
             << "\"" << RED << " ==> ..FAILED\n  ----> " << expectType << CLR
             << "\"" << RED << x << CLR << "\"" << RED << text << CLR << "\"" << GREEN << y << CLR << "\"" << RED;
@@ -175,4 +229,6 @@ public:
     bool lastTestFailed{ false };
     bool isLastTest{ false };
     std::string suiteName;
+    std::unique_ptr<std::stringstream> coutBuffer;
+    std::streambuf* oldCoutBuffer;
 };

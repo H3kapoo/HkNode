@@ -3,8 +3,9 @@
 #include "../../hkTestFw/HkTestBase.hpp"
 #include "../../../src/base/HkNode.hpp" // class to be tested (sut)
 
+#include <utility>
 
-class HkNodeTCS : public IHkTCS<HkNodeTCS>
+class HkNodeTCShould : public IHkTCS<HkNodeTCShould>
 {
 public:
     void setup()
@@ -24,24 +25,15 @@ private:
     std::shared_ptr<HkNode> node0, node1, node2, node3, node4, node5, node6, node7;
 
 private:
-    void test1();
-    void test2();
-    void test3();
-    void test4();
-    DEFINE_SUITE(HkNodeTCS,
-        TEST_DECLARE(HkNodeTCS, test1)
-        TEST_DECLARE(HkNodeTCS, test2)
-        TEST_DECLARE(HkNodeTCS, test3)
-        TEST_DECLARE(HkNodeTCS, test4)
+    void returnCorrectAmountOfNodes();
+    void outputCorectBFSStructure();
+    void reparentChildrenCorrectly();
+    void checkToHaveCorrectChildren();
+
+    DEFINE_SUITE(HkNodeTCShould,
+        // TEST_DECLARE(HkNodeTCShould, returnCorrectAmountOfNodes)
+        // TEST_DECLARE(HkNodeTCShould, outputCorectBFSStructure)
+        // TEST_DECLARE(HkNodeTCShould, reparentChildrenCorrectly)
+        TEST_DECLARE(HkNodeTCShould, checkToHaveCorrectChildren)
     )
 };
-
-/**
- * declara prin macro TEST_F(clasa, numefunc) => class numeFunc : public clasa {..}
- * ^ testu inheriteaza toate functiile din fixture asa, incepe clean mereu
- * apoi e un program care scaneaza fiecare .cpp file cu TEST_F expandat, le culege pe toate
- * apoi intr un test_main.cpp le instanteaza one by one
- * test1 a;
- * a->testBody();
- * ...la fel pt restu de clase pe care le gaseste
-*/

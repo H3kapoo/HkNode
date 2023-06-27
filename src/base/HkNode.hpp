@@ -5,7 +5,9 @@
 #include <memory>
 #include <queue>
 #include <set>
+#include <iostream>
 #include <utility>
+#include <optional>
 
 #define GET(typ, n, x) typ get##n() { return x;}
 
@@ -16,7 +18,7 @@ public:
     void removeChildren(const std::set<uint32_t>& rmChildrenIds);
     void pushChildren(const std::vector<std::shared_ptr<HkNode>>& newChildren);
     void printChildren() const;
-    void printBfs(const std::shared_ptr<HkNode> srcNode) const;
+    void printBfs() const;
     static void reParent(const std::vector<std::shared_ptr<HkNode>>& nodes, const std::shared_ptr<HkNode> newParent);
     std::shared_ptr<HkNode> hasChild(uint32_t childId) const;
 
@@ -25,6 +27,11 @@ public:
     GET(uint32_t, Level, level);
     GET(std::weak_ptr<HkNode>, Parent, parent);
     GET(std::vector<std::shared_ptr<HkNode>>, Children, children);
+
+    // friend std::ostream& operator<<(std::ostream& os, const std::optional<std::shared_ptr<HkNode>>& node);
+    friend std::ostream& operator<<(std::ostream& os, const std::shared_ptr<HkNode>& node);
+    friend std::ostream& operator<<(std::ostream& os, const HkNode& node);
+
 
 private:
     static uint32_t genId();
