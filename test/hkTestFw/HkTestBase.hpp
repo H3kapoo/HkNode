@@ -41,7 +41,6 @@ struct is_shared_pointer_v : std::false_type {};
 template<class T>
 struct is_shared_pointer_v<std::shared_ptr<T>> : std::true_type {};
 
-
 /*Testing macros*/
 #define EXPECT_EQ(x, y)\
     if (!__handle_is_null_ptr_case(x, y)) return;\
@@ -70,12 +69,12 @@ public:
         {
             bool failed{ false };
             const char* func = "myFUnc";
-            if (x != (decltype(x))NULL && y != (decltype(y))NULL)
+            if constexpr (x != (decltype(x))NULL && y != (decltype(y))NULL)
             {
                 std::cout << "both NOT null, calling classic compare\n";
                 return __EXPECT_EQ_COND(x, y);
             }
-            if (x == (decltype(x))NULL && y != (decltype(y))NULL)
+            if constexpr (x == (decltype(x))NULL && y != (decltype(y))NULL)
             {
                 std::cout << "x null, y not null, false expect\n";
 
@@ -83,14 +82,14 @@ public:
                 printFailExpectation(func, "EXPECT_EQ: Expected ", x, " to be equal to ", y);
                 // return false;
             }
-            if (x != (decltype(x))NULL && y == (decltype(y))NULL)
+            if constexpr (x != (decltype(x))NULL && y == (decltype(y))NULL)
             {
                 std::cout << "x not null, y null, false expect\n";
                 failed = true;
                 printFailExpectation(func, "EXPECT_EQ: Expected ", x, " to be equal to ", y);
                 // return false;
             }
-            if (x == (decltype(x))NULL && y == (decltype(y))NULL)
+            if constexpr (x == (decltype(x))NULL && y == (decltype(y))NULL)
             {
                 std::cout << "both null, expect matches\n";
                 failed = true;

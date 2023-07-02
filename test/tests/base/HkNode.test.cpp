@@ -41,19 +41,14 @@ void HkNodeTCShould::checkToHaveCorrectChildren()
 {
     node3->pushChildren({ node1, node2, node3, node4 });
     // EXPECT_EQ(0, 1);
-    if (node3->hasChild(node7->getId()))
-    {
-        std::cout << "ceva ok\n";
-    }
-    // EXPECT_EQ(0, 1); //0 not-null
-    std::pair<int, int> x{ 2,3 };
-    std::pair<int, int> y{ 3,3 };
+    // if (node3->hasChild(node3->getId()))
+    // {
+    //     std::cout << "ceva ok\n";
+    // }
 
-    // EXPECT_EQ(0, 3);
-    // EXPECT_EQ(x, y);
-    // EXPECT_EQ(node3->hasChild({ node7->getId() }), node1); //null not-null
-    EXPECT_EQ(nullptr, node3->hasChild({ node1->getId() })); //null not-null
+    // EXPECT_EQ(nullptr, nullptr); //null null
+    // EXPECT_EQ(nullptr, 3); //null null
 
-    // EXPECT_EQ(x, node1);
-    //
+    // TODO: More work needs to be done on the test FW
+
 }

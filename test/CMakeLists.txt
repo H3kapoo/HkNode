@@ -17,4 +17,4 @@ add_executable(test_hkNode
     ../src/base/HkNode.cpp
 
     )
-# target_link_libraries(hkNode glfw GLEW GL X11 pthread Xrandr dl)
+# target_link_libraries(hkNode glfw3 GLEW GL X11 pthread Xrandr dl)

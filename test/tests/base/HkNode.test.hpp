@@ -5,6 +5,8 @@
 
 #include <utility>
 
+using namespace hkui;
+
 class HkNodeTCShould : public IHkTCS<HkNodeTCShould>
 {
 public:
