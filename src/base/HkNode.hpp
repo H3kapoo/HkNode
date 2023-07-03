@@ -16,7 +16,11 @@ namespace hkui
     class HkNode : public std::enable_shared_from_this<HkNode>
     {
     public:
-        HkNode(const std::string& name);
+        HkNode(const std::string& name, const std::string& type);
+        virtual ~HkNode() = default;
+        virtual void updateMySelf() = 0;
+
+    protected:
         void removeChildren(const std::set<uint32_t>& rmChildrenIds);
         void pushChildren(const std::vector<std::shared_ptr<HkNode>>& newChildren);
         void printChildren() const;
@@ -24,6 +28,7 @@ namespace hkui
         void printTree() const;
         static void reParent(const std::vector<std::shared_ptr<HkNode>>& nodes, const std::shared_ptr<HkNode> newParent);
         std::shared_ptr<HkNode> hasChild(uint32_t childId) const;
+
 
         GET(std::string, Name, name);
         GET(uint32_t, Id, id);
@@ -42,6 +47,7 @@ namespace hkui
         void setParent(const std::shared_ptr<HkNode>& newParent);
 
         std::string name{ "UNSET_NODE" };
+        std::string type{ "UNSET_TYPE" };
         uint32_t id{ 0 };
         uint32_t level{ 0 };
         bool isParented{ false };
@@ -51,4 +57,7 @@ namespace hkui
         std::weak_ptr<HkNode> parent;
         std::vector<std::shared_ptr<HkNode>> children;
     };
+
+    using HkNodePtr = std::shared_ptr<HkNode>;
+    using HkNodeCPtr = const std::shared_ptr<HkNode>;
 } // hkui

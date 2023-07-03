@@ -2,8 +2,8 @@
 
 namespace hkui
 {
-    HkNode::HkNode(const std::string& name)
-        : name{ name }, id{ genId() } {}
+    HkNode::HkNode(const std::string& name, const std::string& type)
+        : name{ name }, type{ type }, id{ genId() } {}
 
     /**
      * Desc: Reparents list of nodes to new parent. All ties to old parents will be
@@ -191,18 +191,18 @@ namespace hkui
     /*Overloads*/
     std::ostream& operator<<(std::ostream& os, const std::shared_ptr<HkNode>& node)
     {
-        os << "(Node: " << node->name << ", Id=" << node->id << ")";
+        os << "(" << node->type << ": " << node->name << ", Id = " << node->id << ")";
         return os;
     }
 
     std::ostream& operator<<(std::ostream& os, const HkNode& node)
     {
-        os << "(Node: " << node.name << ", Id=" << node.id << ")";
+        os << "(" << node.type << ": " << node.name << ", Id = " << node.id << ")";
         return os;
     }
     std::ostream& operator<<(std::ostream& os, const HkNode* node)
     {
-        os << "(Node: " << node->name << ", Id=" << node->id << ")";
+        os << "(" << node->type << ": " << node->name << ", Id = " << node->id << ")";
         return os;
     }
 } // hkui

@@ -10,5 +10,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../debug)
 add_executable(hkNode
     main.cpp
     base/HkNode.cpp
+    management/HkSceneManagement.cpp
     )
 target_link_libraries(hkNode glfw GLEW GL X11 pthread Xrandr dl)
