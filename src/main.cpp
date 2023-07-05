@@ -10,41 +10,41 @@ using namespace hkui;
 void resizeCallback(GLFWwindow* window, int width, int height)
 {
     // let the user call the functions
-    HkSceneManagement::resizeEvent(window, width, height);
+    HkSceneManagement::resizeWindowEvent(window, width, height);
+}
+
+void mouseMoveCallback(GLFWwindow* window, double xpos, double ypos)
+{
+    // let the user call the functions
+    HkSceneManagement::mouseMoveEvent(window, xpos, ypos);
+}
+
+void mouseClickCallback(GLFWwindow* window, int button, int action, int mods)
+{
+    // let the user call the functions
+    HkSceneManagement::mouseClickEvent(window, button, action, mods);
+}
+
+void mouseEnterCallback(GLFWwindow* window, int entered)
+{
+    // let the user call the functions
+    HkSceneManagement::mouseEnterEvent(window, entered);
+}
+
+void mouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    // let the user call the functions
+    HkSceneManagement::mouseScrollEvent(window, xoffset, yoffset);
+}
+
+void dropCallback(GLFWwindow* window, int count, const char** paths)
+{
+    // let the user call the functions
+    HkSceneManagement::dropEvent(window, count, paths);
 }
 
 int main()
 {
-    // std::shared_ptr<HkNode> master, slave1, slave2, slave3, slave4, slave5, slave6, slave7;
-    // master = std::make_shared<HkNode>("Master", "UNSET_TYPE");
-    // slave1 = std::make_shared<HkNode>("Slave1", "UNSET_TYPE");
-    // slave2 = std::make_shared<HkNode>("Slave2", "UNSET_TYPE");
-    // slave3 = std::make_shared<HkNode>("Slave3", "UNSET_TYPE");
-    // slave4 = std::make_shared<HkNode>("Slave4", "UNSET_TYPE");
-    // slave5 = std::make_shared<HkNode>("Slave5", "UNSET_TYPE");
-    // slave6 = std::make_shared<HkNode>("Slave6", "UNSET_TYPE");
-    // slave7 = std::make_shared<HkNode>("Slave7", "UNSET_TYPE");
-
-    // master->pushChildren({ slave1, slave4 });
-    // slave1->pushChildren({ slave2, slave3, slave5 });
-    // slave4->pushChildren({ slave6, slave7 });
-
-
-    // master->printTree();
-    // std::cout << '\n';
-
-
-    HkContainerPtr container1 = std::make_shared<HkContainer>("Cont1");
-    HkContainerPtr container2 = std::make_shared<HkContainer>("Cont2");
-    HkButtonPtr button1 = std::make_shared<HkButton>("Button1");
-
-    container1->pushChildren({ container2 });
-
-    container1->printTree();
-
-    HkSceneManagement::setRoot(container1);
-    HkSceneManagement::update();
-
     // return 0;
     // opengl stuff
 
@@ -61,8 +61,15 @@ int main()
         glfwTerminate();
         return -1;
     }
+
     glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, resizeCallback);
+    // glfwSwapInterval(0); // zero to disable Vsync
+    // glfwSetFramebufferSizeCallback(window, resizeCallback);
+    // glfwSetCursorPosCallback(window, mouseMoveCallback);
+    glfwSetMouseButtonCallback(window, mouseClickCallback);
+    // glfwSetCursorEnterCallback(window, mouseEnterCallback);
+    // glfwSetScrollCallback(window, mouseScrollCallback);
+    // glfwSetDropCallback(window, dropCallback);
 
     if (glewInit() != GLEW_OK)
     {
@@ -70,14 +77,44 @@ int main()
         return -1;
     }
 
+    HkContainerPtr container1 = std::make_shared<HkContainer>("Cont1");
+    HkContainerPtr container2 = std::make_shared<HkContainer>("Cont2");
+    HkButtonPtr button1 = std::make_shared<HkButton>("Button1");
+
+    container1->pushChildren({ container2 });
+    container2->pushChildren({ button1 });
+
+    container1->printTree();
+
+    HkSceneManagement::setRoot(container1);
+    // HkSceneManagement::update();
+    HkSceneManagement::init(800, 600);
+
+    double previousTime = glfwGetTime();
+    int frameCount = 0;
     while (!glfwWindowShouldClose(window))
     {
+
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
+
+        // Measure speed
+        double currentTime = glfwGetTime();
+        frameCount++;
+        if (currentTime - previousTime >= 1.0)
+        {
+            glfwSetWindowTitle(window, std::to_string(frameCount).c_str());
+            frameCount = 0;
+            previousTime = currentTime;
+        }
     }
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
+    return 0;
 
     {
         const char* vertexShaderSource = "#version 330 core\n"

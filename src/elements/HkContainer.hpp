@@ -6,35 +6,7 @@
 
 namespace hkui
 {
-    // addons
-    struct IHkElementHolder
-    {
-        virtual void pushChildren(const std::vector<std::shared_ptr<HkNode>>&) = 0;
-        virtual void updateChildren() = 0;
-    };
-
-    struct IHkElementPrintable
-    {
-        virtual void printTree() = 0;
-    };
-
-    class IHkElementUtility
-    {
-    public:
-        virtual void identify(std::ostream&) = 0;
-
-        friend std::ostream& operator<<(std::ostream& os, const std::shared_ptr<IHkElementUtility>& element)
-        {
-            element->identify(os);
-            return os;
-        }
-    };
-    //
-
     class HkContainer : public HkNode
-        , public IHkElementUtility
-        , public IHkElementPrintable
-        , public IHkElementHolder
     {
     public:
         HkContainer(const std::string& name) : HkNode(name, "Container") {}
@@ -42,32 +14,26 @@ namespace hkui
         //HkNode
         void updateMySelf() override
         {
-            std::cout << getName() << " needs an update\n";
+            // std::cout << getName() << " needs an update\n";
             updateChildren();
         }
 
-
-        // IHkElementHolder
-        void updateChildren() override
+        void updateChildren()
         {
             for (const auto& child : getChildren())
                 child->updateMySelf();
         }
 
-        void pushChildren(const std::vector<std::shared_ptr<HkNode>>& newChildren) override
+        void pushChildren(const std::vector<std::shared_ptr<HkNode>>& newChildren)
         {
             HkNode::pushChildren(newChildren);
         }
 
-        // IHkElementPrintable
-        void printTree() override { HkNode::printTree(); }
-    private:
-        // HkElement
-        void identify(std::ostream& os) override { os << this; }
+        void printTree() { HkNode::printTree(); }
     };
 
+
     class HkButton : public HkNode
-        , public IHkElementUtility
     {
     public:
         HkButton(const std::string& name) : HkNode(name, "Button") {}
@@ -75,12 +41,8 @@ namespace hkui
         //HkNode
         void updateMySelf() override
         {
-            std::cout << getName() << " button needs an update\n";
+            std::cout << getName() << " " << std::boolalpha << HkSceneManagement::sceneData.isMouseClicked << "\n";
         }
-
-    private:
-        // HkElement
-        void identify(std::ostream& os) override { os << this; }
     };
 
     using HkButtonPtr = std::shared_ptr<HkButton>;
