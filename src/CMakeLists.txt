@@ -11,5 +11,6 @@ add_executable(hkNode
     main.cpp
     base/HkNode.cpp
     management/HkSceneManagement.cpp
+    renderer/HkShader.cpp
     )
 target_link_libraries(hkNode glfw GLEW GL X11 pthread Xrandr dl)

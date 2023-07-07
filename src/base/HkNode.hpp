@@ -17,6 +17,7 @@ namespace hkui
     {
     public:
         HkNode(const std::string& name, const std::string& type);
+        static void reParent(const std::vector<std::shared_ptr<HkNode>>& nodes, const std::shared_ptr<HkNode> newParent);
         virtual ~HkNode() = default;
         virtual void updateMySelf() = 0;
 
@@ -26,7 +27,6 @@ namespace hkui
         void printChildren() const;
         void printBfs() const;
         void printTree() const;
-        static void reParent(const std::vector<std::shared_ptr<HkNode>>& nodes, const std::shared_ptr<HkNode> newParent);
         std::shared_ptr<HkNode> hasChild(uint32_t childId) const;
 
 
@@ -51,9 +51,6 @@ namespace hkui
         uint32_t id{ 0 };
         uint32_t level{ 0 };
         bool isParented{ false };
-        // shader
-        // VAO
-        // Texture
         std::weak_ptr<HkNode> parent;
         std::vector<std::shared_ptr<HkNode>> children;
     };
