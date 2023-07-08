@@ -2,6 +2,6 @@
 
 namespace hkui
 {
-    SceneData HkSceneManagement::sceneData = { };
-    HkNodePtr HkSceneManagement::rootNode = nullptr;
-}
+SceneData HkSceneManagement::sceneData = { };
+HkNodePtr HkSceneManagement::rootNode = nullptr;
+} // hkui

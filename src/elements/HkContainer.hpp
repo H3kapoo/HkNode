@@ -8,89 +8,109 @@
 
 namespace hkui
 {
-    class HkContainer : public HkNode, public HkRenderableNode
+
+//TODO: maybe rename HkNode => HkTreeNode
+class HkContainer : public HkNode, public HkRenderableNode
+{
+public:
+    HkContainer(const std::string& name)
+        : HkNode(name, "Container")
+        , HkRenderableNode("assets/shaders/v1.glsl", "assets/shaders/f1.glsl")
     {
-    public:
-        HkContainer(const std::string& name) : HkNode(name, "Container") { HkNodeRenderer::renderNode(this); }
+        HkRenderableNode::render();
+    }
 
-        //HkNode
-        void updateMySelf() override
-        {
-            // std::cout << getName() << " needs an update\n";
-            HkNodeRenderer::renderNode(this);
-            switch (HkSceneManagement::sceneData.currentEvent)
-            {
-            case Event::None:
-            case Event::GeneralUpdate:
-            case Event::WindowResize:
-            case Event::MouseMove:
-            case Event::MouseClick:
-            case Event::MouseEnterExit:
-            case Event::MouseScroll:
-            case Event::DropPath:
-                break;
-            }
-            updateChildren();
-        }
-
-        void updateChildren()
-        {
-            for (const auto& child : getChildren())
-                child->updateMySelf();
-        }
-
-        void pushChildren(const std::vector<std::shared_ptr<HkNode>>& newChildren)
-        {
-            HkNode::pushChildren(newChildren);
-        }
-
-        void printTree() { HkNode::printTree(); }
-    };
-
-
-    class HkButton : public HkNode, public HkRenderableNode
+    //HkNode
+    void updateMySelf() override
     {
-    public:
-        HkButton(const std::string& name) : HkNode(name, "Button") { HkNodeRenderer::renderNode(this); }
-
-        //HkNode
-        void updateMySelf() override
+        /*main HkEvents handler*/
+        switch (HkSceneManagement::sceneData.currentEvent)
         {
-            HkNodeRenderer::renderNode(this);
-            switch (HkSceneManagement::sceneData.currentEvent)
+        case HkEvent::None:
+        case HkEvent::GeneralUpdate: break;
+        case HkEvent::WindowResize:
+        case HkEvent::MouseMove:
+            // break;
+        case HkEvent::MouseClick:
+            if (!HkSceneManagement::sceneData.isMouseClicked)
             {
-            case Event::None:
-                std::cout << this << " none evt\n";
-                break;
-            case Event::GeneralUpdate:
-                std::cout << this << " gen update\n";
-                break;
-            case Event::WindowResize:
-                std::cout << this << " win resize\n";
-                break;
-            case Event::MouseMove:
-                std::cout << this << " mouse move\n";
-                break;
-            case Event::MouseClick:
-                if (HkSceneManagement::sceneData.isMouseClicked)
-                    std::cout << this << " mouse clicked\n";
-                break;
-            case Event::MouseEnterExit:
-                std::cout << this << " mouse enter/exit\n";
-                break;
-            case Event::MouseScroll:
-                std::cout << this << " mouse scroll\n";
-                break;
-            case Event::DropPath:
-                std::cout << this << " drop path\n";
-                break;
+                // std::cout << "mouse released at: " <<
+                    // HkSceneManagement::sceneData.mousePosX << " " << HkSceneManagement::sceneData.mousePosY << '\n';
+                HkRenderableNode::setPos({ HkSceneManagement::sceneData.mousePosX, HkSceneManagement::sceneData.mousePosY });
             }
+            break;
+        case HkEvent::MouseEnterExit:
+        case HkEvent::MouseScroll:
+        case HkEvent::DropPath:
+            break;
         }
-    };
+        HkRenderableNode::render();
+        updateChildren();
+    }
 
-    using HkButtonPtr = std::shared_ptr<HkButton>;
-    using HkButtonCPtr = const std::shared_ptr<HkButton>;
+    void updateChildren()
+    {
+        for (const auto& child : getChildren())
+            child->updateMySelf();
+    }
 
-    using HkContainerPtr = std::shared_ptr<HkContainer>;
-    using HkContainerCPtr = const std::shared_ptr<HkContainer>;
+    void pushChildren(const std::vector<std::shared_ptr<HkNode>>& newChildren)
+    {
+        HkNode::pushChildren(newChildren);
+    }
+
+    void printTree() { HkNode::printTree(); }
+};
+
+
+class HkButton : public HkNode, public HkRenderableNode
+{
+public:
+    HkButton(const std::string& name)
+        : HkNode(name, "Button")
+        , HkRenderableNode("assets/shaders/v1.glsl", "assets/shaders/f1.glsl")
+    {
+        HkNodeRenderer::renderNode(this);
+    }
+
+    //HkNode
+    void updateMySelf() override
+    {
+        switch (HkSceneManagement::sceneData.currentEvent)
+        {
+        case HkEvent::None:
+            std::cout << this << " none evt\n";
+            break;
+        case HkEvent::GeneralUpdate:
+            std::cout << this << " gen update\n";
+            break;
+        case HkEvent::WindowResize:
+            std::cout << this << " win resize\n";
+            break;
+        case HkEvent::MouseMove:
+            std::cout << this << " mouse move\n";
+            break;
+        case HkEvent::MouseClick:
+            if (HkSceneManagement::sceneData.isMouseClicked)
+                std::cout << this << " mouse clicked\n";
+            break;
+        case HkEvent::MouseEnterExit:
+            std::cout << this << " mouse enter/exit\n";
+            break;
+        case HkEvent::MouseScroll:
+            std::cout << this << " mouse scroll\n";
+            break;
+        case HkEvent::DropPath:
+            std::cout << this << " drop path\n";
+            break;
+        }
+        HkNodeRenderer::renderNode(this);
+    }
+};
+
+using HkButtonPtr = std::shared_ptr<HkButton>;
+using HkButtonCPtr = const std::shared_ptr<HkButton>;
+
+using HkContainerPtr = std::shared_ptr<HkContainer>;
+using HkContainerCPtr = const std::shared_ptr<HkContainer>;
 } // hkui
