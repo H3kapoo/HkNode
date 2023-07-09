@@ -105,15 +105,4 @@ public:
     // Pos
 };
 
-class HkNodeRenderer
-{
-public:
-    // no need to create smart pointer as passed ptr is already memory managed
-    static void renderNode(HkRenderableNode*)
-    {
-        // node->shader.bind();
-        // node->bindVaoAndDraw();
-        std::cout << "rendering node\n";
-    }
-};
 } // hkui

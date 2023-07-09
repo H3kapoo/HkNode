@@ -10,32 +10,41 @@ namespace hkui
 {
 
 //TODO: maybe rename HkNode => HkTreeNode
-class HkContainer : public HkNode, public HkRenderableNode
+class HkContainer : public HkNode, public HkRenderableNode // TODO: Eliminate duble inh
 {
 public:
     HkContainer(const std::string& name)
         : HkNode(name, "Container")
         , HkRenderableNode("assets/shaders/v1.glsl", "assets/shaders/f1.glsl")
+        , scenDataRef(HkSceneManagement::get().sceneData)
     {
         HkRenderableNode::shader.setVec3f("color", glm::vec3(0.0f, 1.0f, 0.0f)); // GREEN
         HkRenderableNode::render();
     }
 
+    /*
+        HKContainer : public HKRenderableNode => rendering stuff, shaders, pos
+        HKRenderableNode : public HkNode => tree data, relationships
+
+        void updateMySelf() override
+        {
+        }
+    */
+
     //HkNode
     void updateMySelf() override
     {
         /*main HkEvents handler*/
-        HkSceneData& sceneData = HkSceneManagement::get().sceneData;
-        switch (sceneData.currentEvent)
+        switch (scenDataRef.currentEvent)
         {
         case HkEvent::None:
         case HkEvent::GeneralUpdate: break;
         case HkEvent::WindowResize:
         case HkEvent::MouseMove: break;
         case HkEvent::MouseClick:
-            if (!sceneData.isMouseClicked)
+            if (!scenDataRef.isMouseClicked)
             {
-                HkRenderableNode::setPos({ sceneData.mousePosX, sceneData.mousePosY });
+                HkRenderableNode::setPos({ scenDataRef.mousePosX, scenDataRef.mousePosY });
             }
             break;
         case HkEvent::MouseEnterExit:
@@ -59,6 +68,9 @@ public:
     }
 
     void printTree() { HkNode::printTree(); }
+
+private:
+    HkSceneData& scenDataRef; /* This is safe as singleton will outlive THIS class anyway*/
 };
 
 
@@ -68,6 +80,7 @@ public:
     HkButton(const std::string& name)
         : HkNode(name, "Button")
         , HkRenderableNode("assets/shaders/v1.glsl", "assets/shaders/f1.glsl")
+        , scenDataRef(HkSceneManagement::get().sceneData)
     {
         HkRenderableNode::shader.setVec3f("color", glm::vec3(1.0f, 0.0f, 0.0f)); // RED
         HkRenderableNode::render();
@@ -77,8 +90,7 @@ public:
     void updateMySelf() override
     {
         /*main HkEvents handler*/
-        HkSceneData& sceneData = HkSceneManagement::get().sceneData;
-        switch (sceneData.currentEvent)
+        switch (scenDataRef.currentEvent)
         {
         case HkEvent::None:
         case HkEvent::GeneralUpdate: break;
@@ -86,9 +98,9 @@ public:
         case HkEvent::MouseMove:
 
         case HkEvent::MouseClick:
-            if (!sceneData.isMouseClicked)
+            if (!scenDataRef.isMouseClicked)
             {
-                HkRenderableNode::setPos({ sceneData.mousePosX, sceneData.mousePosY });
+                HkRenderableNode::setPos({ scenDataRef.mousePosX, scenDataRef.mousePosY });
             }
             break;
         case HkEvent::MouseEnterExit:
@@ -99,6 +111,8 @@ public:
         /*Don't forget to only show node*/
         HkRenderableNode::render();
     }
+private:
+    HkSceneData& scenDataRef; /* This is safe as singleton will outlive THIS class anyway*/
 };
 
 using HkButtonPtr = std::shared_ptr<HkButton>;
