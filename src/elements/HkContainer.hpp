@@ -17,9 +17,7 @@ public:
         : HkNode(name, "Container")
         , HkRenderableNode("assets/shaders/v1.glsl", "assets/shaders/f1.glsl")
     {
-        // shader.setVec3f("color", glm::vec3(0.1f, 0.1f, 0.4f));
-        shader.setVec3f("color", glm::vec3(0.0f, 1.0f, 0.0f)); // GREEN
-
+        HkRenderableNode::shader.setVec3f("color", glm::vec3(0.0f, 1.0f, 0.0f)); // GREEN
         HkRenderableNode::render();
     }
 
@@ -27,18 +25,17 @@ public:
     void updateMySelf() override
     {
         /*main HkEvents handler*/
-        switch (HkSceneManagement::sceneData.currentEvent)
+        HkSceneData& sceneData = HkSceneManagement::get().sceneData;
+        switch (sceneData.currentEvent)
         {
         case HkEvent::None:
         case HkEvent::GeneralUpdate: break;
         case HkEvent::WindowResize:
         case HkEvent::MouseMove: break;
         case HkEvent::MouseClick:
-            if (!HkSceneManagement::sceneData.isMouseClicked)
+            if (!sceneData.isMouseClicked)
             {
-                // std::cout << "mouse released at: " <<
-                    // HkSceneManagement::sceneData.mousePosX << " " << HkSceneManagement::sceneData.mousePosY << '\n';
-                HkRenderableNode::setPos({ HkSceneManagement::sceneData.mousePosX, HkSceneManagement::sceneData.mousePosY });
+                HkRenderableNode::setPos({ sceneData.mousePosX, sceneData.mousePosY });
             }
             break;
         case HkEvent::MouseEnterExit:
@@ -72,8 +69,7 @@ public:
         : HkNode(name, "Button")
         , HkRenderableNode("assets/shaders/v1.glsl", "assets/shaders/f1.glsl")
     {
-        shader.setVec3f("color", glm::vec3(1.0f, 0.0f, 0.0f)); // RED
-
+        HkRenderableNode::shader.setVec3f("color", glm::vec3(1.0f, 0.0f, 0.0f)); // RED
         HkRenderableNode::render();
     }
 
@@ -81,7 +77,8 @@ public:
     void updateMySelf() override
     {
         /*main HkEvents handler*/
-        switch (HkSceneManagement::sceneData.currentEvent)
+        HkSceneData& sceneData = HkSceneManagement::get().sceneData;
+        switch (sceneData.currentEvent)
         {
         case HkEvent::None:
         case HkEvent::GeneralUpdate: break;
@@ -89,11 +86,9 @@ public:
         case HkEvent::MouseMove:
 
         case HkEvent::MouseClick:
-            if (!HkSceneManagement::sceneData.isMouseClicked)
+            if (!sceneData.isMouseClicked)
             {
-                // std::cout << "mouse released at: " <<
-                    // HkSceneManagement::sceneData.mousePosX << " " << HkSceneManagement::sceneData.mousePosY << '\n';
-                HkRenderableNode::setPos({ HkSceneManagement::sceneData.mousePosX, HkSceneManagement::sceneData.mousePosY });
+                HkRenderableNode::setPos({ sceneData.mousePosX, sceneData.mousePosY });
             }
             break;
         case HkEvent::MouseEnterExit:
@@ -101,6 +96,7 @@ public:
         case HkEvent::DropPath:
             break;
         }
+        /*Don't forget to only show node*/
         HkRenderableNode::render();
     }
 };

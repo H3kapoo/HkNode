@@ -12,37 +12,37 @@ using namespace hkui;
 void resizeCallback(GLFWwindow* window, int width, int height)
 {
     // let the user call the functions
-    HkSceneManagement::resizeWindowEvent(window, width, height);
+    HkSceneManagement::get().resizeWindowEvent(window, width, height);
 }
 
 void mouseMoveCallback(GLFWwindow* window, double xpos, double ypos)
 {
     // let the user call the functions
-    HkSceneManagement::mouseMoveEvent(window, xpos, ypos);
+    HkSceneManagement::get().mouseMoveEvent(window, xpos, ypos);
 }
 
 void mouseClickCallback(GLFWwindow* window, int button, int action, int mods)
 {
     // let the user call the functions
-    HkSceneManagement::mouseClickEvent(window, button, action, mods);
+    HkSceneManagement::get().mouseClickEvent(window, button, action, mods);
 }
 
 void mouseEnterCallback(GLFWwindow* window, int entered)
 {
     // let the user call the functions
-    HkSceneManagement::mouseEnterEvent(window, entered);
+    HkSceneManagement::get().mouseEnterEvent(window, entered);
 }
 
 void mouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
     // let the user call the functions
-    HkSceneManagement::mouseScrollEvent(window, xoffset, yoffset);
+    HkSceneManagement::get().mouseScrollEvent(window, xoffset, yoffset);
 }
 
 void dropCallback(GLFWwindow* window, int count, const char** paths)
 {
     // let the user call the functions
-    HkSceneManagement::dropEvent(window, count, paths);
+    HkSceneManagement::get().dropEvent(window, count, paths);
 }
 
 int main()
@@ -55,7 +55,6 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glEnable(GL_DEPTH_TEST); // this shows nothing now
-
 
     // GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
     GLFWwindow* window = glfwCreateWindow(1920, 1080, "LearnOpenGL", NULL, NULL);
@@ -90,8 +89,8 @@ int main()
 
     container1->printTree();
 
-    HkSceneManagement::setRoot(container1);
-    HkSceneManagement::init(800, 600);
+    HkSceneManagement::get().setRoot(container1);
+    HkSceneManagement::get().init(800, 600);
 
     double previousTime = glfwGetTime();
     int frameCount = 0;
@@ -101,7 +100,7 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        HkSceneManagement::update(HkEvent::GeneralUpdate);
+        HkSceneManagement::get().update(HkEvent::GeneralUpdate);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

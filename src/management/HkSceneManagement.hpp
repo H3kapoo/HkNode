@@ -27,7 +27,7 @@ enum class HkEvent
     // Keyboard // TO DO:
 };
 
-struct SceneData
+struct HkSceneData
 {
     HkEvent currentEvent;
     int windowWidth, windowHeight;
@@ -50,36 +50,42 @@ class HkSceneManagement
     friend class HkContainer;
 
 public:
-    static void init(int wWidth, int wHeight)
+    HkSceneManagement(const HkSceneManagement&) = delete;
+    void operator=(const HkSceneManagement&) = delete;
+
+    static HkSceneManagement& get()
+    {
+        static HkSceneManagement instance;
+        return instance;
+    }
+
+    void init(int wWidth, int wHeight)
     {
         sceneData.windowWidth = wWidth;
         sceneData.windowHeight = wHeight;
     }
 
-    static void setRoot(HkNodeCPtr& newRootNode)
+    void setRoot(HkNodeCPtr& newRootNode)
     {
         rootNode = newRootNode;
         std::cout << "Root for scene changed to: " << rootNode << '\n';
     }
 
-    // TODO: Maybe in the future add an HkEvent queue and handle each HkEvent in sequence..
-    //       or maybe glfw already does that, we'll see
-    static void update(const HkEvent& ev)
+    void update(const HkEvent& ev)
     {
-        // std::cout << "Update loop called\n";
         sceneData.currentEvent = ev; // HkEvent gets consumed
         rootNode->updateMySelf();
         sceneData.currentEvent = HkEvent::None; // HkEvent gets consumed
     }
 
-    static void resizeWindowEvent(GLFWwindow*, int width, int height)
+    void resizeWindowEvent(GLFWwindow*, int width, int height)
     {
         sceneData.windowWidth = width;
         sceneData.windowHeight = height;
         update(HkEvent::WindowResize);
     }
 
-    static void mouseMoveEvent(GLFWwindow*, double xPos, double yPos)
+    void mouseMoveEvent(GLFWwindow*, double xPos, double yPos)
     {
         // std::cout << "moved to " << xPos << " " << yPos << "\n";
         sceneData.lastMousePosX = sceneData.mousePosX;
@@ -89,7 +95,7 @@ public:
         update(HkEvent::MouseMove);
     }
 
-    static void mouseClickEvent(GLFWwindow*, int button, int action, int)
+    void mouseClickEvent(GLFWwindow*, int button, int action, int)
     {
         // std::cout << "mouse click ";// << xpos << " " << ypos << "\n";
         if (action == GLFW_PRESS)
@@ -116,14 +122,14 @@ public:
         update(HkEvent::MouseClick);
     }
 
-    static void mouseEnterEvent(GLFWwindow*, int entered)
+    void mouseEnterEvent(GLFWwindow*, int entered)
     {
         entered ? (sceneData.mouseEntered = true) : (sceneData.mouseEntered = false);
         // std::cout << "mouse entered or exited ";// << xpos << " " << ypos << "\n";
         update(HkEvent::MouseEnterExit);
     }
 
-    static void mouseScrollEvent(GLFWwindow*, double xOffset, double)
+    void mouseScrollEvent(GLFWwindow*, double xOffset, double)
     {
         // std::cout << "mouse scroll\n";// << xpos << " " << ypos << "\n";
         sceneData.lastScrollPosY = sceneData.scrollPosY;
@@ -131,7 +137,7 @@ public:
         update(HkEvent::MouseScroll);
     }
 
-    static void dropEvent(GLFWwindow*, int count, const char** paths)
+    void dropEvent(GLFWwindow*, int count, const char** paths)
     {
         std::cout << "dropped something\n";// << xpos << " " << ypos << "\n";
         sceneData.receivedDrop = true;
@@ -139,9 +145,13 @@ public:
         sceneData.droppedPaths = paths;
         update(HkEvent::DropPath);
     }
+
 private:
-    static SceneData sceneData;
-    static HkNodePtr rootNode;
+    HkSceneManagement() = default;
+
+    HkSceneData sceneData;
+    HkNodePtr rootNode;
+    static HkSceneManagement* instance;
 };
 
 } // hkui
