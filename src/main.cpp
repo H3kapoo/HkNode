@@ -2,7 +2,6 @@
 #include <GLFW/glfw3.h>
 
 #include "renderer/HkShader.hpp"
-
 #include "base/HkNode.hpp"
 #include "management/HkSceneManagement.hpp"
 #include "elements/HkContainer.hpp"
@@ -83,9 +82,10 @@ int main()
     HkContainerPtr container1 = std::make_shared<HkContainer>("Cont1");
     HkContainerPtr container2 = std::make_shared<HkContainer>("Cont2");
     HkButtonPtr button1 = std::make_shared<HkButton>("Button1");
+    HkButtonPtr button2 = std::make_shared<HkButton>("Button2");
 
     container1->pushChildren({ container2 });
-    container2->pushChildren({ button1 });
+    container2->pushChildren({ button1, button2 });
 
     container1->printTree();
 

@@ -3,33 +3,21 @@
 #include <string>
 
 #include "../management/HkSceneManagement.hpp"
-#include "../renderer/HkRenderer.hpp"
 #include "../base/HkNode.hpp"
 
 namespace hkui
 {
 
-//TODO: maybe rename HkNode => HkTreeNode
-class HkContainer : public HkNode, public HkRenderableNode // TODO: Eliminate duble inh
+class HkContainer : public HkNode
 {
 public:
     HkContainer(const std::string& name)
-        : HkNode(name, "Container")
-        , HkRenderableNode("assets/shaders/v1.glsl", "assets/shaders/f1.glsl")
+        : HkNode(name, "Container", "assets/shaders/v1.glsl", "assets/shaders/f1.glsl")
         , scenDataRef(HkSceneManagement::get().sceneData)
     {
-        HkRenderableNode::shader.setVec3f("color", glm::vec3(0.0f, 1.0f, 0.0f)); // GREEN
-        HkRenderableNode::render();
+        renderContext.shader.setVec3f("color", glm::vec3(0.0f, 1.0f, 0.0f)); // GREEN
+        renderContext.render();
     }
-
-    /*
-        HKContainer : public HKRenderableNode => rendering stuff, shaders, pos
-        HKRenderableNode : public HkNode => tree data, relationships
-
-        void updateMySelf() override
-        {
-        }
-    */
 
     //HkNode
     void updateMySelf() override
@@ -44,7 +32,7 @@ public:
         case HkEvent::MouseClick:
             if (!scenDataRef.isMouseClicked)
             {
-                HkRenderableNode::setPos({ scenDataRef.mousePosX, scenDataRef.mousePosY });
+                renderContext.setPos({ scenDataRef.mousePosX, scenDataRef.mousePosY });
             }
             break;
         case HkEvent::MouseEnterExit:
@@ -52,7 +40,7 @@ public:
         case HkEvent::DropPath:
             break;
         }
-        HkRenderableNode::render();
+        renderContext.render();
         updateChildren();
     }
 
@@ -74,16 +62,15 @@ private:
 };
 
 
-class HkButton : public HkNode, public HkRenderableNode
+class HkButton : public HkNode
 {
 public:
     HkButton(const std::string& name)
-        : HkNode(name, "Button")
-        , HkRenderableNode("assets/shaders/v1.glsl", "assets/shaders/f1.glsl")
+        : HkNode(name, "Button", "assets/shaders/v1.glsl", "assets/shaders/f1.glsl")
         , scenDataRef(HkSceneManagement::get().sceneData)
     {
-        HkRenderableNode::shader.setVec3f("color", glm::vec3(1.0f, 0.0f, 0.0f)); // RED
-        HkRenderableNode::render();
+        renderContext.shader.setVec3f("color", glm::vec3(1.0f, 0.0f, 0.0f)); // RED
+        renderContext.render();
     }
 
     //HkNode
@@ -96,11 +83,16 @@ public:
         case HkEvent::GeneralUpdate: break;
         case HkEvent::WindowResize:
         case HkEvent::MouseMove:
-
+            break;
         case HkEvent::MouseClick:
             if (!scenDataRef.isMouseClicked)
             {
-                HkRenderableNode::setPos({ scenDataRef.mousePosX, scenDataRef.mousePosY });
+                const auto p = getParent().lock();
+                if (p)
+                {
+                    std::cout << "My parent as a " << this << " is " << p << '\n';
+                }
+                // renderContext.setPos({ scenDataRef.mousePosX, scenDataRef.mousePosY });
             }
             break;
         case HkEvent::MouseEnterExit:
@@ -109,7 +101,7 @@ public:
             break;
         }
         /*Don't forget to only show node*/
-        HkRenderableNode::render();
+        renderContext.render();
     }
 private:
     HkSceneData& scenDataRef; /* This is safe as singleton will outlive THIS class anyway*/

@@ -33,10 +33,11 @@ struct HkTransform
     glm::vec2 pos, scale, rot;
 };
 
-class HkRenderableNode
+class HkRenderContext
 {
 public:
-    HkRenderableNode(const std::string& vertPath, const std::string& fragPath)
+    HkRenderContext() = delete;
+    HkRenderContext(const std::string& vertPath, const std::string& fragPath)
         : shader(vertPath, fragPath), renderArch(rectangleArch)
     {
         //TODO: Refactor
@@ -93,7 +94,7 @@ public:
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     }
 
-    virtual ~HkRenderableNode() = default;
+    virtual ~HkRenderContext() = default;
 
     HkShader shader;
     HkTransform transform;

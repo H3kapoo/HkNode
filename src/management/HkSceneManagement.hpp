@@ -1,7 +1,7 @@
 #pragma once
-#include <GLFW/glfw3.h>
 
-#include "../base/HkNode.hpp"
+#include "../base/HkNode.hpp" /* Yes, order is correct due to glew/glfw3 import order */
+#include <GLFW/glfw3.h>
 
 namespace hkui
 {
