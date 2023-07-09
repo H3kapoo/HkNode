@@ -42,7 +42,8 @@ public:
         //TODO: Refactor
         transform.scale = { 100, 100 };
         transform.pos = { 100, 100 };
-        projMat = glm::ortho(0.0f, 800.0f, 600.0f, 0.0f, 0.0f, 100.0f);
+        // projMat = glm::ortho(0.0f, 800.0f, 600.0f, 0.0f, 0.0f, 100.0f);
+        projMat = glm::ortho(0.0f, 1920.0f, 1080.0f, 0.0f, 0.0f, 100.0f);
         computeModelMatrix();
 
         unsigned int VBO, EBO;
@@ -85,6 +86,7 @@ public:
     void render()
     {
         shader.bind();
+        // shader.setVec3f("color", glm::vec3(0.5f, 0.5f, 0.4f));
         shader.setMatrix4("proj", projMat);
         shader.setMatrix4("model", modelMat);
         glBindVertexArray(vaoId);

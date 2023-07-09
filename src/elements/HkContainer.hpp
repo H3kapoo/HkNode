@@ -17,6 +17,9 @@ public:
         : HkNode(name, "Container")
         , HkRenderableNode("assets/shaders/v1.glsl", "assets/shaders/f1.glsl")
     {
+        // shader.setVec3f("color", glm::vec3(0.1f, 0.1f, 0.4f));
+        shader.setVec3f("color", glm::vec3(0.0f, 1.0f, 0.0f)); // GREEN
+
         HkRenderableNode::render();
     }
 
@@ -29,8 +32,7 @@ public:
         case HkEvent::None:
         case HkEvent::GeneralUpdate: break;
         case HkEvent::WindowResize:
-        case HkEvent::MouseMove:
-            // break;
+        case HkEvent::MouseMove: break;
         case HkEvent::MouseClick:
             if (!HkSceneManagement::sceneData.isMouseClicked)
             {
@@ -70,41 +72,36 @@ public:
         : HkNode(name, "Button")
         , HkRenderableNode("assets/shaders/v1.glsl", "assets/shaders/f1.glsl")
     {
-        HkNodeRenderer::renderNode(this);
+        shader.setVec3f("color", glm::vec3(1.0f, 0.0f, 0.0f)); // RED
+
+        HkRenderableNode::render();
     }
 
     //HkNode
     void updateMySelf() override
     {
+        /*main HkEvents handler*/
         switch (HkSceneManagement::sceneData.currentEvent)
         {
         case HkEvent::None:
-            std::cout << this << " none evt\n";
-            break;
-        case HkEvent::GeneralUpdate:
-            std::cout << this << " gen update\n";
-            break;
+        case HkEvent::GeneralUpdate: break;
         case HkEvent::WindowResize:
-            std::cout << this << " win resize\n";
-            break;
         case HkEvent::MouseMove:
-            std::cout << this << " mouse move\n";
-            break;
+
         case HkEvent::MouseClick:
-            if (HkSceneManagement::sceneData.isMouseClicked)
-                std::cout << this << " mouse clicked\n";
+            if (!HkSceneManagement::sceneData.isMouseClicked)
+            {
+                // std::cout << "mouse released at: " <<
+                    // HkSceneManagement::sceneData.mousePosX << " " << HkSceneManagement::sceneData.mousePosY << '\n';
+                HkRenderableNode::setPos({ HkSceneManagement::sceneData.mousePosX, HkSceneManagement::sceneData.mousePosY });
+            }
             break;
         case HkEvent::MouseEnterExit:
-            std::cout << this << " mouse enter/exit\n";
-            break;
         case HkEvent::MouseScroll:
-            std::cout << this << " mouse scroll\n";
-            break;
         case HkEvent::DropPath:
-            std::cout << this << " drop path\n";
             break;
         }
-        HkNodeRenderer::renderNode(this);
+        HkRenderableNode::render();
     }
 };
 
