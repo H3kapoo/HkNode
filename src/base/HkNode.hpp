@@ -11,6 +11,7 @@
 #include <optional>
 
 #include "../renderer/HkRenderContext.hpp"
+#include "../renderer/HkTransformContext.hpp"
 
 #define GET(typ, n, x) typ get##n() { return x;}
 
@@ -19,8 +20,7 @@ namespace hkui
 class HkNode : public std::enable_shared_from_this<HkNode>
 {
 public:
-    HkNode(const std::string& name, const std::string& type,
-        const std::string& vertPath, const std::string& fragPath);
+    HkNode(const std::string& name, const std::string& type);
     static void reParent(const std::vector<std::shared_ptr<HkNode>>& nodes, const std::shared_ptr<HkNode> newParent);
     virtual ~HkNode() = default;
     virtual void updateMySelf() = 0;
@@ -58,8 +58,9 @@ private:
     std::weak_ptr<HkNode> parent;
     std::vector<std::shared_ptr<HkNode>> children;
 
-protected:
+public:
     HkRenderContext renderContext;
+    HkTransformContext transformContext;
 };
 
 using HkNodePtr = std::shared_ptr<HkNode>;

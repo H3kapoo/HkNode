@@ -2,9 +2,8 @@
 
 namespace hkui
 {
-HkNode::HkNode(const std::string& name, const std::string& type,
-    const std::string& vertPath, const std::string& fragPath)
-    : name{ name }, type{ type }, id{ genId() }, renderContext(vertPath, fragPath) {}
+HkNode::HkNode(const std::string& name, const std::string& type)
+    : name{ name }, type{ type }, id{ genId() } {}
 
 /**
  * Desc: Reparents list of nodes to new parent. All ties to old parents will be

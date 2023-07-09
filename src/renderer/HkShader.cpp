@@ -4,6 +4,11 @@ namespace hkui
 {
 HkShader::HkShader(const std::string& vertPath, const std::string& fragPath)
 {
+    setShaderSource(vertPath, fragPath);
+}
+
+void HkShader::setShaderSource(const std::string& vertPath, const std::string& fragPath)
+{
     linkShaders(compileShader(vertPath, GL_VERTEX_SHADER),
         compileShader(fragPath, GL_FRAGMENT_SHADER));
 }

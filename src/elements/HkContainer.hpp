@@ -12,11 +12,12 @@ class HkContainer : public HkNode
 {
 public:
     HkContainer(const std::string& name)
-        : HkNode(name, "Container", "assets/shaders/v1.glsl", "assets/shaders/f1.glsl")
+        : HkNode(name, "Container")
         , scenDataRef(HkSceneManagement::get().sceneData)
     {
+        renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
         renderContext.shader.setVec3f("color", glm::vec3(0.0f, 1.0f, 0.0f)); // GREEN
-        renderContext.render();
+        renderContext.render(transformContext.getModelMatrix());
     }
 
     //HkNode
@@ -32,7 +33,7 @@ public:
         case HkEvent::MouseClick:
             if (!scenDataRef.isMouseClicked)
             {
-                renderContext.setPos({ scenDataRef.mousePosX, scenDataRef.mousePosY });
+                // renderContext.setPos({ scenDataRef.mousePosX, scenDataRef.mousePosY });
             }
             break;
         case HkEvent::MouseEnterExit:
@@ -40,7 +41,7 @@ public:
         case HkEvent::DropPath:
             break;
         }
-        renderContext.render();
+        renderContext.render(transformContext.getModelMatrix());
         updateChildren();
     }
 
@@ -66,11 +67,12 @@ class HkButton : public HkNode
 {
 public:
     HkButton(const std::string& name)
-        : HkNode(name, "Button", "assets/shaders/v1.glsl", "assets/shaders/f1.glsl")
+        : HkNode(name, "Button")
         , scenDataRef(HkSceneManagement::get().sceneData)
     {
+        renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
         renderContext.shader.setVec3f("color", glm::vec3(1.0f, 0.0f, 0.0f)); // RED
-        renderContext.render();
+        renderContext.render(transformContext.getModelMatrix());
     }
 
     //HkNode
@@ -87,12 +89,12 @@ public:
         case HkEvent::MouseClick:
             if (!scenDataRef.isMouseClicked)
             {
-                const auto p = getParent().lock();
+                const auto p = getParent().lock(); // this could be cached if used a lot
                 if (p)
                 {
                     std::cout << "My parent as a " << this << " is " << p << '\n';
+                    p->transformContext.setPos({ scenDataRef.mousePosX, scenDataRef.mousePosY });
                 }
-                // renderContext.setPos({ scenDataRef.mousePosX, scenDataRef.mousePosY });
             }
             break;
         case HkEvent::MouseEnterExit:
@@ -101,7 +103,7 @@ public:
             break;
         }
         /*Don't forget to only show node*/
-        renderContext.render();
+        renderContext.render(transformContext.getModelMatrix());
     }
 private:
     HkSceneData& scenDataRef; /* This is safe as singleton will outlive THIS class anyway*/

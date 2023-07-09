@@ -16,6 +16,7 @@ class HkShader
 {
 public:
     HkShader(const std::string& vertPath, const std::string& fragPath);
+    void setShaderSource(const std::string& vertPath, const std::string& fragPath);
     void setInt(const char* location, int value);
     void setVec3f(const char* location, glm::vec3 value);
     void setMatrix4(const char* location, const glm::mat4 transform);

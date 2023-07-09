@@ -28,25 +28,15 @@ const HkRenderArch rectangleArch = {
         1, 2, 3}
 };
 
-struct HkTransform
-{
-    glm::vec2 pos, scale, rot;
-};
-
 class HkRenderContext
 {
 public:
-    HkRenderContext() = delete;
-    HkRenderContext(const std::string& vertPath, const std::string& fragPath)
-        : shader(vertPath, fragPath), renderArch(rectangleArch)
-    {
-        //TODO: Refactor
-        transform.scale = { 100, 100 };
-        transform.pos = { 100, 100 };
-        // projMat = glm::ortho(0.0f, 800.0f, 600.0f, 0.0f, 0.0f, 100.0f);
-        projMat = glm::ortho(0.0f, 1920.0f, 1080.0f, 0.0f, 0.0f, 100.0f);
-        computeModelMatrix();
+    HkRenderContext()
+        : renderArch(rectangleArch)
+        , shader("assets/shaders/v1.glsl", "assets/shaders/f1.glsl") {}
 
+    void setupArch()
+    {
         unsigned int VBO, EBO;
         glGenVertexArrays(1, &vaoId);
         glGenBuffers(1, &VBO);
@@ -65,42 +55,32 @@ public:
         glEnableVertexAttribArray(0);
     }
 
-    void addPos(const glm::vec2& pos)
+    void setShaderSource(const std::string& vertSource, const std::string& fragSource)
     {
-        transform.pos += pos;
-        computeModelMatrix();
-    }
-    void setPos(const glm::vec2& pos)
-    {
-        transform.pos = pos;
-        computeModelMatrix();
-    }
-    void computeModelMatrix() {
-        modelMat = glm::mat4(1.0f);
-        modelMat = glm::translate(modelMat, glm::vec3(transform.pos, -1.0f)); // it goes negative, expected
-        // modelMat = glm::translate(modelMat, glm::vec3(pivotPoint_, 0));
-        // modelMat = glm::rotate(modelMat, glm::radians(glm::degrees(rot_)), glm::vec3(0, 0, 1));
-        modelMat = glm::scale(modelMat, glm::vec3(transform.scale, 1.0f));
-        // modelMat = glm::translate(modelMat, glm::vec3(-pivotPoint_, 0));
+        //TODO: Refactor
+        // transform.scale = { 100, 100 };
+        // transform.pos = { 100, 100 };
+        // projMat = glm::ortho(0.0f, 800.0f, 600.0f, 0.0f, 0.0f, 100.0f);
+        // shader("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
+        projMat = glm::ortho(0.0f, 1920.0f, 1080.0f, 0.0f, 0.0f, 100.0f);
+        shader.setShaderSource(vertSource, fragSource);
+        // computeModelMatrix();
+        setupArch();
     }
 
-    void render()
+    void render(const glm::mat4& modelMat)
     {
         shader.bind();
-        // shader.setVec3f("color", glm::vec3(0.5f, 0.5f, 0.4f));
         shader.setMatrix4("proj", projMat);
         shader.setMatrix4("model", modelMat);
         glBindVertexArray(vaoId);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     }
 
-    virtual ~HkRenderContext() = default;
-
-    HkShader shader;
-    HkTransform transform;
     HkRenderArch renderArch;
+    HkShader shader;
     uint32_t vaoId;
-    glm::mat4 modelMat, projMat;
+    glm::mat4 projMat;
     // shader
     // Texture
     // Pos
