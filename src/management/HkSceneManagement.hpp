@@ -3,6 +3,10 @@
 #include "../base/HkNode.hpp" /* Yes, order is correct due to glew/glfw3 import order */
 #include <GLFW/glfw3.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 namespace hkui
 {
 
@@ -41,13 +45,14 @@ struct HkSceneData
     bool receivedDrop;
     int dropCount;
     const char** droppedPaths;
+
+    int maybeSelectedNodeId{ -1 };
+
+    glm::mat4 sceneProjMatrix;
 };
 
 class HkSceneManagement
 {
-    /* Needs to be friend for it to access private sceneData */
-    friend class HkButton;
-    friend class HkContainer;
 
 public:
     HkSceneManagement(const HkSceneManagement&) = delete;
@@ -60,10 +65,13 @@ public:
         return instance;
     }
 
+    HkSceneData& getSceneDataRef() { return sceneData; }
+
     void init(int wWidth, int wHeight)
     {
         sceneData.windowWidth = wWidth;
         sceneData.windowHeight = wHeight;
+        sceneData.sceneProjMatrix = glm::ortho(0.0f, (float)wWidth, (float)wHeight, 0.0f, 0.0f, 100.0f);
     }
 
     void setRoot(HkNodeCPtr& newRootNode)
@@ -83,6 +91,9 @@ public:
     {
         sceneData.windowWidth = width;
         sceneData.windowHeight = height;
+        sceneData.sceneProjMatrix = glm::ortho(0.0f, (float)width, (float)height, 0.0f, 0.0f, 100.0f);
+        glViewport(0, 0, width, height);
+
         update(HkEvent::WindowResize);
     }
 
@@ -121,6 +132,11 @@ public:
             sceneData.clickedHkMouseButton = HkMouseButton::None;
         }
         update(HkEvent::MouseClick);
+
+        // maybemaybeSelectedNodeId;
+
+        if (!sceneData.isMouseClicked)
+            std::cout << "Selected id is: " << sceneData.maybeSelectedNodeId << '\n';
     }
 
     void mouseEnterEvent(GLFWwindow*, int entered)

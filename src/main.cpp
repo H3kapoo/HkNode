@@ -69,9 +69,9 @@ int main()
     glfwSetFramebufferSizeCallback(window, resizeCallback);
     glfwSetCursorPosCallback(window, mouseMoveCallback);
     glfwSetMouseButtonCallback(window, mouseClickCallback);
-    // glfwSetCursorEnterCallback(window, mouseEnterCallback);
-    // glfwSetScrollCallback(window, mouseScrollCallback);
-    // glfwSetDropCallback(window, dropCallback);
+    glfwSetCursorEnterCallback(window, mouseEnterCallback);
+    glfwSetScrollCallback(window, mouseScrollCallback);
+    glfwSetDropCallback(window, dropCallback);
 
     if (glewInit() != GLEW_OK)
     {
@@ -84,13 +84,17 @@ int main()
     HkButtonPtr button1 = std::make_shared<HkButton>("Button1");
     HkButtonPtr button2 = std::make_shared<HkButton>("Button2");
 
-    container1->pushChildren({ container2 });
-    container2->pushChildren({ button1, button2 });
+    container1->pushChildren({ button1 });
+    // container2->pushChildren({ button1 });
 
     container1->printTree();
 
+    container1->setPos({ 600, 400 });
+    button1->setSize({ 200, 50 });
+    container1->setSize({ 250, 150 });
+
     HkSceneManagement::get().setRoot(container1);
-    HkSceneManagement::get().init(800, 600);
+    HkSceneManagement::get().init(1920, 1080);
 
     double previousTime = glfwGetTime();
     int frameCount = 0;

@@ -35,6 +35,28 @@ public:
         : renderArch(rectangleArch)
         , shader("assets/shaders/v1.glsl", "assets/shaders/f1.glsl") {}
 
+    void setShaderSource(const std::string& vertSource, const std::string& fragSource)
+    {
+        // projMat = glm::ortho(0.0f, 1920.0f, 1080.0f, 0.0f, 0.0f, 100.0f);
+        shader.setShaderSource(vertSource, fragSource);
+        setupArch();
+    }
+
+    // void setRenderSize(int newWidth, int newHeight)
+    // {
+    //     // TODO: THis should be updated only once per window resize, not once her ELEMENT
+    //     // Later edit:
+    // }
+
+    void render(const glm::mat4& projMat, const glm::mat4& modelMat)
+    {
+        shader.bind();
+        shader.setMatrix4("proj", projMat);
+        shader.setMatrix4("model", modelMat);
+        glBindVertexArray(vaoId);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    }
+
     void setupArch()
     {
         unsigned int VBO, EBO;
@@ -55,32 +77,13 @@ public:
         glEnableVertexAttribArray(0);
     }
 
-    void setShaderSource(const std::string& vertSource, const std::string& fragSource)
-    {
-        //TODO: Refactor
-        // transform.scale = { 100, 100 };
-        // transform.pos = { 100, 100 };
-        // projMat = glm::ortho(0.0f, 800.0f, 600.0f, 0.0f, 0.0f, 100.0f);
-        // shader("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
-        projMat = glm::ortho(0.0f, 1920.0f, 1080.0f, 0.0f, 0.0f, 100.0f);
-        shader.setShaderSource(vertSource, fragSource);
-        // computeModelMatrix();
-        setupArch();
-    }
 
-    void render(const glm::mat4& modelMat)
-    {
-        shader.bind();
-        shader.setMatrix4("proj", projMat);
-        shader.setMatrix4("model", modelMat);
-        glBindVertexArray(vaoId);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    }
-
+private:
     HkRenderArch renderArch;
-    HkShader shader;
     uint32_t vaoId;
-    glm::mat4 projMat;
+    // glm::mat4 projMat;
+public:
+    HkShader shader;
     // shader
     // Texture
     // Pos

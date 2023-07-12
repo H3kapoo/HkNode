@@ -13,35 +13,59 @@ class HkContainer : public HkNode
 public:
     HkContainer(const std::string& name)
         : HkNode(name, "Container")
-        , scenDataRef(HkSceneManagement::get().sceneData)
+        , sceneDataRef(HkSceneManagement::get().getSceneDataRef())
     {
+        transformContext.setOffsetFromParent({ 0,0 });
         renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
         renderContext.shader.setVec3f("color", glm::vec3(0.0f, 1.0f, 0.0f)); // GREEN
-        renderContext.render(transformContext.getModelMatrix());
+        renderContext.render(sceneDataRef.sceneProjMatrix, transformContext.getModelMatrix());
     }
+    glm::vec2 diff{ 0,0 };
 
     //HkNode
     void updateMySelf() override
     {
         /*main HkEvents handler*/
-        switch (scenDataRef.currentEvent)
+        switch (sceneDataRef.currentEvent)
         {
-        case HkEvent::None:
+        case HkEvent::None: break;
         case HkEvent::GeneralUpdate: break;
         case HkEvent::WindowResize:
-        case HkEvent::MouseMove: break;
-        case HkEvent::MouseClick:
-            if (!scenDataRef.isMouseClicked)
+            if (transformContext.getPos().x > sceneDataRef.windowWidth)
             {
-                // renderContext.setPos({ scenDataRef.mousePosX, scenDataRef.mousePosY });
+                transformContext.setPos({ sceneDataRef.windowWidth, transformContext.getPos().y });
             }
             break;
-        case HkEvent::MouseEnterExit:
-        case HkEvent::MouseScroll:
-        case HkEvent::DropPath:
+        case HkEvent::MouseMove:
+            if (sceneDataRef.maybeSelectedNodeId == getId() && diff == glm::vec2{ 0, 0 })
+            {
+                diff = transformContext.getPos() - glm::vec2{ sceneDataRef.mousePosX, sceneDataRef.mousePosY };
+                std::cout << "calculating " << diff.x << " " << diff.y << '\n';
+            }
+
+            if (sceneDataRef.isMouseClicked && sceneDataRef.maybeSelectedNodeId == getId())
+            {
+                transformContext.setPos(glm::vec2{ sceneDataRef.mousePosX, sceneDataRef.mousePosY } + diff);
+            }
             break;
+        case HkEvent::MouseClick:
+            if (!sceneDataRef.isMouseClicked)
+            {
+                diff = { 0,0 };
+            }
+
+            if (!sceneDataRef.isMouseClicked
+                && transformContext.isPosInsideOfNode({ sceneDataRef.mousePosX, sceneDataRef.mousePosY }))
+            {
+                sceneDataRef.maybeSelectedNodeId = getId();
+            }
+            break;
+        case HkEvent::MouseEnterExit: break;
+        case HkEvent::MouseScroll: break;
+        case HkEvent::DropPath: break;
         }
-        renderContext.render(transformContext.getModelMatrix());
+        /*Don't forget to show node*/
+        renderContext.render(sceneDataRef.sceneProjMatrix, transformContext.getModelMatrix());
         updateChildren();
     }
 
@@ -58,8 +82,12 @@ public:
 
     void printTree() { HkNode::printTree(); }
 
+    void setPos(const glm::vec2& pos) { transformContext.setPos(pos); }
+
+    void setSize(const glm::vec2& size) { transformContext.setScale(size); }
+
 private:
-    HkSceneData& scenDataRef; /* This is safe as singleton will outlive THIS class anyway*/
+    HkSceneData& sceneDataRef; /* This is safe as singleton will outlive THIS class anyway*/
 };
 
 
@@ -68,45 +96,68 @@ class HkButton : public HkNode
 public:
     HkButton(const std::string& name)
         : HkNode(name, "Button")
-        , scenDataRef(HkSceneManagement::get().sceneData)
+        , sceneDataRef(HkSceneManagement::get().getSceneDataRef())
     {
+        if (const auto& p = getParent().lock())
+        {
+            transformContext.setPos(p->transformContext.getPos());
+        }
+
+        transformContext.setOffsetFromParent({ 0,-30 });
         renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
         renderContext.shader.setVec3f("color", glm::vec3(1.0f, 0.0f, 0.0f)); // RED
-        renderContext.render(transformContext.getModelMatrix());
+        renderContext.render(sceneDataRef.sceneProjMatrix, transformContext.getModelMatrix());
     }
 
     //HkNode
     void updateMySelf() override
     {
-        /*main HkEvents handler*/
-        switch (scenDataRef.currentEvent)
+        /*I need to reposition myself based on my parent*/
+        if (const auto& p = getParent().lock())
         {
-        case HkEvent::None:
+            transformContext.setPos(p->transformContext.getPos());
+            transformContext.setOffsetFromParent({ 0,-30 });
+        }
+
+        /*main HkEvents handler*/
+        switch (sceneDataRef.currentEvent)
+        {
+        case HkEvent::None: break;
         case HkEvent::GeneralUpdate: break;
-        case HkEvent::WindowResize:
+        case HkEvent::WindowResize: break;
         case HkEvent::MouseMove:
             break;
         case HkEvent::MouseClick:
-            if (!scenDataRef.isMouseClicked)
+            if (!sceneDataRef.isMouseClicked
+                && transformContext.isPosInsideOfNode({ sceneDataRef.mousePosX, sceneDataRef.mousePosY }))
             {
-                const auto p = getParent().lock(); // this could be cached if used a lot
-                if (p)
-                {
-                    std::cout << "My parent as a " << this << " is " << p << '\n';
-                    p->transformContext.setPos({ scenDataRef.mousePosX, scenDataRef.mousePosY });
-                }
+                sceneDataRef.maybeSelectedNodeId = getId();
             }
+
+            // if (!sceneDataRef.isMouseClicked)
+            // {
+            //     const auto p = getParent().lock(); // this could be cached if used a lot
+            //     if (p)
+            //     {
+            //         // std::cout << "My parent as a " << this << " is " << p << '\n';
+            //         p->transformContext.setPos({ sceneDataRef.mousePosX, sceneDataRef.mousePosY });
+            //     }
+            // }
             break;
-        case HkEvent::MouseEnterExit:
-        case HkEvent::MouseScroll:
-        case HkEvent::DropPath:
-            break;
+        case HkEvent::MouseEnterExit: break;
+        case HkEvent::MouseScroll: break;
+        case HkEvent::DropPath: break;
         }
-        /*Don't forget to only show node*/
-        renderContext.render(transformContext.getModelMatrix());
+        /*Don't forget to show node*/
+        renderContext.render(sceneDataRef.sceneProjMatrix, transformContext.getModelMatrix());
     }
+
+    void setPos(const glm::vec2& pos) { transformContext.setPos(pos); }
+
+    void setSize(const glm::vec2& size) { transformContext.setScale(size); }
+
 private:
-    HkSceneData& scenDataRef; /* This is safe as singleton will outlive THIS class anyway*/
+    HkSceneData& sceneDataRef; /* This is safe as singleton will outlive THIS class anyway*/
 };
 
 using HkButtonPtr = std::shared_ptr<HkButton>;

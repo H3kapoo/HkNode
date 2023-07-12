@@ -10,7 +10,7 @@ namespace hkui
 class HkTransformContext
 {
 public:
-    HkTransformContext() : pos{ 100,100 }, scale{ 100,100 } { computeModelMatrix(); }
+    HkTransformContext() : pos{ 100,100 }, scale{ 200,100 } { computeModelMatrix(); }
 
     void addPos(const glm::vec2& pos)
     {
@@ -36,7 +36,32 @@ public:
         computeModelMatrix();
     }
 
+    glm::vec2& getPos() { return pos; }
+
     glm::mat4& getModelMatrix() { return modelMat; }
+
+    void setOffsetFromParent(const glm::vec2& offset)
+    {
+        offsetFromParent = offset;
+        pos += offsetFromParent;
+        computeModelMatrix();
+    }
+
+    bool isPosInsideOfNode(const glm::vec2& pin)
+    {
+        // for now we assume that nodes have the pivot point at the center of the shape
+        // so the middle is height/2 middle/2
+        // TODO: optimize
+        float xmin = pos.x - scale.x / 2;
+        float xmax = pos.x + scale.x / 2;
+
+        float ymin = pos.y - scale.y / 2;
+        float ymax = pos.y + scale.y / 2;
+        if (xmin < pin.x && pin.x < xmax && ymin < pin.y && pin.y < ymax)
+            return true;
+        return false;
+    }
+
 private:
     void computeModelMatrix()
     {
@@ -49,6 +74,7 @@ private:
     }
 
     glm::vec2 pos, scale, rot;
+    glm::vec2 offsetFromParent;
     glm::mat4 modelMat;
 };
 } // hkui

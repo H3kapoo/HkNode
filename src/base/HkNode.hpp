@@ -19,6 +19,10 @@ namespace hkui
 {
 class HkNode : public std::enable_shared_from_this<HkNode>
 {
+    /*UI elements need to be friend so that they can access contexts bellow*/
+    friend class HkButton;
+    friend class HkContainer;
+
 public:
     HkNode(const std::string& name, const std::string& type);
     static void reParent(const std::vector<std::shared_ptr<HkNode>>& nodes, const std::shared_ptr<HkNode> newParent);
@@ -58,7 +62,7 @@ private:
     std::weak_ptr<HkNode> parent;
     std::vector<std::shared_ptr<HkNode>> children;
 
-public:
+protected:
     HkRenderContext renderContext;
     HkTransformContext transformContext;
 };
