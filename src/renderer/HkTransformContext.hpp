@@ -43,7 +43,14 @@ public:
     void setOffsetFromParent(const glm::vec2& offset)
     {
         offsetFromParent = offset;
-        pos += offsetFromParent;
+        // pos += offsetFromParent;
+        computeModelMatrix();
+    }
+
+    void addOffsetFromParent(const glm::vec2& offset)
+    {
+        offsetFromParent += offset;
+        // pos += offsetFromParent;
         computeModelMatrix();
     }
 
@@ -52,21 +59,23 @@ public:
         // for now we assume that nodes have the pivot point at the center of the shape
         // so the middle is height/2 middle/2
         // TODO: optimize
-        float xmin = pos.x - scale.x / 2;
-        float xmax = pos.x + scale.x / 2;
+        glm::vec2 workingPos = pos + offsetFromParent;
+        float xmin = workingPos.x - scale.x / 2;
+        float xmax = workingPos.x + scale.x / 2;
 
-        float ymin = pos.y - scale.y / 2;
-        float ymax = pos.y + scale.y / 2;
+        float ymin = workingPos.y - scale.y / 2;
+        float ymax = workingPos.y + scale.y / 2;
         if (xmin < pin.x && pin.x < xmax && ymin < pin.y && pin.y < ymax)
             return true;
         return false;
     }
 
 private:
+    //TODO: It would be better to pivot quad around top-left vertex instead of its center
     void computeModelMatrix()
     {
         modelMat = glm::mat4(1.0f);
-        modelMat = glm::translate(modelMat, glm::vec3(pos, -1.0f)); // it goes negative, expected
+        modelMat = glm::translate(modelMat, glm::vec3(pos + offsetFromParent, -1.0f)); // it goes negative, expected
         // modelMat = glm::translate(modelMat, glm::vec3(pivotPoint_, 0));
         // modelMat = glm::rotate(modelMat, glm::radians(glm::degrees(rot_)), glm::vec3(0, 0, 1));
         modelMat = glm::scale(modelMat, glm::vec3(scale, 1.0f));

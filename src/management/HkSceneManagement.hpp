@@ -15,7 +15,8 @@ enum class HkMouseButton
     None,
     Left,
     Right,
-    Middle
+    Middle,
+    Unknown
 };
 
 enum class HkEvent
@@ -35,10 +36,10 @@ struct HkSceneData
 {
     HkEvent currentEvent;
     int windowWidth, windowHeight;
-    double mousePosX, mousePosY;
-    double lastMousePosX, lastMousePosY;
+    glm::vec2 mousePos;
+    glm::vec2 lastMousePos;
     bool isMouseClicked;
-    HkMouseButton clickedHkMouseButton;
+    HkMouseButton clickedMouseButton;
     bool mouseEntered, mouseExited;
     double scrollPosY;
     double lastScrollPosY;
@@ -46,8 +47,12 @@ struct HkSceneData
     int dropCount;
     const char** droppedPaths;
 
-    int maybeSelectedNodeId{ -1 };
+    /*Selection*/
+    uint32_t maybeSelectedNodeId; /* refers to the currently selected node by means of mouseClick */
+    uint32_t maybeFocusedNodeId; /* refers to the node that was previously selected and its still on focus */
+    glm::vec2 mouseOffsetFromCenter{ 0,0 }; /* offset from center of UI element clicked */
 
+    /*Rendering*/
     glm::mat4 sceneProjMatrix;
 };
 
@@ -69,6 +74,9 @@ public:
 
     void init(int wWidth, int wHeight)
     {
+        sceneData.lastMousePos = sceneData.mousePos = { 0,0 };
+        sceneData.maybeSelectedNodeId = sceneData.maybeFocusedNodeId = NO_SELECTION_ID;
+
         sceneData.windowWidth = wWidth;
         sceneData.windowHeight = wHeight;
         sceneData.sceneProjMatrix = glm::ortho(0.0f, (float)wWidth, (float)wHeight, 0.0f, 0.0f, 100.0f);
@@ -82,8 +90,11 @@ public:
 
     void update(const HkEvent& ev)
     {
+        // std::cout << "Focused node id is: " << sceneData.maybeFocusedNodeId << '\n';
+
         sceneData.currentEvent = ev; // HkEvent gets consumed
         rootNode->updateMySelf();
+        /* Not sure that to do with this for now, maybe it will be useful later */
         sceneData.currentEvent = HkEvent::None; // HkEvent gets consumed
     }
 
@@ -100,55 +111,67 @@ public:
     void mouseMoveEvent(GLFWwindow*, double xPos, double yPos)
     {
         // std::cout << "moved to " << xPos << " " << yPos << "\n";
-        sceneData.lastMousePosX = sceneData.mousePosX;
-        sceneData.lastMousePosY = sceneData.mousePosY;
-        sceneData.mousePosX = xPos;
-        sceneData.mousePosY = yPos;
+        sceneData.lastMousePos = sceneData.mousePos;
+        sceneData.mousePos = { xPos, yPos };
         update(HkEvent::MouseMove);
     }
 
     void mouseClickEvent(GLFWwindow*, int button, int action, int)
     {
-        // std::cout << "mouse click ";// << xpos << " " << ypos << "\n";
         if (action == GLFW_PRESS)
         {
             sceneData.isMouseClicked = true;
             if (button == GLFW_MOUSE_BUTTON_LEFT)
             {
-                sceneData.clickedHkMouseButton = HkMouseButton::Left;
+                sceneData.clickedMouseButton = HkMouseButton::Left;
             }
-            else if (button == GLFW_MOUSE_BUTTON_LEFT)
+            else if (button == GLFW_MOUSE_BUTTON_RIGHT)
             {
-                sceneData.clickedHkMouseButton = HkMouseButton::Left;
+                sceneData.clickedMouseButton = HkMouseButton::Right;
             }
             else if (button == GLFW_MOUSE_BUTTON_MIDDLE)
             {
-                sceneData.clickedHkMouseButton = HkMouseButton::Middle;
+                sceneData.clickedMouseButton = HkMouseButton::Middle;
+            }
+            else
+            {
+                std::cout << "Unhandled mouse button press\n";
+                sceneData.clickedMouseButton = HkMouseButton::Unknown;
             }
         }
         else if (action == GLFW_RELEASE)
         {
             sceneData.isMouseClicked = false;
-            sceneData.clickedHkMouseButton = HkMouseButton::None;
+            sceneData.clickedMouseButton = HkMouseButton::None;
         }
         update(HkEvent::MouseClick);
 
-        // maybemaybeSelectedNodeId;
+        /* As soon as we know who the selected node is, it becomes the focused one*/
+        if (sceneData.isMouseClicked)
+        {
+            sceneData.maybeFocusedNodeId = sceneData.maybeSelectedNodeId;
+            std::cout << "Focused id is: " << sceneData.maybeFocusedNodeId << '\n';
+        }
 
+        /* When the mouse gets released, offset should be cleared because it wouldn't
+           make sense on mouseMovement to use garbage offset from previous selection*/
         if (!sceneData.isMouseClicked)
-            std::cout << "Selected id is: " << sceneData.maybeSelectedNodeId << '\n';
+        {
+            std::cout << "Maybe selected id was: " << sceneData.maybeSelectedNodeId << '\n';
+
+            sceneData.mouseOffsetFromCenter = { 0,0 };
+            sceneData.maybeSelectedNodeId = NO_SELECTION_ID;
+        }
     }
 
     void mouseEnterEvent(GLFWwindow*, int entered)
     {
         entered ? (sceneData.mouseEntered = true) : (sceneData.mouseEntered = false);
-        // std::cout << "mouse entered or exited ";// << xpos << " " << ypos << "\n";
         update(HkEvent::MouseEnterExit);
     }
 
     void mouseScrollEvent(GLFWwindow*, double xOffset, double)
     {
-        // std::cout << "mouse scroll\n";// << xpos << " " << ypos << "\n";
         sceneData.lastScrollPosY = sceneData.scrollPosY;
         sceneData.scrollPosY = xOffset;
         update(HkEvent::MouseScroll);
@@ -156,7 +179,6 @@ public:
 
     void dropEvent(GLFWwindow*, int count, const char** paths)
     {
-        std::cout << "dropped something\n";// << xpos << " " << ypos << "\n";
         sceneData.receivedDrop = true;
         sceneData.dropCount = count;
         sceneData.droppedPaths = paths;
@@ -166,6 +188,7 @@ public:
 private:
     HkSceneManagement() = default;
 
+    const uint32_t NO_SELECTION_ID = 9999; /* Small hack to not get warnings when comparing uint to int */
     HkSceneData sceneData;
     HkNodePtr rootNode;
 };

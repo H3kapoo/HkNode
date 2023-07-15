@@ -82,16 +82,22 @@ int main()
     HkContainerPtr container1 = std::make_shared<HkContainer>("Cont1");
     HkContainerPtr container2 = std::make_shared<HkContainer>("Cont2");
     HkButtonPtr button1 = std::make_shared<HkButton>("Button1");
-    HkButtonPtr button2 = std::make_shared<HkButton>("Button2");
+    // HkButtonPtr button2 = std::make_shared<HkButton>("Button2");
 
-    container1->pushChildren({ button1 });
+    // container1->pushChildren({ button1, container2 });
+    container1->pushChildren({ container2, button1 });
     // container2->pushChildren({ button1 });
 
     container1->printTree();
 
-    container1->setPos({ 600, 400 });
-    button1->setSize({ 200, 50 });
-    container1->setSize({ 250, 150 });
+    container1->setPos({ 800, 600 });
+    container1->setSize({ 800, 600 });
+
+    button1->setSize({ 150, 25 });
+
+    container2->setColor({ 1.0f, 1.0f, 1.0f });
+    container2->setSize({ 150, 25 });
+
 
     HkSceneManagement::get().setRoot(container1);
     HkSceneManagement::get().init(1920, 1080);
