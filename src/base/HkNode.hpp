@@ -20,8 +20,9 @@ namespace hkui
 class HkNode : public std::enable_shared_from_this<HkNode>
 {
     /*UI elements need to be friend so that they can access contexts bellow*/
-    friend class HkButton;
+    friend class HkWindowFrame;
     friend class HkContainer;
+    friend class HkButton;
 
 public:
     HkNode(const std::string& name, const std::string& type);

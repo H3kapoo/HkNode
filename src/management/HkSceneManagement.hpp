@@ -58,7 +58,6 @@ struct HkSceneData
 
 class HkSceneManagement
 {
-
 public:
     HkSceneManagement(const HkSceneManagement&) = delete;
     void operator=(const HkSceneManagement&) = delete;
@@ -157,7 +156,7 @@ public:
            make sense on mouseMovement to use garbage offset from previous selection*/
         if (!sceneData.isMouseClicked)
         {
-            std::cout << "Maybe selected id was: " << sceneData.maybeSelectedNodeId << '\n';
+            std::cout << "Maybe selected id is: " << sceneData.maybeFocusedNodeId << '\n';
 
             sceneData.mouseOffsetFromCenter = { 0,0 };
             sceneData.maybeSelectedNodeId = NO_SELECTION_ID;

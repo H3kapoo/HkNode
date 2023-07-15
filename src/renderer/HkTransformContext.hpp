@@ -10,7 +10,7 @@ namespace hkui
 class HkTransformContext
 {
 public:
-    HkTransformContext() : pos{ 100,100 }, scale{ 200,100 } { computeModelMatrix(); }
+    HkTransformContext() : pos{ 100,100 }, offsetFromParent{ 0,0 }, scale{ 200,100 } { computeModelMatrix(); }
 
     void addPos(const glm::vec2& pos)
     {
@@ -82,8 +82,7 @@ private:
         // modelMat = glm::translate(modelMat, glm::vec3(-pivotPoint_, 0));
     }
 
-    glm::vec2 pos, scale, rot;
-    glm::vec2 offsetFromParent;
+    glm::vec2 pos, offsetFromParent, scale, rot;
     glm::mat4 modelMat;
 };
 } // hkui

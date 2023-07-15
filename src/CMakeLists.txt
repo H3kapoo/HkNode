@@ -10,6 +10,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../debug)
 add_executable(hkNode
     main.cpp
     base/HkNode.cpp
+    elements/HkWindowFrame.cpp
+    elements/HkButton.cpp
+    elements/HkContainer.cpp
     management/HkSceneManagement.cpp
     renderer/HkShader.cpp
     )
