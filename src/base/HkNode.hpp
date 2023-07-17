@@ -3,27 +3,19 @@
 #include <vector>
 #include <algorithm>
 #include <memory>
-#include <queue>
 #include <set>
 #include <string>
+#include <queue>
 #include <iostream>
-#include <utility>
-#include <optional>
 
-#include "../renderer/HkRenderContext.hpp"
-#include "../renderer/HkTransformContext.hpp"
+#include "HkNodeData.hpp"
 
 #define GET(typ, n, x) typ get##n() { return x;}
 
 namespace hkui
 {
-class HkNode : public std::enable_shared_from_this<HkNode>
+class HkNode : public HkNodeData, public std::enable_shared_from_this<HkNode>
 {
-    /*UI elements need to be friend so that they can access contexts bellow*/
-    friend class HkWindowFrame;
-    friend class HkContainer;
-    friend class HkButton;
-
 public:
     HkNode(const std::string& name, const std::string& type);
     static void reParent(const std::vector<std::shared_ptr<HkNode>>& nodes, const std::shared_ptr<HkNode> newParent);
@@ -49,7 +41,6 @@ protected:
     friend std::ostream& operator<<(std::ostream& os, const HkNode& node);
     friend std::ostream& operator<<(std::ostream& os, const HkNode* node);
 
-
 private:
     void printTreeAux(int level) const;
     static uint32_t genId();
@@ -62,10 +53,6 @@ private:
     bool isParented{ false };
     std::weak_ptr<HkNode> parent;
     std::vector<std::shared_ptr<HkNode>> children;
-
-protected:
-    HkRenderContext renderContext;
-    HkTransformContext transformContext;
 };
 
 using HkNodePtr = std::shared_ptr<HkNode>;

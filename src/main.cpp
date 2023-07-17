@@ -48,8 +48,7 @@ void dropCallback(GLFWwindow* window, int count, const char** paths)
 
 int main()
 {
-    // return 0;
-    // opengl stuff
+    int a = 3;
 
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -67,13 +66,13 @@ int main()
     }
 
     glfwMakeContextCurrent(window);
-    // glfwSwapInterval(0); // zero to disable Vsync
-    glfwSetFramebufferSizeCallback(window, resizeCallback);
-    glfwSetCursorPosCallback(window, mouseMoveCallback);
-    glfwSetMouseButtonCallback(window, mouseClickCallback);
-    glfwSetCursorEnterCallback(window, mouseEnterCallback);
-    glfwSetScrollCallback(window, mouseScrollCallback);
-    glfwSetDropCallback(window, dropCallback);
+    // // glfwSwapInterval(0); // zero to disable Vsync
+    // glfwSetFramebufferSizeCallback(window, resizeCallback);
+    // glfwSetCursorPosCallback(window, mouseMoveCallback);
+    // glfwSetMouseButtonCallback(window, mouseClickCallback);
+    // glfwSetCursorEnterCallback(window, mouseEnterCallback);
+    // glfwSetScrollCallback(window, mouseScrollCallback);
+    // glfwSetDropCallback(window, dropCallback);
 
     if (glewInit() != GLEW_OK)
     {
@@ -82,25 +81,25 @@ int main()
     }
 
     HkWindowFramePtr windowFrame = std::make_shared<HkWindowFrame>("WindowFrame");
-    // HkContainerPtr container1 = std::make_shared<HkContainer>("Cont1");
-    HkContainerPtr container2 = std::make_shared<HkContainer>("Cont2");
-    HkButtonPtr button1 = std::make_shared<HkButton>("Button1");
-    // HkButtonPtr button2 = std::make_shared<HkButton>("Button2");
+    // // HkContainerPtr container1 = std::make_shared<HkContainer>("Cont1");
+    // HkContainerPtr container2 = std::make_shared<HkContainer>("Cont2");
+    // HkButtonPtr button1 = std::make_shared<HkButton>("Button1");
+    // // HkButtonPtr button2 = std::make_shared<HkButton>("Button2");
 
-    // container1->pushChildren({ button1, container2 });
-    windowFrame->pushChildren({ container2, button1 });
-    // container2->pushChildren({ button1 });
+    // // container1->pushChildren({ button1, container2 });
+    // windowFrame->pushChildren({ container2, button1 });
+    // // container2->pushChildren({ button1 });
 
     windowFrame->printTree();
 
     windowFrame->setPos({ 800, 600 });
     windowFrame->setSize({ 800, 600 });
 
-    button1->setSize({ 150, 25 });
+    // button1->setSize({ 150, 25 });
 
-    container2->setColor({ 1.0f, 1.0f, 1.0f });
-    container2->setSize({ 150, 25 });
-
+    // container2->setColor({ 1.0f, 1.0f, 1.0f });
+    // container2->setSize({ 150, 25 });
+    // // container2->setSize({ 150, 25 });
 
     HkSceneManagement::get().setRoot(windowFrame);
     HkSceneManagement::get().init(1920, 1080);

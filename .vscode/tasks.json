@@ -1,0 +1,12 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build", // runtime
+            "type": "shell",
+            "command": "echo 'start' && cmake -B debug -GNinja src && cmake --build debug && mv debug/hkNode ${workspaceFolder}/",
+            "group": "build",
+            "problemMatcher": []
+        }
+    ]
+}

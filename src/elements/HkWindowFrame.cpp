@@ -12,6 +12,9 @@ HkWindowFrame::HkWindowFrame(const std::string windowName)
     renderContext.render(sceneDataRef.sceneProjMatrix, transformContext.getModelMatrix());
 }
 
+// IHkRootNode
+void HkWindowFrame::rootUpdateMySelf() { updateMySelf(); }
+
 // HkNode
 void HkWindowFrame::updateMySelf()
 {
@@ -57,7 +60,7 @@ void HkWindowFrame::updateChildren()
         child->updateMySelf();
 }
 
-void HkWindowFrame::pushChildren(const std::vector<std::shared_ptr<HkNode>>& newChildren)
+void HkWindowFrame::pushChildren(const std::vector<HkNodePtr>& newChildren)
 {
     HkNode::pushChildren(newChildren);
 }

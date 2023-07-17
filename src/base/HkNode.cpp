@@ -184,7 +184,7 @@ void HkNode::setParent(const std::shared_ptr<HkNode>& newParent)
 */
 uint32_t HkNode::genId()
 {
-    static uint32_t currentId = 0;
+    static uint32_t currentId = 1; // Start giving IDs from 1
     return currentId++;
 }
 
