@@ -34,6 +34,8 @@ void HkTransformContext::setScale(const glm::vec2& scale)
 
 glm::vec2& HkTransformContext::getPos() { return pos; }
 
+glm::vec2& HkTransformContext::getScale() { return scale; }
+
 glm::mat4& HkTransformContext::getModelMatrix() { return modelMat; }
 
 void HkTransformContext::setOffsetFromParent(const glm::vec2& offset)

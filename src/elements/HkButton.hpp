@@ -22,6 +22,7 @@ private:
     HkSceneData& sceneDataRef; /* This is safe as singleton will outlive THIS class anyway*/
 };
 
+using HkButtonUPtr = std::unique_ptr<HkButton>;
 using HkButtonPtr = std::shared_ptr<HkButton>;
 using HkButtonCPtr = const std::shared_ptr<HkButton>;
 

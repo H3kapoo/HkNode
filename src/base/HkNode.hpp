@@ -24,6 +24,10 @@ public:
 
 protected:
     void removeChildren(const std::set<uint32_t>& rmChildrenIds);
+
+    /*Currently we can push only shared ptrs of HkNode, so pushing a list of HkNode& would not work
+      if we didnt want to create heap allocated nodes
+      TODO: maybe handle also pushing stack allocated nodes */
     void pushChildren(const std::vector<std::shared_ptr<HkNode>>& newChildren);
     void printChildren() const;
     void printBfs() const;

@@ -11,7 +11,6 @@ HkButton::HkButton(const std::string& name)
         transformContext.setPos(p->transformContext.getPos());
     }
 
-
     transformContext.setOffsetFromParent({ 0,-30 });
     renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
     renderContext.shader.setVec3f("color", glm::vec3(1.0f, 0.0f, 0.0f)); // RED

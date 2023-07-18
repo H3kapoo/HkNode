@@ -6,10 +6,20 @@ namespace hkui
 HkWindowFrame::HkWindowFrame(const std::string windowName)
     : HkNode(windowName, "RootFrame")
     , sceneDataRef(HkSceneManagement::get().getSceneDataRef())
+    , controlFrame(std::make_shared<HkContainer>("WindowFrame_ControlFrame"))
+    , exitBtnNode(std::make_shared<HkButton>("ControlFrame_ExitBtn"))
 {
     renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
-    renderContext.shader.setVec3f("color", glm::vec3(0.0f, 0.0f, 1.0f)); // BLUE
+    renderContext.shader.setVec3f("color", glm::vec3(0.0f, 0.5f, 0.5f)); // BLUEish
     renderContext.render(sceneDataRef.sceneProjMatrix, transformContext.getModelMatrix());
+
+    // controlFrame->pushChildren({ exitBtnNode });
+    if (controlFrame)
+    {
+        std::cout << "exists\n";
+    }
+    // pushChildren({ controlFrame });
+
 }
 
 // IHkRootNode
@@ -32,6 +42,7 @@ void HkWindowFrame::updateMySelf()
         }
         break;
     case HkEvent::MouseClick:
+
         /*
         If mouse is clicked (currently any) and inside UI element bounds, safe to assume this is a
         candidate to be the currently selected node, although it's not guaranteed to be this one. The selected node
@@ -52,6 +63,22 @@ void HkWindowFrame::updateMySelf()
     /*Don't forget to show node & update children*/
     renderContext.render(sceneDataRef.sceneProjMatrix, transformContext.getModelMatrix());
     updateChildren();
+    /*Render additional things AFTER children so that additional things appear on top of children*/
+    renderAdditionalSelfElements();
+}
+
+void HkWindowFrame::renderAdditionalSelfElements()
+{
+    /*TODO: Possible optimization would be to only to this Set on demand*/
+    controlFrame->transformContext.setScale({ transformContext.getScale().x, 30 });
+    controlFrame->transformContext.setPos(
+        {
+            transformContext.getPos().x,
+            transformContext.getPos().y - transformContext.getScale().y / 2 + 15
+        });
+
+    controlFrame->updateMySelf();
+    // controlFrame->printTree();
 }
 
 void HkWindowFrame::updateChildren()

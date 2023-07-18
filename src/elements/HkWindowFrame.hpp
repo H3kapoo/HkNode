@@ -7,6 +7,9 @@
 #include "../management/HkSceneManagement.hpp"
 #include "../base/HkNode.hpp"
 
+#include "HkContainer.hpp"
+#include "HkButton.hpp"
+
 namespace hkui
 {
 /* This shall serve as the root of the scene manager, it has no parent and can only host children.*/
@@ -23,6 +26,7 @@ public:
     void updateMySelf() override;
 
     void updateChildren();
+    void renderAdditionalSelfElements();
     void pushChildren(const std::vector<HkNodePtr>& newChildren);
 
     void printTree();
@@ -32,6 +36,11 @@ public:
 
 private:
     HkSceneData& sceneDataRef; /* This is safe as singleton will outlive THIS class anyway*/
+
+    /* Elements that compose the "tab view" of the window frame*/
+    HkContainerPtr controlFrame; /*TODO: investigate why this crashes with bad_weak_ptr
+                                 if made unique_ptr (shared_from_this might have to do with it)*/
+    HkButtonPtr exitBtnNode;
 };
 
 using HkWindowFramePtr = std::shared_ptr<HkWindowFrame>;
