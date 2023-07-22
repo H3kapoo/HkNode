@@ -1,26 +1,18 @@
-#include "HkContainer.hpp"
+#include "HkWFTopContainer.hpp"
 
 namespace hkui
 {
-HkContainer::HkContainer(const std::string& name)
-    : HkNode(name, "Container")
+
+HkWFTopContainer::HkWFTopContainer(const std::string& topContainerName)
+    : HkNode(topContainerName, "WindowFrameTopContainer")
     , sceneDataRef(HkSceneManagement::get().getSceneDataRef())
 {
-    /* By default position at center of parent, could be changed by setting constraints.
-       Maybe its safe to assume there's always gonna be a parent since if there's no parent,
-       it's impossible for THIS node to be updated from the main loop */
-    if (const auto& p = getParent().lock())
-    {
-        transformContext.init(p->transformContext.getPos());
-    }
-
     renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
-    renderContext.shader.setVec3f("color", glm::vec3(0.0f, 1.0f, 0.0f)); // GREEN
+    renderContext.shader.setVec3f("color", glm::vec3(0.5f, 0.5f, 0.5f)); // gray
     renderContext.render(sceneDataRef.sceneProjMatrix, transformContext.getModelMatrix());
 }
 
-//HkNode
-void HkContainer::updateMySelf()
+void HkWFTopContainer::updateMySelf()
 {
     /*
     I need to reposition myself based on my parent.
@@ -29,6 +21,8 @@ void HkContainer::updateMySelf()
     The only way to move the children is by offseting them in relation to their parent.
     Note: If this happend to be the selectedNodeId AND it has a parent, because if has a parent
     node will be unable to move on mouse click+drag for exaple because it is constrained to the parent */
+
+    /*Theoretically this shouldnt have any parent*/
     if (const auto& p = getParent().lock())
     {
         transformContext.setPos(p->transformContext.getPos());
@@ -49,16 +43,32 @@ void HkContainer::updateMySelf()
         }
         break;
     case HkEvent::MouseMove:
+        /* Safe to assume that this is what dragging the current element logic looks like */
+        if (sceneDataRef.isMouseClicked && sceneDataRef.maybeFocusedNodeId == getId())
+        {
+            transformContext.setPos(sceneDataRef.mouseOffsetFromCenter + sceneDataRef.mousePos);
+        }
         break;
     case HkEvent::MouseClick:
         /*
         If mouse is clicked (currently any) and inside UI element bounds, safe to assume this is a
         candidate to be the currently selected node, although it's not guaranteed to be this one. The selected node
-        will actually be one of the leaf of the UI tree who hits and validates this check the latest. */
+        will actually be one of the leafs of the UI tree who's hit and validates this check the latest.
+        Offset from mouse position to UI node will also be calculated so on mouse move, object doesn't just
+        rubber band to center of UI node and instead it keeps a natural offset to it. This is used for grabbing.*/
         if (sceneDataRef.isMouseClicked && transformContext.isPosInsideOfNode(sceneDataRef.mousePos))
         {
             sceneDataRef.maybeSelectedNodeId = getId();
+            sceneDataRef.mouseOffsetFromCenter = transformContext.getPos() - sceneDataRef.mousePos;
         }
+        /*
+        If mouse is clicked (currently any) and inside UI element bounds, safe to assume this is a
+        candidate to be the currently selected node, although it's not guaranteed to be this one. The selected node
+        will actually be one of the leaf of the UI tree who hits and validates this check the latest. */
+        // if (sceneDataRef.isMouseClicked && transformContext.isPosInsideOfNode(sceneDataRef.mousePos))
+        // {
+        //     sceneDataRef.maybeSelectedNodeId = getId();
+        // }
         break;
     case HkEvent::MouseEnterExit: break;
     case HkEvent::MouseScroll: break;
@@ -66,26 +76,8 @@ void HkContainer::updateMySelf()
     }
     /*Don't forget to show node*/
     renderContext.render(sceneDataRef.sceneProjMatrix, transformContext.getModelMatrix());
-    updateChildren();
+    // updateChildren();
 }
 
-void HkContainer::updateChildren()
-{
-    for (const auto& child : getChildren())
-        child->updateMySelf();
-}
-
-void HkContainer::pushChildren(const std::vector<std::shared_ptr<HkNode>>& newChildren)
-{
-    HkNode::pushChildren(newChildren);
-}
-
-/* Funcs to be removed when styling context comes */
-void HkContainer::printTree() { HkNode::printTree(); }
-
-void HkContainer::setColor(const glm::vec3& color)
-{
-    renderContext.shader.setVec3f("color", color);
-}
 
 } // hkui

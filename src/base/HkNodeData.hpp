@@ -13,15 +13,15 @@ namespace hkui
 class HkNodeData
 {
 public:
-    /*UI elements need to be friend so that they can access contexts bellow*/
-    friend class HkWindowFrame;
-    friend class HkContainer;
-    friend class HkButton;
-    // friend class HkButton;
+  /*UI elements need to be friend so that they can access contexts bellow*/
+  friend class HkWFTopContainer;
+  friend class HkWindowFrame;
+  friend class HkContainer;
+  friend class HkButton;
 
-    virtual ~HkNodeData() = default;
+  virtual ~HkNodeData() = default;
 private:
-    HkRenderContext renderContext;
-    HkTransformContext transformContext;
+  HkRenderContext renderContext;
+  HkTransformContext transformContext;
 };
 } // hkui

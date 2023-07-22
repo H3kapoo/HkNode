@@ -7,7 +7,7 @@
 #include "../management/HkSceneManagement.hpp"
 #include "../base/HkNode.hpp"
 
-#include "HkContainer.hpp"
+#include "WindowFrameHelpers/HkWFTopContainer.hpp"
 #include "HkButton.hpp"
 
 namespace hkui
@@ -17,7 +17,7 @@ namespace hkui
 class HkWindowFrame : public HkNode, public IHkRootNode
 {
 public:
-    HkWindowFrame(const std::string windowName);
+    HkWindowFrame(const std::string& windowName);
 
     // IHkRootNode
     void rootUpdateMySelf() override;
@@ -38,8 +38,9 @@ private:
     HkSceneData& sceneDataRef; /* This is safe as singleton will outlive THIS class anyway*/
 
     /* Elements that compose the "tab view" of the window frame*/
-    HkContainerPtr controlFrame; /*TODO: investigate why this crashes with bad_weak_ptr
-                                 if made unique_ptr (shared_from_this might have to do with it)*/
+    glm::vec2 diff;
+    bool elementsInitialized;
+    HkWFTopContainerPtr controlTopCont;
     HkButtonPtr exitBtnNode;
 };
 
