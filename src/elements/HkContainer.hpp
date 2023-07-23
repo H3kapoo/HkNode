@@ -13,6 +13,7 @@ class HkContainer : public HkNode
 {
 public:
     HkContainer(const std::string& name);
+
     //HkNode
     void updateMySelf() override;
 

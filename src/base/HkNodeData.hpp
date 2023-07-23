@@ -13,8 +13,7 @@ namespace hkui
 class HkNodeData
 {
 public:
-  /*UI elements need to be friend so that they can access contexts bellow*/
-  friend class HkWFTopContainer;
+  friend class HkWFContainer;
   friend class HkWindowFrame;
   friend class HkContainer;
   friend class HkButton;

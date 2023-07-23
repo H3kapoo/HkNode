@@ -1,9 +1,9 @@
-#include "HkWFTopContainer.hpp"
+#include "HkWFContainer.hpp"
 
 namespace hkui
 {
 
-HkWFTopContainer::HkWFTopContainer(const std::string& topContainerName)
+HkWFContainer::HkWFContainer(const std::string& topContainerName)
     : HkNode(topContainerName, "WindowFrameTopContainer")
     , sceneDataRef(HkSceneManagement::get().getSceneDataRef())
 {
@@ -12,7 +12,7 @@ HkWFTopContainer::HkWFTopContainer(const std::string& topContainerName)
     renderContext.render(sceneDataRef.sceneProjMatrix, transformContext.getModelMatrix());
 }
 
-void HkWFTopContainer::updateMySelf()
+void HkWFContainer::updateMySelf()
 {
     /*
     I need to reposition myself based on my parent.
@@ -43,32 +43,8 @@ void HkWFTopContainer::updateMySelf()
         }
         break;
     case HkEvent::MouseMove:
-        /* Safe to assume that this is what dragging the current element logic looks like */
-        if (sceneDataRef.isMouseClicked && sceneDataRef.maybeFocusedNodeId == getId())
-        {
-            transformContext.setPos(sceneDataRef.mouseOffsetFromCenter + sceneDataRef.mousePos);
-        }
         break;
     case HkEvent::MouseClick:
-        /*
-        If mouse is clicked (currently any) and inside UI element bounds, safe to assume this is a
-        candidate to be the currently selected node, although it's not guaranteed to be this one. The selected node
-        will actually be one of the leafs of the UI tree who's hit and validates this check the latest.
-        Offset from mouse position to UI node will also be calculated so on mouse move, object doesn't just
-        rubber band to center of UI node and instead it keeps a natural offset to it. This is used for grabbing.*/
-        if (sceneDataRef.isMouseClicked && transformContext.isPosInsideOfNode(sceneDataRef.mousePos))
-        {
-            sceneDataRef.maybeSelectedNodeId = getId();
-            sceneDataRef.mouseOffsetFromCenter = transformContext.getPos() - sceneDataRef.mousePos;
-        }
-        /*
-        If mouse is clicked (currently any) and inside UI element bounds, safe to assume this is a
-        candidate to be the currently selected node, although it's not guaranteed to be this one. The selected node
-        will actually be one of the leaf of the UI tree who hits and validates this check the latest. */
-        // if (sceneDataRef.isMouseClicked && transformContext.isPosInsideOfNode(sceneDataRef.mousePos))
-        // {
-        //     sceneDataRef.maybeSelectedNodeId = getId();
-        // }
         break;
     case HkEvent::MouseEnterExit: break;
     case HkEvent::MouseScroll: break;
@@ -77,6 +53,18 @@ void HkWFTopContainer::updateMySelf()
     /*Don't forget to show node*/
     renderContext.render(sceneDataRef.sceneProjMatrix, transformContext.getModelMatrix());
     // updateChildren();
+}
+
+void HkWFContainer::updateChildren()
+{
+    // BIG ERROR: CANNOT ACCESS CHILDREN OF CHILDREN NODES FROM HERE, NEEDS REDESIGN
+    for (const auto& child : getChildren())
+        child->updateMySelf();
+}
+
+void HkWFContainer::pushChildren(const std::vector<HkNodePtr>& newChildren)
+{
+    HkNode::pushChildren(newChildren);
 }
 
 

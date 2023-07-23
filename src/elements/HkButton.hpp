@@ -15,6 +15,7 @@ public:
 
     //HkNode
     void updateMySelf() override;
+
     void setPos(const glm::vec2& pos);
     void setSize(const glm::vec2& size);
 

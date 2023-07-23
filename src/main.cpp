@@ -85,9 +85,10 @@ int main()
     HkButtonPtr button1 = std::make_shared<HkButton>("Button1");
     // HkButtonPtr button2 = std::make_shared<HkButton>("Button2");
 
-    windowFrame->pushChildren({ container2 });
+    // windowFrame->pushChildren({ container2 });
 
     windowFrame->printTree();
+    HkNodePtr windowFrame2 = std::make_shared<HkWindowFrame>("WindowFrame");
 
     windowFrame->setPos({ 800, 600 });
     windowFrame->setSize({ 800, 600 });

@@ -22,8 +22,9 @@ public:
     virtual ~HkNode() = default;
     virtual void updateMySelf() = 0;
 
-protected:
     void removeChildren(const std::set<uint32_t>& rmChildrenIds);
+
+    // virtual void gateKeepPure() = 0;
 
     /*Currently we can push only shared ptrs of HkNode, so pushing a list of HkNode& would not work
       if we didnt want to create heap allocated nodes

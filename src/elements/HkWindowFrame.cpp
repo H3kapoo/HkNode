@@ -7,7 +7,7 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
     : HkNode(windowName, "RootFrame")
     , sceneDataRef(HkSceneManagement::get().getSceneDataRef())
     , elementsInitialized(false)
-    , controlTopCont(std::make_shared<HkWFTopContainer>("WindowFrame_ControlTopCont"))
+    , wfContainer(std::make_shared<HkWFContainer>("WindowFrame_WfContainer"))
     , exitBtnNode(std::make_shared<HkButton>("ControlCont_ExitBtn"))
 {
     renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
@@ -28,20 +28,47 @@ void HkWindowFrame::updateMySelf()
     case HkEvent::GeneralUpdate: break;
     case HkEvent::WindowResize: break;
     case HkEvent::MouseMove:
+        /* Safe to assume that this is what dragging the current element logic looks like */
+        if (sceneDataRef.isMouseClicked && sceneDataRef.maybeFocusedNodeId == getId())
+        {
+            transformContext.setPos(sceneDataRef.mouseOffsetFromCenter + sceneDataRef.mousePos);
+        }
         break;
     case HkEvent::MouseClick:
+        /*
+        If mouse is clicked (currently any) and inside UI element bounds, safe to assume this is a
+        candidate to be the currently selected node, although it's not guaranteed to be this one. The selected node
+        will actually be one of the leafs of the UI tree who's hit and validates this check the latest.
+        Offset from mouse position to UI node will also be calculated so on mouse move, object doesn't just
+        rubber band to center of UI node and instead it keeps a natural offset to it. This is used for grabbing.*/
+        if (sceneDataRef.isMouseClicked && transformContext.isPosInsideOfNode(sceneDataRef.mousePos))
+        {
+            sceneDataRef.maybeSelectedNodeId = getId();
+            sceneDataRef.mouseOffsetFromCenter = transformContext.getPos() - sceneDataRef.mousePos;
+        }
+        /*
+        If mouse is clicked (currently any) and inside UI element bounds, safe to assume this is a
+        candidate to be the currently selected node, although it's not guaranteed to be this one. The selected node
+        will actually be one of the leaf of the UI tree who hits and validates this check the latest. */
+        // if (sceneDataRef.isMouseClicked && transformContext.isPosInsideOfNode(sceneDataRef.mousePos))
+        // {
+        //     sceneDataRef.maybeSelectedNodeId = getId();
+        // }
         break;
     case HkEvent::MouseEnterExit: break;
     case HkEvent::MouseScroll: break;
     case HkEvent::DropPath: break;
     }
 
-    /*Don't forget to show node & update children*/
+    /*Don't forget to show node + additional details & update children*/
     renderContext.render(sceneDataRef.sceneProjMatrix, transformContext.getModelMatrix());
+    renderAdditionalSelfElements();
     updateChildren();
 
-    /*Render additional things AFTER children so that additional things appear on top of children*/
-    renderAdditionalSelfElements();
+    // std::cout << "Diff: " << transformContext.getDiff().x << " " << transformContext.getDiff().y << '\n';
+
+    /*Clear my movement direction after frame ended for this node*/
+    transformContext.clearDiff();
 }
 
 void HkWindowFrame::renderAdditionalSelfElements()
@@ -51,8 +78,8 @@ void HkWindowFrame::renderAdditionalSelfElements()
     if (!elementsInitialized)
     {
         /* Set offset from center of window frame + scale control cont after window*/
-        controlTopCont->transformContext.setScale({ transformContext.getScale().x, 30 });
-        controlTopCont->transformContext.init(
+        wfContainer->transformContext.setScale({ transformContext.getScale().x, 30 });
+        wfContainer->transformContext.init(
             {
                 transformContext.getPos().x,
                 transformContext.getPos().y - transformContext.getScale().y / 2 - 15
@@ -61,24 +88,24 @@ void HkWindowFrame::renderAdditionalSelfElements()
         elementsInitialized = true;
     }
 
-    controlTopCont->updateMySelf();
+    wfContainer->updateMySelf();
 
     /*If parent moves, it will generate a XY vector representing direction of movement. Logic here is to move
       children in the same direction the same amount. To not move continously this amount, we need to clear the
       previously computed diff.*/
-    transformContext.addPos(controlTopCont->transformContext.getDiff());
-    controlTopCont->transformContext.clearDiff();
+    transformContext.addPos(wfContainer->transformContext.getDiff());
+    wfContainer->transformContext.clearDiff();
 }
 
 void HkWindowFrame::updateChildren()
 {
-    for (const auto& child : getChildren())
+    for (const auto& child : wfContainer->getChildren())
         child->updateMySelf();
 }
 
 void HkWindowFrame::pushChildren(const std::vector<HkNodePtr>& newChildren)
 {
-    HkNode::pushChildren(newChildren);
+    wfContainer->pushChildren(newChildren);
 }
 
 void HkWindowFrame::printTree() { HkNode::printTree(); }

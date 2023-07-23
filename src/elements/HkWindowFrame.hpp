@@ -7,7 +7,7 @@
 #include "../management/HkSceneManagement.hpp"
 #include "../base/HkNode.hpp"
 
-#include "WindowFrameHelpers/HkWFTopContainer.hpp"
+#include "WindowFrameHelpers/HkWFContainer.hpp"
 #include "HkButton.hpp"
 
 namespace hkui
@@ -26,7 +26,6 @@ public:
     void updateMySelf() override;
 
     void updateChildren();
-    void renderAdditionalSelfElements();
     void pushChildren(const std::vector<HkNodePtr>& newChildren);
 
     void printTree();
@@ -35,12 +34,17 @@ public:
     void setSize(const glm::vec2& size);
 
 private:
+    //gatekeep
+    void gateKeep() { std::cout << "sugi\n"; }
+
+private:
+    void renderAdditionalSelfElements();
+
     HkSceneData& sceneDataRef; /* This is safe as singleton will outlive THIS class anyway*/
 
     /* Elements that compose the "tab view" of the window frame*/
-    glm::vec2 diff;
     bool elementsInitialized;
-    HkWFTopContainerPtr controlTopCont;
+    HkWFContainerPtr wfContainer;
     HkButtonPtr exitBtnNode;
 };
 

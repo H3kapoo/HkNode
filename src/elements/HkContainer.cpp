@@ -6,14 +6,6 @@ HkContainer::HkContainer(const std::string& name)
     : HkNode(name, "Container")
     , sceneDataRef(HkSceneManagement::get().getSceneDataRef())
 {
-    /* By default position at center of parent, could be changed by setting constraints.
-       Maybe its safe to assume there's always gonna be a parent since if there's no parent,
-       it's impossible for THIS node to be updated from the main loop */
-    if (const auto& p = getParent().lock())
-    {
-        transformContext.init(p->transformContext.getPos());
-    }
-
     renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
     renderContext.shader.setVec3f("color", glm::vec3(0.0f, 1.0f, 0.0f)); // GREEN
     renderContext.render(sceneDataRef.sceneProjMatrix, transformContext.getModelMatrix());
@@ -32,6 +24,7 @@ void HkContainer::updateMySelf()
     if (const auto& p = getParent().lock())
     {
         transformContext.setPos(p->transformContext.getPos());
+        transformContext.addPos({ 0, 130 });
     }
 
     /*main HkEvents handler*/
@@ -64,9 +57,14 @@ void HkContainer::updateMySelf()
     case HkEvent::MouseScroll: break;
     case HkEvent::DropPath: break;
     }
+
     /*Don't forget to show node*/
     renderContext.render(sceneDataRef.sceneProjMatrix, transformContext.getModelMatrix());
     updateChildren();
+
+    /*Unless window frame, idk why you would use it*/
+    /*Clear my movement direction after frame ended for this node*/
+    // transformContext.clearDiff();
 }
 
 void HkContainer::updateChildren()

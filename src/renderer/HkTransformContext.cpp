@@ -12,7 +12,11 @@ HkTransformContext::HkTransformContext()
 
 void HkTransformContext::addPos(const glm::vec2& pos)
 {
-    this->currentPos += pos;
+    lastPos = currentPos;
+    currentPos += pos;
+    currLastDiff = currentPos - lastPos;
+    // std::cout << "Diff: " << currLastDiff.x << " " << currLastDiff.y << '\n';
+
     computeModelMatrix();
 }
 
@@ -56,6 +60,7 @@ glm::mat4& HkTransformContext::getModelMatrix() { return modelMat; }
 /* This shall be called at the end of update loop of each node holding children */
 void HkTransformContext::clearDiff() { currLastDiff = { 0,0 }; }
 
+/*TO BE DEPRECATED, use addPos*/
 void HkTransformContext::setOffsetFromParent(const glm::vec2& offset)
 {
     currentPos += offset;
