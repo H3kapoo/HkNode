@@ -5,18 +5,19 @@
 
 namespace hkui
 {
-class HkWFContainer : public HkNode
+class HkWFContainer
 {
 public:
     HkWFContainer(const std::string& topContainerName);
 
     // HkNode
-    void updateMySelf() override;
+    void updateMySelf();
 
     void updateChildren();
     void pushChildren(const std::vector<HkNodePtr>& newChildren);
 
 private:
+    HkNodePtr node;
     HkSceneData& sceneDataRef; /* This is safe as singleton will outlive THIS class anyway*/
 };
 

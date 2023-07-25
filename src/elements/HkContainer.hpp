@@ -9,13 +9,13 @@
 namespace hkui
 {
 
-class HkContainer : public HkNode
+class HkContainer
 {
 public:
     HkContainer(const std::string& name);
 
     //HkNode
-    void updateMySelf() override;
+    void updateMySelf();
 
     void updateChildren();
     void pushChildren(const std::vector<std::shared_ptr<HkNode>>& newChildren);

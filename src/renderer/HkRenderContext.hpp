@@ -39,7 +39,6 @@ public:
 private:
     HkRenderArch renderArch;
     uint32_t vaoId;
-    // glm::mat4 projMat;
 public:
     HkShader shader;
     // shader

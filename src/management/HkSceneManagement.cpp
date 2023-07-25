@@ -1,5 +1,7 @@
 #include "HkSceneManagement.hpp"
 
+#include "../elements/HkWindowFrame.hpp"
+
 namespace hkui
 {
 
@@ -24,11 +26,10 @@ void HkSceneManagement::init(int wWidth, int wHeight)
 void HkSceneManagement::setRoot(IHkRootNodeCPtr& newRootNode)
 {
     rootNode = newRootNode;
-    HkNodePtr downcastedTemp = std::dynamic_pointer_cast<HkNode>(newRootNode);
-
+    HkWindowFrameCPtr downcastedTemp = std::dynamic_pointer_cast<HkWindowFrame>(newRootNode);
     if (downcastedTemp)
     {
-        std::cout << "Root for scene changed to: " << downcastedTemp << '\n';
+        std::cout << "Root for scene changed to: " << "TODO: Help print this node" << '\n';
     }
     else
     {

@@ -1,4 +1,4 @@
 target_sources(${PROJECT_NAME} PRIVATE
-    HkNodeData.cpp
+    HkTreeStructure.cpp
     HkNode.cpp
     )
