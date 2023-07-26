@@ -4,83 +4,62 @@ namespace hkui
 {
 
 HkWindowFrame::HkWindowFrame(const std::string& windowName)
-    : treeStruct(this, windowName, "RootWindowFrame")
+    : HkNodeBase(windowName, "RootWindowFrame")
     , sceneDataRef(HkSceneManagement::get().getSceneDataRef())
-    , elementsInitialized(false)
     // , wfContainer(std::make_shared<HkWFContainer>("WindowFrame_WfContainer"))
     // , exitBtnNode(std::make_shared<HkButton>("ControlCont_ExitBtn"))
 {
-    // node->renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
-    // node->renderContext.shader.setVec3f("color", glm::vec3(0.0f, 0.5f, 0.5f)); // BLUEish
-    // node->renderContext.render(sceneDataRef.sceneProjMatrix, node->transformContext.getModelMatrix());
+    node_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
+    node_.renderContext.shader.setVec3f("color", glm::vec3(0.0f, 0.5f, 0.9f)); // BLUEish
+    node_.renderContext.render(sceneDataRef.sceneProjMatrix, node_.transformContext.getModelMatrix());
 }
 
 // IHkRootNode
 void HkWindowFrame::rootUpdateMySelf() { updateMySelf(); }
 
-
-// IHkNodeBase
-HkNodeData* HkWindowFrame::accessNode()
-{
-    return &node;
-}
-
-HkTreeStructure<IHkNodeBase>* HkWindowFrame::accessTreeStruct()
-{
-    return &treeStruct;
-}
-
 void HkWindowFrame::updateMySelf()
 {
-    if (treeStruct.getParent())
-    {
-        std::cout << "has parent\n";
-    }
-    else
-    {
-        std::cout << "doesnt have parent\n";
-    }
     // /*main HkEvents handler*/
-    // switch (sceneDataRef.currentEvent)
-    // {
-    // case HkEvent::None: break;
-    // case HkEvent::GeneralUpdate: break;
-    // case HkEvent::WindowResize: break;
-    // case HkEvent::MouseMove:
-    //     /* Safe to assume that this is what dragging the current element logic looks like */
-    //     if (sceneDataRef.isMouseClicked && sceneDataRef.maybeFocusedNodeId == getId())
-    //     {
-    //         transformContext.setPos(sceneDataRef.mouseOffsetFromCenter + sceneDataRef.mousePos);
-    //     }
-    //     break;
-    // case HkEvent::MouseClick:
-    //     /*
-    //     If mouse is clicked (currently any) and inside UI element bounds, safe to assume this is a
-    //     candidate to be the currently selected node, although it's not guaranteed to be this one. The selected node
-    //     will actually be one of the leafs of the UI tree who's hit and validates this check the latest.
-    //     Offset from mouse position to UI node will also be calculated so on mouse move, object doesn't just
-    //     rubber band to center of UI node and instead it keeps a natural offset to it. This is used for grabbing.*/
-    //     if (sceneDataRef.isMouseClicked && transformContext.isPosInsideOfNode(sceneDataRef.mousePos))
-    //     {
-    //         sceneDataRef.maybeSelectedNodeId = getId();
-    //         sceneDataRef.mouseOffsetFromCenter = transformContext.getPos() - sceneDataRef.mousePos;
-    //     }
-    //     /*
-    //     If mouse is clicked (currently any) and inside UI element bounds, safe to assume this is a
-    //     candidate to be the currently selected node, although it's not guaranteed to be this one. The selected node
-    //     will actually be one of the leaf of the UI tree who hits and validates this check the latest. */
-    //     // if (sceneDataRef.isMouseClicked && transformContext.isPosInsideOfNode(sceneDataRef.mousePos))
-    //     // {
-    //     //     sceneDataRef.maybeSelectedNodeId = getId();
-    //     // }
-    //     break;
-    // case HkEvent::MouseEnterExit: break;
-    // case HkEvent::MouseScroll: break;
-    // case HkEvent::DropPath: break;
-    // }
+    switch (sceneDataRef.currentEvent)
+    {
+    case HkEvent::None: break;
+    case HkEvent::GeneralUpdate: break;
+    case HkEvent::WindowResize: break;
+    case HkEvent::MouseMove:
+        /* Safe to assume that this is what dragging the current element logic looks like */
+        if (sceneDataRef.isMouseClicked && sceneDataRef.maybeFocusedNodeId == treeStruct_.getId())
+        {
+            node_.transformContext.setPos(sceneDataRef.mouseOffsetFromCenter + sceneDataRef.mousePos);
+        }
+        break;
+    case HkEvent::MouseClick:
+        /*
+        If mouse is clicked (currently any) and inside UI element bounds, safe to assume this is a
+        candidate to be the currently selected node, although it's not guaranteed to be this one. The selected node
+        will actually be one of the leafs of the UI tree who's hit and validates this check the latest.
+        Offset from mouse position to UI node will also be calculated so on mouse move, object doesn't just
+        rubber band to center of UI node and instead it keeps a natural offset to it. This is used for grabbing.*/
+        if (sceneDataRef.isMouseClicked && node_.transformContext.isPosInsideOfNode(sceneDataRef.mousePos))
+        {
+            sceneDataRef.maybeSelectedNodeId = treeStruct_.getId();
+            sceneDataRef.mouseOffsetFromCenter = node_.transformContext.getPos() - sceneDataRef.mousePos;
+        }
+        /*
+        If mouse is clicked (currently any) and inside UI element bounds, safe to assume this is a
+        candidate to be the currently selected node, although it's not guaranteed to be this one. The selected node
+        will actually be one of the leaf of the UI tree who hits and validates this check the latest. */
+        // if (sceneDataRef.isMouseClicked && transformContext.isPosInsideOfNode(sceneDataRef.mousePos))
+        // {
+        //     sceneDataRef.maybeSelectedNodeId = getId();
+        // }
+        break;
+    case HkEvent::MouseEnterExit: break;
+    case HkEvent::MouseScroll: break;
+    case HkEvent::DropPath: break;
+    }
 
     // /*Don't forget to show node + additional details & update children*/
-    // node->renderContext.render(sceneDataRef.sceneProjMatrix, node->transformContext.getModelMatrix());
+    node_.renderContext.render(sceneDataRef.sceneProjMatrix, node_.transformContext.getModelMatrix());
     // renderAdditionalSelfElements();
     updateChildren();
 
@@ -118,36 +97,34 @@ void HkWindowFrame::renderAdditionalSelfElements()
 
 void HkWindowFrame::updateChildren()
 {
-    for (const auto& child : treeStruct.getChildren())
+    for (const auto& child : treeStruct_.getChildren())
         child->getPayload()->updateMySelf();
 }
 
-void HkWindowFrame::pushChildren(const std::vector<IHkNodeBasePtr>& newChildren)
+void HkWindowFrame::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)
 {
     for (const auto& child : newChildren)
     {
-        treeStruct.pushChild(child->accessTreeStruct());
-        // treeStruct.removeChildren({ child->accessTreeStruct()->getId() });
+        treeStruct_.pushChild(&child->treeStruct_);
+        // treeStruct.removeChildren({ child->treeStruct.getId() });
     }
 }
 
 void HkWindowFrame::printTree() {
-    treeStruct.printTree();
+    treeStruct_.printTree();
 }
 
 void HkWindowFrame::setColor(const glm::vec3& color)
 {
-    // renderContext.shader.setVec3f("color", color);
+    node_.renderContext.shader.setVec3f("color", color);
 }
 
-/* Here it is not necessary to use TC.init() for first initialization as diff is not used by anyone, so it can be left
-to be as big as it want in the first frame */
 void HkWindowFrame::setPos(const glm::vec2& pos) {
-    //  transformContext.setPos(pos);
+    node_.transformContext.setPos(pos);
 }
 
 void HkWindowFrame::setSize(const glm::vec2& size) {
-    // transformContext.setScale(size); 
+    node_.transformContext.setScale(size);
 }
 
 } // hkui

@@ -78,24 +78,17 @@ int main()
         return -1;
     }
 
-    HkWindowFramePtr windowFrame3 = std::make_shared<HkWindowFrame>("WindowFrame");
-    HkWindowFramePtr windowFrame4 = std::make_shared<HkWindowFrame>("WindowFrame");
-    windowFrame3->pushChildren({ windowFrame4 });
-    windowFrame3->printTree();
-
-    windowFrame3->rootUpdateMySelf();
-    return 0;
 
     HkWindowFramePtr windowFrame = std::make_shared<HkWindowFrame>("WindowFrame");
-    HkWindowFramePtr windowFrame2 = std::make_shared<HkWindowFrame>("WindowFrame2");
+    // HkWindowFramePtr windowFrame2 = std::make_shared<HkWindowFrame>("WindowFrame2");
     // windowFrame->accessNode().getChildren();
     // // HkContainerPtr container1 = std::make_shared<HkContainer>("Cont1");
 
-    HkContainerPtr container2 = std::make_shared<HkContainer>("Cont2");
+    // HkContainerPtr container2 = std::make_shared<HkContainer>("Cont2");
     // HkButtonPtr button1 = std::make_shared<HkButton>("Button1");
     // HkButtonPtr button2 = std::make_shared<HkButton>("Button2");
 
-    windowFrame->pushChildren({ windowFrame2 });
+    // windowFrame->pushChildren({ windowFrame2 });
 
     windowFrame->printTree();
     // HkNodePtr windowFrame2 = std::make_shared<HkWindowFrame>("WindowFrame");
@@ -103,7 +96,7 @@ int main()
     windowFrame->setPos({ 800, 600 });
     windowFrame->setSize({ 800, 600 });
 
-    container2->setColor({ 1.0f, 1.0f, 1.0f });
+    // container2->setColor({ 1.0f, 1.0f, 1.0f });
     // container2->setSize({ 150, 25 });
 
     // button1->setSize({ 150, 25 });

@@ -8,8 +8,6 @@ namespace hkui
 class HkNodeData
 {
 public:
-    HkNodeData() {}
-
     HkRenderContext renderContext;
     HkTransformContext transformContext;
 };
