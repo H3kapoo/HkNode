@@ -5,12 +5,16 @@ namespace hkui
 
 HkWindowFrame::HkWindowFrame(const std::string& windowName)
     : HkNodeBase(windowName, "RootWindowFrame")
-    // , wfContainer(std::make_shared<HkWFContainer>("WindowFrame_WfContainer"))
-    // , exitBtnNode(std::make_shared<HkButton>("ControlCont_ExitBtn"))
+    , wfCont_("ContainerFor_" + windowName)
 {
     node_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
     node_.renderContext.shader.setVec3f("color", glm::vec3(0.0f, 0.5f, 0.9f)); // BLUEish
     node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix());
+    treeStruct_.pushChild(&wfCont_.treeStruct_);
+
+    rc.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
+    rc.shader.setVec3f("color", glm::vec3(1.0f, 0.5f, 0.9f)); // BLUEish
+    rc.render(sceneDataRef_.sceneProjMatrix, tc.getModelMatrix());
 }
 
 // IHkRootNode
@@ -43,13 +47,19 @@ void HkWindowFrame::updateMySelf()
             sceneDataRef_.maybeSelectedNodeId = treeStruct_.getId();
             sceneDataRef_.mouseOffsetFromCenter = node_.transformContext.getPos() - sceneDataRef_.mousePos;
         }
-        /*
-        If mouse is clicked (currently any) and inside UI element bounds, safe to assume this is a
-        candidate to be the currently selected node, although it's not guaranteed to be this one. The selected node
-        will actually be one of the leaf of the UI tree who hits and validates this check the latest. */
-        // if (sceneDataRef.isMouseClicked && transformContext.isPosInsideOfNode(sceneDataRef.mousePos))
+
+        if (sceneDataRef_.maybeFocusedNodeId == treeStruct_.getId() && sceneDataRef_.isMouseClicked
+            && sceneDataRef_.clickedMouseButton == HkMouseButton::Right)
+        {
+            std::cout << "Right mouse clicked on " << treeStruct_.getName() << '\n';
+            isMinimized = !isMinimized;
+        }
+
+        /*TODO: this doesnt capture click release, fix later*/
+        // if (sceneDataRef_.maybeFocusedNodeId == treeStruct_.getId() && !sceneDataRef_.isMouseClicked
+        //     && sceneDataRef_.clickedMouseButton == HkMouseButton::Right)
         // {
-        //     sceneDataRef.maybeSelectedNodeId = getId();
+        //     std::cout << "Right mouse released on " << treeStruct_.getName() << '\n';
         // }
         break;
     case HkEvent::MouseEnterExit: break;
@@ -57,29 +67,44 @@ void HkWindowFrame::updateMySelf()
     case HkEvent::DropPath: break;
     }
 
-    // /*Don't forget to show node + additional details & update children*/
+    // /*Don't forget to show node & update children*/
+    if (isMinimized)
+    {
+        glEnable(GL_SCISSOR_TEST);
+    }
+
+    glScissor(
+        node_.transformContext.getPos().x - node_.transformContext.getScale().x / 2,
+        sceneDataRef_.windowHeight - node_.transformContext.getPos().y - node_.transformContext.getScale().y / 2,
+        node_.transformContext.getScale().x,
+        node_.transformContext.getScale().y);
+
+    tc.setScale({ 10,10 });
+    tc.setPos({
+        node_.transformContext.getPos().x - node_.transformContext.getScale().x / 2,
+        node_.transformContext.getPos().y + node_.transformContext.getScale().y / 2 });
+    rc.render(sceneDataRef_.sceneProjMatrix, tc.getModelMatrix());
+
+    // tc.setPos({ node_.transformContext.getPos().x + node_.transformContext.getScale().x / 2,
+    //     node_.transformContext.getPos().y - node_.transformContext.getScale().y / 2 });
+
+    // rc.render(sceneDataRef_.sceneProjMatrix, tc.getModelMatrix());
+
     node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix());
-    // renderAdditionalSelfElements();
     updateChildren();
-
-    // std::cout << "Diff: " << transformContext.getDiff().x << " " << transformContext.getDiff().y << '\n';
-
-    /*Clear my movement direction after frame ended for this node*/
-    // transformContext.clearDiff();
+    glDisable(GL_SCISSOR_TEST);
 }
 
 void HkWindowFrame::updateChildren()
 {
-    for (const auto& child : treeStruct_.getChildren())
-        child->getPayload()->updateMySelf();
+    wfCont_.updateMySelf();
 }
 
 void HkWindowFrame::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)
 {
     for (const auto& child : newChildren)
     {
-        treeStruct_.pushChild(&child->treeStruct_);
-        // treeStruct.removeChildren({ child->treeStruct.getId() });
+        wfCont_.treeStruct_.pushChild(&child->treeStruct_);
     }
 }
 
@@ -97,7 +122,7 @@ void HkWindowFrame::setPos(const glm::vec2& pos) {
 }
 
 void HkWindowFrame::setSize(const glm::vec2& size) {
-    node_.transformContext.setScale(size);
+    node_.transformContext.setScale({ size.x, 30 });
+    wfCont_.node_.transformContext.setScale(size);
 }
-
 } // hkui

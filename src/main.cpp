@@ -64,7 +64,7 @@ int main()
     }
 
     glfwMakeContextCurrent(window);
-    // glfwSwapInterval(3); // zero to disable Vsync
+    // glfwSwapInterval(20); // zero to disable Vsync
     glfwSetFramebufferSizeCallback(window, resizeCallback);
     glfwSetCursorPosCallback(window, mouseMoveCallback);
     glfwSetMouseButtonCallback(window, mouseClickCallback);
@@ -79,30 +79,11 @@ int main()
     }
 
 
-    HkWindowFramePtr windowFrame = std::make_shared<HkWindowFrame>("WindowFrame");
-    // HkWindowFramePtr windowFrame2 = std::make_shared<HkWindowFrame>("WindowFrame2");
-    // windowFrame->accessNode().getChildren();
-    // // HkContainerPtr container1 = std::make_shared<HkContainer>("Cont1");
-
-    // HkContainerPtr container2 = std::make_shared<HkContainer>("Cont2");
-    // HkButtonPtr button1 = std::make_shared<HkButton>("Button1");
-    // HkButtonPtr button2 = std::make_shared<HkButton>("Button2");
-
-    // windowFrame->pushChildren({ windowFrame2 });
+    HkWindowFramePtr windowFrame = std::make_shared<HkWindowFrame>("WindowFrameHaha");
 
     windowFrame->printTree();
-    // HkNodePtr windowFrame2 = std::make_shared<HkWindowFrame>("WindowFrame");
-
     windowFrame->setPos({ 800, 600 });
-    windowFrame->setSize({ 800, 600 });
-
-    // container2->setColor({ 1.0f, 1.0f, 1.0f });
-    // container2->setSize({ 150, 25 });
-
-    // button1->setSize({ 150, 25 });
-    // container2->setSize({ 150, 25 });
-
-
+    windowFrame->setSize({ 800, 30 });
 
     HkSceneManagement::get().setRoot(windowFrame);
     HkSceneManagement::get().init(1920, 1080);

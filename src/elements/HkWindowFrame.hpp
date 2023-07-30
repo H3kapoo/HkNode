@@ -3,15 +3,16 @@
 #include <string>
 #include <memory>
 
-#include "IHkRootNode.hpp"
-#include "HkNodeBase.hpp"
+#include "../base/IHkRootNode.hpp"
+#include "../base/HkNodeBase.hpp"
 #include "../base/HkNodeData.hpp"
 #include "../base/HkTreeStructure.hpp"
+#include "WindowFrameHelpers/HkWFContainer.hpp"
 
 namespace hkui
 {
 /* This shall serve as the root of the scene manager, it has no parent and can only host children.*/
-class HkWindowFrame : protected HkNodeBase, public IHkRootNode
+class HkWindowFrame : public HkNodeBase, public IHkRootNode
 {
 public:
     HkWindowFrame(const std::string& windowName);
@@ -27,9 +28,11 @@ public:
     void setPos(const glm::vec2& pos);
     void setSize(const glm::vec2& size);
 
-
 private:
-    // todo
+    HkWFContainer wfCont_;
+    HkTransformContext tc;
+    HkRenderContext rc;
+    bool isMinimized{ false };
 };
 using HkWindowFramePtr = std::shared_ptr<HkWindowFrame>;
 using HkWindowFrameCPtr = const std::shared_ptr<HkWindowFrame>;

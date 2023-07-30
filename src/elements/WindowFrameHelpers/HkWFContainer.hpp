@@ -1,26 +1,20 @@
 #pragma once
 
 #include "../../management/HkSceneManagement.hpp"
-#include "../../base/HkNode.hpp"
+#include "../../base/HkNodeBase.hpp"
 
 namespace hkui
 {
-class HkWFContainer
+class HkWFContainer : public HkNodeBase
 {
 public:
-    HkWFContainer(const std::string& topContainerName);
+    HkWFContainer(const std::string& containerName);
 
-    // HkNode
-    void updateMySelf();
+    void updateMySelf() override; // HkNodeBase
+
+    void repositionBasedOnParent();
 
     void updateChildren();
-    void pushChildren(const std::vector<HkNodePtr>& newChildren);
-
-private:
-    HkNodePtr node;
-    HkSceneData& sceneDataRef; /* This is safe as singleton will outlive THIS class anyway*/
+    void pushChildren(const std::vector<HkNodeBasePtr>& newChildren);
 };
-
-using HkWFContainerPtr = std::shared_ptr<HkWFContainer>;
-using HkWFContainerCPtr = const std::shared_ptr<HkWFContainer>;
 } // hkui

@@ -3,14 +3,13 @@
 namespace hkui
 {
 
-// HkWFContainer::HkWFContainer(const std::string& topContainerName)
-// // : HkNode(topContainerName, "WindowFrameTopContainer")
-// , sceneDataRef(HkSceneManagement::get().getSceneDataRef())
-// {
-    // renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
-    // renderContext.shader.setVec3f("color", glm::vec3(0.5f, 0.5f, 0.5f)); // gray
-    // renderContext.render(sceneDataRef.sceneProjMatrix, transformContext.getModelMatrix());
-// }
+HkWFContainer::HkWFContainer(const std::string& containerName)
+    : HkNodeBase(containerName, "[Internal] RootWindowFrame_Container")
+{
+    node_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
+    node_.renderContext.shader.setVec3f("color", glm::vec3(0.5f, 0.5f, 0.5f)); // gray
+    node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix());
+}
 
 void HkWFContainer::updateMySelf()
 {
@@ -27,45 +26,68 @@ void HkWFContainer::updateMySelf()
     // {
     //     transformContext.setPos(p->transformContext.getPos());
     // }
+    repositionBasedOnParent();
 
-    // /*main HkEvents handler*/
-    // switch (sceneDataRef.currentEvent)
-    // {
-    // case HkEvent::None: break;
-    // case HkEvent::GeneralUpdate: break;
-    // case HkEvent::WindowResize:
-    //     /*
-    //     For now this just keeps the element inside the window if the window is rescaled. Does
-    //     not modify the size of UI elements */
-    //     if (transformContext.getPos().x > sceneDataRef.windowWidth)
-    //     {
-    //         transformContext.setPos({ sceneDataRef.windowWidth, transformContext.getPos().y });
-    //     }
-    //     break;
-    // case HkEvent::MouseMove:
-    //     break;
-    // case HkEvent::MouseClick:
-    //     break;
-    // case HkEvent::MouseEnterExit: break;
-    // case HkEvent::MouseScroll: break;
-    // case HkEvent::DropPath: break;
-    // }
+    /*main HkEvents handler*/
+    switch (sceneDataRef_.currentEvent)
+    {
+    case HkEvent::None: break;
+    case HkEvent::GeneralUpdate: break;
+    case HkEvent::WindowResize:
+        /*
+        For now this just keeps the element inside the window if the window is rescaled. Does
+        not modify the size of UI elements */
+        // if (node_.transformContext.getPos().x > sceneDataRef_.windowWidth)
+        // {
+        //     node_.transformContext.setPos({ sceneDataRef_.windowWidth, node_.transformContext.getPos().y });
+        // }
+        break;
+    case HkEvent::MouseMove:
+        break;
+    case HkEvent::MouseClick:
+        /*
+        If mouse is clicked (currently any) and inside UI element bounds, safe to assume this is a
+        candidate to be the currently selected node, although it's not guaranteed to be this one. The selected node
+        will actually be one of the leafs of the UI tree who's hit and validates this check the latest.*/
+        if (sceneDataRef_.isMouseClicked && node_.transformContext.isPosInsideOfNode(sceneDataRef_.mousePos))
+        {
+            sceneDataRef_.maybeSelectedNodeId = treeStruct_.getId();
+        }
+        break;
+    case HkEvent::MouseEnterExit: break;
+    case HkEvent::MouseScroll: break;
+    case HkEvent::DropPath: break;
+    }
     // /*Don't forget to show node*/
-    // renderContext.render(sceneDataRef.sceneProjMatrix, transformContext.getModelMatrix());
-    // // updateChildren();
+    node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix());
+    updateChildren();
+}
+
+void HkWFContainer::repositionBasedOnParent()
+{
+    /* This node type is always guaranteed to have a parent */
+    HkNodeBase* parent = treeStruct_.getParent()->getPayload();
+    const auto pos = parent->node_.transformContext.getPos();
+    const auto scale = parent->node_.transformContext.getScale();
+    const auto thisPos = node_.transformContext.getPos();
+    const auto thisScale = node_.transformContext.getScale();
+
+    /* TODO: dirty flags shall be used here to not do redundant repositioning */
+    node_.transformContext.setPos({ pos.x, pos.y + thisScale.y / 2 + scale.y / 2 });
+    node_.transformContext.setScale({ scale.x, 200 });
 }
 
 void HkWFContainer::updateChildren()
 {
-    // BIG ERROR: CANNOT ACCESS CHILDREN OF CHILDREN NODES FROM HERE, NEEDS REDESIGN
-    // for (const auto& child : getChildren())
-    //     child->updateMySelf();
+    for (const auto& child : treeStruct_.getChildren())
+        child->getPayload()->updateMySelf();
 }
 
-void HkWFContainer::pushChildren(const std::vector<HkNodePtr>& newChildren)
+void HkWFContainer::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)
 {
-    // HkNode::pushChildren(newChildren);
+    for (const auto& child : newChildren)
+    {
+        treeStruct_.pushChild(&child->treeStruct_);
+    }
 }
-
-
 } // hkui

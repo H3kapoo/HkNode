@@ -10,69 +10,49 @@ HkTransformContext::HkTransformContext()
     computeModelMatrix();
 }
 
-void HkTransformContext::addPos(const glm::vec2& pos)
+void HkTransformContext::addPos(const glm::ivec2& pos)
 {
     lastPos = currentPos;
     currentPos += pos;
     currLastDiff = currentPos - lastPos;
-    // std::cout << "Diff: " << currLastDiff.x << " " << currLastDiff.y << '\n';
-
     computeModelMatrix();
 }
 
-void HkTransformContext::setPos(const glm::vec2& pos)
+void HkTransformContext::setPos(const glm::ivec2& pos)
 {
     lastPos = currentPos;
     currentPos = pos;
     currLastDiff = currentPos - lastPos;
-    // std::cout << "Diff: " << currLastDiff.x << " " << currLastDiff.y << '\n';
-
     computeModelMatrix();
 }
 
-/* Use this for initialization of transform context */
-void HkTransformContext::init(const glm::vec2& pos)
-{
-    lastPos = currentPos = pos;
-    computeModelMatrix();
-}
-
-void HkTransformContext::addScale(const glm::vec2& scale)
+void HkTransformContext::addScale(const glm::ivec2& scale)
 {
     this->scale += scale;
     computeModelMatrix();
 }
 
-void HkTransformContext::setScale(const glm::vec2& scale)
+void HkTransformContext::setScale(const glm::ivec2& scale)
 {
     this->scale = scale;
     computeModelMatrix();
 }
 
-glm::vec2& HkTransformContext::getPos() { return currentPos; }
+/* These can't be made const since we return ref. If we dont return with ref, efficency might
+   be impacted due to a lot of copying since these functions are called a lot. Necessary tradefoff.
+   Use with care.*/
+glm::ivec2& HkTransformContext::getPos() { return currentPos; }
 
-glm::vec2& HkTransformContext::getScale() { return scale; }
-
-glm::vec2& HkTransformContext::getDiff() { return currLastDiff; }
+glm::ivec2& HkTransformContext::getScale() { return scale; }
 
 glm::mat4& HkTransformContext::getModelMatrix() { return modelMat; }
 
-/* This shall be called at the end of update loop of each node holding children */
-void HkTransformContext::clearDiff() { currLastDiff = { 0,0 }; }
-
-/*TO BE DEPRECATED, use addPos*/
-void HkTransformContext::setOffsetFromParent(const glm::vec2& offset)
-{
-    currentPos += offset;
-    computeModelMatrix();
-}
-
-bool HkTransformContext::isPosInsideOfNode(const glm::vec2& pin)
+bool HkTransformContext::isPosInsideOfNode(const glm::ivec2& pin)
 {
     // for now we assume that nodes have the pivot point at the center of the shape
     // so the middle is height/2 middle/2
     // TODO: optimize
-    // glm::vec2 workingPos = pos + offsetFromParent;
+    // glm::ivec2 workingPos = pos + offsetFromParent;
     float xmin = currentPos.x - scale.x / 2;
     float xmax = currentPos.x + scale.x / 2;
 

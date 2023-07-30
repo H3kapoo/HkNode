@@ -7,7 +7,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "../elements/IHkRootNode.hpp"
+#include "../base/IHkRootNode.hpp"
 
 namespace hkui
 {
@@ -38,8 +38,8 @@ struct HkSceneData
 {
     HkEvent currentEvent;
     int windowWidth, windowHeight;
-    glm::vec2 mousePos;
-    glm::vec2 lastMousePos;
+    glm::ivec2 mousePos;
+    glm::ivec2 lastMousePos;
     bool isMouseClicked;
     HkMouseButton clickedMouseButton;
     bool mouseEntered, mouseExited;
@@ -52,7 +52,7 @@ struct HkSceneData
     /*Selection*/
     uint32_t maybeSelectedNodeId; /* refers to the currently selected node by means of mouseClick */
     uint32_t maybeFocusedNodeId; /* refers to the node that was previously selected and its still on focus */
-    glm::vec2 mouseOffsetFromCenter{ 0,0 }; /* offset from center of UI element clicked */
+    glm::ivec2 mouseOffsetFromCenter{ 0,0 }; /* offset from center of UI element clicked */
 
     /*Rendering*/
     glm::mat4 sceneProjMatrix;

@@ -53,12 +53,10 @@ public:
 
     void printChildren() const;
     void printBfs() const;
-
     void printTree() const { printTreeAux(0); }
-
     std::shared_ptr<HkTreeStructure> hasChild(uint32_t childId) const;
 
-    // /*Overloads*/
+    /*Overloads*/
     template<class U>
     friend std::ostream& operator<<(std::ostream& os, const HkTreeStructure<U>* node)
     {
@@ -66,12 +64,11 @@ public:
         return os;
     }
 
-    // GET(std::string, Name, name);
-    // GET(uint32_t, Id, id);
-    // GET(uint32_t, Level, level);
+    std::string getName() { return name_; }
     uint32_t getId() { return id_; }
     HkTreeStructure* getParent() { return parent_; }
-    std::vector<HkTreeStructure*> getChildren() { return children_; }
+    /* Necessary & so no copying occurs each frame */
+    std::vector<HkTreeStructure*>& getChildren() { return children_; }
     T* getPayload() { return payload_; }
 
 private:
