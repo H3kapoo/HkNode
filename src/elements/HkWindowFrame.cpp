@@ -11,10 +11,6 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
     node_.renderContext.shader.setVec3f("color", glm::vec3(0.0f, 0.5f, 0.9f)); // BLUEish
     node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix());
     treeStruct_.pushChild(&wfCont_.treeStruct_);
-
-    rc.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
-    rc.shader.setVec3f("color", glm::vec3(1.0f, 0.5f, 0.9f)); // BLUEish
-    rc.render(sceneDataRef_.sceneProjMatrix, tc.getModelMatrix());
 }
 
 // IHkRootNode
@@ -26,34 +22,34 @@ void HkWindowFrame::updateMySelf()
     switch (sceneDataRef_.currentEvent)
     {
     case HkEvent::None: break;
+    case HkEvent::FocusHoverScan:
+        if (sceneDataRef_.isMouseClicked && sceneDataRef_.clickedMouseButton == HkMouseButton::Left
+            && node_.transformContext.isPosInsideOfNode(sceneDataRef_.mousePos))
+        {
+            sceneDataRef_.focusedIdAux = treeStruct_.getId();
+            sceneDataRef_.mouseOffsetFromFocusedCenter = node_.transformContext.getPos() - sceneDataRef_.mousePos;
+        }
+
+        if (node_.transformContext.isPosInsideOfNode(sceneDataRef_.mousePos))
+        {
+            sceneDataRef_.hoveredId = treeStruct_.getId();
+        }
+        break;
     case HkEvent::GeneralUpdate: break;
     case HkEvent::WindowResize: break;
     case HkEvent::MouseMove:
         /* Safe to assume that this is what dragging the current element logic looks like */
-        if (sceneDataRef_.isMouseClicked && sceneDataRef_.maybeFocusedNodeId == treeStruct_.getId())
+        if (sceneDataRef_.isMouseClicked && sceneDataRef_.focusedId == treeStruct_.getId())
         {
-            node_.transformContext.setPos(sceneDataRef_.mouseOffsetFromCenter + sceneDataRef_.mousePos);
+            node_.transformContext.setPos(sceneDataRef_.mouseOffsetFromFocusedCenter + sceneDataRef_.mousePos);
         }
         break;
     case HkEvent::MouseClick:
-        /*
-        If mouse is clicked (currently any) and inside UI element bounds, safe to assume this is a
-        candidate to be the currently selected node, although it's not guaranteed to be this one. The selected node
-        will actually be one of the leafs of the UI tree who's hit and validates this check the latest.
-        Offset from mouse position to UI node will also be calculated so on mouse move, object doesn't just
-        rubber band to center of UI node and instead it keeps a natural offset to it. This is used for grabbing.*/
-        if (sceneDataRef_.isMouseClicked && node_.transformContext.isPosInsideOfNode(sceneDataRef_.mousePos))
-        {
-            sceneDataRef_.maybeSelectedNodeId = treeStruct_.getId();
-            sceneDataRef_.mouseOffsetFromCenter = node_.transformContext.getPos() - sceneDataRef_.mousePos;
-        }
-
-        if (sceneDataRef_.maybeFocusedNodeId == treeStruct_.getId() && sceneDataRef_.isMouseClicked
-            && sceneDataRef_.clickedMouseButton == HkMouseButton::Right)
-        {
-            std::cout << "Right mouse clicked on " << treeStruct_.getName() << '\n';
-            isMinimized = !isMinimized;
-        }
+        // if (sceneDataRef_.maybeFocusedNodeId == treeStruct_.getId() && sceneDataRef_.isMouseClicked
+        //     && sceneDataRef_.clickedMouseButton == HkMouseButton::Right)
+        // {
+        //     std::cout << "Right mouse clicked on " << treeStruct_.getName() << '\n';
+        // }
 
         /*TODO: this doesnt capture click release, fix later*/
         // if (sceneDataRef_.maybeFocusedNodeId == treeStruct_.getId() && !sceneDataRef_.isMouseClicked
@@ -68,31 +64,8 @@ void HkWindowFrame::updateMySelf()
     }
 
     // /*Don't forget to show node & update children*/
-    if (isMinimized)
-    {
-        glEnable(GL_SCISSOR_TEST);
-    }
-
-    glScissor(
-        node_.transformContext.getPos().x - node_.transformContext.getScale().x / 2,
-        sceneDataRef_.windowHeight - node_.transformContext.getPos().y - node_.transformContext.getScale().y / 2,
-        node_.transformContext.getScale().x,
-        node_.transformContext.getScale().y);
-
-    tc.setScale({ 10,10 });
-    tc.setPos({
-        node_.transformContext.getPos().x - node_.transformContext.getScale().x / 2,
-        node_.transformContext.getPos().y + node_.transformContext.getScale().y / 2 });
-    rc.render(sceneDataRef_.sceneProjMatrix, tc.getModelMatrix());
-
-    // tc.setPos({ node_.transformContext.getPos().x + node_.transformContext.getScale().x / 2,
-    //     node_.transformContext.getPos().y - node_.transformContext.getScale().y / 2 });
-
-    // rc.render(sceneDataRef_.sceneProjMatrix, tc.getModelMatrix());
-
     node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix());
     updateChildren();
-    glDisable(GL_SCISSOR_TEST);
 }
 
 void HkWindowFrame::updateChildren()

@@ -30,9 +30,6 @@ public:
 
 private:
     HkWFContainer wfCont_;
-    HkTransformContext tc;
-    HkRenderContext rc;
-    bool isMinimized{ false };
 };
 using HkWindowFramePtr = std::shared_ptr<HkWindowFrame>;
 using HkWindowFrameCPtr = const std::shared_ptr<HkWindowFrame>;

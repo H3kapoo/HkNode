@@ -2,7 +2,6 @@
 
 namespace hkui
 {
-
 HkWFContainer::HkWFContainer(const std::string& containerName)
     : HkNodeBase(containerName, "[Internal] RootWindowFrame_Container")
 {
@@ -20,18 +19,32 @@ void HkWFContainer::updateMySelf()
     The only way to move the children is by offseting them in relation to their parent.
     Note: If this happend to be the selectedNodeId AND it has a parent, because if has a parent
     node will be unable to move on mouse click+drag for exaple because it is constrained to the parent */
-
-    // /*Theoretically this shouldnt have any parent*/
-    // if (const auto& p = getParent().lock())
-    // {
-    //     transformContext.setPos(p->transformContext.getPos());
-    // }
     repositionBasedOnParent();
 
     /*main HkEvents handler*/
     switch (sceneDataRef_.currentEvent)
     {
     case HkEvent::None: break;
+    case HkEvent::FocusHoverScan:
+        /*
+        If mouse is clicked (currently any) and inside UI element bounds, safe to assume this is a
+        candidate to be the currently selected node, although it's not guaranteed to be this one. The selected node
+        will actually be one of the leafs of the UI tree who's hit and validates this check the latest.
+        Offset from mouse position to UI node will also be calculated so on mouse move, object doesn't just
+        rubber band to center of UI node and instead it keeps a natural offset to it. This is used for grabbing.*/
+        if (sceneDataRef_.isMouseClicked && sceneDataRef_.clickedMouseButton == HkMouseButton::Left
+            && node_.transformContext.isPosInsideOfNode(sceneDataRef_.mousePos))
+        {
+            sceneDataRef_.focusedIdAux = treeStruct_.getId();
+            sceneDataRef_.mouseOffsetFromFocusedCenter = node_.transformContext.getPos() - sceneDataRef_.mousePos;
+        }
+
+        if (node_.transformContext.isPosInsideOfNode(sceneDataRef_.mousePos))
+        {
+            sceneDataRef_.hoveredId = treeStruct_.getId();
+        }
+
+        break;
     case HkEvent::GeneralUpdate: break;
     case HkEvent::WindowResize:
         /*
@@ -45,14 +58,6 @@ void HkWFContainer::updateMySelf()
     case HkEvent::MouseMove:
         break;
     case HkEvent::MouseClick:
-        /*
-        If mouse is clicked (currently any) and inside UI element bounds, safe to assume this is a
-        candidate to be the currently selected node, although it's not guaranteed to be this one. The selected node
-        will actually be one of the leafs of the UI tree who's hit and validates this check the latest.*/
-        if (sceneDataRef_.isMouseClicked && node_.transformContext.isPosInsideOfNode(sceneDataRef_.mousePos))
-        {
-            sceneDataRef_.maybeSelectedNodeId = treeStruct_.getId();
-        }
         break;
     case HkEvent::MouseEnterExit: break;
     case HkEvent::MouseScroll: break;

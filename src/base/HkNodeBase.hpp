@@ -19,6 +19,9 @@ private:
     /* These functions/params will be accessible to friend classes but will not be accessible to user */
     virtual void updateMySelf() = 0;
 
+    virtual void onMouseMove();
+    virtual void onMouseClick();
+
     HkNodeData node_;
     HkTreeStructure<HkNodeBase> treeStruct_;
     HkSceneData& sceneDataRef_; /* This is safe as singleton will outlive THIS class anyway*/

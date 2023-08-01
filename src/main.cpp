@@ -54,8 +54,8 @@ int main()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glEnable(GL_DEPTH_TEST); // this shows nothing now
 
-    // GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
-    GLFWwindow* window = glfwCreateWindow(1920, 1080, "LearnOpenGL", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(1280, 720, "HkUI", NULL, NULL);
+    // GLFWwindow* window = glfwCreateWindow(1920, 1080, "LearnOpenGL", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -82,11 +82,12 @@ int main()
     HkWindowFramePtr windowFrame = std::make_shared<HkWindowFrame>("WindowFrameHaha");
 
     windowFrame->printTree();
-    windowFrame->setPos({ 800, 600 });
+    windowFrame->setPos({ 1280 / 2, 720 / 2 });
     windowFrame->setSize({ 800, 30 });
 
     HkSceneManagement::get().setRoot(windowFrame);
-    HkSceneManagement::get().init(1920, 1080);
+    HkSceneManagement::get().init(1280, 720);
+    // HkSceneManagement::get().init(1920, 1080);
 
     double previousTime = glfwGetTime();
     int frameCount = 0;
@@ -96,10 +97,11 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        //TODO: GLFWAPI void glfwPostEmptyEvent(void); could be used in the future in case of animations
         HkSceneManagement::get().update(HkEvent::GeneralUpdate);
-
         glfwSwapBuffers(window);
-        glfwPollEvents();
+        glfwWaitEvents();
+        // glfwPollEvents();
 
         // Measure speed
         double currentTime = glfwGetTime();

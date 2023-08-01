@@ -24,6 +24,7 @@ enum class HkMouseButton
 enum class HkEvent
 {
     None,
+    FocusHoverScan,
     GeneralUpdate,
     WindowResize,
     MouseMove,
@@ -54,6 +55,13 @@ struct HkSceneData
     uint32_t maybeFocusedNodeId; /* refers to the node that was previously selected and its still on focus */
     glm::ivec2 mouseOffsetFromCenter{ 0,0 }; /* offset from center of UI element clicked */
 
+    uint32_t focusedId;
+    uint32_t focusedIdAux;
+    glm::ivec2 mouseOffsetFromFocusedCenter;
+
+    /*Hover*/
+    uint32_t hoveredId;
+
     /*Rendering*/
     glm::mat4 sceneProjMatrix;
 
@@ -81,6 +89,9 @@ public:
     void mouseEnterEvent(GLFWwindow*, int entered);
     void mouseScrollEvent(GLFWwindow*, double xOffset, double);
     void dropEvent(GLFWwindow*, int count, const char** paths);
+
+    void resolveFocus();
+    void resolveHover();
 
 private:
     HkSceneManagement() = default;
