@@ -98,7 +98,7 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         //TODO: GLFWAPI void glfwPostEmptyEvent(void); could be used in the future in case of animations
-        HkSceneManagement::get().update(HkEvent::GeneralUpdate);
+        HkSceneManagement::get().update();
         glfwSwapBuffers(window);
         glfwWaitEvents();
         // glfwPollEvents();

@@ -10,62 +10,14 @@ HkWFContainer::HkWFContainer(const std::string& containerName)
     node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix());
 }
 
-void HkWFContainer::updateMySelf()
+void HkWFContainer::onGeneralUpdate()
 {
-    /*
-    I need to reposition myself based on my parent.
-    This system implicitly doesn't let you move UI elements who happen to have a parent
-    so only top level root objects can be moved.
-    The only way to move the children is by offseting them in relation to their parent.
-    Note: If this happend to be the selectedNodeId AND it has a parent, because if has a parent
-    node will be unable to move on mouse click+drag for exaple because it is constrained to the parent */
     repositionBasedOnParent();
+    // updateChildren();
+}
 
-    /*main HkEvents handler*/
-    switch (sceneDataRef_.currentEvent)
-    {
-    case HkEvent::None: break;
-    case HkEvent::FocusHoverScan:
-        /*
-        If mouse is clicked (currently any) and inside UI element bounds, safe to assume this is a
-        candidate to be the currently selected node, although it's not guaranteed to be this one. The selected node
-        will actually be one of the leafs of the UI tree who's hit and validates this check the latest.
-        Offset from mouse position to UI node will also be calculated so on mouse move, object doesn't just
-        rubber band to center of UI node and instead it keeps a natural offset to it. This is used for grabbing.*/
-        if (sceneDataRef_.isMouseClicked && sceneDataRef_.clickedMouseButton == HkMouseButton::Left
-            && node_.transformContext.isPosInsideOfNode(sceneDataRef_.mousePos))
-        {
-            sceneDataRef_.focusedIdAux = treeStruct_.getId();
-            sceneDataRef_.mouseOffsetFromFocusedCenter = node_.transformContext.getPos() - sceneDataRef_.mousePos;
-        }
-
-        if (node_.transformContext.isPosInsideOfNode(sceneDataRef_.mousePos))
-        {
-            sceneDataRef_.hoveredId = treeStruct_.getId();
-        }
-
-        break;
-    case HkEvent::GeneralUpdate: break;
-    case HkEvent::WindowResize:
-        /*
-        For now this just keeps the element inside the window if the window is rescaled. Does
-        not modify the size of UI elements */
-        // if (node_.transformContext.getPos().x > sceneDataRef_.windowWidth)
-        // {
-        //     node_.transformContext.setPos({ sceneDataRef_.windowWidth, node_.transformContext.getPos().y });
-        // }
-        break;
-    case HkEvent::MouseMove:
-        break;
-    case HkEvent::MouseClick:
-        break;
-    case HkEvent::MouseEnterExit: break;
-    case HkEvent::MouseScroll: break;
-    case HkEvent::DropPath: break;
-    }
-    // /*Don't forget to show node*/
-    node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix());
-    updateChildren();
+void HkWFContainer::onGeneralMouseMove()
+{
 }
 
 void HkWFContainer::repositionBasedOnParent()
@@ -74,7 +26,6 @@ void HkWFContainer::repositionBasedOnParent()
     HkNodeBase* parent = treeStruct_.getParent()->getPayload();
     const auto pos = parent->node_.transformContext.getPos();
     const auto scale = parent->node_.transformContext.getScale();
-    const auto thisPos = node_.transformContext.getPos();
     const auto thisScale = node_.transformContext.getScale();
 
     /* TODO: dirty flags shall be used here to not do redundant repositioning */

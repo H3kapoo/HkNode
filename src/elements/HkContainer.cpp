@@ -2,7 +2,7 @@
 
 namespace hkui
 {
-HkContainer::HkContainer(const std::string& name)
+HkContainer::HkContainer(const std::string&)
     :
     // HkNode(name, "Container")
     sceneDataRef(HkSceneManagement::get().getSceneDataRef())
@@ -74,7 +74,7 @@ void HkContainer::updateChildren()
     //     child->updateMySelf();
 }
 
-void HkContainer::pushChildren(const std::vector<std::shared_ptr<HkNode>>& newChildren)
+void HkContainer::pushChildren(const std::vector<std::shared_ptr<HkNode>>&)
 {
     // HkNode::pushChildren(newChildren);
 }
@@ -82,7 +82,7 @@ void HkContainer::pushChildren(const std::vector<std::shared_ptr<HkNode>>& newCh
 /* Funcs to be removed when styling context comes */
 // void HkContainer::printTree() { HkNode::printTree(); }
 
-void HkContainer::setColor(const glm::vec3& color)
+void HkContainer::setColor(const glm::vec3&)
 {
     // renderContext.shader.setVec3f("color", color);
 }

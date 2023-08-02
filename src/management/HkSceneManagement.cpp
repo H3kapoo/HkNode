@@ -16,7 +16,8 @@ HkSceneData& HkSceneManagement::getSceneDataRef() { return sceneData; }
 void HkSceneManagement::init(int wWidth, int wHeight)
 {
     sceneData.lastMousePos = sceneData.mousePos = { 0,0 };
-    sceneData.maybeSelectedNodeId = sceneData.maybeFocusedNodeId = HkSceneData::NO_SELECTION_ID;
+    sceneData.focusedId = HkSceneData::NO_SELECTION_ID;
+    sceneData.hoveredId = HkSceneData::NO_SELECTION_ID;
 
     sceneData.windowWidth = wWidth;
     sceneData.windowHeight = wHeight;
@@ -35,6 +36,11 @@ void HkSceneManagement::setRoot(IHkRootNodeCPtr& newRootNode)
     {
         std::cout << "Something happened during root downcasting. Worth a check\n";
     }
+}
+
+void HkSceneManagement::update()
+{
+    update(HkEvent::GeneralUpdate);
 }
 
 void HkSceneManagement::update(const HkEvent& ev)
@@ -60,7 +66,16 @@ void HkSceneManagement::mouseMoveEvent(GLFWwindow*, double xPos, double yPos)
     sceneData.lastMousePos = sceneData.mousePos;
     sceneData.mousePos = { xPos, yPos };
 
+    /* As mouse moves in the scene, compute first who's hovered, it might not be the 'focusedId'. Only after that,
+    dispatch mouseMove event. The dragged element will become the 'focusedId' */
     resolveHover();
+    if (sceneData.clickedMouseButton == HkMouseButton::Left && sceneData.hoveredId != HkSceneData::NO_SELECTION_ID)
+    {
+        sceneData.isDragging = true;
+    }
+
+    // std::cout << glfwGetTime() << " Hovered: " << sceneData.hoveredId << " is dragging id: " << sceneData.focusedId << "\n";
+
     update(HkEvent::MouseMove);
 }
 
@@ -91,12 +106,13 @@ void HkSceneManagement::mouseClickEvent(GLFWwindow*, int button, int action, int
     {
         sceneData.isMouseClicked = false;
         sceneData.clickedMouseButton = HkMouseButton::None;
+
+        sceneData.isDragging = false;
     }
 
     /* At this point mouse state is already applied and we want to find what's been clicked, it's ID.
     After that normal mouse click event can be dispatched, this helps isolate things even more.
-    Once this function exits, 'maybeSelectedNode' is guaranteed to be the currenctly selected node..or hovered,
-    or whatever you like. */
+    Once this function exits, 'focusedId' is guaranteed to be the currenctly selected node */
     resolveFocus();
     update(HkEvent::MouseClick);
 }
@@ -126,28 +142,18 @@ void HkSceneManagement::dropEvent(GLFWwindow*, int count, const char** paths)
 
 void HkSceneManagement::resolveFocus()
 {
-    /*Aux focus id shall only be cleared when we really have the potential for focused ID to change,
-    aka when we click with the left mouse button */
-    if (sceneData.isMouseClicked && sceneData.clickedMouseButton == HkMouseButton::Left)
+    if (sceneData.clickedMouseButton == HkMouseButton::Left)
     {
-        sceneData.focusedIdAux = HkSceneData::NO_SELECTION_ID;
+        sceneData.focusedId = HkSceneData::NO_SELECTION_ID;
         sceneData.mouseOffsetFromFocusedCenter = { 0,0 };
+        update(HkEvent::FocusScan);
+        std::cout << glfwGetTime() << " Focused ID is: " << sceneData.focusedId << '\n';
     }
-
-    update(HkEvent::FocusHoverScan);
-
-    /* This handles so that on mouse release, selection from mouse click is still available */
-    if (sceneData.focusedIdAux != sceneData.focusedId)
-        sceneData.focusedId = sceneData.focusedIdAux;
-
-    // std::cout << glfwGetTime() << " Focused ID is: " << sceneData.focusedId << '\n';
 }
 
 void HkSceneManagement::resolveHover()
 {
     sceneData.hoveredId = HkSceneData::NO_SELECTION_ID;
-    update(HkEvent::FocusHoverScan);
-
-    std::cout << glfwGetTime() << " Hovered ID is: " << sceneData.hoveredId << '\n';
+    update(HkEvent::HoverScan);
 }
 } // hkui

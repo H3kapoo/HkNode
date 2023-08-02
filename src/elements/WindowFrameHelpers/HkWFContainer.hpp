@@ -10,7 +10,8 @@ class HkWFContainer : public HkNodeBase
 public:
     HkWFContainer(const std::string& containerName);
 
-    void updateMySelf() override; // HkNodeBase
+    void onGeneralUpdate() override; // HkNodeBase
+    void onGeneralMouseMove() override; // HkNodeBase
 
     void repositionBasedOnParent();
 

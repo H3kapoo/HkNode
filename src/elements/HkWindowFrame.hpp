@@ -18,7 +18,12 @@ public:
     HkWindowFrame(const std::string& windowName);
 
     void rootUpdateMySelf() override; // IHkRootNode
-    void updateMySelf() override; // IHkNodeBase
+    // void updateMySelf() override; // IHkNodeBase
+
+    virtual void onGeneralMouseMove() override; // HkNodeBase
+    virtual void onGeneralMouseClick() override; // HkNodeBase
+    virtual void onGeneralUpdate() override; // HkNodeBase
+
 
     /* add whatever functionality.. */
     void updateChildren();

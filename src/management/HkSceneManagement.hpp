@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../base/HkNode.hpp" /* Yes, order is correct due to glew/glfw3 import order */
+#include "../base/HkNode.hpp" /* Yes, order is correct due to glew/glfw3 import order */ // TODO: fix import order, this import is no longer needed
 #include <GLFW/glfw3.h>
 
 #include <glm/glm.hpp>
@@ -11,7 +11,6 @@
 
 namespace hkui
 {
-
 enum class HkMouseButton
 {
     None,
@@ -24,7 +23,8 @@ enum class HkMouseButton
 enum class HkEvent
 {
     None,
-    FocusHoverScan,
+    FocusScan,
+    HoverScan,
     GeneralUpdate,
     WindowResize,
     MouseMove,
@@ -51,13 +51,11 @@ struct HkSceneData
     const char** droppedPaths;
 
     /*Selection*/
-    uint32_t maybeSelectedNodeId; /* refers to the currently selected node by means of mouseClick */
-    uint32_t maybeFocusedNodeId; /* refers to the node that was previously selected and its still on focus */
-    glm::ivec2 mouseOffsetFromCenter{ 0,0 }; /* offset from center of UI element clicked */
-
     uint32_t focusedId;
-    uint32_t focusedIdAux;
     glm::ivec2 mouseOffsetFromFocusedCenter;
+
+    /*Drag*/
+    bool isDragging;
 
     /*Hover*/
     uint32_t hoveredId;
@@ -82,7 +80,7 @@ public:
 
     void init(int wWidth, int wHeight);
     void setRoot(IHkRootNodeCPtr& newRootNode);
-    void update(const HkEvent& ev);
+    void update();
     void resizeWindowEvent(GLFWwindow*, int width, int height);
     void mouseMoveEvent(GLFWwindow*, double xPos, double yPos);
     void mouseClickEvent(GLFWwindow*, int button, int action, int);
@@ -95,6 +93,7 @@ public:
 
 private:
     HkSceneManagement() = default;
+    void update(const HkEvent& ev);
 
     HkSceneData sceneData;
     IHkRootNodePtr rootNode;

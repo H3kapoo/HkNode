@@ -16,61 +16,30 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
 // IHkRootNode
 void HkWindowFrame::rootUpdateMySelf() { updateMySelf(); }
 
-void HkWindowFrame::updateMySelf()
+void HkWindowFrame::onGeneralMouseMove()
 {
-    // /*main HkEvents handler*/
-    switch (sceneDataRef_.currentEvent)
+    // /* Safe to assume that this is what dragging the current element logic looks like */
+    // //TODO: A dragging state needs to be added in SM
+    if (sceneDataRef_.isMouseClicked && sceneDataRef_.focusedId == treeStruct_.getId())
     {
-    case HkEvent::None: break;
-    case HkEvent::FocusHoverScan:
-        if (sceneDataRef_.isMouseClicked && sceneDataRef_.clickedMouseButton == HkMouseButton::Left
-            && node_.transformContext.isPosInsideOfNode(sceneDataRef_.mousePos))
-        {
-            sceneDataRef_.focusedIdAux = treeStruct_.getId();
-            sceneDataRef_.mouseOffsetFromFocusedCenter = node_.transformContext.getPos() - sceneDataRef_.mousePos;
-        }
-
-        if (node_.transformContext.isPosInsideOfNode(sceneDataRef_.mousePos))
-        {
-            sceneDataRef_.hoveredId = treeStruct_.getId();
-        }
-        break;
-    case HkEvent::GeneralUpdate: break;
-    case HkEvent::WindowResize: break;
-    case HkEvent::MouseMove:
-        /* Safe to assume that this is what dragging the current element logic looks like */
-        if (sceneDataRef_.isMouseClicked && sceneDataRef_.focusedId == treeStruct_.getId())
-        {
-            node_.transformContext.setPos(sceneDataRef_.mouseOffsetFromFocusedCenter + sceneDataRef_.mousePos);
-        }
-        break;
-    case HkEvent::MouseClick:
-        // if (sceneDataRef_.maybeFocusedNodeId == treeStruct_.getId() && sceneDataRef_.isMouseClicked
-        //     && sceneDataRef_.clickedMouseButton == HkMouseButton::Right)
-        // {
-        //     std::cout << "Right mouse clicked on " << treeStruct_.getName() << '\n';
-        // }
-
-        /*TODO: this doesnt capture click release, fix later*/
-        // if (sceneDataRef_.maybeFocusedNodeId == treeStruct_.getId() && !sceneDataRef_.isMouseClicked
-        //     && sceneDataRef_.clickedMouseButton == HkMouseButton::Right)
-        // {
-        //     std::cout << "Right mouse released on " << treeStruct_.getName() << '\n';
-        // }
-        break;
-    case HkEvent::MouseEnterExit: break;
-    case HkEvent::MouseScroll: break;
-    case HkEvent::DropPath: break;
+        node_.transformContext.setPos(sceneDataRef_.mouseOffsetFromFocusedCenter + sceneDataRef_.mousePos);
+        // std::cout << sceneDataRef_.mouseOffsetFromFocusedCenter.x << " " << sceneDataRef_.mouseOffsetFromFocusedCenter.y << '\n';
     }
+}
 
-    // /*Don't forget to show node & update children*/
-    node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix());
-    updateChildren();
+void HkWindowFrame::onGeneralMouseClick()
+{
+    // if (sceneDataRef_.focusedId == treeStruct_.getId())
+        // std::cout << "MOuse has been clicked for " << treeStruct_.getName() << "\n";
+}
+
+void HkWindowFrame::onGeneralUpdate()
+{
 }
 
 void HkWindowFrame::updateChildren()
 {
-    wfCont_.updateMySelf();
+    // wfCont_.updateMySelf();
 }
 
 void HkWindowFrame::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)
