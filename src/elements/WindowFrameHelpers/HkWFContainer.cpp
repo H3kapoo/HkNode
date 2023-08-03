@@ -13,7 +13,6 @@ HkWFContainer::HkWFContainer(const std::string& containerName)
 void HkWFContainer::onGeneralUpdate()
 {
     repositionBasedOnParent();
-    // updateChildren();
 }
 
 void HkWFContainer::onGeneralMouseMove()
@@ -30,13 +29,7 @@ void HkWFContainer::repositionBasedOnParent()
 
     /* TODO: dirty flags shall be used here to not do redundant repositioning */
     node_.transformContext.setPos({ pos.x, pos.y + thisScale.y / 2 + scale.y / 2 });
-    node_.transformContext.setScale({ scale.x, 200 });
-}
-
-void HkWFContainer::updateChildren()
-{
-    for (const auto& child : treeStruct_.getChildren())
-        child->getPayload()->updateMySelf();
+    // node_.transformContext.setScale({ scale.x, 200 });
 }
 
 void HkWFContainer::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)

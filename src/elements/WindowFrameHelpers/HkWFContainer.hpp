@@ -15,7 +15,6 @@ public:
 
     void repositionBasedOnParent();
 
-    void updateChildren();
     void pushChildren(const std::vector<HkNodeBasePtr>& newChildren);
 };
 } // hkui

@@ -23,10 +23,9 @@ public:
     virtual void onGeneralMouseMove() override; // HkNodeBase
     virtual void onGeneralMouseClick() override; // HkNodeBase
     virtual void onGeneralUpdate() override; // HkNodeBase
-
+    virtual void onWindowResize() override; // HkNodeBase
 
     /* add whatever functionality.. */
-    void updateChildren();
     void pushChildren(const std::vector<HkNodeBasePtr>& newChildren);
     void printTree();
     void setColor(const glm::vec3& color);

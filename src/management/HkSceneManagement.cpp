@@ -13,6 +13,7 @@ HkSceneManagement& HkSceneManagement::get()
 
 HkSceneData& HkSceneManagement::getSceneDataRef() { return sceneData; }
 
+//TODO: this function shall be deprecated
 void HkSceneManagement::init(int wWidth, int wHeight)
 {
     sceneData.lastMousePos = sceneData.mousePos = { 0,0 };
@@ -27,10 +28,10 @@ void HkSceneManagement::init(int wWidth, int wHeight)
 void HkSceneManagement::setRoot(IHkRootNodeCPtr& newRootNode)
 {
     rootNode = newRootNode;
-    HkWindowFrameCPtr downcastedTemp = std::dynamic_pointer_cast<HkWindowFrame>(newRootNode);
-    if (downcastedTemp)
+    HkWindowFrameCPtr dcRoot = std::dynamic_pointer_cast<HkWindowFrame>(newRootNode);
+    if (dcRoot)
     {
-        std::cout << "Root for scene changed to: " << "TODO: Help print this node" << '\n';
+        std::cout << "Root for scene changed to: " << dcRoot->treeStruct_.getName() << '\n';
     }
     else
     {

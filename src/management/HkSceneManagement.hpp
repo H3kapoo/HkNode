@@ -1,7 +1,8 @@
 #pragma once
 
-#include "../base/HkNode.hpp" /* Yes, order is correct due to glew/glfw3 import order */ // TODO: fix import order, this import is no longer needed
-#include <GLFW/glfw3.h>
+// #include "../base/HkNode.hpp" /* Yes, order is correct due to glew/glfw3 import order */ // TODO: fix import order, this import is no longer needed
+// #include <GLFW/glfw3.h>
+#include "../APIGate/GlfwGlewGate.hpp"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

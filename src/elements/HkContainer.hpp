@@ -4,7 +4,6 @@
 #include <memory>
 
 #include "../management/HkSceneManagement.hpp"
-#include "../base/HkNode.hpp"
 
 namespace hkui
 {
@@ -18,7 +17,7 @@ public:
     void updateMySelf();
 
     void updateChildren();
-    void pushChildren(const std::vector<std::shared_ptr<HkNode>>& newChildren);
+    // void pushChildren(const std::vector<std::shared_ptr<HkNode>>& newChildren);
 
     /* Funcs to be removed when styling context comes */
     void printTree();

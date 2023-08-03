@@ -1,8 +1,8 @@
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+// #include <GL/glew.h>
+// #include <GLFW/glfw3.h>
+#include "APIGate/GlfwGlewGate.hpp"
 
 #include "renderer/HkShader.hpp"
-#include "base/HkNode.hpp"
 #include "management/HkSceneManagement.hpp"
 #include "elements/HkWindowFrame.hpp"
 #include "elements/HkContainer.hpp"
@@ -82,8 +82,9 @@ int main()
     HkWindowFramePtr windowFrame = std::make_shared<HkWindowFrame>("WindowFrameHaha");
 
     windowFrame->printTree();
-    windowFrame->setPos({ 1280 / 2, 720 / 2 });
-    windowFrame->setSize({ 800, 30 });
+    windowFrame->setPos({ 1280 * 0.5, 720 * 0.25 });
+    // windowFrame->setSize({ 300,600 });
+    windowFrame->setSize({ 1280 * 0.5, 720 * 0.5 });
 
     HkSceneManagement::get().setRoot(windowFrame);
     HkSceneManagement::get().init(1280, 720);

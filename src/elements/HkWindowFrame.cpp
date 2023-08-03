@@ -27,6 +27,17 @@ void HkWindowFrame::onGeneralMouseMove()
     }
 }
 
+void HkWindowFrame::onWindowResize()
+{
+    /* Techically root windows shall not resize with WINDOW itself, only children should resize with their parents */
+    //TODO: Future: Refactor transforms so that they have pivot at top left corner instead of center
+    // auto factor = 0.5f;
+    // auto factor2 = 0.25f;
+    // node_.transformContext.setScale({ sceneDataRef_.windowWidth * factor, 30 });
+    // wfCont_.node_.transformContext.setScale({ sceneDataRef_.windowWidth * factor, sceneDataRef_.windowHeight * factor });
+    // node_.transformContext.setPos({ sceneDataRef_.windowWidth * factor, sceneDataRef_.windowHeight * factor2 });
+}
+
 void HkWindowFrame::onGeneralMouseClick()
 {
     // if (sceneDataRef_.focusedId == treeStruct_.getId())
@@ -35,11 +46,6 @@ void HkWindowFrame::onGeneralMouseClick()
 
 void HkWindowFrame::onGeneralUpdate()
 {
-}
-
-void HkWindowFrame::updateChildren()
-{
-    // wfCont_.updateMySelf();
 }
 
 void HkWindowFrame::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)

@@ -74,10 +74,10 @@ void HkContainer::updateChildren()
     //     child->updateMySelf();
 }
 
-void HkContainer::pushChildren(const std::vector<std::shared_ptr<HkNode>>&)
-{
+// void HkContainer::pushChildren(const std::vector<std::shared_ptr<HkNode>>&)
+// {
     // HkNode::pushChildren(newChildren);
-}
+// }
 
 /* Funcs to be removed when styling context comes */
 // void HkContainer::printTree() { HkNode::printTree(); }
