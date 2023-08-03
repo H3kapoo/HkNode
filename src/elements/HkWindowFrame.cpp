@@ -5,7 +5,7 @@ namespace hkui
 
 HkWindowFrame::HkWindowFrame(const std::string& windowName)
     : HkNodeBase(windowName, "RootWindowFrame")
-    , wfCont_("ContainerFor_" + windowName)
+    , wfCont_("{Internal} ContainerFor_" + windowName)
 {
     node_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
     node_.renderContext.shader.setVec3f("color", glm::vec3(0.0f, 0.5f, 0.9f)); // BLUEish

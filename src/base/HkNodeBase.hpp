@@ -10,7 +10,7 @@ class HkNodeBase
 {
     friend class HkSceneManagement;
     friend class HkWindowFrame;
-    friend class HkWFContainer;
+    friend class HkContainer;
 public:
     HkNodeBase(const std::string& windowName, const std::string& type);
     virtual ~HkNodeBase() = default;

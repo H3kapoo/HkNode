@@ -7,7 +7,7 @@
 #include "../base/HkNodeBase.hpp"
 #include "../base/HkNodeData.hpp"
 #include "../base/HkTreeStructure.hpp"
-#include "WindowFrameHelpers/HkWFContainer.hpp"
+#include "HkContainer.hpp"
 
 namespace hkui
 {
@@ -33,7 +33,7 @@ public:
     void setSize(const glm::vec2& size);
 
 private:
-    HkWFContainer wfCont_;
+    HkContainer wfCont_;
 };
 using HkWindowFramePtr = std::shared_ptr<HkWindowFrame>;
 using HkWindowFrameCPtr = const std::shared_ptr<HkWindowFrame>;
