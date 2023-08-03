@@ -1,5 +1,3 @@
-// #include <GL/glew.h>
-// #include <GLFW/glfw3.h>
 #include "APIGate/GlfwGlewGate.hpp"
 
 #include "renderer/HkShader.hpp"
@@ -10,6 +8,7 @@
 
 using namespace hkui;
 
+//TODO: these shall be encapsulated inside HkSceneManagement
 void resizeCallback(GLFWwindow* window, int width, int height)
 {
     // let the user call the functions
@@ -78,13 +77,22 @@ int main()
         return -1;
     }
 
+    HkWindowFramePtr windowFrame = std::make_shared<HkWindowFrame>("MyWindowFrame");
+    HkContainerPtr ctr = std::make_shared<HkContainer>("MyContainer");
+    HkContainerPtr ctr2 = std::make_shared<HkContainer>("MyContainer2");
+    HkContainerPtr ctr3 = std::make_shared<HkContainer>("MyContainer3");
 
-    HkWindowFramePtr windowFrame = std::make_shared<HkWindowFrame>("WindowFrameHaha");
+    ctr->setColor({ 0.2f,0.3f,0.4f });
+    ctr2->setColor({ 0.3f,0.4f,0.5f });
+    ctr3->setColor({ 0.4f,0.5f,0.6f });
+    ctr->setSize({ 220, 100 });
+    ctr2->setSize({ 120, 100 });
+    ctr3->setSize({ 120, 100 });
 
-    windowFrame->printTree();
     windowFrame->setPos({ 1280 * 0.5, 720 * 0.25 });
-    // windowFrame->setSize({ 300,600 });
     windowFrame->setSize({ 1280 * 0.5, 720 * 0.5 });
+    windowFrame->pushChildren({ ctr, ctr2, ctr3 });
+    windowFrame->printTree();
 
     HkSceneManagement::get().setRoot(windowFrame);
     HkSceneManagement::get().init(1280, 720);

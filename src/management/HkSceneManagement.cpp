@@ -39,6 +39,7 @@ void HkSceneManagement::setRoot(IHkRootNodeCPtr& newRootNode)
     }
 }
 
+//TODO: Investigate in the future why calling update() one time generates more than one event loop
 void HkSceneManagement::update()
 {
     update(HkEvent::GeneralUpdate);
@@ -148,7 +149,7 @@ void HkSceneManagement::resolveFocus()
         sceneData.focusedId = HkSceneData::NO_SELECTION_ID;
         sceneData.mouseOffsetFromFocusedCenter = { 0,0 };
         update(HkEvent::FocusScan);
-        std::cout << glfwGetTime() << " Focused ID is: " << sceneData.focusedId << '\n';
+        // std::cout << glfwGetTime() << " Focused ID is: " << sceneData.focusedId << '\n';
     }
 }
 

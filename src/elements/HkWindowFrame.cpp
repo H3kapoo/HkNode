@@ -40,12 +40,14 @@ void HkWindowFrame::onWindowResize()
 
 void HkWindowFrame::onGeneralMouseClick()
 {
-    // if (sceneDataRef_.focusedId == treeStruct_.getId())
-        // std::cout << "MOuse has been clicked for " << treeStruct_.getName() << "\n";
 }
 
 void HkWindowFrame::onGeneralUpdate()
 {
+    node_.constraintContext.windowFrameContainerConstraint(
+        node_.transformContext,
+        wfCont_.node_.transformContext
+    );
 }
 
 void HkWindowFrame::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)

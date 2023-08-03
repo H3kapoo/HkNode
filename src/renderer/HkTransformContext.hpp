@@ -31,7 +31,5 @@ private:
     glm::ivec2 scale, rot;
     glm::ivec2 currentPos, lastPos, currLastDiff, diffCpy{ 0,0 };
     glm::mat4 modelMat;
-
-    bool firstSetting{ true };
 };
 } // hkui

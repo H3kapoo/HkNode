@@ -36,8 +36,12 @@ void HkNodeBase::updateMySelf()
     case HkEvent::DropPath: break;
     }
 
+    //TODO: Constraintor should be here, something like
+    // node_.constraintContext()
+
     // render parent -> update element children
     node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix());
+    // std::cout << glfwGetTime() << " Rendered " << treeStruct_.getName() << '\n';
     for (const auto& child : treeStruct_.getChildren())
         child->getPayload()->updateMySelf();
 }

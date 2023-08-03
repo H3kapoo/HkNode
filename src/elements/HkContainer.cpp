@@ -12,25 +12,23 @@ HkContainer::HkContainer(const std::string& containerName)
 
 void HkContainer::onGeneralUpdate()
 {
-    repositionBasedOnParent();
+    //TODO: this should definitely dissapear from here and a more efficent way needs to be implemented
+    //      . experimental for now
+    std::vector<HkTransformContext*> childTcs;
+    childTcs.reserve(treeStruct_.getChildren().size());
+    for (const auto& child : treeStruct_.getChildren())
+    {
+        childTcs.push_back(&child->getPayload()->node_.transformContext);
+    }
+
+    node_.constraintContext.freeConstraint(
+        node_.transformContext,
+        childTcs
+    );
 }
 
 void HkContainer::onGeneralMouseMove()
-{
-}
-
-void HkContainer::repositionBasedOnParent()
-{
-    /* This node type is always guaranteed to have a parent */
-    HkNodeBase* parent = treeStruct_.getParent()->getPayload();
-    const auto pos = parent->node_.transformContext.getPos();
-    const auto scale = parent->node_.transformContext.getScale();
-    const auto thisScale = node_.transformContext.getScale();
-
-    /* TODO: dirty flags shall be used here to not do redundant repositioning */
-    node_.transformContext.setPos({ pos.x, pos.y + thisScale.y / 2 + scale.y / 2 });
-    // node_.transformContext.setScale({ scale.x, 200 });
-}
+{}
 
 void HkContainer::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)
 {
@@ -38,5 +36,19 @@ void HkContainer::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)
     {
         treeStruct_.pushChild(&child->treeStruct_);
     }
+}
+
+// bewllow to be removed later when constraints come
+void HkContainer::setColor(const glm::vec3& color)
+{
+    node_.renderContext.shader.setVec3f("color", color);
+}
+
+void HkContainer::setPos(const glm::vec2& pos) {
+    node_.transformContext.setPos(pos);
+}
+
+void HkContainer::setSize(const glm::vec2& size) {
+    node_.transformContext.setScale(size);
 }
 } // hkui

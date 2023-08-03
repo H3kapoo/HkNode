@@ -18,6 +18,7 @@ private:
     /* These functions/params will be accessible to friend classes but will not be accessible to user */
     virtual void updateMySelf();
 
+    /* Derived can implement whatever function it needs */
     virtual void onGeneralUpdate();
     virtual void onWindowResize();
     virtual void onGeneralMouseMove();
