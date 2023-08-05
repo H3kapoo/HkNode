@@ -5,24 +5,24 @@
 namespace hkui
 {
 HkTransformContext::HkTransformContext()
-    : scale{ 200,100 }, currentPos{ 100,100 }, lastPos{ 100,100 }, currLastDiff{ 0,0 }
+    : scale{ 200,100 }, pos{ 100,100 }, lastPos{ 100,100 }, currLastDiff{ 0,0 }
 {
     computeModelMatrix();
 }
 
 void HkTransformContext::addPos(const glm::ivec2& pos)
 {
-    lastPos = currentPos;
-    currentPos += pos;
-    currLastDiff = currentPos - lastPos;
+    lastPos = pos;
+    this->pos += pos;
+    currLastDiff = pos - lastPos;
     computeModelMatrix();
 }
 
 void HkTransformContext::setPos(const glm::ivec2& pos)
 {
-    lastPos = currentPos;
-    currentPos = pos;
-    currLastDiff = currentPos - lastPos;
+    lastPos = pos;
+    this->pos = pos;
+    currLastDiff = pos - lastPos;
     computeModelMatrix();
 }
 
@@ -38,13 +38,6 @@ void HkTransformContext::setScale(const glm::ivec2& scale)
     computeModelMatrix();
 }
 
-/* These can't be made const since we return ref. If we dont return with ref, efficency might
-   be impacted due to a lot of copying since these functions are called a lot. Necessary tradefoff.
-   Use with care.*/
-glm::ivec2& HkTransformContext::getPos() { return currentPos; }
-
-glm::ivec2& HkTransformContext::getScale() { return scale; }
-
 glm::mat4& HkTransformContext::getModelMatrix() { return modelMat; }
 
 bool HkTransformContext::isPosInsideOfNode(const glm::ivec2& pin)
@@ -53,11 +46,11 @@ bool HkTransformContext::isPosInsideOfNode(const glm::ivec2& pin)
     // so the middle is height/2 middle/2
     // TODO: optimize
     // glm::ivec2 workingPos = pos + offsetFromParent;
-    float xmin = currentPos.x - scale.x / 2;
-    float xmax = currentPos.x + scale.x / 2;
+    float xmin = pos.x - scale.x / 2;
+    float xmax = pos.x + scale.x / 2;
 
-    float ymin = currentPos.y - scale.y / 2;
-    float ymax = currentPos.y + scale.y / 2;
+    float ymin = pos.y - scale.y / 2;
+    float ymax = pos.y + scale.y / 2;
     if (xmin < pin.x && pin.x < xmax && ymin < pin.y && pin.y < ymax)
         return true;
     return false;
@@ -67,7 +60,7 @@ bool HkTransformContext::isPosInsideOfNode(const glm::ivec2& pin)
 void HkTransformContext::computeModelMatrix()
 {
     modelMat = glm::mat4(1.0f);
-    modelMat = glm::translate(modelMat, glm::vec3(currentPos, -1.0f)); // it goes negative, expected
+    modelMat = glm::translate(modelMat, glm::vec3(pos, -1.0f)); // it goes negative, expected
     // modelMat = glm::translate(modelMat, glm::vec3(pivotPoint_, 0));
     // modelMat = glm::rotate(modelMat, glm::radians(glm::degrees(rot_)), glm::vec3(0, 0, 1));
     modelMat = glm::scale(modelMat, glm::vec3(scale, 1.0f));

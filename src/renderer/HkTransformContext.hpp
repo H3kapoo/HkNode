@@ -25,11 +25,11 @@ public:
     void clearDiff();
     bool isPosInsideOfNode(const glm::ivec2& pin);
 
+    glm::ivec2 scale, rot, pos;
 private:
     void computeModelMatrix();
 
-    glm::ivec2 scale, rot;
-    glm::ivec2 currentPos, lastPos, currLastDiff, diffCpy{ 0,0 };
+    glm::ivec2 lastPos, currLastDiff, diffCpy{ 0,0 };
     glm::mat4 modelMat;
 };
 } // hkui

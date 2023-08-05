@@ -78,6 +78,9 @@ int main()
     }
 
     HkWindowFramePtr windowFrame = std::make_shared<HkWindowFrame>("MyWindowFrame");
+
+    windowFrame->setConstraintPolicy(HkConstraintPolicy::AlignHorizontally);
+
     HkContainerPtr ctr = std::make_shared<HkContainer>("MyContainer");
     HkContainerPtr ctr2 = std::make_shared<HkContainer>("MyContainer2");
     HkContainerPtr ctr3 = std::make_shared<HkContainer>("MyContainer3");

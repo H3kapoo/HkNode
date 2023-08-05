@@ -11,18 +11,29 @@ class HkNodeBase
     friend class HkSceneManagement;
     friend class HkWindowFrame;
     friend class HkContainer;
+
+    friend class HkConstraintContext;
+
 public:
     HkNodeBase(const std::string& windowName, const std::string& type);
     virtual ~HkNodeBase() = default;
 private:
     /* These functions/params will be accessible to friend classes but will not be accessible to user */
+    /* Derived can override whatever function it needs */
     virtual void updateMySelf();
 
-    /* Derived can implement whatever function it needs */
+    /* Constraints */
+    virtual void resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children);
+
+    /* Events */
     virtual void onGeneralUpdate();
     virtual void onWindowResize();
     virtual void onGeneralMouseMove();
     virtual void onGeneralMouseClick();
+
+    /* Normal internal functions */
+    void resolveHover();
+    void resolveFocus();
 
     HkNodeData node_;
     HkTreeStructure<HkNodeBase> treeStruct_;

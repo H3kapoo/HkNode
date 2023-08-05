@@ -20,10 +20,12 @@ public:
     void rootUpdateMySelf() override; // IHkRootNode
     // void updateMySelf() override; // IHkNodeBase
 
-    virtual void onGeneralMouseMove() override; // HkNodeBase
-    virtual void onGeneralMouseClick() override; // HkNodeBase
-    virtual void onGeneralUpdate() override; // HkNodeBase
-    virtual void onWindowResize() override; // HkNodeBase
+    void resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>&);
+
+    void onGeneralMouseMove() override; // HkNodeBase
+    void onGeneralMouseClick() override; // HkNodeBase
+    void onGeneralUpdate() override; // HkNodeBase
+    void onWindowResize() override; // HkNodeBase
 
     /* add whatever functionality.. */
     void pushChildren(const std::vector<HkNodeBasePtr>& newChildren);
@@ -31,6 +33,9 @@ public:
     void setColor(const glm::vec3& color);
     void setPos(const glm::vec2& pos);
     void setSize(const glm::vec2& size);
+
+    /* Constraints */
+    void setConstraintPolicy(const HkConstraintPolicy policy);
 
 private:
     HkContainer wfCont_;

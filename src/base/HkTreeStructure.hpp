@@ -57,6 +57,7 @@ public:
     std::shared_ptr<HkTreeStructure> hasChild(uint32_t childId) const;
 
     /*Overloads*/
+    //TODO: THis causes redefinition problems
     template<class U>
     friend std::ostream& operator<<(std::ostream& os, const HkTreeStructure<U>* node)
     {

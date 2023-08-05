@@ -10,6 +10,7 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
     node_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
     node_.renderContext.shader.setVec3f("color", glm::vec3(0.0f, 0.5f, 0.9f)); // BLUEish
     node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix());
+    // node_.constraintContext.setPolicy(HkConstraintPolicy::WINDOW_FRAME_CONT);
     treeStruct_.pushChild(&wfCont_.treeStruct_);
 }
 
@@ -34,20 +35,22 @@ void HkWindowFrame::onWindowResize()
     // auto factor = 0.5f;
     // auto factor2 = 0.25f;
     // node_.transformContext.setScale({ sceneDataRef_.windowWidth * factor, 30 });
-    // wfCont_.node_.transformContext.setScale({ sceneDataRef_.windowWidth * factor, sceneDataRef_.windowHeight * factor });
     // node_.transformContext.setPos({ sceneDataRef_.windowWidth * factor, sceneDataRef_.windowHeight * factor2 });
+    // wfCont_.node_.transformContext.setScale({ sceneDataRef_.windowWidth * factor, sceneDataRef_.windowHeight * factor });
 }
 
 void HkWindowFrame::onGeneralMouseClick()
 {
 }
 
+void HkWindowFrame::resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>&)
+{
+    node_.constraintContext.windowFrameContainerConstraint(wfCont_.node_.transformContext);
+
+}
+
 void HkWindowFrame::onGeneralUpdate()
 {
-    node_.constraintContext.windowFrameContainerConstraint(
-        node_.transformContext,
-        wfCont_.node_.transformContext
-    );
 }
 
 void HkWindowFrame::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)
@@ -74,5 +77,10 @@ void HkWindowFrame::setPos(const glm::vec2& pos) {
 void HkWindowFrame::setSize(const glm::vec2& size) {
     node_.transformContext.setScale({ size.x, 30 });
     wfCont_.node_.transformContext.setScale(size);
+}
+
+void HkWindowFrame::setConstraintPolicy(const HkConstraintPolicy policy)
+{
+    wfCont_.node_.constraintContext.setPolicy(policy);
 }
 } // hkui
