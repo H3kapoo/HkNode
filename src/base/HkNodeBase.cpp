@@ -26,7 +26,6 @@ void HkNodeBase::updateMySelf()
     case HkEvent::DropPath: break;
     }
 
-    //TODO: Definitely smart optimize this out..we dont want to create a vec each frame just for this
     auto& children = treeStruct_.getChildren();
     resolveConstraints(children);
 

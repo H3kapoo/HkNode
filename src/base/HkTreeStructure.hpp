@@ -51,6 +51,16 @@ public:
         }
     }
 
+    void pushChildAfter(const std::vector<HkTreeStructure<T>*>::iterator index, HkTreeStructure<T>* child)
+    {
+        if (child)
+        {
+            if (child->isParented_ || child->getId() == id_) return;
+            child->setParent(this);
+            children_.insert(index, child);
+        }
+    }
+
     void printChildren() const;
     void printBfs() const;
     void printTree() const { printTreeAux(0); }

@@ -5,26 +5,25 @@ namespace hkui
 
 HkWindowFrame::HkWindowFrame(const std::string& windowName)
     : HkNodeBase(windowName, "RootWindowFrame")
-    , wfCont_("{Internal} ContainerFor_" + windowName)
+    , wfCont_("{Internal}-ContainerFor " + windowName)
 {
     node_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
     node_.renderContext.shader.setVec3f("color", glm::vec3(0.0f, 0.5f, 0.9f)); // BLUEish
     node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix());
-    // node_.constraintContext.setPolicy(HkConstraintPolicy::WINDOW_FRAME_CONT);
     treeStruct_.pushChild(&wfCont_.treeStruct_);
+
+    wfCont_.scrollbars(true, true);
 }
 
-// IHkRootNode
 void HkWindowFrame::rootUpdateMySelf() { updateMySelf(); }
 
 void HkWindowFrame::onGeneralMouseMove()
 {
     // /* Safe to assume that this is what dragging the current element logic looks like */
-    // //TODO: A dragging state needs to be added in SM
+    // //TODO: A dragging state needs to be added in SM => added, just adapt THIS code
     if (sceneDataRef_.isMouseClicked && sceneDataRef_.focusedId == treeStruct_.getId())
     {
         node_.transformContext.setPos(sceneDataRef_.mouseOffsetFromFocusedCenter + sceneDataRef_.mousePos);
-        // std::cout << sceneDataRef_.mouseOffsetFromFocusedCenter.x << " " << sceneDataRef_.mouseOffsetFromFocusedCenter.y << '\n';
     }
 }
 
@@ -40,25 +39,19 @@ void HkWindowFrame::onWindowResize()
 }
 
 void HkWindowFrame::onGeneralMouseClick()
-{
-}
+{}
 
 void HkWindowFrame::resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>&)
 {
     node_.constraintContext.windowFrameContainerConstraint(wfCont_.node_.transformContext);
-
 }
 
 void HkWindowFrame::onGeneralUpdate()
-{
-}
+{}
 
 void HkWindowFrame::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)
 {
-    for (const auto& child : newChildren)
-    {
-        wfCont_.treeStruct_.pushChild(&child->treeStruct_);
-    }
+    wfCont_.pushChildren(newChildren);
 }
 
 void HkWindowFrame::printTree() {

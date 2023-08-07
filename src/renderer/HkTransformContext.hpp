@@ -18,13 +18,12 @@ public:
     void addScale(const glm::ivec2& scale);
     void setScale(const glm::ivec2& scale);
 
-    glm::ivec2& getPos();
-    glm::ivec2& getScale();
     glm::mat4& getModelMatrix();
 
     void clearDiff();
     bool isPosInsideOfNode(const glm::ivec2& pin);
 
+    /* Note: Even if these are public, still use the setters, they do more work under the hood! */
     glm::ivec2 scale, rot, pos;
 private:
     void computeModelMatrix();

@@ -12,6 +12,8 @@ class HkNodeBase
     friend class HkWindowFrame;
     friend class HkContainer;
 
+    friend class HkScrollBar;
+
     friend class HkConstraintContext;
 
 public:

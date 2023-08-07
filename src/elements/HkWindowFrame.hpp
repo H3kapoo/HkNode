@@ -8,24 +8,25 @@
 #include "../base/HkNodeData.hpp"
 #include "../base/HkTreeStructure.hpp"
 #include "HkContainer.hpp"
+#include "helpers/HkScrollBar.hpp"
 
 namespace hkui
 {
-/* This shall serve as the root of the scene manager, it has no parent and can only host children.*/
 class HkWindowFrame : public HkNodeBase, public IHkRootNode
 {
 public:
     HkWindowFrame(const std::string& windowName);
 
-    void rootUpdateMySelf() override; // IHkRootNode
-    // void updateMySelf() override; // IHkNodeBase
+    /* IHRootNode */
+    void rootUpdateMySelf() override;
 
-    void resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>&);
+    /* HkNodeBase */
+    void resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children) override;
 
-    void onGeneralMouseMove() override; // HkNodeBase
-    void onGeneralMouseClick() override; // HkNodeBase
-    void onGeneralUpdate() override; // HkNodeBase
-    void onWindowResize() override; // HkNodeBase
+    void onGeneralMouseMove() override;
+    void onGeneralMouseClick() override;
+    void onGeneralUpdate() override;
+    void onWindowResize() override;
 
     /* add whatever functionality.. */
     void pushChildren(const std::vector<HkNodeBasePtr>& newChildren);
@@ -39,6 +40,7 @@ public:
 
 private:
     HkContainer wfCont_;
+
 };
 using HkWindowFramePtr = std::shared_ptr<HkWindowFrame>;
 using HkWindowFrameCPtr = const std::shared_ptr<HkWindowFrame>;

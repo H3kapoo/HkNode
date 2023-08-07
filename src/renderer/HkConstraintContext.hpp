@@ -18,6 +18,7 @@ class HkNodeBase;
 class HkConstraintContext
 {
 public:
+    HkConstraintContext() : isOverflowX{ false }, isOverflowY{ false } {}
 
     void setRootTc(HkTransformContext* rootTc);
 
@@ -28,12 +29,17 @@ public:
     void windowFrameContainerConstraint(HkTransformContext& childTc);
 
     void alignHorizontally(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
+    void alignVertically(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
+
+    void scrollBarConstrain(const bool isHorizontalBar);
 
     void freeConstraint(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
 
+    // ConstraintParams..
+    bool isOverflowX;
+    bool isOverflowY;
 private:
     HkConstraintPolicy policy_;
     HkTransformContext* thisTc_;
-    // ConstraintParams..
 };
 } // hkui
