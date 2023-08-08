@@ -31,7 +31,9 @@ public:
     void alignHorizontally(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
     void alignVertically(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
 
-    void scrollBarConstrain(const bool isHorizontalBar);
+    /* Scrollbar related */
+    void scrollBarConstrain(HkTransformContext& scrollBarTc, bool isHorizontalBar);
+    void constrainSBKnob(bool isFromHorizontalSB, float currKnobValue, HkTransformContext& knobTc);
 
     void freeConstraint(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
 

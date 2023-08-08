@@ -15,6 +15,8 @@ public:
     void onGeneralUpdate() override;
     void onGeneralMouseMove() override;
 
+    void resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children);
+
     void pushChildren(const std::vector<HkNodeBasePtr>& newChildren);
     void scrollbars(bool x, bool y);
 

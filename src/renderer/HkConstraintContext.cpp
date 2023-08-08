@@ -56,6 +56,8 @@ void HkConstraintContext::alignHorizontally(const std::vector<HkTreeStructure<Hk
     const auto childrenWidth = std::accumulate(children.begin(), children.end(), 0,
         [](int total, HkTreeStructure<HkNodeBase>* child)
         {
+            /* Skip ScrollBars from width calc */
+            if (child->getType() == "ScrollBar") return total;
             return total + child->getPayload()->node_.transformContext.scale.x;
         });
 
@@ -64,6 +66,8 @@ void HkConstraintContext::alignHorizontally(const std::vector<HkTreeStructure<Hk
     auto startPosX = thisTc_->pos.x - thisTc_->scale.x / 2 + spaceLeft / 2;
     for (const auto& child : children)
     {
+        if (child->getType() == "ScrollBar") continue;
+
         auto& childTc = child->getPayload()->node_.transformContext;
         startPosX += childTc.scale.x / 2;
         childTc.setPos({ startPosX , thisTc_->pos.y });
@@ -71,9 +75,40 @@ void HkConstraintContext::alignHorizontally(const std::vector<HkTreeStructure<Hk
     }
 }
 
-void HkConstraintContext::scrollBarConstrain(const bool isHorizontalBar)
+void HkConstraintContext::constrainSBKnob(bool isFromHorizontalSB, float currKnobValue, HkTransformContext& knobTc)
 {
+    const auto knobSqSize = std::min(thisTc_->scale.x, thisTc_->scale.y);
+    knobTc.setScale({ knobSqSize, knobSqSize });
 
+    if (isFromHorizontalSB)
+    {
+        const auto minX = thisTc_->pos.x - thisTc_->scale.x / 2 + knobSqSize / 2;
+        const auto maxX = thisTc_->pos.x + thisTc_->scale.x / 2 - knobSqSize / 2;
+        const auto posX = minX * (1.0f - currKnobValue) + currKnobValue * maxX;
+        knobTc.setPos({ posX, thisTc_->pos.y });
+    }
+    else
+    {
+        const auto minY = thisTc_->pos.y - thisTc_->scale.y / 2 + knobSqSize / 2;
+        const auto maxY = thisTc_->pos.y + thisTc_->scale.y / 2 - knobSqSize / 2;
+        const auto posY = minY * (1.0f - currKnobValue) + currKnobValue * maxY;
+        knobTc.setPos({ thisTc_->pos.x, posY });
+    }
+}
+
+void HkConstraintContext::scrollBarConstrain(HkTransformContext& scrollBarTc, bool isHorizontalBar)
+{
+    const auto barScale = 20;
+    if (isHorizontalBar)
+    {
+        scrollBarTc.setScale({ thisTc_->scale.x - barScale, barScale });
+        scrollBarTc.setPos({ thisTc_->pos.x - barScale / 2, thisTc_->pos.y + thisTc_->scale.y / 2 - barScale / 2 });
+    }
+    else
+    {
+        scrollBarTc.setScale({ barScale, thisTc_->scale.y - barScale });
+        scrollBarTc.setPos({ thisTc_->pos.x + thisTc_->scale.x / 2 - barScale / 2, thisTc_->pos.y - barScale / 2 });
+    }
 }
 
 void HkConstraintContext::windowFrameContainerConstraint(HkTransformContext& childTc)
