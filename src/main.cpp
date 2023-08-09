@@ -84,17 +84,23 @@ int main()
     HkContainerPtr ctr = std::make_shared<HkContainer>("MyContainer");
     HkContainerPtr ctr2 = std::make_shared<HkContainer>("MyContainer2");
     HkContainerPtr ctr3 = std::make_shared<HkContainer>("MyContainer3");
+    HkContainerPtr ctr4 = std::make_shared<HkContainer>("MyContainer4");
+    HkContainerPtr ctr5 = std::make_shared<HkContainer>("MyContainer5");
 
     ctr->setColor({ 0.2f,0.3f,0.4f });
     ctr2->setColor({ 0.3f,0.4f,0.5f });
     ctr3->setColor({ 0.4f,0.5f,0.6f });
+    ctr4->setColor({ 0.7f,0.8f,0.9f });
+    ctr5->setColor({ 0.0f,0.1f,0.2f });
     ctr->setSize({ 220, 100 });
-    ctr2->setSize({ 120, 100 });
+    ctr2->setSize({ 220, 100 });
     ctr3->setSize({ 120, 100 });
+    ctr4->setSize({ 120, 100 });
+    ctr5->setSize({ 120, 100 });
 
     windowFrame->setPos({ 1280 * 0.5, 720 * 0.25 });
     windowFrame->setSize({ 1280 * 0.5, 720 * 0.5 });
-    windowFrame->pushChildren({ ctr, ctr2, ctr3 });
+    windowFrame->pushChildren({ ctr, ctr2, ctr3, ctr4, ctr5 });
     windowFrame->printTree();
 
     HkSceneManagement::get().setRoot(windowFrame);

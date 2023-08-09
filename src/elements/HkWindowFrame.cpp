@@ -39,7 +39,10 @@ void HkWindowFrame::onWindowResize()
 }
 
 void HkWindowFrame::onGeneralMouseClick()
-{}
+{
+    std::cout << glfwGetTime() << '\n';
+    printTree();
+}
 
 void HkWindowFrame::resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>&)
 {

@@ -12,9 +12,6 @@ public:
     HkContainer(const std::string& containerName);
 
     /* HkNodeBase */
-    void onGeneralUpdate() override;
-    void onGeneralMouseMove() override;
-
     void resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children);
 
     void pushChildren(const std::vector<HkNodeBasePtr>& newChildren);

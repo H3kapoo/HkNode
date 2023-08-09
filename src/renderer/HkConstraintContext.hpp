@@ -40,6 +40,11 @@ public:
     // ConstraintParams..
     bool isOverflowX;
     bool isOverflowY;
+
+    glm::ivec2 additionalOffset_{ 0,0 };
+    uint32_t vScrollBarHeight_;
+    uint32_t hScrollBarWidth_;
+
 private:
     HkConstraintPolicy policy_;
     HkTransformContext* thisTc_;

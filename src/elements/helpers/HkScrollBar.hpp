@@ -17,6 +17,9 @@ public:
 
     bool isHorizontalScrollBar() const;
     void setScrollValue(float value);
+    float getScrollValue() const;
+    bool isScrollBarActive() const;
+    bool setScrollBarActive(const bool isActive);
 
     /* HkNodeBase */
     void resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>&);
@@ -27,6 +30,7 @@ public:
 private:
     HkKnob knob_;
     bool isHorizontal_;
+    bool isActive_;
 };
 using HkScrollBarPtr = std::shared_ptr<HkScrollBar>;
 using HkScrollBarCPtr = const std::shared_ptr<HkScrollBar>;

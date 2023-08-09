@@ -16,25 +16,35 @@ HkContainer::HkContainer(const std::string& containerName)
 //TODO: Just for experimenting
 void HkContainer::scrollbars(bool x, bool y)
 {
-    x ? treeStruct_.pushChild(&hScrollBar_.treeStruct_) : treeStruct_.removeChildren({ hScrollBar_.treeStruct_.getId() });
-    y ? treeStruct_.pushChild(&vScrollBar_.treeStruct_) : treeStruct_.removeChildren({ vScrollBar_.treeStruct_.getId() });
-    sbCount_ = x + y;
+    // x ? treeStruct_.pushChild(&hScrollBar_.treeStruct_) : treeStruct_.removeChildren({ hScrollBar_.treeStruct_.getId() });
+    // y ? treeStruct_.pushChild(&vScrollBar_.treeStruct_) : treeStruct_.removeChildren({ vScrollBar_.treeStruct_.getId() });
+    // sbCount_ = x + y;
 }
 
 void HkContainer::resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children)
 {
     HkNodeBase::resolveConstraints(children);
 
+    if (!hScrollBar_.isScrollBarActive() && node_.constraintContext.isOverflowX)
+    {
+        sbCount_++;
+        hScrollBar_.setScrollBarActive(true);
+        treeStruct_.pushChild(&hScrollBar_.treeStruct_);
+    }
+    else if (hScrollBar_.isScrollBarActive() && !node_.constraintContext.isOverflowX)
+    {
+        sbCount_--;
+        hScrollBar_.setScrollBarActive(false);
+        treeStruct_.removeChildren({ hScrollBar_.treeStruct_.getId() });
+    }
+
     node_.constraintContext.scrollBarConstrain(hScrollBar_.node_.transformContext, true);
     node_.constraintContext.scrollBarConstrain(vScrollBar_.node_.transformContext, false);
-}
 
-void HkContainer::onGeneralUpdate()
-{
+    node_.constraintContext.additionalOffset_ = { 100 * hScrollBar_.getScrollValue(), 0 };
+    node_.constraintContext.hScrollBarWidth_ = hScrollBar_.node_.transformContext.scale.y;
+    node_.constraintContext.vScrollBarHeight_ = vScrollBar_.node_.transformContext.scale.x;
 }
-
-void HkContainer::onGeneralMouseMove()
-{}
 
 void HkContainer::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)
 {

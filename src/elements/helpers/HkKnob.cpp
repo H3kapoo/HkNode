@@ -29,7 +29,6 @@ void HkKnob::computeKnobValue()
         const float maxX = parentTc.pos.x + parentTc.scale.x / 2;
         // https://rosettacode.org/wiki/Map_range
         setValue((sceneDataRef_.mousePos.x - minX) / (maxX - minX));
-        std::cout << glfwGetTime() << " " << value_ << "\n";
     }
     else
     {
@@ -37,7 +36,6 @@ void HkKnob::computeKnobValue()
         const float maxY = parentTc.pos.y + parentTc.scale.y / 2;
         // https://rosettacode.org/wiki/Map_range
         setValue((sceneDataRef_.mousePos.y - minY) / (maxY - minY));
-        std::cout << glfwGetTime() << " " << value_ << "\n";
     }
 }
 
@@ -50,7 +48,6 @@ bool HkKnob::isHorizontal() const
 {
     return isHorizontalKnob_;
 }
-
 
 void HkKnob::setValue(float value)
 {

@@ -30,6 +30,21 @@ void HkScrollBar::onGeneralMouseClick()
     }
 }
 
+float HkScrollBar::getScrollValue() const
+{
+    return knob_.getValue();
+}
+
+bool HkScrollBar::isScrollBarActive() const
+{
+    return isActive_;
+}
+
+bool HkScrollBar::setScrollBarActive(const bool isActive)
+{
+    isActive_ = isActive;
+}
+
 void HkScrollBar::setScrollValue(float value)
 {
     knob_.setValue(value);

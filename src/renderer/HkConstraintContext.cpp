@@ -57,13 +57,25 @@ void HkConstraintContext::alignHorizontally(const std::vector<HkTreeStructure<Hk
         [](int total, HkTreeStructure<HkNodeBase>* child)
         {
             /* Skip ScrollBars from width calc */
+            //TODO: Maybe introduce enum types so we dont compare strings each time?
             if (child->getType() == "ScrollBar") return total;
             return total + child->getPayload()->node_.transformContext.scale.x;
         });
 
     const auto spaceLeft = thisTc_->scale.x - childrenWidth;
 
-    auto startPosX = thisTc_->pos.x - thisTc_->scale.x / 2 + spaceLeft / 2;
+    // std::cout << glfwGetTime() << " width available: " << thisTc_->scale.x
+        // << " width calculated: " << childrenWidth << '\n';
+    if (thisTc_->scale.x < childrenWidth)
+    {
+        isOverflowX = true;
+    }
+    else
+    {
+        isOverflowX = false;
+    }
+
+    auto startPosX = thisTc_->pos.x - thisTc_->scale.x / 2 + spaceLeft / 2 - additionalOffset_.x;
     for (const auto& child : children)
     {
         if (child->getType() == "ScrollBar") continue;
