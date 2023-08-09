@@ -14,12 +14,58 @@ void HkConstraintContext::resolveConstraints(std::vector<HkTreeStructure<HkNodeB
     if (children.empty()) return;
 
     /* TODO: dirty flags shall be used here to not do redundant repositioning */
-
     switch (policy_)
     {
     case HkConstraintPolicy::AlignHorizontally:
-        alignHorizontally(children);
+        // alignHorizontally(children);
+        alignLeftRight(children);
         break;
+    }
+}
+void HkConstraintContext::alignLeftRight(const std::vector<HkTreeStructure<HkNodeBase>*>& children)
+{
+    /*
+        Centers children horizontally inside the parent and places children one after the other horizontally.
+        Parent's Y value is used for the children Y value.
+    */
+    const auto childrenWidth = std::accumulate(children.begin(), children.end(), 0,
+        [](int total, HkTreeStructure<HkNodeBase>* child)
+        {
+            /* Skip ScrollBars from width calc */
+            //TODO: Maybe introduce enum types so we dont compare strings each time?
+            if (child->getType() == "ScrollBar") return total;
+            return total + child->getPayload()->node_.transformContext.scale.x;
+        });
+
+    const auto spaceLeft = thisTc_->scale.x - childrenWidth;
+
+    // std::cout << glfwGetTime() << " wa: " << thisTc_->scale.x
+        // << " wc: " << childrenWidth
+        // << " dc: " << spaceLeft << '\n';
+
+    /* This should be it's separate function. This will be the effective trigger to tell if scrollbars
+       are needed to scroll the content or not */
+    if (spaceLeft < 0)
+    {
+        overflowXYSize_.x = -spaceLeft;
+        isOverflowX = true;
+    }
+    else
+    {
+        overflowXYSize_.x = 0;
+        isOverflowX = false;
+    }
+    // (thisTc_->scale.x < childrenWidth) ? isOverflowY = true : isOverflowY = false;
+
+    auto startPosX = thisTc_->pos.x - thisTc_->scale.x / 2 - offsetPercentage_.x * overflowXYSize_.x;
+    for (const auto& child : children)
+    {
+        if (child->getType() == "ScrollBar") continue;
+
+        auto& childTc = child->getPayload()->node_.transformContext;
+        startPosX += childTc.scale.x / 2;
+        childTc.setPos({ startPosX , thisTc_->pos.y });
+        startPosX += childTc.scale.x / 2;
     }
 }
 
@@ -64,18 +110,16 @@ void HkConstraintContext::alignHorizontally(const std::vector<HkTreeStructure<Hk
 
     const auto spaceLeft = thisTc_->scale.x - childrenWidth;
 
-    // std::cout << glfwGetTime() << " width available: " << thisTc_->scale.x
-        // << " width calculated: " << childrenWidth << '\n';
-    if (thisTc_->scale.x < childrenWidth)
-    {
-        isOverflowX = true;
-    }
-    else
-    {
-        isOverflowX = false;
-    }
+    std::cout << glfwGetTime() << " width available: " << thisTc_->scale.x
+        << " width calculated: " << childrenWidth
+        << " diff calculated: " << spaceLeft << '\n';
 
-    auto startPosX = thisTc_->pos.x - thisTc_->scale.x / 2 + spaceLeft / 2 - additionalOffset_.x;
+    /* This should be it's separate function. This will be the effective trigger to tell if scrollbars
+       are needed to scroll the content or not */
+    (spaceLeft < 0) ? isOverflowX = true : isOverflowX = false;
+    // (thisTc_->scale.x < childrenWidth) ? isOverflowY = true : isOverflowY = false;
+
+    auto startPosX = thisTc_->pos.x - thisTc_->scale.x / 2 + spaceLeft / 2 - offsetPercentage_.x;
     for (const auto& child : children)
     {
         if (child->getType() == "ScrollBar") continue;
@@ -87,6 +131,7 @@ void HkConstraintContext::alignHorizontally(const std::vector<HkTreeStructure<Hk
     }
 }
 
+/* This simply constraints the Knob inside the scrollbar itself, at given currentValue (0 to 1) */
 void HkConstraintContext::constrainSBKnob(bool isFromHorizontalSB, float currKnobValue, HkTransformContext& knobTc)
 {
     const auto knobSqSize = std::min(thisTc_->scale.x, thisTc_->scale.y);
@@ -94,6 +139,7 @@ void HkConstraintContext::constrainSBKnob(bool isFromHorizontalSB, float currKno
 
     if (isFromHorizontalSB)
     {
+        /* Orientation calcs do differ */
         const auto minX = thisTc_->pos.x - thisTc_->scale.x / 2 + knobSqSize / 2;
         const auto maxX = thisTc_->pos.x + thisTc_->scale.x / 2 - knobSqSize / 2;
         const auto posX = minX * (1.0f - currKnobValue) + currKnobValue * maxX;
@@ -108,21 +154,28 @@ void HkConstraintContext::constrainSBKnob(bool isFromHorizontalSB, float currKno
     }
 }
 
+/* Keeps scrollbar object at the bottom or at the right of the container. */
 void HkConstraintContext::scrollBarConstrain(HkTransformContext& scrollBarTc, bool isHorizontalBar)
 {
     const auto barScale = 20;
     if (isHorizontalBar)
     {
-        scrollBarTc.setScale({ thisTc_->scale.x - barScale, barScale });
-        scrollBarTc.setPos({ thisTc_->pos.x - barScale / 2, thisTc_->pos.y + thisTc_->scale.y / 2 - barScale / 2 });
+        /* We should take into account if vertical bar is present so that bottom right 'intersection'
+           between bars is filled or not. Same thing shoukd apply for vertical calcs bellow */
+        const auto verticalBarAwareMargin = isOverflowY ? barScale : 0;
+        scrollBarTc.setScale({ thisTc_->scale.x - verticalBarAwareMargin, barScale });
+        scrollBarTc.setPos({ thisTc_->pos.x - verticalBarAwareMargin / 2, thisTc_->pos.y + thisTc_->scale.y / 2 - barScale / 2 });
     }
     else
     {
-        scrollBarTc.setScale({ barScale, thisTc_->scale.y - barScale });
-        scrollBarTc.setPos({ thisTc_->pos.x + thisTc_->scale.x / 2 - barScale / 2, thisTc_->pos.y - barScale / 2 });
+        const auto horizontalBarAwareMargin = isOverflowX ? barScale : 0;
+        scrollBarTc.setScale({ barScale, thisTc_->scale.y - horizontalBarAwareMargin });
+        scrollBarTc.setPos({ thisTc_->pos.x + thisTc_->scale.x / 2 - barScale / 2, thisTc_->pos.y - horizontalBarAwareMargin / 2 });
     }
 }
 
+/* WindowFrame is a special UI element that 'drags' a container along with it that sits underneath the window frame. This
+   function helps constraint that container to the windowFrame element */
 void HkConstraintContext::windowFrameContainerConstraint(HkTransformContext& childTc)
 {
     /* TODO: dirty flags shall be used here to not do redundant repositioning */

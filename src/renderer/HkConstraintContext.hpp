@@ -28,6 +28,7 @@ public:
 
     void windowFrameContainerConstraint(HkTransformContext& childTc);
 
+    void alignLeftRight(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
     void alignHorizontally(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
     void alignVertically(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
 
@@ -41,7 +42,8 @@ public:
     bool isOverflowX;
     bool isOverflowY;
 
-    glm::ivec2 additionalOffset_{ 0,0 };
+    glm::ivec2 overflowXYSize_{ 0,0 };
+    glm::vec2 offsetPercentage_{ 0,0 };
     uint32_t vScrollBarHeight_;
     uint32_t hScrollBarWidth_;
 

@@ -11,8 +11,6 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
     node_.renderContext.shader.setVec3f("color", glm::vec3(0.0f, 0.5f, 0.9f)); // BLUEish
     node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix());
     treeStruct_.pushChild(&wfCont_.treeStruct_);
-
-    wfCont_.scrollbars(true, true);
 }
 
 void HkWindowFrame::rootUpdateMySelf() { updateMySelf(); }
@@ -40,8 +38,8 @@ void HkWindowFrame::onWindowResize()
 
 void HkWindowFrame::onGeneralMouseClick()
 {
-    std::cout << glfwGetTime() << '\n';
-    printTree();
+    // std::cout << glfwGetTime() << '\n';
+    // printTree();
 }
 
 void HkWindowFrame::resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>&)

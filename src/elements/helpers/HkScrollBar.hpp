@@ -19,7 +19,7 @@ public:
     void setScrollValue(float value);
     float getScrollValue() const;
     bool isScrollBarActive() const;
-    bool setScrollBarActive(const bool isActive);
+    void setScrollBarActive(const bool isActive);
 
     /* HkNodeBase */
     void resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>&);

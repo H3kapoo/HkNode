@@ -40,7 +40,7 @@ bool HkScrollBar::isScrollBarActive() const
     return isActive_;
 }
 
-bool HkScrollBar::setScrollBarActive(const bool isActive)
+void HkScrollBar::setScrollBarActive(const bool isActive)
 {
     isActive_ = isActive;
 }

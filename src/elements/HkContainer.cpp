@@ -13,18 +13,43 @@ HkContainer::HkContainer(const std::string& containerName)
     node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix());
 }
 
-//TODO: Just for experimenting
-void HkContainer::scrollbars(bool x, bool y)
-{
-    // x ? treeStruct_.pushChild(&hScrollBar_.treeStruct_) : treeStruct_.removeChildren({ hScrollBar_.treeStruct_.getId() });
-    // y ? treeStruct_.pushChild(&vScrollBar_.treeStruct_) : treeStruct_.removeChildren({ vScrollBar_.treeStruct_.getId() });
-    // sbCount_ = x + y;
-}
-
 void HkContainer::resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children)
 {
+    /* Resolve children constraints (ignores scrollbar children) */
     HkNodeBase::resolveConstraints(children);
 
+    /* Exactly what it says, show bars or not if overflow occured*/
+    handleContainerOverflowIfNeeded();
+
+    /* Resolve scrollbar only constraints for axis */
+    constrainScrollbarsIfNeeded();
+
+    //Not sure about this one here..
+    node_.constraintContext.offsetPercentage_.x = hScrollBar_.getScrollValue();
+
+    //TODO: This could be set automatically from ConstraintContext
+    node_.constraintContext.hScrollBarWidth_ = hScrollBar_.node_.transformContext.scale.y;
+    node_.constraintContext.vScrollBarHeight_ = vScrollBar_.node_.transformContext.scale.x;
+}
+
+/* Compute SB constraints only if needed */
+void HkContainer::constrainScrollbarsIfNeeded()
+{
+    if (node_.constraintContext.isOverflowX)
+    {
+        node_.constraintContext.scrollBarConstrain(hScrollBar_.node_.transformContext, true);
+    }
+    if (node_.constraintContext.isOverflowY)
+    {
+        node_.constraintContext.scrollBarConstrain(vScrollBar_.node_.transformContext, false);
+    }
+}
+
+
+/* This determines if the container will have a scrollbar showing or not */
+void HkContainer::handleContainerOverflowIfNeeded()
+{
+    // hsb
     if (!hScrollBar_.isScrollBarActive() && node_.constraintContext.isOverflowX)
     {
         sbCount_++;
@@ -38,12 +63,19 @@ void HkContainer::resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& 
         treeStruct_.removeChildren({ hScrollBar_.treeStruct_.getId() });
     }
 
-    node_.constraintContext.scrollBarConstrain(hScrollBar_.node_.transformContext, true);
-    node_.constraintContext.scrollBarConstrain(vScrollBar_.node_.transformContext, false);
-
-    node_.constraintContext.additionalOffset_ = { 100 * hScrollBar_.getScrollValue(), 0 };
-    node_.constraintContext.hScrollBarWidth_ = hScrollBar_.node_.transformContext.scale.y;
-    node_.constraintContext.vScrollBarHeight_ = vScrollBar_.node_.transformContext.scale.x;
+    // vsb
+    if (!vScrollBar_.isScrollBarActive() && node_.constraintContext.isOverflowY)
+    {
+        sbCount_++;
+        vScrollBar_.setScrollBarActive(true);
+        treeStruct_.pushChild(&vScrollBar_.treeStruct_);
+    }
+    else if (vScrollBar_.isScrollBarActive() && !node_.constraintContext.isOverflowY)
+    {
+        sbCount_--;
+        vScrollBar_.setScrollBarActive(false);
+        treeStruct_.removeChildren({ vScrollBar_.treeStruct_.getId() });
+    }
 }
 
 void HkContainer::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)

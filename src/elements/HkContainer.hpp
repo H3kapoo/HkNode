@@ -14,8 +14,9 @@ public:
     /* HkNodeBase */
     void resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children);
 
+    void constrainScrollbarsIfNeeded();
+    void handleContainerOverflowIfNeeded();
     void pushChildren(const std::vector<HkNodeBasePtr>& newChildren);
-    void scrollbars(bool x, bool y);
 
     void setColor(const glm::vec3& color);
     void setPos(const glm::vec2& pos);
