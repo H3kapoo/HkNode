@@ -35,7 +35,7 @@ void HkNodeBase::updateMySelf()
     const auto parent = treeStruct_.getParent();
     if (parent && parent->getType() != "RootWindowFrame")
     {
-        glEnable(GL_SCISSOR_TEST);
+        // glEnable(GL_SCISSOR_TEST);
         const auto& pTc = parent->getPayload()->node_.transformContext;
         glScissor(
             pTc.pos.x - pTc.scale.x / 2,

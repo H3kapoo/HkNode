@@ -43,6 +43,11 @@ bool HkScrollBar::isScrollBarActive() const
 void HkScrollBar::setScrollBarActive(const bool isActive)
 {
     isActive_ = isActive;
+    /* Reset knob value on scrollbar deactivation */
+    if (!isActive_)
+    {
+        setScrollValue(0);
+    }
 }
 
 void HkScrollBar::setScrollValue(float value)

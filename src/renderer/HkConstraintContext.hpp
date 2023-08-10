@@ -11,14 +11,30 @@ namespace hkui
 enum class HkConstraintPolicy
 {
     AlignHorizontally,
+    AlignLeftToRight,
+    AlignTopToBottom
+};
+
+enum class HkChildrenOrientation
+{
+    Horizontal,
+    Vertical
+};
+
+struct MaxAndTotal
+{
+    int max;
+    int total;
 };
 
 class HkNodeBase;
 
 class HkConstraintContext
 {
+private:
+
 public:
-    HkConstraintContext() : isOverflowX{ false }, isOverflowY{ false } {}
+    HkConstraintContext() : isOverflowX_{ false }, isOverflowY_{ false } {}
 
     void setRootTc(HkTransformContext* rootTc);
 
@@ -26,9 +42,17 @@ public:
 
     void resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children);
 
+    MaxAndTotal getVerticalMaxValueAndTotalHeightValue(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
+    MaxAndTotal getHorizontalMaxValueAndTotalWidthValue(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
+
+    void resolveChildrenOverflowVariables(const HkChildrenOrientation orientation,
+        const std::vector<HkTreeStructure<HkNodeBase>*>& children);
+
     void windowFrameContainerConstraint(HkTransformContext& childTc);
 
     void alignLeftRight(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
+    void alignTopBottom(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
+
     void alignHorizontally(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
     void alignVertically(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
 
@@ -39,13 +63,15 @@ public:
     void freeConstraint(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
 
     // ConstraintParams..
-    bool isOverflowX;
-    bool isOverflowY;
+    bool isOverflowX_;
+    bool isOverflowY_;
 
     glm::ivec2 overflowXYSize_{ 0,0 };
     glm::vec2 offsetPercentage_{ 0,0 };
-    uint32_t vScrollBarHeight_;
-    uint32_t hScrollBarWidth_;
+
+    //TODO: used??
+    uint32_t vScrollBarHeight_{ 0 };
+    uint32_t hScrollBarWidth_{ 0 };
 
 private:
     HkConstraintPolicy policy_;

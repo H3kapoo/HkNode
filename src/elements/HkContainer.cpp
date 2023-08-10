@@ -26,6 +26,7 @@ void HkContainer::resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& 
 
     //Not sure about this one here..
     node_.constraintContext.offsetPercentage_.x = hScrollBar_.getScrollValue();
+    node_.constraintContext.offsetPercentage_.y = vScrollBar_.getScrollValue();
 
     //TODO: This could be set automatically from ConstraintContext
     node_.constraintContext.hScrollBarWidth_ = hScrollBar_.node_.transformContext.scale.y;
@@ -35,28 +36,27 @@ void HkContainer::resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& 
 /* Compute SB constraints only if needed */
 void HkContainer::constrainScrollbarsIfNeeded()
 {
-    if (node_.constraintContext.isOverflowX)
+    if (node_.constraintContext.isOverflowX_)
     {
         node_.constraintContext.scrollBarConstrain(hScrollBar_.node_.transformContext, true);
     }
-    if (node_.constraintContext.isOverflowY)
+    if (node_.constraintContext.isOverflowY_)
     {
         node_.constraintContext.scrollBarConstrain(vScrollBar_.node_.transformContext, false);
     }
 }
 
-
 /* This determines if the container will have a scrollbar showing or not */
 void HkContainer::handleContainerOverflowIfNeeded()
 {
     // hsb
-    if (!hScrollBar_.isScrollBarActive() && node_.constraintContext.isOverflowX)
+    if (!hScrollBar_.isScrollBarActive() && node_.constraintContext.isOverflowX_)
     {
         sbCount_++;
         hScrollBar_.setScrollBarActive(true);
         treeStruct_.pushChild(&hScrollBar_.treeStruct_);
     }
-    else if (hScrollBar_.isScrollBarActive() && !node_.constraintContext.isOverflowX)
+    else if (hScrollBar_.isScrollBarActive() && !node_.constraintContext.isOverflowX_)
     {
         sbCount_--;
         hScrollBar_.setScrollBarActive(false);
@@ -64,13 +64,13 @@ void HkContainer::handleContainerOverflowIfNeeded()
     }
 
     // vsb
-    if (!vScrollBar_.isScrollBarActive() && node_.constraintContext.isOverflowY)
+    if (!vScrollBar_.isScrollBarActive() && node_.constraintContext.isOverflowY_)
     {
         sbCount_++;
         vScrollBar_.setScrollBarActive(true);
         treeStruct_.pushChild(&vScrollBar_.treeStruct_);
     }
-    else if (vScrollBar_.isScrollBarActive() && !node_.constraintContext.isOverflowY)
+    else if (vScrollBar_.isScrollBarActive() && !node_.constraintContext.isOverflowY_)
     {
         sbCount_--;
         vScrollBar_.setScrollBarActive(false);

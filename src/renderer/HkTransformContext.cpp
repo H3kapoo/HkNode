@@ -5,24 +5,20 @@
 namespace hkui
 {
 HkTransformContext::HkTransformContext()
-    : scale{ 200,100 }, pos{ 100,100 }, lastPos{ 100,100 }, currLastDiff{ 0,0 }
+    : scale{ 200,100 }, rot{ 0,0 }, pos{ 100,100 }
 {
     computeModelMatrix();
 }
 
 void HkTransformContext::addPos(const glm::ivec2& pos)
 {
-    lastPos = pos;
     this->pos += pos;
-    currLastDiff = pos - lastPos;
     computeModelMatrix();
 }
 
 void HkTransformContext::setPos(const glm::ivec2& pos)
 {
-    lastPos = pos;
     this->pos = pos;
-    currLastDiff = pos - lastPos;
     computeModelMatrix();
 }
 

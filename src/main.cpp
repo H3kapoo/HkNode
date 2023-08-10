@@ -79,7 +79,7 @@ int main()
 
     HkWindowFramePtr windowFrame = std::make_shared<HkWindowFrame>("MyWindowFrame");
 
-    windowFrame->setConstraintPolicy(HkConstraintPolicy::AlignHorizontally);
+    windowFrame->setConstraintPolicy(HkConstraintPolicy::AlignTopToBottom);
 
     HkContainerPtr ctr = std::make_shared<HkContainer>("MyContainer");
     HkContainerPtr ctr2 = std::make_shared<HkContainer>("MyContainer2");
@@ -92,14 +92,15 @@ int main()
     ctr3->setColor({ 0.4f,0.5f,0.6f });
     ctr4->setColor({ 0.7f,0.8f,0.9f });
     ctr5->setColor({ 0.0f,0.1f,0.2f });
-    ctr->setSize({ 220, 100 });
+    ctr->setSize({ 700, 100 });
     ctr2->setSize({ 220, 100 });
     ctr3->setSize({ 120, 100 });
     ctr4->setSize({ 120, 100 });
-    ctr5->setSize({ 120, 100 });
+    ctr5->setSize({ 120, 30 });
 
     windowFrame->setPos({ 1280 * 0.5, 720 * 0.25 });
     windowFrame->setSize({ 1280 * 0.5, 720 * 0.5 });
+    // windowFrame->pushChildren({ ctr, ctr2 });
     windowFrame->pushChildren({ ctr, ctr2, ctr3, ctr4, ctr5 });
     windowFrame->printTree();
 

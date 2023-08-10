@@ -25,15 +25,17 @@ void HkWindowFrame::onGeneralMouseMove()
     }
 }
 
+//TODO: BUG: On rescaling, there are 1 pixel wide errors, maybe due tot some rounding errors. Or maybe due to 
+// calculating stuff relative to the center of the UI element?
 void HkWindowFrame::onWindowResize()
 {
     /* Techically root windows shall not resize with WINDOW itself, only children should resize with their parents */
     //TODO: Future: Refactor transforms so that they have pivot at top left corner instead of center
-    // auto factor = 0.5f;
-    // auto factor2 = 0.25f;
-    // node_.transformContext.setScale({ sceneDataRef_.windowWidth * factor, 30 });
-    // node_.transformContext.setPos({ sceneDataRef_.windowWidth * factor, sceneDataRef_.windowHeight * factor2 });
-    // wfCont_.node_.transformContext.setScale({ sceneDataRef_.windowWidth * factor, sceneDataRef_.windowHeight * factor });
+    auto factor = 0.5f;
+    auto factor2 = 0.25f;
+    node_.transformContext.setScale({ sceneDataRef_.windowWidth * factor, 30 });
+    node_.transformContext.setPos({ sceneDataRef_.windowWidth * factor, sceneDataRef_.windowHeight * factor2 });
+    wfCont_.node_.transformContext.setScale({ sceneDataRef_.windowWidth * factor, sceneDataRef_.windowHeight * factor });
 }
 
 void HkWindowFrame::onGeneralMouseClick()
