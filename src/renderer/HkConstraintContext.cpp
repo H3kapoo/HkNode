@@ -31,7 +31,6 @@ MaxAndTotal HkConstraintContext::getVerticalMaxValueAndTotalHeightValue(
     const std::vector<HkTreeStructure<HkNodeBase>*>& children)
 {
     MaxAndTotal mt;
-
     mt.total = std::accumulate(children.begin(), children.end(), 0,
         [&mt](int total, HkTreeStructure<HkNodeBase>* child)
         {
@@ -86,7 +85,8 @@ void HkConstraintContext::resolveChildrenOverflowVariables(const HkChildrenOrien
             isOverflowY_ = true;
             /*Account for scrollbar height */
             //TODO: hardcoded for now..
-            overflowXYSize_.y += 20;
+            overflowXYSize_.y += isOverflowX_ ? 20 : 0;
+            // overflowXYSize_.x += 20;
         }
         else
         {
@@ -103,7 +103,8 @@ void HkConstraintContext::resolveChildrenOverflowVariables(const HkChildrenOrien
             isOverflowX_ = true;
             /*Account for scrollbar height */
             //TODO: hardcoded for now..
-            overflowXYSize_.x += 20;
+            overflowXYSize_.x += isOverflowY_ ? 20 : 0;
+            // overflowXYSize_.y += 20;
         }
         else
         {
@@ -152,7 +153,6 @@ void HkConstraintContext::alignTopBottom(const std::vector<HkTreeStructure<HkNod
     resolveChildrenOverflowVariables(HkChildrenOrientation::Vertical, children);
 
     auto startPosY = thisTc_->pos.y - thisTc_->scale.y / 2 + offsetPercentage_.y * -overflowXYSize_.y;
-    std::cout << startPosY << '\n';
     auto startPosX = thisTc_->pos.x - thisTc_->scale.x / 2 + offsetPercentage_.x * -overflowXYSize_.x;
     for (const auto& child : children)
     {

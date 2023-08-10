@@ -23,8 +23,8 @@ enum class HkChildrenOrientation
 
 struct MaxAndTotal
 {
-    int max;
-    int total;
+    int max{ 0 };
+    int total{ 0 };
 };
 
 class HkNodeBase;
