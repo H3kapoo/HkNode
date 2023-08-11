@@ -108,23 +108,41 @@ void HkContainer::postChildrenRendered()
 }
 
 
+void HkContainer::onDrag()
+{
+    // std::cout << treeStruct_.getName() << " is being dragged now\n";
+        //     //TODO: THis logic shall be moved in SM
+    // if (!mouseClickPositionSet_)
+    // {
+    //     clickPosition_ = sceneDataRef_.mousePos;
+    //     mouseClickPositionSet_ = true;
+    // }
+
+    /* Ignore mouse moves inside intersector area */
+    if (sbCount_ == 2 && !dummyXYIntersectorData_.transformContext.isPosInsideOfNode(sceneDataRef_.dragStartMousePosition))
+        std::cout << glfwGetTime() << "  " << sceneDataRef_.dragStartMousePosition.x << "  " <<
+        sceneDataRef_.dragStartMousePosition.y << "dragging ouside of intersector\n";
+}
+
 //TODO: BUG: when click and drag inside intersector area..it does drag, we shall ignore that part when dragging but we dont
 void HkContainer::onGeneralMouseMove()
 {
     // /* Safe to assume that this is what dragging the current element logic looks like */
     // //TODO: A dragging state needs to be added in SM => added, just adapt THIS code
-    if (sceneDataRef_.isMouseClicked && sceneDataRef_.focusedId == treeStruct_.getId())
-    {
-        if (!mouseClickPositionSet_)
-        {
-            clickPosition_ = sceneDataRef_.mousePos;
-            mouseClickPositionSet_ = true;
-        }
 
-        /* Ignore mouse moves inside intersector area */
-        if (sbCount_ == 2 && !dummyXYIntersectorData_.transformContext.isPosInsideOfNode(clickPosition_))
-            std::cout << glfwGetTime() << "dragging on container with 2 SBs\n";
-    }
+    // if (sceneDataRef_.isMouseClicked && sceneDataRef_.focusedId == treeStruct_.getId())
+    // {
+    //     //TODO: THis logic shall be moved in SM
+    //     if (!mouseClickPositionSet_)
+    //     {
+    //         clickPosition_ = sceneDataRef_.mousePos;
+    //         mouseClickPositionSet_ = true;
+    //     }
+
+    //     /* Ignore mouse moves inside intersector area */
+    //     if (sbCount_ == 2 && !dummyXYIntersectorData_.transformContext.isPosInsideOfNode(clickPosition_))
+    //         std::cout << glfwGetTime() << "dragging on container with 2 SBs\n";
+    // }
 }
 
 void HkContainer::onGeneralMouseClick()

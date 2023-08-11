@@ -29,6 +29,9 @@ private:
     virtual void resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children);
 
     /* Events */
+    virtual void onDrag();
+    virtual void onClick();
+
     virtual void onGeneralUpdate();
     virtual void onWindowResize();
     virtual void onGeneralMouseMove();
@@ -39,6 +42,9 @@ private:
     /* Normal internal functions */
     void resolveHover();
     void resolveFocus();
+    void resolveMouseClickEvent();
+    void resolveMouseMovementEvent();
+
 
     HkNodeData node_;
     HkTreeStructure<HkNodeBase> treeStruct_;

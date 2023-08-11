@@ -19,8 +19,8 @@ void HkNodeBase::updateMySelf()
     case HkEvent::FocusScan: resolveFocus(); break;
     case HkEvent::GeneralUpdate: onGeneralUpdate(); break;
     case HkEvent::WindowResize: onWindowResize(); break;
-    case HkEvent::MouseMove: onGeneralMouseMove(); break;
-    case HkEvent::MouseClick: onGeneralMouseClick(); break;
+    case HkEvent::MouseMove: resolveMouseMovementEvent(); break;
+    case HkEvent::MouseClick: resolveMouseClickEvent(); break;
     case HkEvent::MouseEnterExit: break;
     case HkEvent::MouseScroll: break;
     case HkEvent::DropPath: break;
@@ -71,6 +71,9 @@ void HkNodeBase::resolveHover()
 
 void HkNodeBase::resolveFocus()
 {
+    /*Element is in focus only if mouse if clicked and the mouse pos is inside thr element.
+      Mouse offsets also get computed so is dragging occurs later on focused object, object doesn't
+      just snap to clicked mouse position */
     if (sceneDataRef_.isMouseClicked && sceneDataRef_.clickedMouseButton == HkMouseButton::Left
         && node_.transformContext.isPosInsideOfNode(sceneDataRef_.mousePos))
     {
@@ -79,8 +82,30 @@ void HkNodeBase::resolveFocus()
     }
 }
 
+void HkNodeBase::resolveMouseClickEvent()
+{
+    /* Notify click on actually clicked object only*/
+    if (sceneDataRef_.focusedId == treeStruct_.getId())
+        onClick();
+    /* Then notify the rest, notified already included */
+    onGeneralMouseClick();
+}
+
+void HkNodeBase::resolveMouseMovementEvent()
+{
+    /* If scene detected a dragging action, separatelly specify that dragged element*/
+    if (sceneDataRef_.isDragging && sceneDataRef_.focusedId == treeStruct_.getId())
+        onDrag();
+
+    /* And notify in general the rest of the tree objects. Dragged+Selected node will get a call from
+       this function too.*/
+    onGeneralMouseMove();
+}
+
 void HkNodeBase::postChildrenRendered() {}
 
+void HkNodeBase::onDrag() {}
+void HkNodeBase::onClick() {}
 void HkNodeBase::onGeneralUpdate() {}
 void HkNodeBase::onWindowResize() {}
 void HkNodeBase::onGeneralMouseMove() {}

@@ -92,7 +92,7 @@ int main()
     ctr3->setColor({ 0.4f,0.5f,0.6f });
     ctr4->setColor({ 0.7f,0.8f,0.9f });
     ctr5->setColor({ 0.0f,0.1f,0.2f });
-    ctr->setSize({ 100, 100 });
+    ctr->setSize({ 200, 100 });
     ctr2->setSize({ 220, 100 });
     ctr3->setSize({ 120, 400 });
     ctr4->setSize({ 120, 100 });
@@ -100,6 +100,11 @@ int main()
 
     windowFrame->setPos({ 1280 * 0.5, 720 * 0.25 });
     windowFrame->setSize({ 1280 * 0.5, 720 * 0.5 });
+
+    /*Fill screen hack for not, later we shall position stuff relative to top left corner, not center*/
+    // windowFrame->setPos({ 1280 * 0.5f, 15 });
+    // windowFrame->setSize({ 1280, 720 - 30 });
+
     // windowFrame->pushChildren({ ctr, ctr2 });
     windowFrame->pushChildren({ ctr, ctr2, ctr3, ctr4, ctr5 });
     windowFrame->printTree();

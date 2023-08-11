@@ -23,6 +23,7 @@ public:
     /* HkNodeBase */
     void resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children) override;
 
+    void onDrag() override;
     void onGeneralMouseMove() override;
     void onGeneralMouseClick() override;
     void onGeneralUpdate() override;

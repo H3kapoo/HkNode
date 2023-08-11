@@ -12,14 +12,17 @@ public:
     HkContainer(const std::string& containerName);
 
     /* HkNodeBase */
-    void resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children);
-    void postChildrenRendered();
+    void resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children) override;
+    void postChildrenRendered() override;
 
-    void onGeneralMouseMove();
-    void onGeneralMouseClick();
+    void onDrag() override;
+    void onGeneralMouseMove() override;
+    void onGeneralMouseClick() override;
 
     void constrainScrollbarsIfNeeded();
     void handleContainerOverflowIfNeeded();
+    //TODO: maybe push those ^^ in constraint mgmt
+
     void pushChildren(const std::vector<HkNodeBasePtr>& newChildren);
 
     void setColor(const glm::vec3& color);

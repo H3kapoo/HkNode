@@ -36,6 +36,7 @@ enum class HkEvent
     // Keyboard // TO DO:
 };
 
+//TODO: Default init each variable to avoid garbage
 struct HkSceneData
 {
     HkEvent currentEvent;
@@ -57,6 +58,7 @@ struct HkSceneData
 
     /*Drag*/
     bool isDragging;
+    glm::ivec2 dragStartMousePosition;
 
     /*Hover*/
     uint32_t hoveredId;

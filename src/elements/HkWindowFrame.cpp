@@ -15,14 +15,13 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
 
 void HkWindowFrame::rootUpdateMySelf() { updateMySelf(); }
 
+void HkWindowFrame::onDrag()
+{
+    node_.transformContext.setPos(sceneDataRef_.mouseOffsetFromFocusedCenter + sceneDataRef_.mousePos);
+}
+
 void HkWindowFrame::onGeneralMouseMove()
 {
-    // /* Safe to assume that this is what dragging the current element logic looks like */
-    // //TODO: A dragging state needs to be added in SM => added, just adapt THIS code
-    if (sceneDataRef_.isMouseClicked && sceneDataRef_.focusedId == treeStruct_.getId())
-    {
-        node_.transformContext.setPos(sceneDataRef_.mouseOffsetFromFocusedCenter + sceneDataRef_.mousePos);
-    }
 }
 
 //TODO: BUG: On rescaling, there are 1 pixel wide errors, maybe due tot some rounding errors. Or maybe due to 

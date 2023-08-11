@@ -69,11 +69,13 @@ void HkSceneManagement::mouseMoveEvent(GLFWwindow*, double xPos, double yPos)
     sceneData.mousePos = { xPos, yPos };
 
     /* As mouse moves in the scene, compute first who's hovered, it might not be the 'focusedId'. Only after that,
-    dispatch mouseMove event. The dragged element will become the 'focusedId' */
+    dispatch mouseMove event. The dragged element will become the 'focusedId'. Dragged element will be set only if
+    there's not already someone being dragged */
     resolveHover();
-    if (sceneData.clickedMouseButton == HkMouseButton::Left && sceneData.hoveredId != HkSceneData::NO_SELECTION_ID)
+    if (!sceneData.isDragging && sceneData.clickedMouseButton == HkMouseButton::Left && sceneData.hoveredId != HkSceneData::NO_SELECTION_ID)
     {
         sceneData.isDragging = true;
+        sceneData.dragStartMousePosition = sceneData.mousePos;
     }
 
     // std::cout << glfwGetTime() << " Hovered: " << sceneData.hoveredId << " is dragging id: " << sceneData.focusedId << "\n";
