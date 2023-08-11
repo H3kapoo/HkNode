@@ -13,6 +13,10 @@ public:
 
     /* HkNodeBase */
     void resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children);
+    void postChildrenRendered();
+
+    void onGeneralMouseMove();
+    void onGeneralMouseClick();
 
     void constrainScrollbarsIfNeeded();
     void handleContainerOverflowIfNeeded();
@@ -28,6 +32,11 @@ private:
     HkScrollBar hScrollBar_;
     HkScrollBar vScrollBar_;
     uint32_t sbCount_;
+
+    HkNodeData dummyXYIntersectorData_;
+    bool mouseClickPositionSet_{ false };
+    glm::ivec2 clickPosition_{ 0,0 };
+    bool isIntersectorNeeded_;
 };
 using HkContainerPtr = std::shared_ptr<HkContainer>;
 using HkContainerCPtr = const std::shared_ptr<HkContainer>;

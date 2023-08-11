@@ -7,10 +7,16 @@ HkContainer::HkContainer(const std::string& containerName)
     , hScrollBar_("{Internal}-HScrollBarFor " + containerName, true)
     , vScrollBar_("{Internal}-VScrollBarFor " + containerName, false)
     , sbCount_{ 0 }
+    , isIntersectorNeeded_{ false }
 {
     node_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
     node_.renderContext.shader.setVec3f("color", glm::vec3(0.5f, 0.5f, 0.5f)); // gray
     node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix());
+
+    /* NOTE: In the future maybe this dummy can be an actual small UI element, but for now let it be
+       just a normal renderable detail */
+    dummyXYIntersectorData_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
+    dummyXYIntersectorData_.renderContext.shader.setVec3f("color", glm::vec3(0.7f, 1.0f, 0.2f));
 }
 
 void HkContainer::resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children)
@@ -78,6 +84,58 @@ void HkContainer::handleContainerOverflowIfNeeded()
     }
 }
 
+/* Useful to render additional visual non children UI, like XY intersector. This will be called after all children (and sub children)
+   of parent have been rendered */
+void HkContainer::postChildrenRendered()
+{
+    /* If both scrollbars are active, it's obvious we need the intersector at bottom right. It is handled in the Container class because
+       container should know when both SBs are active and what to do with them. Also clicking on the dummy object basically means clicking
+       on the container itself and since coordinates for this location are already known, maybe we can do some particular stuff with that info */
+    if (sbCount_ == 2)
+    {
+        dummyXYIntersectorData_.transformContext.setScale({
+            hScrollBar_.node_.transformContext.scale.y,
+            hScrollBar_.node_.transformContext.scale.y });
+
+        dummyXYIntersectorData_.transformContext.setPos({
+            hScrollBar_.node_.transformContext.pos.x + hScrollBar_.node_.transformContext.scale.x / 2
+                + hScrollBar_.node_.transformContext.scale.y / 2,
+            hScrollBar_.node_.transformContext.pos.y }
+        );
+        dummyXYIntersectorData_.renderContext.render(sceneDataRef_.sceneProjMatrix,
+            dummyXYIntersectorData_.transformContext.getModelMatrix());
+    }
+}
+
+
+//TODO: BUG: when click and drag inside intersector area..it does drag, we shall ignore that part when dragging but we dont
+void HkContainer::onGeneralMouseMove()
+{
+    // /* Safe to assume that this is what dragging the current element logic looks like */
+    // //TODO: A dragging state needs to be added in SM => added, just adapt THIS code
+    if (sceneDataRef_.isMouseClicked && sceneDataRef_.focusedId == treeStruct_.getId())
+    {
+        if (!mouseClickPositionSet_)
+        {
+            clickPosition_ = sceneDataRef_.mousePos;
+            mouseClickPositionSet_ = true;
+        }
+
+        /* Ignore mouse moves inside intersector area */
+        if (sbCount_ == 2 && !dummyXYIntersectorData_.transformContext.isPosInsideOfNode(clickPosition_))
+            std::cout << glfwGetTime() << "dragging on container with 2 SBs\n";
+    }
+}
+
+void HkContainer::onGeneralMouseClick()
+{
+    if (!sceneDataRef_.isMouseClicked)
+    {
+        mouseClickPositionSet_ = false;
+    }
+}
+
+
 void HkContainer::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)
 {
     for (const auto& child : newChildren)
@@ -97,7 +155,7 @@ void HkContainer::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)
     }
 }
 
-// bewllow to be removed later when constraints come
+//TODO: bellow to be removed later when constraints come
 void HkContainer::setColor(const glm::vec3& color)
 {
     node_.renderContext.shader.setVec3f("color", color);

@@ -34,6 +34,8 @@ private:
     virtual void onGeneralMouseMove();
     virtual void onGeneralMouseClick();
 
+    virtual void postChildrenRendered();
+
     /* Normal internal functions */
     void resolveHover();
     void resolveFocus();

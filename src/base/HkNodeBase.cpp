@@ -35,7 +35,7 @@ void HkNodeBase::updateMySelf()
     const auto parent = treeStruct_.getParent();
     if (parent && parent->getType() != "RootWindowFrame")
     {
-        // glEnable(GL_SCISSOR_TEST);
+        glEnable(GL_SCISSOR_TEST);
         const auto& pTc = parent->getPayload()->node_.transformContext;
         glScissor(
             pTc.pos.x - pTc.scale.x / 2,
@@ -49,6 +49,8 @@ void HkNodeBase::updateMySelf()
     {
         child->getPayload()->updateMySelf();
     }
+
+    postChildrenRendered();
 
     /* Disable scissors after rendering. Technically just one at end of frame just be enough but oh well */
     glDisable(GL_SCISSOR_TEST);
@@ -76,6 +78,8 @@ void HkNodeBase::resolveFocus()
         sceneDataRef_.mouseOffsetFromFocusedCenter = node_.transformContext.pos - sceneDataRef_.mousePos;
     }
 }
+
+void HkNodeBase::postChildrenRendered() {}
 
 void HkNodeBase::onGeneralUpdate() {}
 void HkNodeBase::onWindowResize() {}

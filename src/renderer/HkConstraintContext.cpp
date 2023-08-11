@@ -19,9 +19,9 @@ void HkConstraintContext::resolveConstraints(std::vector<HkTreeStructure<HkNodeB
     {
     case HkConstraintPolicy::AlignHorizontally:
     case HkConstraintPolicy::AlignLeftToRight:
+        alignLeftRight(children);
+        break;
     case HkConstraintPolicy::AlignTopToBottom:
-        // alignHorizontally(children);
-        // alignLeftRight(children);
         alignTopBottom(children);
         break;
     }
@@ -86,7 +86,6 @@ void HkConstraintContext::resolveChildrenOverflowVariables(const HkChildrenOrien
             /*Account for scrollbar height */
             //TODO: hardcoded for now..
             overflowXYSize_.y += isOverflowX_ ? 20 : 0;
-            // overflowXYSize_.x += 20;
         }
         else
         {
@@ -104,7 +103,6 @@ void HkConstraintContext::resolveChildrenOverflowVariables(const HkChildrenOrien
             /*Account for scrollbar height */
             //TODO: hardcoded for now..
             overflowXYSize_.x += isOverflowY_ ? 20 : 0;
-            // overflowXYSize_.y += 20;
         }
         else
         {
@@ -117,10 +115,13 @@ void HkConstraintContext::resolveChildrenOverflowVariables(const HkChildrenOrien
         /* Compute both possible X overflow situations */
         /* Overflow in this context can only occur if one children is too big X wise vs Parent OR if
             combined children widths are bigger than Parent's.*/
-        overflowXYSize_.x = std::max(maxAndTotalVert.max - thisTc_->scale.x, maxAndTotalVert.total - thisTc_->scale.x);
+        overflowXYSize_.x = std::max(maxAndTotalHori.max - thisTc_->scale.x, maxAndTotalHori.total - thisTc_->scale.x);
         if (overflowXYSize_.x >= 0)
         {
             isOverflowX_ = true;
+            /*Account for scrollbar height */
+            //TODO: hardcoded for now..
+            overflowXYSize_.x += isOverflowY_ ? 20 : 0;
         }
         else
         {
@@ -131,10 +132,13 @@ void HkConstraintContext::resolveChildrenOverflowVariables(const HkChildrenOrien
 
         /* Compute the single possible Y overflow situation */
         /* Overflow in this context can only occur if one children is too big Y wise vs Parent */
-        overflowXYSize_.y = maxAndTotalHori.max - thisTc_->scale.y;
+        overflowXYSize_.y = maxAndTotalVert.max - thisTc_->scale.y;
         if (overflowXYSize_.y >= 0)
         {
             isOverflowY_ = true;
+            /*Account for scrollbar height */
+            //TODO: hardcoded for now..
+            overflowXYSize_.y += isOverflowX_ ? 20 : 0;
         }
         else
         {
@@ -144,16 +148,17 @@ void HkConstraintContext::resolveChildrenOverflowVariables(const HkChildrenOrien
     }
 }
 
+//TODO: This shall be renamed something like "Layouting", horizontal or vertical so then we can
+//      use methods to center them or left/right align them
 void HkConstraintContext::alignTopBottom(const std::vector<HkTreeStructure<HkNodeBase>*>& children)
 {
     /*
-        Centers children vertically inside the parent and places children one after the other vertically.
-        Parent's X value is used for the children X value.
+        Positions children one on top of the other, left aligned
     */
     resolveChildrenOverflowVariables(HkChildrenOrientation::Vertical, children);
 
-    auto startPosY = thisTc_->pos.y - thisTc_->scale.y / 2 + offsetPercentage_.y * -overflowXYSize_.y;
     auto startPosX = thisTc_->pos.x - thisTc_->scale.x / 2 + offsetPercentage_.x * -overflowXYSize_.x;
+    auto startPosY = thisTc_->pos.y - thisTc_->scale.y / 2 + offsetPercentage_.y * -overflowXYSize_.y;
     for (const auto& child : children)
     {
         if (child->getType() == "ScrollBar") continue;
@@ -165,20 +170,24 @@ void HkConstraintContext::alignTopBottom(const std::vector<HkTreeStructure<HkNod
     }
 }
 
+// Same at top bot counterpart
 void HkConstraintContext::alignLeftRight(const std::vector<HkTreeStructure<HkNodeBase>*>& children)
 {
     /*
         Place children from left to right, simple as that
     */
 
-    auto startPosX = thisTc_->pos.x - thisTc_->scale.x / 2 + offsetPercentage_.x * overflowXYSize_.x;
+    resolveChildrenOverflowVariables(HkChildrenOrientation::Horizontal, children);
+
+    auto startPosX = thisTc_->pos.x - thisTc_->scale.x / 2 + offsetPercentage_.x * -overflowXYSize_.x;
+    auto startPosY = thisTc_->pos.y - thisTc_->scale.y / 2 + offsetPercentage_.y * -overflowXYSize_.y;
     for (const auto& child : children)
     {
         if (child->getType() == "ScrollBar") continue;
 
         auto& childTc = child->getPayload()->node_.transformContext;
         startPosX += childTc.scale.x / 2;
-        childTc.setPos({ startPosX , thisTc_->pos.y });
+        childTc.setPos({ startPosX , startPosY + childTc.scale.y / 2 });
         startPosX += childTc.scale.x / 2;
     }
 }
