@@ -35,11 +35,11 @@ void HkNodeBase::updateMySelf()
     const auto parent = treeStruct_.getParent();
     if (parent && parent->getType() != "RootWindowFrame")
     {
-        glEnable(GL_SCISSOR_TEST);
+        // glEnable(GL_SCISSOR_TEST);
         const auto& pTc = parent->getPayload()->node_.transformContext;
         glScissor(
-            pTc.pos.x - pTc.scale.x / 2,
-            sceneDataRef_.windowHeight - pTc.pos.y - pTc.scale.y / 2,
+            pTc.pos.x - 1, //TODO: Bug: something forces to push sccissor box one pixel to the left and to the top..idk why
+            sceneDataRef_.windowHeight - pTc.pos.y - pTc.scale.y + 1, // not sure why the second minus, but it works
             pTc.scale.x,
             pTc.scale.y);
     }

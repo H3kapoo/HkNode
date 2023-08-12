@@ -1,5 +1,7 @@
 #include "HkConstraintContext.hpp"
 
+#include "../utils/HkDrawDebugger.hpp"
+
 #include "../base/HkNodeBase.hpp"
 
 namespace hkui
@@ -67,7 +69,6 @@ MaxAndTotal HkConstraintContext::getHorizontalMaxValueAndTotalWidthValue(
     return mt;
 }
 
-//TODO: BUG: Sometimes scroll knob movement causes weird int overflow. THis is occasional..maybe something's not inited
 void HkConstraintContext::resolveChildrenOverflowVariables(const HkChildrenOrientation orientation,
     const std::vector<HkTreeStructure<HkNodeBase>*>& children)
 {
@@ -96,13 +97,10 @@ void HkConstraintContext::resolveChildrenOverflowVariables(const HkChildrenOrien
 
         /* Compute the single possible X overflow situation */
         /* Overflow in this context can only occur if one children is too big X wise vs Parent */
-        overflowXYSize_.x = maxAndTotalHori.max - thisTc_->scale.x;
+        overflowXYSize_.x = thisTc_->pos.x + maxAndTotalHori.max + (isOverflowY_ ? 20 : 0) - (thisTc_->pos.x + thisTc_->scale.x);
         if (overflowXYSize_.x >= 0)
         {
             isOverflowX_ = true;
-            /*Account for scrollbar height */
-            //TODO: hardcoded for now..
-            overflowXYSize_.x += isOverflowY_ ? 20 : 0;
         }
         else
         {
@@ -132,13 +130,10 @@ void HkConstraintContext::resolveChildrenOverflowVariables(const HkChildrenOrien
 
         /* Compute the single possible Y overflow situation */
         /* Overflow in this context can only occur if one children is too big Y wise vs Parent */
-        overflowXYSize_.y = maxAndTotalVert.max - thisTc_->scale.y;
+        overflowXYSize_.y = thisTc_->pos.y + maxAndTotalVert.max + (isOverflowX_ ? 20 : 0) - (thisTc_->pos.y + thisTc_->scale.y);
         if (overflowXYSize_.y >= 0)
         {
             isOverflowY_ = true;
-            /*Account for scrollbar height */
-            //TODO: hardcoded for now..
-            overflowXYSize_.y += isOverflowX_ ? 20 : 0;
         }
         else
         {
@@ -157,16 +152,15 @@ void HkConstraintContext::alignTopBottom(const std::vector<HkTreeStructure<HkNod
     */
     resolveChildrenOverflowVariables(HkChildrenOrientation::Vertical, children);
 
-    auto startPosX = thisTc_->pos.x - thisTc_->scale.x / 2 + offsetPercentage_.x * -overflowXYSize_.x;
-    auto startPosY = thisTc_->pos.y - thisTc_->scale.y / 2 + offsetPercentage_.y * -overflowXYSize_.y;
+    auto startPosX = thisTc_->pos.x + offsetPercentage_.x * -overflowXYSize_.x;
+    auto startPosY = thisTc_->pos.y + offsetPercentage_.y * -overflowXYSize_.y;
     for (const auto& child : children)
     {
         if (child->getType() == "ScrollBar") continue;
 
         auto& childTc = child->getPayload()->node_.transformContext;
-        startPosY += childTc.scale.y / 2;
-        childTc.setPos({ startPosX + childTc.scale.x / 2, startPosY });
-        startPosY += childTc.scale.y / 2;
+        childTc.setPos({ startPosX, startPosY });
+        startPosY += childTc.scale.y;
     }
 }
 
@@ -179,16 +173,15 @@ void HkConstraintContext::alignLeftRight(const std::vector<HkTreeStructure<HkNod
 
     resolveChildrenOverflowVariables(HkChildrenOrientation::Horizontal, children);
 
-    auto startPosX = thisTc_->pos.x - thisTc_->scale.x / 2 + offsetPercentage_.x * -overflowXYSize_.x;
-    auto startPosY = thisTc_->pos.y - thisTc_->scale.y / 2 + offsetPercentage_.y * -overflowXYSize_.y;
+    auto startPosX = thisTc_->pos.x + offsetPercentage_.x * -overflowXYSize_.x;
+    auto startPosY = thisTc_->pos.y + offsetPercentage_.y * -overflowXYSize_.y;
     for (const auto& child : children)
     {
         if (child->getType() == "ScrollBar") continue;
 
         auto& childTc = child->getPayload()->node_.transformContext;
-        startPosX += childTc.scale.x / 2;
-        childTc.setPos({ startPosX , startPosY + childTc.scale.y / 2 });
-        startPosX += childTc.scale.x / 2;
+        childTc.setPos({ startPosX , startPosY });
+        startPosX += childTc.scale.x;
     }
 }
 
@@ -263,15 +256,15 @@ void HkConstraintContext::constrainSBKnob(bool isFromHorizontalSB, float currKno
     if (isFromHorizontalSB)
     {
         /* Orientation calcs do differ */
-        const auto minX = thisTc_->pos.x - thisTc_->scale.x / 2 + knobSqSize / 2;
-        const auto maxX = thisTc_->pos.x + thisTc_->scale.x / 2 - knobSqSize / 2;
+        const auto minX = thisTc_->pos.x;
+        const auto maxX = thisTc_->pos.x + thisTc_->scale.x - knobSqSize;
         const auto posX = minX * (1.0f - currKnobValue) + currKnobValue * maxX;
         knobTc.setPos({ posX, thisTc_->pos.y });
     }
     else
     {
-        const auto minY = thisTc_->pos.y - thisTc_->scale.y / 2 + knobSqSize / 2;
-        const auto maxY = thisTc_->pos.y + thisTc_->scale.y / 2 - knobSqSize / 2;
+        const auto minY = thisTc_->pos.y;
+        const auto maxY = thisTc_->pos.y + thisTc_->scale.y - knobSqSize;
         const auto posY = minY * (1.0f - currKnobValue) + currKnobValue * maxY;
         knobTc.setPos({ thisTc_->pos.x, posY });
     }
@@ -287,13 +280,16 @@ void HkConstraintContext::scrollBarConstrain(HkTransformContext& scrollBarTc, bo
            between bars is filled or not. Same thing shoukd apply for vertical calcs bellow */
         const auto verticalBarAwareMargin = isOverflowY_ ? barScale : 0;
         scrollBarTc.setScale({ thisTc_->scale.x - verticalBarAwareMargin, barScale });
-        scrollBarTc.setPos({ thisTc_->pos.x - verticalBarAwareMargin / 2, thisTc_->pos.y + thisTc_->scale.y / 2 - barScale / 2 });
+        scrollBarTc.setPos({ thisTc_->pos.x, thisTc_->pos.y + thisTc_->scale.y - barScale });
     }
     else
     {
         const auto horizontalBarAwareMargin = isOverflowX_ ? barScale : 0;
         scrollBarTc.setScale({ barScale, thisTc_->scale.y - horizontalBarAwareMargin });
-        scrollBarTc.setPos({ thisTc_->pos.x + thisTc_->scale.x / 2 - barScale / 2, thisTc_->pos.y - horizontalBarAwareMargin / 2 });
+        scrollBarTc.setPos({ thisTc_->pos.x + thisTc_->scale.x - barScale, thisTc_->pos.y });
+
+        // scrollBarTc.setScale({ barScale, thisTc_->scale.y - horizontalBarAwareMargin });
+        // scrollBarTc.setPos({ thisTc_->pos.x + thisTc_->scale.x / 2 - barScale / 2, thisTc_->pos.y - horizontalBarAwareMargin / 2 });
     }
 }
 
@@ -302,7 +298,7 @@ void HkConstraintContext::scrollBarConstrain(HkTransformContext& scrollBarTc, bo
 void HkConstraintContext::windowFrameContainerConstraint(HkTransformContext& childTc)
 {
     /* TODO: dirty flags shall be used here to not do redundant repositioning */
-    childTc.setPos({ thisTc_->pos.x, thisTc_->pos.y + childTc.scale.y / 2 + thisTc_->scale.y / 2 });
+    childTc.setPos({ thisTc_->pos.x, thisTc_->pos.y + thisTc_->scale.y });
 }
 
 void HkConstraintContext::freeConstraint(const std::vector<HkTreeStructure<HkNodeBase>*>&)

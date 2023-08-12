@@ -21,26 +21,27 @@ void HkWindowFrame::onDrag()
 }
 
 void HkWindowFrame::onGeneralMouseMove()
-{
-}
+{}
 
 //TODO: BUG: On rescaling, there are 1 pixel wide errors, maybe due tot some rounding errors. Or maybe due to 
 // calculating stuff relative to the center of the UI element?
 // Later edit: BUG can be fixed by not allowing odd scale/pos(maybe this not?). Maybe it can be mitigated by topLeft positioning in the future
 void HkWindowFrame::onWindowResize()
 {
+    //TODO: Refactor if needed after topLeft coordinate change
     /* Techically root windows shall not resize with WINDOW itself, only children should resize with their parents */
     //TODO: Future: Refactor transforms so that they have pivot at top left corner instead of center
-    auto factor = 0.5f;
-    auto factor2 = 0.25f;
-    //Just for now
-    auto width_factor = std::round(sceneDataRef_.windowWidth * factor / 2) * 2;
-    auto height_factor2 = std::round(sceneDataRef_.windowHeight * factor2 / 2) * 2;
-    auto height_factor = std::round(sceneDataRef_.windowHeight * factor / 2) * 2;
+    // auto factor = 0.5f;
+    // auto factor2 = 0.25f;
+    // //Just for now
+    // auto width_factor = std::round(sceneDataRef_.windowWidth * factor / 2) * 2;
+    // auto height_factor2 = std::round(sceneDataRef_.windowHeight * factor2 / 2) * 2;
+    // auto height_factor = std::round(sceneDataRef_.windowHeight * factor / 2) * 2;
 
-    node_.transformContext.setScale({ width_factor, 30 });
-    node_.transformContext.setPos({ width_factor, height_factor2 });
-    wfCont_.node_.transformContext.setScale({ width_factor, height_factor });
+    // node_.transformContext.setScale({ sceneDataRef_.windowWidth * factor, 30 });
+    // node_.transformContext.setPos({ sceneDataRef_.windowWidth * factor, sceneDataRef_.windowHeight * factor });
+    // wfCont_.node_.transformContext.setScale({ sceneDataRef_.windowWidth * factor, wfCont_.node_.transformContext.scale.y });
+
 }
 
 void HkWindowFrame::onGeneralMouseClick()
@@ -62,7 +63,8 @@ void HkWindowFrame::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)
     wfCont_.pushChildren(newChildren);
 }
 
-void HkWindowFrame::printTree() {
+void HkWindowFrame::printTree()
+{
     treeStruct_.printTree();
 }
 
@@ -71,11 +73,13 @@ void HkWindowFrame::setColor(const glm::vec3& color)
     node_.renderContext.shader.setVec3f("color", color);
 }
 
-void HkWindowFrame::setPos(const glm::vec2& pos) {
+void HkWindowFrame::setPos(const glm::vec2& pos)
+{
     node_.transformContext.setPos(pos);
 }
 
-void HkWindowFrame::setSize(const glm::vec2& size) {
+void HkWindowFrame::setSize(const glm::vec2& size)
+{
     node_.transformContext.setScale({ size.x, 30 });
     wfCont_.node_.transformContext.setScale(size);
 }

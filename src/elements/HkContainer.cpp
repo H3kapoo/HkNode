@@ -40,6 +40,7 @@ void HkContainer::resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& 
 }
 
 /* Compute SB constraints only if needed */
+//TODO: This could be moved directly inside the constraint context
 void HkContainer::constrainScrollbarsIfNeeded()
 {
     if (node_.constraintContext.isOverflowX_)
@@ -53,6 +54,7 @@ void HkContainer::constrainScrollbarsIfNeeded()
 }
 
 /* This determines if the container will have a scrollbar showing or not */
+//TODO: This could be moved directly inside the constraint context
 void HkContainer::handleContainerOverflowIfNeeded()
 {
     // hsb
@@ -98,26 +100,16 @@ void HkContainer::postChildrenRendered()
             hScrollBar_.node_.transformContext.scale.y });
 
         dummyXYIntersectorData_.transformContext.setPos({
-            hScrollBar_.node_.transformContext.pos.x + hScrollBar_.node_.transformContext.scale.x / 2
-                + hScrollBar_.node_.transformContext.scale.y / 2,
-            hScrollBar_.node_.transformContext.pos.y }
-        );
+            hScrollBar_.node_.transformContext.pos.x + hScrollBar_.node_.transformContext.scale.x,
+            hScrollBar_.node_.transformContext.pos.y });
+
         dummyXYIntersectorData_.renderContext.render(sceneDataRef_.sceneProjMatrix,
             dummyXYIntersectorData_.transformContext.getModelMatrix());
     }
 }
 
-
 void HkContainer::onDrag()
 {
-    // std::cout << treeStruct_.getName() << " is being dragged now\n";
-        //     //TODO: THis logic shall be moved in SM
-    // if (!mouseClickPositionSet_)
-    // {
-    //     clickPosition_ = sceneDataRef_.mousePos;
-    //     mouseClickPositionSet_ = true;
-    // }
-
     /* Ignore mouse moves inside intersector area */
     if (sbCount_ == 2 && !dummyXYIntersectorData_.transformContext.isPosInsideOfNode(sceneDataRef_.dragStartMousePosition))
         std::cout << glfwGetTime() << "  " << sceneDataRef_.dragStartMousePosition.x << "  " <<
