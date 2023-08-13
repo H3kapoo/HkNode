@@ -111,6 +111,8 @@ int main()
     // windowFrame->setSize({ 1280, 720 - 30 });
 
     windowFrame->pushChildren({ ctr, ctr2 });
+    ctr2->pushChildren({ ctr3, ctr4, ctr4, ctr5 });
+
     // windowFrame->pushChildren({ ctr, ctr2, ctr3, ctr4, ctr5 });
     windowFrame->printTree();
 

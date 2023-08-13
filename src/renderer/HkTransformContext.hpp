@@ -20,7 +20,7 @@ public:
 
     glm::mat4& getModelMatrix();
 
-    bool isPosInsideOfNode(const glm::ivec2& pin);
+    bool isPosInsideOfNode(const glm::ivec2& pin) const;
 
     /* Note: Even if these are public, still use the setters, they do more work under the hood! */
     glm::ivec2 scale, rot, pos;

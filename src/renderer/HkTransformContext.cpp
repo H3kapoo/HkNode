@@ -36,7 +36,7 @@ void HkTransformContext::setScale(const glm::ivec2& scale)
 
 glm::mat4& HkTransformContext::getModelMatrix() { return modelMat; }
 
-bool HkTransformContext::isPosInsideOfNode(const glm::ivec2& posIn)
+bool HkTransformContext::isPosInsideOfNode(const glm::ivec2& posIn) const
 {
     if (pos.x <= posIn.x && posIn.x <= pos.x + scale.x && pos.y <= posIn.y && posIn.y <= pos.y + scale.y)
         return true;

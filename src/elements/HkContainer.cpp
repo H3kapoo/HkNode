@@ -17,8 +17,16 @@ HkContainer::HkContainer(const std::string& containerName)
        just a normal renderable detail */
     dummyXYIntersectorData_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
     dummyXYIntersectorData_.renderContext.shader.setVec3f("color", glm::vec3(0.7f, 1.0f, 0.2f));
+
+    //Dummy just to test nested scrollbars
+    if (treeStruct_.getName() == "MyContainer2")
+    {
+        vScrollBar_.node_.renderContext.shader.setVec3f("color", glm::vec3(0.4f, 0.2f, 0.6f));
+        hScrollBar_.node_.renderContext.shader.setVec3f("color", glm::vec3(0.4f, 0.2f, 0.6f));
+    }
 }
 
+//TODO: Disable scrollbars outside of view area
 void HkContainer::resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children)
 {
     /* Resolve children constraints (ignores scrollbar children) */
@@ -84,6 +92,21 @@ void HkContainer::handleContainerOverflowIfNeeded()
         vScrollBar_.setScrollBarActive(false);
         treeStruct_.removeChildren({ vScrollBar_.treeStruct_.getId() });
     }
+
+    //TODO: now check my parent to see if MY scrollbar should be there or not, maybe its not visible..
+    //TODO: refactor above if's later..
+    //Edit: it kinds works :)
+    const auto parentNode = treeStruct_.getParent();
+    if (parentNode->getType() == "RootWindowFrame") return;
+
+    const auto parent = parentNode->getPayload()->node_.transformContext;
+    if (!parent.isPosInsideOfNode(vScrollBar_.node_.transformContext.pos + vScrollBar_.node_.transformContext.scale.x)) // account for SB width
+    {
+        // const auto scaleDiff = node_.transformContext.pos.x + node_.transformContext.scale.x - (parent.pos.x + parent.scale.x);
+        sbCount_--;
+        vScrollBar_.setScrollBarActive(false);
+        treeStruct_.removeChildren({ vScrollBar_.treeStruct_.getId() });
+    }
 }
 
 /* Useful to render additional visual non children UI, like XY intersector. This will be called after all children (and sub children)
@@ -116,26 +139,8 @@ void HkContainer::onDrag()
         sceneDataRef_.dragStartMousePosition.y << "dragging ouside of intersector\n";
 }
 
-//TODO: BUG: when click and drag inside intersector area..it does drag, we shall ignore that part when dragging but we dont
 void HkContainer::onGeneralMouseMove()
-{
-    // /* Safe to assume that this is what dragging the current element logic looks like */
-    // //TODO: A dragging state needs to be added in SM => added, just adapt THIS code
-
-    // if (sceneDataRef_.isMouseClicked && sceneDataRef_.focusedId == treeStruct_.getId())
-    // {
-    //     //TODO: THis logic shall be moved in SM
-    //     if (!mouseClickPositionSet_)
-    //     {
-    //         clickPosition_ = sceneDataRef_.mousePos;
-    //         mouseClickPositionSet_ = true;
-    //     }
-
-    //     /* Ignore mouse moves inside intersector area */
-    //     if (sbCount_ == 2 && !dummyXYIntersectorData_.transformContext.isPosInsideOfNode(clickPosition_))
-    //         std::cout << glfwGetTime() << "dragging on container with 2 SBs\n";
-    // }
-}
+{}
 
 void HkContainer::onGeneralMouseClick()
 {
