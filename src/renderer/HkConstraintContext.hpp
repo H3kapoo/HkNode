@@ -10,7 +10,6 @@ namespace hkui
 {
 enum class HkConstraintPolicy
 {
-    AlignHorizontally,
     AlignLeftToRight,
     AlignTopToBottom
 };
@@ -74,7 +73,7 @@ public:
     uint32_t hScrollBarWidth_{ 0 };
 
 private:
-    HkConstraintPolicy policy_;
+    HkConstraintPolicy policy_{ HkConstraintPolicy::AlignLeftToRight }; /* Always set defaults */
     HkTransformContext* thisTc_;
 };
 } // hkui

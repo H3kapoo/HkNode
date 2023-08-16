@@ -1,7 +1,5 @@
 #include "HkConstraintContext.hpp"
 
-#include "../utils/HkDrawDebugger.hpp"
-
 #include "../base/HkNodeBase.hpp"
 
 namespace hkui
@@ -13,13 +11,12 @@ void HkConstraintContext::setPolicy(const HkConstraintPolicy policy) { policy_ =
 
 void HkConstraintContext::resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children)
 {
-    if (children.empty()) return;
+    if (children.empty())
+        return;
 
     /* TODO: dirty flags shall be used here to not do redundant repositioning */
-
     switch (policy_)
     {
-    case HkConstraintPolicy::AlignHorizontally:
     case HkConstraintPolicy::AlignLeftToRight:
         alignLeftRight(children);
         break;
@@ -173,7 +170,7 @@ void HkConstraintContext::alignLeftRight(const std::vector<HkTreeStructure<HkNod
 
     resolveChildrenOverflowVariables(HkChildrenOrientation::Horizontal, children);
 
-    auto startPosX = thisTc_->pos.x + offsetPercentage_.x * -overflowXYSize_.x;
+    auto startPosX = thisTc_->pos.x + offsetPercentage_.x * -(overflowXYSize_.x + 40); //TODO: Remove debug 40
     auto startPosY = thisTc_->pos.y + offsetPercentage_.y * -overflowXYSize_.y;
     for (const auto& child : children)
     {

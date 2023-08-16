@@ -6,6 +6,17 @@
 
 namespace hkui
 {
+
+struct HkTransformBBox
+{
+    glm::ivec2 pos, scale;
+};
+
+struct HKAxisBoundsPoints
+{
+    int firstPos, secondPos;
+};
+
 /* This context should basically handle all that happens to the model matrix of the primitive */
 class HkTransformContext
 {
@@ -21,10 +32,14 @@ public:
     glm::mat4& getModelMatrix();
 
     bool isPosInsideOfNode(const glm::ivec2& pin) const;
+    HkTransformBBox computeBBoxWith(const HkTransformContext& otherTc) const;
+
 
     /* Note: Even if these are public, still use the setters, they do more work under the hood! */
     glm::ivec2 scale, rot, pos;
 private:
+    HKAxisBoundsPoints computeXIntersectionPointWith(const HkTransformContext& otherTc) const;
+
     void computeModelMatrix();
     glm::mat4 modelMat;
 };

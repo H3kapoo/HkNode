@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -19,10 +20,15 @@ public:
     static HkDrawDebugger& get();
 
     void setDefaultDebugShader();
-    void draw10x10(const glm::ivec2 pos);
+    void pushDraw10x10(const glm::ivec2 pos);
+
+    void drawBuffer();
 
 private:
     HkDrawDebugger() = default;
+    void draw10x10(const glm::ivec2 pos);
+
+    std::vector<glm::ivec2> buffer_;
 
     HkRenderContext rc_;
     HkTransformContext tc_;

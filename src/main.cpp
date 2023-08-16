@@ -1,5 +1,8 @@
 #include "APIGate/GlfwGlewGate.hpp"
 
+/*Only for debugging*/
+#include "utils/HkDrawDebugger.hpp"
+
 #include "renderer/HkShader.hpp"
 #include "management/HkSceneManagement.hpp"
 #include "elements/HkWindowFrame.hpp"
@@ -88,17 +91,17 @@ int main()
     HkContainerPtr ctr4 = std::make_shared<HkContainer>("MyContainer4");
     HkContainerPtr ctr5 = std::make_shared<HkContainer>("MyContainer5");
 
-    ctr->setColor({ 0.2f,0.3f,0.4f });
+    ctr->setColor({ 0.3f,0.3f,0.7f });
     ctr2->setColor({ 0.3f,0.4f,0.5f });
     ctr3->setColor({ 0.4f,0.5f,0.6f });
     ctr4->setColor({ 0.7f,0.8f,0.9f });
     ctr5->setColor({ 0.0f,0.1f,0.2f });
-    ctr->setSize({ 100, 300 });
-    ctr2->setSize({ 670, 350 });
+    ctr->setSize({ 300, 300 });
+    ctr2->setSize({ 500, 200 });
     // ctr2->setSize({ 630, 200 });
-    ctr3->setSize({ 120, 400 });
-    ctr4->setSize({ 120, 100 });
-    ctr5->setSize({ 120, 30 });
+    ctr3->setSize({ 320, 200 });
+    ctr4->setSize({ 370, 100 });
+    ctr5->setSize({ 1060, 30 });
 
     // windowFrame->setPos({ 1280 * 0.5, 720 * 0.25 });
     // windowFrame->setSize({ 1280 * 0.5, 720 * 0.5 });
@@ -110,8 +113,9 @@ int main()
     // windowFrame->setPos({ 1280 * 0.5f, 15 });
     // windowFrame->setSize({ 1280, 720 - 30 });
 
-    windowFrame->pushChildren({ ctr, ctr2 });
-    ctr2->pushChildren({ ctr3, ctr4, ctr4, ctr5 });
+    windowFrame->pushChildren({ ctr });
+    // ctr->pushChildren({ ctr2 });
+    // ctr2->pushChildren({ ctr5 });
 
     // windowFrame->pushChildren({ ctr, ctr2, ctr3, ctr4, ctr5 });
     windowFrame->printTree();
@@ -130,6 +134,7 @@ int main()
 
         //TODO: GLFWAPI void glfwPostEmptyEvent(void); could be used in the future in case of animations
         HkSceneManagement::get().update();
+        HkDrawDebugger::get().drawBuffer();
         glfwSwapBuffers(window);
         glfwWaitEvents();
         // glfwPollEvents();

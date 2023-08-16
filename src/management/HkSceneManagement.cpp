@@ -118,6 +118,9 @@ void HkSceneManagement::mouseClickEvent(GLFWwindow*, int button, int action, int
     After that normal mouse click event can be dispatched, this helps isolate things even more.
     Once this function exits, 'focusedId' is guaranteed to be the currenctly selected node */
     resolveFocus();
+
+    //TODO: Selection is also broken when talking about scissors overflow.. maybe we need to also compute
+    //      what part of the UI Element is actually visible
     update(HkEvent::MouseClick);
 }
 

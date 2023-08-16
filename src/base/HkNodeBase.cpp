@@ -1,5 +1,7 @@
 #include "HkNodeBase.hpp"
 
+#include "../utils/HkDrawDebugger.hpp"
+
 namespace hkui
 {
 HkNodeBase::HkNodeBase(const std::string& windowName, const std::string& type)
@@ -29,12 +31,40 @@ void HkNodeBase::updateMySelf()
     auto& children = treeStruct_.getChildren();
     resolveConstraints(children);
 
-    /* Render just the WF's container bounding box */
+    //TODO: Bug in current config..overflows where there shouldn bei
+    /*There will be two cases:
+    1.When the Node's parent is the WF => normal scissor around that Node's bb
+    2.When the Node's parent is not WF => normal scirros around that Node's bb +
+      taking into account that possible childre WF container overflow */
+      /* Render just the WF's container bounding box */
+
     const auto parent = treeStruct_.getParent();
+    // this part should remain the same
     if (parent && parent->getType() == "RootWindowFrame")
     {
-        glEnable(GL_SCISSOR_TEST);
+        // glEnable(GL_SCISSOR_TEST);
+
         const auto& tc = node_.transformContext;
+        glScissor(
+            tc.pos.x - 1,
+            sceneDataRef_.windowHeight - tc.pos.y - tc.scale.y + 1,
+            tc.scale.x,
+            tc.scale.y);
+    }
+    /* Render bounding box based on paren'ts bounds  */
+    else if (parent && parent->getType() != "RootWindowFrame")
+    {
+        // glEnable(GL_SCISSOR_TEST);
+        const auto& tc = parent->getPayload()->node_.transformContext;
+        if (treeStruct_.getName() == "MyContainer")
+        {
+            const auto returnTc = tc.computeBBoxWith(node_.transformContext);
+
+            HkDrawDebugger::get().pushDraw10x10({ returnTc.pos.x, returnTc.pos.y });
+            HkDrawDebugger::get().pushDraw10x10({ returnTc.pos.x + returnTc.scale.x, returnTc.pos.y + returnTc.scale.y });
+
+        }
+
         glScissor(
             tc.pos.x - 1,
             sceneDataRef_.windowHeight - tc.pos.y - tc.scale.y + 1,
@@ -44,18 +74,19 @@ void HkNodeBase::updateMySelf()
 
     /* Normal rendering */
     node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix());
+
     for (const auto& child : children)
     {
         child->getPayload()->updateMySelf();
     }
 
-    postChildrenRendered();
-
     /* Disable scissors after rendering if we are the WF's container */
     if (parent && parent->getType() == "RootWindowFrame")
     {
-        glDisable(GL_SCISSOR_TEST);
+        // glDisable(GL_SCISSOR_TEST);
     }
+    postChildrenRendered();
+
 }
 
 void HkNodeBase::resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children)

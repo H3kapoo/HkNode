@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+
 namespace hkui
 {
 HkTransformContext::HkTransformContext()
@@ -41,6 +42,56 @@ bool HkTransformContext::isPosInsideOfNode(const glm::ivec2& posIn) const
     if (pos.x <= posIn.x && posIn.x <= pos.x + scale.x && pos.y <= posIn.y && posIn.y <= pos.y + scale.y)
         return true;
     return false;
+}
+
+HKAxisBoundsPoints HkTransformContext::computeXIntersectionPointWith(const HkTransformContext& otherTc) const
+{
+    HKAxisBoundsPoints xBounds = {};
+
+    /* Case when otherTc X is fully overflowing Tc */
+    if (otherTc.pos.x < pos.x && (otherTc.pos.x + otherTc.scale.x) >(pos.x + scale.x))
+    {
+        xBounds.firstPos = pos.x;
+        xBounds.secondPos = pos.x + scale.x;
+        return xBounds;
+    }
+
+    /* Case when otherTc X is fully inside Tc */
+    if (otherTc.pos.x >= pos.x && (otherTc.pos.x + otherTc.scale.x) <= (pos.x + scale.x))
+    {
+        xBounds.firstPos = otherTc.pos.x;
+        xBounds.secondPos = otherTc.pos.x + otherTc.scale.x;
+        return xBounds;
+    }
+
+    /* Case when otherTc X partially lies outside of Tc to the RIGHT */
+    if (otherTc.pos.x < (pos.x + scale.x) && (otherTc.pos.x + otherTc.scale.x) > pos.x + scale.x)
+    {
+        xBounds.firstPos = otherTc.pos.x;
+        xBounds.secondPos = otherTc.pos.x + (pos.x + scale.x) - otherTc.pos.x;
+        return xBounds;
+    }
+
+    /* Case when otherTc X partially lies outside of Tc to the LEFT */
+    if (otherTc.pos.x < pos.x && (otherTc.pos.x + otherTc.scale.x) > pos.x)
+    {
+        xBounds.firstPos = pos.x;
+        xBounds.secondPos = pos.x + otherTc.scale.x - (pos.x - otherTc.pos.x);
+        return xBounds;
+    }
+
+    return xBounds;
+}
+
+HkTransformBBox HkTransformContext::computeBBoxWith(const HkTransformContext& otherTc) const
+{
+    HkTransformBBox returnTc = {};
+    returnTc.pos.y = 0;
+    returnTc.scale.y = 0;
+    returnTc.pos.x = computeXIntersectionPointWith(otherTc).firstPos;
+    returnTc.scale.x = computeXIntersectionPointWith(otherTc).secondPos - computeXIntersectionPointWith(otherTc).firstPos;
+
+    return returnTc;
 }
 
 //TODO: It would be better to pivot quad around top-left vertex instead of its center

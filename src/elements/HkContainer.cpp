@@ -30,13 +30,13 @@ HkContainer::HkContainer(const std::string& containerName)
 void HkContainer::resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children)
 {
     /* Resolve children constraints (ignores scrollbar children) */
-    HkNodeBase::resolveConstraints(children);
+    // HkNodeBase::resolveConstraints(children);
 
     /* Exactly what it says, show bars or not if overflow occured*/
-    handleContainerOverflowIfNeeded();
+    // handleContainerOverflowIfNeeded();
 
     /* Resolve scrollbar only constraints for axis */
-    constrainScrollbarsIfNeeded();
+    // constrainScrollbarsIfNeeded();
 
     //Not sure about this one here..
     node_.constraintContext.offsetPercentage_.x = hScrollBar_.getScrollValue();
@@ -65,6 +65,7 @@ void HkContainer::constrainScrollbarsIfNeeded()
 //TODO: This could be moved directly inside the constraint context
 void HkContainer::handleContainerOverflowIfNeeded()
 {
+    //TODO: Maybe just turn them inactive instead of removing them?
     // hsb
     if (!hScrollBar_.isScrollBarActive() && node_.constraintContext.isOverflowX_)
     {
@@ -90,23 +91,24 @@ void HkContainer::handleContainerOverflowIfNeeded()
     {
         sbCount_--;
         vScrollBar_.setScrollBarActive(false);
+        //TODO: this adding/removing could be solved by new SCISSORING mechanism, when implemented
         treeStruct_.removeChildren({ vScrollBar_.treeStruct_.getId() });
     }
 
     //TODO: now check my parent to see if MY scrollbar should be there or not, maybe its not visible..
     //TODO: refactor above if's later..
     //Edit: it kinds works :)
-    const auto parentNode = treeStruct_.getParent();
-    if (parentNode->getType() == "RootWindowFrame") return;
+    // const auto parentNode = treeStruct_.getParent();
+    // if (parentNode->getType() == "RootWindowFrame") return;
 
-    const auto parent = parentNode->getPayload()->node_.transformContext;
-    if (!parent.isPosInsideOfNode(vScrollBar_.node_.transformContext.pos + vScrollBar_.node_.transformContext.scale.x)) // account for SB width
-    {
-        // const auto scaleDiff = node_.transformContext.pos.x + node_.transformContext.scale.x - (parent.pos.x + parent.scale.x);
-        sbCount_--;
-        vScrollBar_.setScrollBarActive(false);
-        treeStruct_.removeChildren({ vScrollBar_.treeStruct_.getId() });
-    }
+    // const auto parent = parentNode->getPayload()->node_.transformContext;
+    // if (!parent.isPosInsideOfNode(vScrollBar_.node_.transformContext.pos + vScrollBar_.node_.transformContext.scale.x)) // account for SB width
+    // {
+    //     // const auto scaleDiff = node_.transformContext.pos.x + node_.transformContext.scale.x - (parent.pos.x + parent.scale.x);
+    //     sbCount_--;
+    //     vScrollBar_.setScrollBarActive(false);
+    //     treeStruct_.removeChildren({ vScrollBar_.treeStruct_.getId() });
+    // }
 }
 
 /* Useful to render additional visual non children UI, like XY intersector. This will be called after all children (and sub children)
@@ -133,7 +135,10 @@ void HkContainer::postChildrenRendered()
 
 void HkContainer::onDrag()
 {
-    /* Ignore mouse moves inside intersector area */
+    node_.transformContext.setPos(sceneDataRef_.mouseOffsetFromFocusedCenter + sceneDataRef_.mousePos);
+
+    //TODO: Should this really be here?
+    /* Ignore mouse drags inside intersector area */
     if (sbCount_ == 2 && !dummyXYIntersectorData_.transformContext.isPosInsideOfNode(sceneDataRef_.dragStartMousePosition))
         std::cout << glfwGetTime() << "  " << sceneDataRef_.dragStartMousePosition.x << "  " <<
         sceneDataRef_.dragStartMousePosition.y << "dragging ouside of intersector\n";
