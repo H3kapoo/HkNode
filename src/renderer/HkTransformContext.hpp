@@ -29,18 +29,31 @@ public:
     void addScale(const glm::ivec2& scale);
     void setScale(const glm::ivec2& scale);
 
+    void setVScale(const glm::ivec2& vScale);
+    void setVPos(const glm::ivec2& vPos);
+
+    const glm::ivec2& getVPos() const;
+    const glm::ivec2& getVScale() const;
+
     glm::mat4& getModelMatrix();
 
     bool isPosInsideOfNode(const glm::ivec2& pin) const;
+    bool isPosInsideOfNodeViewableArea(const glm::ivec2& pin) const;
+
     HkTransformBBox computeBBoxWith(const HkTransformContext& otherTc) const;
 
 
-    /* Note: Even if these are public, still use the setters, they do more work under the hood! */
+    /* Absolute transfrom of the mesh */
     glm::ivec2 scale, rot, pos;
+
 private:
-    HKAxisBoundsPoints computeXIntersectionPointWith(const HkTransformContext& otherTc) const;
+    HKAxisBoundsPoints computeXIntersectionPointsWith(const HkTransformContext& otherTc) const;
+    HKAxisBoundsPoints computeYIntersectionPointsWith(const HkTransformContext& otherTc) const;
 
     void computeModelMatrix();
     glm::mat4 modelMat;
+
+    /* Whats the actual viewable by user part of the mesh */
+    glm::ivec2 vScale, vPos;
 };
 } // hkui

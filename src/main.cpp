@@ -96,11 +96,11 @@ int main()
     ctr3->setColor({ 0.4f,0.5f,0.6f });
     ctr4->setColor({ 0.7f,0.8f,0.9f });
     ctr5->setColor({ 0.0f,0.1f,0.2f });
-    ctr->setSize({ 300, 300 });
+    ctr->setSize({ 700, 600 });
     ctr2->setSize({ 500, 200 });
     // ctr2->setSize({ 630, 200 });
     ctr3->setSize({ 320, 200 });
-    ctr4->setSize({ 370, 100 });
+    ctr4->setSize({ 370, 400 });
     ctr5->setSize({ 1060, 30 });
 
     // windowFrame->setPos({ 1280 * 0.5, 720 * 0.25 });
@@ -113,9 +113,9 @@ int main()
     // windowFrame->setPos({ 1280 * 0.5f, 15 });
     // windowFrame->setSize({ 1280, 720 - 30 });
 
-    windowFrame->pushChildren({ ctr });
+    windowFrame->pushChildren({ ctr,ctr2 });
     // ctr->pushChildren({ ctr2 });
-    // ctr2->pushChildren({ ctr5 });
+    ctr2->pushChildren({ ctr4, ctr5 });
 
     // windowFrame->pushChildren({ ctr, ctr2, ctr3, ctr4, ctr5 });
     windowFrame->printTree();

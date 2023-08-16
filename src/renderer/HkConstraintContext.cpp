@@ -170,7 +170,7 @@ void HkConstraintContext::alignLeftRight(const std::vector<HkTreeStructure<HkNod
 
     resolveChildrenOverflowVariables(HkChildrenOrientation::Horizontal, children);
 
-    auto startPosX = thisTc_->pos.x + offsetPercentage_.x * -(overflowXYSize_.x + 40); //TODO: Remove debug 40
+    auto startPosX = thisTc_->pos.x + offsetPercentage_.x * -(overflowXYSize_.x);
     auto startPosY = thisTc_->pos.y + offsetPercentage_.y * -overflowXYSize_.y;
     for (const auto& child : children)
     {

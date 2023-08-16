@@ -154,7 +154,6 @@ void HkSceneManagement::resolveFocus()
         sceneData.focusedId = HkSceneData::NO_SELECTION_ID;
         sceneData.mouseOffsetFromFocusedCenter = { 0,0 };
         update(HkEvent::FocusScan);
-        // std::cout << glfwGetTime() << " Focused ID is: " << sceneData.focusedId << '\n';
     }
 }
 

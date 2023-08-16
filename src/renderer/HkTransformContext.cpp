@@ -6,7 +6,8 @@
 namespace hkui
 {
 HkTransformContext::HkTransformContext()
-    : scale{ 200,100 }, rot{ 0,0 }, pos{ 100,100 }
+    : scale{ 200, 100 }, rot{ 0,0 }, pos{ 100,100 }
+    , vScale{ 200, 100 }, vPos{ 100, 100 }
 {
     computeModelMatrix();
 }
@@ -35,16 +36,58 @@ void HkTransformContext::setScale(const glm::ivec2& scale)
     computeModelMatrix();
 }
 
+void HkTransformContext::setVPos(const glm::ivec2& vPos)
+{
+    this->vPos = vPos;
+}
+
+void HkTransformContext::setVScale(const glm::ivec2& vScale)
+{
+    this->vScale = vScale;
+}
+
+const glm::ivec2& HkTransformContext::getVPos() const
+{
+    return vPos;
+}
+
+const glm::ivec2& HkTransformContext::getVScale() const
+{
+    return vScale;
+}
+
 glm::mat4& HkTransformContext::getModelMatrix() { return modelMat; }
 
 bool HkTransformContext::isPosInsideOfNode(const glm::ivec2& posIn) const
 {
+    /* Absolute positioning. Doesn't take into account if position can actually be seen by user */
     if (pos.x <= posIn.x && posIn.x <= pos.x + scale.x && pos.y <= posIn.y && posIn.y <= pos.y + scale.y)
         return true;
     return false;
 }
 
-HKAxisBoundsPoints HkTransformContext::computeXIntersectionPointWith(const HkTransformContext& otherTc) const
+bool HkTransformContext::isPosInsideOfNodeViewableArea(const glm::ivec2& posIn) const
+{
+    /* Non-absolute positioning. Takes into account if position can actually be seen by user */
+    if (vPos.x <= posIn.x && posIn.x <= vPos.x + vScale.x && vPos.y <= posIn.y && posIn.y <= vPos.y + vScale.y)
+        return true;
+    return false;
+}
+
+HkTransformBBox HkTransformContext::computeBBoxWith(const HkTransformContext& otherTc) const
+{
+    HkTransformBBox returnTc = {};
+    const auto xBounds = computeXIntersectionPointsWith(otherTc);
+    const auto yBounds = computeYIntersectionPointsWith(otherTc);
+    returnTc.pos.x = xBounds.firstPos;
+    returnTc.scale.x = xBounds.secondPos - xBounds.firstPos;
+    returnTc.pos.y = yBounds.firstPos;
+    returnTc.scale.y = yBounds.secondPos - yBounds.firstPos;
+
+    return returnTc;
+}
+
+HKAxisBoundsPoints HkTransformContext::computeXIntersectionPointsWith(const HkTransformContext& otherTc) const
 {
     HKAxisBoundsPoints xBounds = {};
 
@@ -83,15 +126,43 @@ HKAxisBoundsPoints HkTransformContext::computeXIntersectionPointWith(const HkTra
     return xBounds;
 }
 
-HkTransformBBox HkTransformContext::computeBBoxWith(const HkTransformContext& otherTc) const
+HKAxisBoundsPoints HkTransformContext::computeYIntersectionPointsWith(const HkTransformContext& otherTc) const
 {
-    HkTransformBBox returnTc = {};
-    returnTc.pos.y = 0;
-    returnTc.scale.y = 0;
-    returnTc.pos.x = computeXIntersectionPointWith(otherTc).firstPos;
-    returnTc.scale.x = computeXIntersectionPointWith(otherTc).secondPos - computeXIntersectionPointWith(otherTc).firstPos;
+    HKAxisBoundsPoints yBounds = {};
 
-    return returnTc;
+    /* Case when otherTc Y is fully overflowing Tc */
+    if (otherTc.pos.y < pos.y && (otherTc.pos.y + otherTc.scale.y) >(pos.y + scale.y))
+    {
+        yBounds.firstPos = pos.y;
+        yBounds.secondPos = pos.y + scale.y;
+        return yBounds;
+    }
+
+    /* Case when otherTc Y is fully inside Tc */
+    if (otherTc.pos.y >= pos.y && (otherTc.pos.y + otherTc.scale.y) <= (pos.y + scale.y))
+    {
+        yBounds.firstPos = otherTc.pos.y;
+        yBounds.secondPos = otherTc.pos.y + otherTc.scale.y;
+        return yBounds;
+    }
+
+    /* Case when otherTc Y partially lies outside of Tc to the TOP */
+    if (otherTc.pos.y < (pos.y + scale.y) && (otherTc.pos.y + otherTc.scale.y) > pos.y + scale.y)
+    {
+        yBounds.firstPos = otherTc.pos.y;
+        yBounds.secondPos = otherTc.pos.y + (pos.y + scale.y) - otherTc.pos.y;
+        return yBounds;
+    }
+
+    /* Case when otherTc Y partially lies outside of Tc to the BOTTOM */
+    if (otherTc.pos.y < pos.y && (otherTc.pos.y + otherTc.scale.y) > pos.y)
+    {
+        yBounds.firstPos = pos.y;
+        yBounds.secondPos = pos.y + otherTc.scale.y - (pos.y - otherTc.pos.y);
+        return yBounds;
+    }
+
+    return yBounds;
 }
 
 //TODO: It would be better to pivot quad around top-left vertex instead of its center

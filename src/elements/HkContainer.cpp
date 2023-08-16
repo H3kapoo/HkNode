@@ -6,8 +6,7 @@ HkContainer::HkContainer(const std::string& containerName)
     : HkNodeBase(containerName, "Container")
     , hScrollBar_("{Internal}-HScrollBarFor " + containerName, true)
     , vScrollBar_("{Internal}-VScrollBarFor " + containerName, false)
-    , sbCount_{ 0 }
-    , isIntersectorNeeded_{ false }
+    , scrollbBarsCount_{ 0 }
 {
     node_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
     node_.renderContext.shader.setVec3f("color", glm::vec3(0.5f, 0.5f, 0.5f)); // gray
@@ -30,13 +29,13 @@ HkContainer::HkContainer(const std::string& containerName)
 void HkContainer::resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children)
 {
     /* Resolve children constraints (ignores scrollbar children) */
-    // HkNodeBase::resolveConstraints(children);
+    HkNodeBase::resolveConstraints(children);
 
     /* Exactly what it says, show bars or not if overflow occured*/
-    // handleContainerOverflowIfNeeded();
+    handleContainerOverflowIfNeeded();
 
     /* Resolve scrollbar only constraints for axis */
-    // constrainScrollbarsIfNeeded();
+    constrainScrollbarsIfNeeded();
 
     //Not sure about this one here..
     node_.constraintContext.offsetPercentage_.x = hScrollBar_.getScrollValue();
@@ -69,13 +68,13 @@ void HkContainer::handleContainerOverflowIfNeeded()
     // hsb
     if (!hScrollBar_.isScrollBarActive() && node_.constraintContext.isOverflowX_)
     {
-        sbCount_++;
+        scrollbBarsCount_++;
         hScrollBar_.setScrollBarActive(true);
         treeStruct_.pushChild(&hScrollBar_.treeStruct_);
     }
     else if (hScrollBar_.isScrollBarActive() && !node_.constraintContext.isOverflowX_)
     {
-        sbCount_--;
+        scrollbBarsCount_--;
         hScrollBar_.setScrollBarActive(false);
         treeStruct_.removeChildren({ hScrollBar_.treeStruct_.getId() });
     }
@@ -83,42 +82,26 @@ void HkContainer::handleContainerOverflowIfNeeded()
     // vsb
     if (!vScrollBar_.isScrollBarActive() && node_.constraintContext.isOverflowY_)
     {
-        sbCount_++;
+        scrollbBarsCount_++;
         vScrollBar_.setScrollBarActive(true);
         treeStruct_.pushChild(&vScrollBar_.treeStruct_);
     }
     else if (vScrollBar_.isScrollBarActive() && !node_.constraintContext.isOverflowY_)
     {
-        sbCount_--;
+        scrollbBarsCount_--;
         vScrollBar_.setScrollBarActive(false);
-        //TODO: this adding/removing could be solved by new SCISSORING mechanism, when implemented
         treeStruct_.removeChildren({ vScrollBar_.treeStruct_.getId() });
     }
-
-    //TODO: now check my parent to see if MY scrollbar should be there or not, maybe its not visible..
-    //TODO: refactor above if's later..
-    //Edit: it kinds works :)
-    // const auto parentNode = treeStruct_.getParent();
-    // if (parentNode->getType() == "RootWindowFrame") return;
-
-    // const auto parent = parentNode->getPayload()->node_.transformContext;
-    // if (!parent.isPosInsideOfNode(vScrollBar_.node_.transformContext.pos + vScrollBar_.node_.transformContext.scale.x)) // account for SB width
-    // {
-    //     // const auto scaleDiff = node_.transformContext.pos.x + node_.transformContext.scale.x - (parent.pos.x + parent.scale.x);
-    //     sbCount_--;
-    //     vScrollBar_.setScrollBarActive(false);
-    //     treeStruct_.removeChildren({ vScrollBar_.treeStruct_.getId() });
-    // }
 }
 
 /* Useful to render additional visual non children UI, like XY intersector. This will be called after all children (and sub children)
    of parent have been rendered */
-void HkContainer::postChildrenRendered()
+void HkContainer::preRenderAdditionalDetails()
 {
     /* If both scrollbars are active, it's obvious we need the intersector at bottom right. It is handled in the Container class because
        container should know when both SBs are active and what to do with them. Also clicking on the dummy object basically means clicking
        on the container itself and since coordinates for this location are already known, maybe we can do some particular stuff with that info */
-    if (sbCount_ == 2)
+    if (scrollbBarsCount_ == 2)
     {
         dummyXYIntersectorData_.transformContext.setScale({
             hScrollBar_.node_.transformContext.scale.y,
@@ -135,11 +118,11 @@ void HkContainer::postChildrenRendered()
 
 void HkContainer::onDrag()
 {
-    node_.transformContext.setPos(sceneDataRef_.mouseOffsetFromFocusedCenter + sceneDataRef_.mousePos);
+    // node_.transformContext.setPos(sceneDataRef_.mouseOffsetFromFocusedCenter + sceneDataRef_.mousePos);
 
     //TODO: Should this really be here?
     /* Ignore mouse drags inside intersector area */
-    if (sbCount_ == 2 && !dummyXYIntersectorData_.transformContext.isPosInsideOfNode(sceneDataRef_.dragStartMousePosition))
+    if (scrollbBarsCount_ == 2 && !dummyXYIntersectorData_.transformContext.isPosInsideOfNodeViewableArea(sceneDataRef_.dragStartMousePosition))
         std::cout << glfwGetTime() << "  " << sceneDataRef_.dragStartMousePosition.x << "  " <<
         sceneDataRef_.dragStartMousePosition.y << "dragging ouside of intersector\n";
 }
@@ -149,12 +132,7 @@ void HkContainer::onGeneralMouseMove()
 
 void HkContainer::onGeneralMouseClick()
 {
-    if (!sceneDataRef_.isMouseClicked)
-    {
-        mouseClickPositionSet_ = false;
-    }
 }
-
 
 void HkContainer::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)
 {
@@ -162,9 +140,9 @@ void HkContainer::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)
     {
         /* What this does is basically push any new children before the scrollbars children so that the
         scrollbars will always be rendered last */
-        if (sbCount_)
+        if (scrollbBarsCount_)
         {
-            const auto it = treeStruct_.getChildren().begin() + treeStruct_.getChildren().size() - sbCount_;
+            const auto it = treeStruct_.getChildren().begin() + treeStruct_.getChildren().size() - scrollbBarsCount_;
             treeStruct_.pushChildAfter(it, &child->treeStruct_);
         }
         /* If no scrollbars, push normally */
@@ -181,11 +159,13 @@ void HkContainer::setColor(const glm::vec3& color)
     node_.renderContext.shader.setVec3f("color", color);
 }
 
-void HkContainer::setPos(const glm::vec2& pos) {
+void HkContainer::setPos(const glm::vec2& pos)
+{
     node_.transformContext.setPos(pos);
 }
 
-void HkContainer::setSize(const glm::vec2& size) {
+void HkContainer::setSize(const glm::vec2& size)
+{
     node_.transformContext.setScale(size);
 }
 } // hkui
