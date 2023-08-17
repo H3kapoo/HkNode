@@ -17,12 +17,12 @@ struct HKAxisBoundsPoints
     int firstPos, secondPos;
 };
 
-/* This context should basically handle all that happens to the model matrix of the primitive */
 class HkTransformContext
 {
 public:
     HkTransformContext();
 
+    /* Setters */
     void addPos(const glm::ivec2& pos);
     void setPos(const glm::ivec2& pos);
 
@@ -32,26 +32,28 @@ public:
     void setVScale(const glm::ivec2& vScale);
     void setVPos(const glm::ivec2& vPos);
 
+    /* Getters */
+    const glm::ivec2& getPos() const;
+    const glm::ivec2& getScale() const;
+
     const glm::ivec2& getVPos() const;
     const glm::ivec2& getVScale() const;
 
     glm::mat4& getModelMatrix();
 
+    /* Pub funcs */
     bool isPosInsideOfNode(const glm::ivec2& pin) const;
     bool isPosInsideOfNodeViewableArea(const glm::ivec2& pin) const;
-
     HkTransformBBox computeBBoxWith(const HkTransformContext& otherTc) const;
-
-
-    /* Absolute transfrom of the mesh */
-    glm::ivec2 scale, rot, pos;
-
 private:
     HKAxisBoundsPoints computeXIntersectionPointsWith(const HkTransformContext& otherTc) const;
     HKAxisBoundsPoints computeYIntersectionPointsWith(const HkTransformContext& otherTc) const;
-
     void computeModelMatrix();
+
     glm::mat4 modelMat;
+
+    /* Absolute transfrom of the mesh */
+    glm::ivec2 scale, rot, pos;
 
     /* Whats the actual viewable by user part of the mesh */
     glm::ivec2 vScale, vPos;

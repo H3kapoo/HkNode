@@ -99,7 +99,7 @@ int main()
     ctr->setSize({ 700, 600 });
     ctr2->setSize({ 500, 200 });
     // ctr2->setSize({ 630, 200 });
-    ctr3->setSize({ 320, 200 });
+    ctr3->setSize({ 730, 200 });
     ctr4->setSize({ 370, 400 });
     ctr5->setSize({ 1060, 30 });
 
@@ -114,7 +114,7 @@ int main()
     // windowFrame->setSize({ 1280, 720 - 30 });
 
     windowFrame->pushChildren({ ctr,ctr2 });
-    // ctr->pushChildren({ ctr2 });
+    ctr->pushChildren({ ctr3 });
     ctr2->pushChildren({ ctr4, ctr5 });
 
     // windowFrame->pushChildren({ ctr, ctr2, ctr3, ctr4, ctr5 });

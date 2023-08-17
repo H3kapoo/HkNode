@@ -11,37 +11,41 @@ HkNodeBase::HkNodeBase(const std::string& windowName, const std::string& type)
     node_.constraintContext.setRootTc(&node_.transformContext);
 }
 
+/*
+    Handles any event sent by the SM to the node, redering, and scissoring.
+    Shall not be implemented by the child unless you really have no other choice.
+*/
 void HkNodeBase::updateMySelf()
 {
     const auto& parentTreeStruct = treeStruct_.getParent();
+    glEnable(GL_SCISSOR_TEST);
 
     /* Compute renderable/inveractive area for each element */
     if ((treeStruct_.getType() == "RootWindowFrame")
         || (parentTreeStruct && parentTreeStruct->getType() == "RootWindowFrame"))
     {
-        glEnable(GL_SCISSOR_TEST);
         auto& tc = node_.transformContext;
-        tc.setVPos(tc.pos);
-        tc.setVScale(tc.scale);
+        tc.setVPos(tc.getPos());
+        tc.setVScale(tc.getScale());
 
         // HkDrawDebugger::get().pushDraw10x10({ tc.getVPos().x, tc.getVPos().y });
         // HkDrawDebugger::get().pushDraw10x10({ tc.getVPos().x + tc.getVScale().x, tc.getVPos().y + tc.getVScale().y });
 
         glScissor(
-            tc.pos.x - 1,
-            sceneDataRef_.windowHeight - tc.pos.y - tc.scale.y + 1,
-            tc.scale.x,
-            tc.scale.y);
+            tc.getPos().x - 1,
+            sceneDataRef_.windowHeight - tc.getPos().y - tc.getScale().y + 1,
+            tc.getScale().x,
+            tc.getScale().y);
     }
     /* Basically use parent's visible area to bound the rendering of it's children */
     else if (parentTreeStruct && parentTreeStruct->getType() != "RootWindowFrame")
     {
-        glEnable(GL_SCISSOR_TEST);
+        // glEnable(GL_SCISSOR_TEST);
         const auto& pTc = parentTreeStruct->getPayload()->node_.transformContext;
 
         HkTransformContext cx;
-        cx.pos = pTc.getVPos();
-        cx.scale = pTc.getVScale();
+        cx.setPos(pTc.getVPos());
+        cx.setScale(pTc.getVScale());
 
         /* Compute intersection TC with the parent Tc*/
         const auto bboxTc = node_.transformContext.computeBBoxWith(cx);
@@ -82,13 +86,11 @@ void HkNodeBase::updateMySelf()
     /* Resolve child constraints relative to parent */
     resolveConstraints(children);
 
-
     /* Update children */
     for (const auto& child : children)
     {
         child->getPayload()->updateMySelf();
     }
-
 
     /* Use this to render additional non interactive things if needed */
     /* Note: rescissoring to original parent is needed unfortunatelly */
@@ -100,7 +102,7 @@ void HkNodeBase::updateMySelf()
         tc.getVScale().x,
         tc.getVScale().y);
 
-    preRenderAdditionalDetails();
+    postRenderAdditionalDetails();
 
     /* Disable scissors after rendering UI */
     glDisable(GL_SCISSOR_TEST);
@@ -128,7 +130,7 @@ void HkNodeBase::resolveFocus()
         && node_.transformContext.isPosInsideOfNodeViewableArea(sceneDataRef_.mousePos))
     {
         sceneDataRef_.focusedId = treeStruct_.getId();
-        sceneDataRef_.mouseOffsetFromFocusedCenter = node_.transformContext.pos - sceneDataRef_.mousePos;
+        sceneDataRef_.mouseOffsetFromFocusedCenter = node_.transformContext.getPos() - sceneDataRef_.mousePos;
     }
 }
 
@@ -152,7 +154,7 @@ void HkNodeBase::resolveMouseMovementEvent()
     onGeneralMouseMove();
 }
 
-void HkNodeBase::preRenderAdditionalDetails() {}
+void HkNodeBase::postRenderAdditionalDetails() {}
 
 void HkNodeBase::onDrag() {}
 void HkNodeBase::onClick() {}

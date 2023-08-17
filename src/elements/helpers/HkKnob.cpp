@@ -25,15 +25,15 @@ void HkKnob::computeKnobValue()
     auto& parentTc = treeStruct_.getParent()->getPayload()->node_.transformContext;
     if (isHorizontalKnob_)
     {
-        const float minX = parentTc.pos.x;
-        const float maxX = parentTc.pos.x + parentTc.scale.x;
+        const float minX = parentTc.getPos().x;
+        const float maxX = parentTc.getPos().x + parentTc.getScale().x;
         // https://rosettacode.org/wiki/Map_range
         setValue((sceneDataRef_.mousePos.x - minX) / (maxX - minX));
     }
     else
     {
-        const float minY = parentTc.pos.y;
-        const float maxY = parentTc.pos.y + parentTc.scale.y;
+        const float minY = parentTc.getPos().y;
+        const float maxY = parentTc.getPos().y + parentTc.getScale().y;
         // https://rosettacode.org/wiki/Map_range
         setValue((sceneDataRef_.mousePos.y - minY) / (maxY - minY));
     }

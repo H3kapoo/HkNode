@@ -42,8 +42,8 @@ void HkContainer::resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& 
     node_.constraintContext.offsetPercentage_.y = vScrollBar_.getScrollValue();
 
     //TODO: This could be set automatically from ConstraintContext
-    node_.constraintContext.hScrollBarWidth_ = hScrollBar_.node_.transformContext.scale.y;
-    node_.constraintContext.vScrollBarHeight_ = vScrollBar_.node_.transformContext.scale.x;
+    node_.constraintContext.hScrollBarWidth_ = hScrollBar_.node_.transformContext.getScale().y;
+    node_.constraintContext.vScrollBarHeight_ = vScrollBar_.node_.transformContext.getScale().x;
 }
 
 /* Compute SB constraints only if needed */
@@ -96,7 +96,7 @@ void HkContainer::handleContainerOverflowIfNeeded()
 
 /* Useful to render additional visual non children UI, like XY intersector. This will be called after all children (and sub children)
    of parent have been rendered */
-void HkContainer::preRenderAdditionalDetails()
+void HkContainer::postRenderAdditionalDetails()
 {
     /* If both scrollbars are active, it's obvious we need the intersector at bottom right. It is handled in the Container class because
        container should know when both SBs are active and what to do with them. Also clicking on the dummy object basically means clicking
@@ -104,12 +104,12 @@ void HkContainer::preRenderAdditionalDetails()
     if (scrollbBarsCount_ == 2)
     {
         dummyXYIntersectorData_.transformContext.setScale({
-            hScrollBar_.node_.transformContext.scale.y,
-            hScrollBar_.node_.transformContext.scale.y });
+            hScrollBar_.node_.transformContext.getScale().y,
+            hScrollBar_.node_.transformContext.getScale().y });
 
         dummyXYIntersectorData_.transformContext.setPos({
-            hScrollBar_.node_.transformContext.pos.x + hScrollBar_.node_.transformContext.scale.x,
-            hScrollBar_.node_.transformContext.pos.y });
+            hScrollBar_.node_.transformContext.getPos().x + hScrollBar_.node_.transformContext.getScale().x,
+            hScrollBar_.node_.transformContext.getPos().y });
 
         dummyXYIntersectorData_.renderContext.render(sceneDataRef_.sceneProjMatrix,
             dummyXYIntersectorData_.transformContext.getModelMatrix());
