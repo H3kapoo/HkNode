@@ -28,7 +28,7 @@ void HkDrawDebugger::setDefaultDebugShader()
 {
     buffer_.reserve(8);
     rc_.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
-    rc_.shader.setVec3f("color", glm::vec3(1.0f, 1.0f, 1.0f));
+    rc_.getShader().setVec3f("color", glm::vec3(1.0f, 1.0f, 1.0f));
 }
 
 void HkDrawDebugger::draw10x10(const glm::ivec2 pos)

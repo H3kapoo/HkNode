@@ -8,7 +8,7 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
     , wfCont_("{Internal}-ContainerFor " + windowName)
 {
     node_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
-    node_.renderContext.shader.setVec3f("color", glm::vec3(0.0f, 0.5f, 0.9f)); // BLUEish
+    node_.renderContext.getShader().setVec3f("color", glm::vec3(0.0f, 0.5f, 0.9f)); // BLUEish
     node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix());
     treeStruct_.pushChild(&wfCont_.treeStruct_);
 }
@@ -70,7 +70,7 @@ void HkWindowFrame::printTree()
 
 void HkWindowFrame::setColor(const glm::vec3& color)
 {
-    node_.renderContext.shader.setVec3f("color", color);
+    node_.renderContext.getShader().setVec3f("color", color);
 }
 
 void HkWindowFrame::setPos(const glm::vec2& pos)

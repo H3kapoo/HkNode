@@ -80,7 +80,8 @@ void HkNodeBase::updateMySelf()
     // and the other ones not
 
     /* Normal rendering */
-    node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix());
+    const auto& tc = node_.transformContext;
+    node_.renderContext.render(sceneDataRef_.sceneProjMatrix, tc.getModelMatrix());
 
     auto& children = treeStruct_.getChildren();
     /* Resolve child constraints relative to parent */
@@ -94,7 +95,6 @@ void HkNodeBase::updateMySelf()
 
     /* Use this to render additional non interactive things if needed */
     /* Note: rescissoring to original parent is needed unfortunatelly */
-    const auto& tc = node_.transformContext;
     glEnable(GL_SCISSOR_TEST);
     glScissor(
         tc.getVPos().x - 1,
@@ -108,11 +108,13 @@ void HkNodeBase::updateMySelf()
     glDisable(GL_SCISSOR_TEST);
 }
 
+/* Resolve constraints based on set policy on this node */
 void HkNodeBase::resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children)
 {
     node_.constraintContext.resolveConstraints(children);
 }
 
+/* Try figure out if im the hovered one */
 void HkNodeBase::resolveHover()
 {
     if (node_.transformContext.isPosInsideOfNodeViewableArea(sceneDataRef_.mousePos))
@@ -121,6 +123,7 @@ void HkNodeBase::resolveHover()
     }
 }
 
+/* Try figure out if im the focused one */
 void HkNodeBase::resolveFocus()
 {
     /*Element is in focus only if mouse if clicked and the mouse pos is inside thr element.
@@ -134,6 +137,7 @@ void HkNodeBase::resolveFocus()
     }
 }
 
+/* Resolve specific and general mouse click evt */
 void HkNodeBase::resolveMouseClickEvent()
 {
     /* Notify click on actually clicked object only*/
@@ -143,6 +147,7 @@ void HkNodeBase::resolveMouseClickEvent()
     onGeneralMouseClick();
 }
 
+/* Resolve specific and general mouse mvmt evt */
 void HkNodeBase::resolveMouseMovementEvent()
 {
     /* If scene detected a dragging action, separatelly specify that dragged element*/
@@ -154,8 +159,8 @@ void HkNodeBase::resolveMouseMovementEvent()
     onGeneralMouseMove();
 }
 
+/* Events to be consumed by derived if needed */
 void HkNodeBase::postRenderAdditionalDetails() {}
-
 void HkNodeBase::onDrag() {}
 void HkNodeBase::onClick() {}
 void HkNodeBase::onGeneralUpdate() {}

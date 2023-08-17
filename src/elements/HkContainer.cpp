@@ -9,19 +9,19 @@ HkContainer::HkContainer(const std::string& containerName)
     , scrollbBarsCount_{ 0 }
 {
     node_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
-    node_.renderContext.shader.setVec3f("color", glm::vec3(0.5f, 0.5f, 0.5f)); // gray
+    node_.renderContext.getShader().setVec3f("color", glm::vec3(0.5f, 0.5f, 0.5f)); // gray
     node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix());
 
     /* NOTE: In the future maybe this dummy can be an actual small UI element, but for now let it be
        just a normal renderable detail */
     dummyXYIntersectorData_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
-    dummyXYIntersectorData_.renderContext.shader.setVec3f("color", glm::vec3(0.7f, 1.0f, 0.2f));
+    dummyXYIntersectorData_.renderContext.getShader().setVec3f("color", glm::vec3(0.7f, 1.0f, 0.2f));
 
     //Dummy just to test nested scrollbars
     if (treeStruct_.getName() == "MyContainer2")
     {
-        vScrollBar_.node_.renderContext.shader.setVec3f("color", glm::vec3(0.4f, 0.2f, 0.6f));
-        hScrollBar_.node_.renderContext.shader.setVec3f("color", glm::vec3(0.4f, 0.2f, 0.6f));
+        vScrollBar_.node_.renderContext.getShader().setVec3f("color", glm::vec3(0.4f, 0.2f, 0.6f));
+        hScrollBar_.node_.renderContext.getShader().setVec3f("color", glm::vec3(0.4f, 0.2f, 0.6f));
     }
 }
 
@@ -156,7 +156,7 @@ void HkContainer::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)
 //TODO: bellow to be removed later when constraints come
 void HkContainer::setColor(const glm::vec3& color)
 {
-    node_.renderContext.shader.setVec3f("color", color);
+    node_.renderContext.getShader().setVec3f("color", color);
 }
 
 void HkContainer::setPos(const glm::vec2& pos)

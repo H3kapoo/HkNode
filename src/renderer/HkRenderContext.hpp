@@ -10,39 +10,30 @@
 
 namespace hkui
 {
+/* Used to define render architecture, like quads, circles, triangles, etc */
+struct HkRenderArch
+{
+    std::vector<float> vertices;
+    std::vector<uint32_t> indices;
+};
+
 class HkRenderContext
 {
 public:
-    struct HkRenderArch
-    {
-        std::vector<float> vertices;
-        std::vector<uint32_t> indices;
-    };
-
-    const HkRenderArch rectangleArch = {
-        .vertices = {
-            0.5f,  0.5f, 0.0f,
-            0.5f, -0.5f, 0.0f,
-            -0.5f, -0.5f, 0.0f,
-            -0.5f,  0.5f, 0.0f},
-        .indices = {
-            0, 1, 3,
-            1, 2, 3}
-    };
-
     HkRenderContext();
     void setShaderSource(const std::string& vertSource, const std::string& fragSource);
     void render(const glm::mat4& projMat, const glm::mat4& modelMat);
     void setupArch();
 
+    /* Getters */
+    HkShader& getShader(); /* Non const, use it as a gateway */
+
 private:
     HkRenderArch renderArch;
     uint32_t vaoId;
-public:
-    HkShader shader;
+    HkShader shader_;
     // shader
     // Texture
     // Pos
 };
-
 } // hkui

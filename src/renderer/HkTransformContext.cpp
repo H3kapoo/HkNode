@@ -220,7 +220,7 @@ const glm::ivec2& HkTransformContext::getScale() const
     return scale;
 }
 
-glm::mat4& HkTransformContext::getModelMatrix()
+const glm::mat4& HkTransformContext::getModelMatrix() const
 {
     return modelMat;
 }
