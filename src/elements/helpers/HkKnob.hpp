@@ -3,7 +3,6 @@
 #include <string>
 #include "../../base/HkNodeBase.hpp"
 
-
 namespace hkui
 {
 class HkKnob : public HkNodeBase
@@ -11,14 +10,15 @@ class HkKnob : public HkNodeBase
 public:
     HkKnob(const std::string& name, const bool isHorizontal);
 
-    void onGeneralMouseMove();
+    void onDrag() override;
 
     void setValue(float value);
     float getValue() const;
     bool isHorizontal() const;
-    void computeKnobValue();
+    void computeKnobValue(const glm::ivec2 offsetFromCenter);
 
 private:
+    HkTransformContext* parentTc;
     float value_; /* From 0 to 1 */
     bool isHorizontalKnob_;
 };

@@ -15,20 +15,16 @@ HkScrollBar::HkScrollBar(const std::string& name, const bool isHorizontal)
     treeStruct_.pushChild(&knob_.treeStruct_);
 }
 
-void HkScrollBar::onGeneralMouseMove()
+void HkScrollBar::onDrag()
 {
-    if (sceneDataRef_.isMouseClicked && sceneDataRef_.focusedId == treeStruct_.getId())
-    {
-        knob_.computeKnobValue();
-    }
+    knob_.computeKnobValue({ -knob_.node_.transformContext.getScale().x / 2,
+            -knob_.node_.transformContext.getScale().y / 2 });
 }
 
-void HkScrollBar::onGeneralMouseClick()
+void HkScrollBar::onClick()
 {
-    if (sceneDataRef_.focusedId == treeStruct_.getId())
-    {
-        knob_.computeKnobValue();
-    }
+    knob_.computeKnobValue({ -knob_.node_.transformContext.getScale().x / 2,
+           -knob_.node_.transformContext.getScale().y / 2 });
 }
 
 float HkScrollBar::getScrollValue() const
@@ -56,7 +52,7 @@ void HkScrollBar::setScrollValue(float value)
     knob_.setValue(value);
 }
 
-void HkScrollBar::resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>&)
+void HkScrollBar::resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>&)
 {
     node_.constraintContext.constrainSBKnob(isHorizontal_, knob_.getValue(), knob_.node_.transformContext);
 }
@@ -65,5 +61,4 @@ bool HkScrollBar::isHorizontalScrollBar() const
 {
     return isHorizontal_;
 }
-
 } // hkui

@@ -21,7 +21,7 @@ public:
     void rootUpdateMySelf() override;
 
     /* HkNodeBase */
-    void resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children) override;
+    void resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children) override;
 
     void onDrag() override;
     void onGeneralMouseMove() override;

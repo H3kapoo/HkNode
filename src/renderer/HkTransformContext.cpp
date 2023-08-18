@@ -164,6 +164,7 @@ void HkTransformContext::computeModelMatrix()
     modelMat = glm::translate(modelMat, glm::vec3(-0.5f, -0.5f, 0));
     modelMat = glm::scale(modelMat, glm::vec3(scale, 1.0f));
     modelMat = glm::translate(modelMat, glm::vec3(0.5f, 0.5f, 0));
+    //TODO: Maybe off by one pixel visual bug is caused by offseting with 0.5f, maybe try offrtging by 1.0f
 }
 
 void HkTransformContext::addPos(const glm::ivec2& pos)

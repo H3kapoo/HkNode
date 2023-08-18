@@ -50,7 +50,7 @@ void HkWindowFrame::onGeneralMouseClick()
     // printTree();
 }
 
-void HkWindowFrame::resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>&)
+void HkWindowFrame::resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>&)
 {
     node_.constraintContext.windowFrameContainerConstraint(wfCont_.node_.transformContext);
 }

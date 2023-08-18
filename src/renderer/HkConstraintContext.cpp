@@ -1,6 +1,7 @@
 #include "HkConstraintContext.hpp"
 
 #include "../base/HkNodeBase.hpp"
+#include "../utils/HkDrawDebugger.hpp"
 
 namespace hkui
 {
@@ -244,19 +245,30 @@ void HkConstraintContext::alignHorizontally(const std::vector<HkTreeStructure<Hk
     }
 }
 
-/* This simply constraints the Knob inside the scrollbar itself, at given currentValue (0 to 1) */
+/* This simply constraints the Knob inside the scrollbar itself, at given currentV
+alue (0 to 1) */
 void HkConstraintContext::constrainSBKnob(bool isFromHorizontalSB, float currKnobValue, HkTransformContext& knobTc)
 {
+    //setting scale of knob
     const auto knobSqSize = std::min(thisTc_->getScale().x, thisTc_->getScale().y);
     knobTc.setScale({ knobSqSize, knobSqSize });
 
     if (isFromHorizontalSB)
     {
+        knobTc.setScale({ 50, knobSqSize });
+    }
+
+    if (isFromHorizontalSB)
+    {
         /* Orientation calcs do differ */
         const auto minX = thisTc_->getPos().x;
-        const auto maxX = thisTc_->getPos().x + thisTc_->getScale().x - knobSqSize;
+        const auto maxX = thisTc_->getPos().x + thisTc_->getScale().x - 50; //knobSqSize;
         const auto posX = minX * (1.0f - currKnobValue) + currKnobValue * maxX;
         knobTc.setPos({ posX, thisTc_->getPos().y });
+
+        HkDrawDebugger::get().pushDraw10x10({ thisTc_->getPos().x, thisTc_->getPos().y });
+        HkDrawDebugger::get().pushDraw10x10({ thisTc_->getPos().x + thisTc_->getScale().x - 50, thisTc_->getPos().y });
+
     }
     else
     {

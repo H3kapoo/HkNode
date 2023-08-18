@@ -22,10 +22,10 @@ public:
     void setScrollBarActive(const bool isActive);
 
     /* HkNodeBase */
-    void resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>&);
+    void resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>&) override;
 
-    void onGeneralMouseMove();
-    void onGeneralMouseClick();
+    void onDrag() override;
+    void onClick() override;
 
 private:
     HkKnob knob_;

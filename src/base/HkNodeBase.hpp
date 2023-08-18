@@ -26,7 +26,7 @@ private:
     virtual void updateMySelf();
 
     /* Constraints */
-    virtual void resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children);
+    virtual void resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children);
 
     /* Events */
     virtual void onDrag();

@@ -1,7 +1,5 @@
 #include "HkNodeBase.hpp"
 
-#include "../utils/HkDrawDebugger.hpp"
-
 namespace hkui
 {
 HkNodeBase::HkNodeBase(const std::string& windowName, const std::string& type)
@@ -85,7 +83,7 @@ void HkNodeBase::updateMySelf()
 
     auto& children = treeStruct_.getChildren();
     /* Resolve child constraints relative to parent */
-    resolveConstraints(children);
+    resolveChildrenConstraints(children);
 
     /* Update children */
     for (const auto& child : children)
@@ -109,7 +107,7 @@ void HkNodeBase::updateMySelf()
 }
 
 /* Resolve constraints based on set policy on this node */
-void HkNodeBase::resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children)
+void HkNodeBase::resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children)
 {
     node_.constraintContext.resolveConstraints(children);
 }

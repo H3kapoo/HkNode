@@ -26,10 +26,10 @@ HkContainer::HkContainer(const std::string& containerName)
 }
 
 //TODO: Disable scrollbars outside of view area
-void HkContainer::resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children)
+void HkContainer::resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children)
 {
     /* Resolve children constraints (ignores scrollbar children) */
-    HkNodeBase::resolveConstraints(children);
+    HkNodeBase::resolveChildrenConstraints(children);
 
     /* Exactly what it says, show bars or not if overflow occured*/
     handleContainerOverflowIfNeeded();
@@ -61,10 +61,8 @@ void HkContainer::constrainScrollbarsIfNeeded()
 }
 
 /* This determines if the container will have a scrollbar showing or not */
-//TODO: This could be moved directly inside the constraint context
 void HkContainer::handleContainerOverflowIfNeeded()
 {
-    //TODO: Maybe just turn them inactive instead of removing them?
     // hsb
     if (!hScrollBar_.isScrollBarActive() && node_.constraintContext.isOverflowX_)
     {
@@ -122,9 +120,9 @@ void HkContainer::onDrag()
 
     //TODO: Should this really be here?
     /* Ignore mouse drags inside intersector area */
-    if (scrollbBarsCount_ == 2 && !dummyXYIntersectorData_.transformContext.isPosInsideOfNodeViewableArea(sceneDataRef_.dragStartMousePosition))
-        std::cout << glfwGetTime() << "  " << sceneDataRef_.dragStartMousePosition.x << "  " <<
-        sceneDataRef_.dragStartMousePosition.y << "dragging ouside of intersector\n";
+    // if (scrollbBarsCount_ == 2 && !dummyXYIntersectorData_.transformContext.isPosInsideOfNodeViewableArea(sceneDataRef_.dragStartMousePosition))
+    //     std::cout << glfwGetTime() << "  " << sceneDataRef_.dragStartMousePosition.x << "  " <<
+    //     sceneDataRef_.dragStartMousePosition.y << "dragging ouside of intersector\n";
 }
 
 void HkContainer::onGeneralMouseMove()

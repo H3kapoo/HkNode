@@ -12,30 +12,37 @@ HkKnob::HkKnob(const std::string& name, const bool isHorizontal)
     node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix());
 }
 
-void HkKnob::onGeneralMouseMove()
+void HkKnob::onDrag()
 {
-    if (sceneDataRef_.isMouseClicked && sceneDataRef_.focusedId == treeStruct_.getId())
-    {
-        computeKnobValue();
-    }
+    computeKnobValue(sceneDataRef_.mouseOffsetFromFocusedCenter);
 }
 
-void HkKnob::computeKnobValue()
+/* Based on where the mouse is at drag time, compute 0 to 1 range mapped from scrollbar min pos to
+   scrollbar max pos */
+void HkKnob::computeKnobValue(const glm::ivec2 offsetFromCenter)
 {
-    auto& parentTc = treeStruct_.getParent()->getPayload()->node_.transformContext;
+    /* Cache parent TC since it will never change anwyaway for knobs */
+    if (!parentTc)
+    {
+        parentTc = &treeStruct_.getParent()->getPayload()->node_.transformContext;
+    }
+
+    const auto& parentPos = parentTc->getPos();
+    const auto& parentScale = parentTc->getScale();
     if (isHorizontalKnob_)
     {
-        const float minX = parentTc.getPos().x;
-        const float maxX = parentTc.getPos().x + parentTc.getScale().x;
+        const float minX = parentPos.x;
+        const float maxX = parentPos.x + parentScale.x - node_.transformContext.getScale().x;
         // https://rosettacode.org/wiki/Map_range
-        setValue((sceneDataRef_.mousePos.x - minX) / (maxX - minX));
+        // std::cout << sceneDataRef_.mouseOffsetFromFocusedCenter.x << "\n";
+        setValue(((sceneDataRef_.mousePos.x + offsetFromCenter.x) - minX) / (maxX - minX));
     }
     else
     {
-        const float minY = parentTc.getPos().y;
-        const float maxY = parentTc.getPos().y + parentTc.getScale().y;
+        const float minY = parentPos.y;
+        const float maxY = parentPos.y + parentScale.y - node_.transformContext.getScale().y;
         // https://rosettacode.org/wiki/Map_range
-        setValue((sceneDataRef_.mousePos.y - minY) / (maxY - minY));
+        setValue(((sceneDataRef_.mousePos.y + offsetFromCenter.y) - minY) / (maxY - minY));
     }
 }
 

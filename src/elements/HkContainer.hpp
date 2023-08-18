@@ -12,7 +12,7 @@ public:
     HkContainer(const std::string& containerName);
 
     /* HkNodeBase */
-    void resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children) override;
+    void resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children) override;
     void postRenderAdditionalDetails() override;
 
     void onDrag() override;
