@@ -245,37 +245,37 @@ void HkConstraintContext::alignHorizontally(const std::vector<HkTreeStructure<Hk
     }
 }
 
-/* This simply constraints the Knob inside the scrollbar itself, at given currentV
-alue (0 to 1) */
-void HkConstraintContext::constrainSBKnob(bool isFromHorizontalSB, float currKnobValue, HkTransformContext& knobTc)
+/* This simply constraints the Knob inside the scrollbar itself, at given currentValue (0 to 1) */
+void HkConstraintContext::constrainSBKnob(bool isFromHorizontalSB, int overflowSize, float currKnobValue, HkTransformContext& knobTc)
 {
     //setting scale of knob
-    const auto knobSqSize = std::min(thisTc_->getScale().x, thisTc_->getScale().y);
-    knobTc.setScale({ knobSqSize, knobSqSize });
+    const auto preKNobSize = std::min(thisTc_->getScale().x, thisTc_->getScale().y);
+    knobTc.setScale({ preKNobSize, preKNobSize });
 
+    const auto margins = 2;
+    const auto minAxisKobSize = 30;
+    /* Orientation calcs do differ */
     if (isFromHorizontalSB)
     {
-        knobTc.setScale({ 50, knobSqSize });
-    }
-
-    if (isFromHorizontalSB)
-    {
-        /* Orientation calcs do differ */
-        const auto minX = thisTc_->getPos().x;
-        const auto maxX = thisTc_->getPos().x + thisTc_->getScale().x - 50; //knobSqSize;
+        const auto knobSizeX = thisTc_->getScale().x - overflowSize;
+        knobTc.setScale({ std::max(minAxisKobSize, knobSizeX) - 2 * margins , preKNobSize - 2 * margins });
+        const auto minX = thisTc_->getPos().x + margins;
+        const auto maxX = thisTc_->getPos().x + thisTc_->getScale().x - knobTc.getScale().x - margins;
         const auto posX = minX * (1.0f - currKnobValue) + currKnobValue * maxX;
-        knobTc.setPos({ posX, thisTc_->getPos().y });
+        knobTc.setPos({ posX, thisTc_->getPos().y + margins });
 
-        HkDrawDebugger::get().pushDraw10x10({ thisTc_->getPos().x, thisTc_->getPos().y });
-        HkDrawDebugger::get().pushDraw10x10({ thisTc_->getPos().x + thisTc_->getScale().x - 50, thisTc_->getPos().y });
-
+        // HkDrawDebugger::get().pushDraw10x10({ thisTc_->getPos().x, thisTc_->getPos().y });
+        // HkDrawDebugger::get().pushDraw10x10({ thisTc_->getPos().x + thisTc_->getScale().x - knobTc.getScale().x, thisTc_->getPos().y });
     }
     else
     {
-        const auto minY = thisTc_->getPos().y;
-        const auto maxY = thisTc_->getPos().y + thisTc_->getScale().y - knobSqSize;
+        const auto knobSizeY = thisTc_->getScale().y - overflowSize;
+        knobTc.setScale({ preKNobSize - 2 * margins, std::max(minAxisKobSize, knobSizeY) - 2 * margins });
+
+        const auto minY = thisTc_->getPos().y + margins;
+        const auto maxY = thisTc_->getPos().y + thisTc_->getScale().y - knobTc.getScale().y - margins;
         const auto posY = minY * (1.0f - currKnobValue) + currKnobValue * maxY;
-        knobTc.setPos({ thisTc_->getPos().x, posY });
+        knobTc.setPos({ thisTc_->getPos().x + margins, posY });
     }
 }
 

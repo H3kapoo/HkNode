@@ -5,6 +5,7 @@ namespace hkui
 HkScrollBar::HkScrollBar(const std::string& name, const bool isHorizontal)
     : HkNodeBase(name, "ScrollBar")
     , knob_("{Internal}-KnobFor " + name, isHorizontal)
+    , overflowSize_{ 0 }
     , isHorizontal_(isHorizontal)
     , isActive_{ false }
 {
@@ -37,6 +38,13 @@ bool HkScrollBar::isScrollBarActive() const
     return isActive_;
 }
 
+void HkScrollBar::setOverflowSize(int value)
+{
+    std::cout << value << '\n';
+
+    overflowSize_ = value;
+}
+
 void HkScrollBar::setScrollBarActive(const bool isActive)
 {
     isActive_ = isActive;
@@ -54,7 +62,7 @@ void HkScrollBar::setScrollValue(float value)
 
 void HkScrollBar::resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>&)
 {
-    node_.constraintContext.constrainSBKnob(isHorizontal_, knob_.getValue(), knob_.node_.transformContext);
+    node_.constraintContext.constrainSBKnob(isHorizontal_, overflowSize_, knob_.getValue(), knob_.node_.transformContext);
 }
 
 bool HkScrollBar::isHorizontalScrollBar() const

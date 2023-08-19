@@ -68,11 +68,13 @@ void HkContainer::handleContainerOverflowIfNeeded()
     {
         scrollbBarsCount_++;
         hScrollBar_.setScrollBarActive(true);
+        hScrollBar_.setOverflowSize(node_.constraintContext.overflowXYSize_.x);
         treeStruct_.pushChild(&hScrollBar_.treeStruct_);
     }
     else if (hScrollBar_.isScrollBarActive() && !node_.constraintContext.isOverflowX_)
     {
         scrollbBarsCount_--;
+        hScrollBar_.setOverflowSize(0);
         hScrollBar_.setScrollBarActive(false);
         treeStruct_.removeChildren({ hScrollBar_.treeStruct_.getId() });
     }
@@ -81,6 +83,7 @@ void HkContainer::handleContainerOverflowIfNeeded()
     if (!vScrollBar_.isScrollBarActive() && node_.constraintContext.isOverflowY_)
     {
         scrollbBarsCount_++;
+        vScrollBar_.setOverflowSize(node_.constraintContext.overflowXYSize_.y);
         vScrollBar_.setScrollBarActive(true);
         treeStruct_.pushChild(&vScrollBar_.treeStruct_);
     }
@@ -88,6 +91,7 @@ void HkContainer::handleContainerOverflowIfNeeded()
     {
         scrollbBarsCount_--;
         vScrollBar_.setScrollBarActive(false);
+        vScrollBar_.setOverflowSize(0);
         treeStruct_.removeChildren({ vScrollBar_.treeStruct_.getId() });
     }
 }
@@ -129,8 +133,7 @@ void HkContainer::onGeneralMouseMove()
 {}
 
 void HkContainer::onGeneralMouseClick()
-{
-}
+{}
 
 void HkContainer::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)
 {

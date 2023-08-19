@@ -20,6 +20,7 @@ public:
     float getScrollValue() const;
     bool isScrollBarActive() const;
     void setScrollBarActive(const bool isActive);
+    void setOverflowSize(int value);
 
     /* HkNodeBase */
     void resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>&) override;
@@ -29,6 +30,7 @@ public:
 
 private:
     HkKnob knob_;
+    float overflowSize_;
     bool isHorizontal_;
     bool isActive_;
 };

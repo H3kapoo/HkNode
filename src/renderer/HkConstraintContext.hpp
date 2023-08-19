@@ -57,7 +57,7 @@ public:
 
     /* Scrollbar related */
     void scrollBarConstrain(HkTransformContext& scrollBarTc, bool isHorizontalBar);
-    void constrainSBKnob(bool isFromHorizontalSB, float currKnobValue, HkTransformContext& knobTc);
+    void constrainSBKnob(bool isFromHorizontalSB, int overflowSize, float currKnobValue, HkTransformContext& knobTc);
 
     void freeConstraint(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
 
