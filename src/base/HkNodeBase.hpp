@@ -30,10 +30,12 @@ private:
     /* Events */
     virtual void onDrag();
     virtual void onClick();
+    virtual void onScroll();
     virtual void onGeneralUpdate();
     virtual void onWindowResize();
     virtual void onGeneralMouseMove();
     virtual void onGeneralMouseClick();
+    virtual void onGeneralMouseScroll();
 
     virtual void postRenderAdditionalDetails();
 
@@ -41,6 +43,7 @@ private:
     void resolveHover();
     void resolveFocus();
     void resolveMouseClickEvent();
+    void resolveMouseScrollEvent();
     void resolveMouseMovementEvent();
 
 private:

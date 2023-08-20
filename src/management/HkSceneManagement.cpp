@@ -130,10 +130,10 @@ void HkSceneManagement::mouseEnterEvent(GLFWwindow*, int entered)
     update(HkEvent::MouseEnterExit);
 }
 
-void HkSceneManagement::mouseScrollEvent(GLFWwindow*, double xOffset, double)
+void HkSceneManagement::mouseScrollEvent(GLFWwindow*, double, double yOffset)
 {
     sceneData.lastScrollPosY = sceneData.scrollPosY;
-    sceneData.scrollPosY = xOffset;
+    sceneData.scrollPosY = yOffset;
 
     /*TODO: Here we should resolve both focus and hover in the future. Think of recycle view */
     update(HkEvent::MouseScroll);
@@ -161,5 +161,6 @@ void HkSceneManagement::resolveHover()
 {
     sceneData.hoveredId = HkSceneData::NO_SELECTION_ID;
     update(HkEvent::HoverScan);
+    // std::cout << "hovered item is: " << sceneData.hoveredId << '\n';
 }
 } // hkui

@@ -26,47 +26,46 @@ struct MaxAndTotal
     int total{ 0 };
 };
 
+struct ScrollbarMargin
+{
+    uint32_t hsbMargin{ 0 };
+    uint32_t vsbMargin{ 0 };
+};
+
 class HkNodeBase;
 
 class HkConstraintContext
 {
-
-    //TODO: Each class shall have their global params default initted inside ctor
 public:
     HkConstraintContext() : isOverflowX_{ false }, isOverflowY_{ false }
         , overflowXYSize_{ 0,0 }, offsetPercentage_{ 0,0 }
         , policy_{ HkConstraintPolicy::AlignLeftToRight } {}
 
     void setRootTc(HkTransformContext* rootTc);
-
     void setPolicy(const HkConstraintPolicy policy);
-
     void resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children);
 
+    ScrollbarMargin getScrollbarMargins(const std::vector<HkTreeStructure<HkNodeBase>*>& children) const;
     MaxAndTotal getVerticalMaxValueAndTotalHeightValue(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
     MaxAndTotal getHorizontalMaxValueAndTotalWidthValue(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
 
     void resolveChildrenOverflowVariables(const HkChildrenOrientation orientation,
         const std::vector<HkTreeStructure<HkNodeBase>*>& children);
 
-    void windowFrameContainerConstraint(HkTransformContext& childTc);
-
     void alignLeftRight(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
     void alignTopBottom(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
 
-    void alignHorizontally(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
-    void alignVertically(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
-
     /* Scrollbar related */
-    void scrollBarConstrain(HkTransformContext& scrollBarTc, bool isHorizontalBar);
+    void scrollBarConstrain(HkTransformContext& scrollBarTc);
     void constrainSBKnob(bool isFromHorizontalSB, int overflowSize, float currKnobValue, HkTransformContext& knobTc);
 
-    void freeConstraint(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
+    /* WindowFrame related */
+    void windowFrameContainerConstraint(HkTransformContext& childTc);
 
     // ConstraintParams..
+    /* Scrollbar related */
     bool isOverflowX_;
     bool isOverflowY_;
-
     glm::ivec2 overflowXYSize_;
     glm::vec2 offsetPercentage_;
 

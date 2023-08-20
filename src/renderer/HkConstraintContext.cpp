@@ -6,8 +6,10 @@
 namespace hkui
 {
 
+/* Set TC this ctx will be based on*/
 void HkConstraintContext::setRootTc(HkTransformContext* rootTc) { thisTc_ = rootTc; }
 
+/* Set policy of TC children */
 void HkConstraintContext::setPolicy(const HkConstraintPolicy policy) { policy_ = policy; }
 
 void HkConstraintContext::resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children)
@@ -27,6 +29,29 @@ void HkConstraintContext::resolveConstraints(std::vector<HkTreeStructure<HkNodeB
     }
 }
 
+ScrollbarMargin HkConstraintContext::getScrollbarMargins(const std::vector<HkTreeStructure<HkNodeBase>*>& children) const
+{
+    //Note: we can deduce which SB is which by looking at its TC:
+    // VSBs have their height > width, vice versa for HSBs. 99% of the cases
+    //Note: this works as long as sbs have same margin, which will be the case
+    ScrollbarMargin margins;
+    for (const auto& child : children)
+    {
+        if (child->getType() != "ScrollBar") continue;
+        const auto scale = child->getPayload()->node_.transformContext.getScale();
+        if (scale.x > scale.y)
+        {
+            margins.hsbMargin = scale.y;
+        }
+        else
+        {
+            margins.vsbMargin = scale.x;
+        }
+    }
+    return margins;
+}
+
+/* Gets the max length of a children plus the total vertical length of the children. Excludes scrollbar children*/
 MaxAndTotal HkConstraintContext::getVerticalMaxValueAndTotalHeightValue(
     const std::vector<HkTreeStructure<HkNodeBase>*>& children)
 {
@@ -47,6 +72,7 @@ MaxAndTotal HkConstraintContext::getVerticalMaxValueAndTotalHeightValue(
     return mt;
 }
 
+/* Gets the max length of a children plus the total horizontal length of the children. Excludes scrollbar children*/
 MaxAndTotal HkConstraintContext::getHorizontalMaxValueAndTotalWidthValue(
     const std::vector<HkTreeStructure<HkNodeBase>*>& children)
 {
@@ -67,9 +93,12 @@ MaxAndTotal HkConstraintContext::getHorizontalMaxValueAndTotalWidthValue(
     return mt;
 }
 
+//TODO: maybe they can be combined into a single pair
+/* Computes X Y overflow truth value plus by how much they overflow */
 void HkConstraintContext::resolveChildrenOverflowVariables(const HkChildrenOrientation orientation,
     const std::vector<HkTreeStructure<HkNodeBase>*>& children)
 {
+    const auto scrollBarMargins = getScrollbarMargins(children);
     const auto maxAndTotalVert = getVerticalMaxValueAndTotalHeightValue(children);
     const auto maxAndTotalHori = getHorizontalMaxValueAndTotalWidthValue(children);
 
@@ -79,12 +108,11 @@ void HkConstraintContext::resolveChildrenOverflowVariables(const HkChildrenOrien
         /* Overflow in this context can only occur if one children is too big Y wise vs Parent OR if
            combined children heights are bigger than Parent's.*/
         overflowXYSize_.y = std::max(maxAndTotalVert.max - thisTc_->getScale().y, maxAndTotalVert.total - thisTc_->getScale().y);
+        /*Account for scrollbar height */
+        overflowXYSize_.y += isOverflowX_ ? scrollBarMargins.hsbMargin : 0;
         if (overflowXYSize_.y >= 0)
         {
             isOverflowY_ = true;
-            /*Account for scrollbar height */
-            //TODO: hardcoded for now..
-            overflowXYSize_.y += isOverflowX_ ? 20 : 0;
         }
         else
         {
@@ -95,7 +123,7 @@ void HkConstraintContext::resolveChildrenOverflowVariables(const HkChildrenOrien
 
         /* Compute the single possible X overflow situation */
         /* Overflow in this context can only occur if one children is too big X wise vs Parent */
-        overflowXYSize_.x = thisTc_->getPos().x + maxAndTotalHori.max + (isOverflowY_ ? 20 : 0) - (thisTc_->getPos().x + thisTc_->getScale().x);
+        overflowXYSize_.x = thisTc_->getPos().x + maxAndTotalHori.max + (isOverflowY_ ? scrollBarMargins.vsbMargin : 0) - (thisTc_->getPos().x + thisTc_->getScale().x);
         if (overflowXYSize_.x >= 0)
         {
             isOverflowX_ = true;
@@ -112,12 +140,11 @@ void HkConstraintContext::resolveChildrenOverflowVariables(const HkChildrenOrien
         /* Overflow in this context can only occur if one children is too big X wise vs Parent OR if
             combined children widths are bigger than Parent's.*/
         overflowXYSize_.x = std::max(maxAndTotalHori.max - thisTc_->getScale().x, maxAndTotalHori.total - thisTc_->getScale().x);
+        /*Account for scrollbar height */
+        overflowXYSize_.x += isOverflowY_ ? scrollBarMargins.vsbMargin : 0;
         if (overflowXYSize_.x >= 0)
         {
             isOverflowX_ = true;
-            /*Account for scrollbar height */
-            //TODO: hardcoded for now..
-            overflowXYSize_.x += isOverflowY_ ? 20 : 0;
         }
         else
         {
@@ -128,7 +155,7 @@ void HkConstraintContext::resolveChildrenOverflowVariables(const HkChildrenOrien
 
         /* Compute the single possible Y overflow situation */
         /* Overflow in this context can only occur if one children is too big Y wise vs Parent */
-        overflowXYSize_.y = thisTc_->getPos().y + maxAndTotalVert.max + (isOverflowX_ ? 20 : 0) - (thisTc_->getPos().y + thisTc_->getScale().y);
+        overflowXYSize_.y = thisTc_->getPos().y + maxAndTotalVert.max + (isOverflowX_ ? scrollBarMargins.hsbMargin : 0) - (thisTc_->getPos().y + thisTc_->getScale().y);
         if (overflowXYSize_.y >= 0)
         {
             isOverflowY_ = true;
@@ -143,11 +170,11 @@ void HkConstraintContext::resolveChildrenOverflowVariables(const HkChildrenOrien
 
 //TODO: This shall be renamed something like "Layouting", horizontal or vertical so then we can
 //      use methods to center them or left/right align them
+/*
+    Positions children one on top of the other, left aligned
+*/
 void HkConstraintContext::alignTopBottom(const std::vector<HkTreeStructure<HkNodeBase>*>& children)
 {
-    /*
-        Positions children one on top of the other, left aligned
-    */
     resolveChildrenOverflowVariables(HkChildrenOrientation::Vertical, children);
 
     auto startPosX = thisTc_->getPos().x + offsetPercentage_.x * -overflowXYSize_.x;
@@ -162,13 +189,11 @@ void HkConstraintContext::alignTopBottom(const std::vector<HkTreeStructure<HkNod
     }
 }
 
-// Same at top bot counterpart
+/*
+    Place children from left to right, simple as that
+*/
 void HkConstraintContext::alignLeftRight(const std::vector<HkTreeStructure<HkNodeBase>*>& children)
 {
-    /*
-        Place children from left to right, simple as that
-    */
-
     resolveChildrenOverflowVariables(HkChildrenOrientation::Horizontal, children);
 
     auto startPosX = thisTc_->getPos().x + offsetPercentage_.x * -(overflowXYSize_.x);
@@ -180,68 +205,6 @@ void HkConstraintContext::alignLeftRight(const std::vector<HkTreeStructure<HkNod
         auto& childTc = child->getPayload()->node_.transformContext;
         childTc.setPos({ startPosX , startPosY });
         startPosX += childTc.getScale().x;
-    }
-}
-
-void HkConstraintContext::alignVertically(const std::vector<HkTreeStructure<HkNodeBase>*>& children)
-{
-    /*
-        Centers children vertically inside the parent and places children one after the other vertically.
-        Parent's X value is used for the children X value.
-    */
-    const auto childrenHeight = std::accumulate(children.begin(), children.end(), 0,
-        [](int total, HkTreeStructure<HkNodeBase>* child)
-        {
-            return total + child->getPayload()->node_.transformContext.getScale().y;
-        });
-
-    const auto spaceLeft = thisTc_->getScale().y - childrenHeight;
-
-    auto startPosY = thisTc_->getPos().y - thisTc_->getScale().y / 2 + spaceLeft / 2;
-    for (const auto& child : children)
-    {
-        auto& childTc = child->getPayload()->node_.transformContext;
-        startPosY += childTc.getScale().y / 2;
-        childTc.setPos({ thisTc_->getPos().x, startPosY });
-        startPosY += childTc.getScale().y / 2;
-    }
-}
-
-void HkConstraintContext::alignHorizontally(const std::vector<HkTreeStructure<HkNodeBase>*>& children)
-{
-    /*
-        Centers children horizontally inside the parent and places children one after the other horizontally.
-        Parent's Y value is used for the children Y value.
-    */
-    const auto childrenWidth = std::accumulate(children.begin(), children.end(), 0,
-        [](int total, HkTreeStructure<HkNodeBase>* child)
-        {
-            /* Skip ScrollBars from width calc */
-            //TODO: Maybe introduce enum types so we dont compare strings each time?
-            if (child->getType() == "ScrollBar") return total;
-            return total + child->getPayload()->node_.transformContext.getScale().x;
-        });
-
-    const auto spaceLeft = thisTc_->getScale().x - childrenWidth;
-
-    std::cout << glfwGetTime() << " width available: " << thisTc_->getScale().x
-        << " width calculated: " << childrenWidth
-        << " diff calculated: " << spaceLeft << '\n';
-
-    /* This should be it's separate function. This will be the effective trigger to tell if scrollbars
-       are needed to scroll the content or not */
-    (spaceLeft < 0) ? isOverflowX_ = true : isOverflowX_ = false;
-    // (thisTc_->scale.x < childrenWidth) ? isOverflowY_ = true : isOverflowY_ = false;
-
-    auto startPosX = thisTc_->getPos().x - thisTc_->getScale().x / 2 + spaceLeft / 2 - offsetPercentage_.x;
-    for (const auto& child : children)
-    {
-        if (child->getType() == "ScrollBar") continue;
-
-        auto& childTc = child->getPayload()->node_.transformContext;
-        startPosX += childTc.getScale().x / 2;
-        childTc.setPos({ startPosX , thisTc_->getPos().y });
-        startPosX += childTc.getScale().x / 2;
     }
 }
 
@@ -263,9 +226,6 @@ void HkConstraintContext::constrainSBKnob(bool isFromHorizontalSB, int overflowS
         const auto maxX = thisTc_->getPos().x + thisTc_->getScale().x - knobTc.getScale().x - margins;
         const auto posX = minX * (1.0f - currKnobValue) + currKnobValue * maxX;
         knobTc.setPos({ posX, thisTc_->getPos().y + margins });
-
-        // HkDrawDebugger::get().pushDraw10x10({ thisTc_->getPos().x, thisTc_->getPos().y });
-        // HkDrawDebugger::get().pushDraw10x10({ thisTc_->getPos().x + thisTc_->getScale().x - knobTc.getScale().x, thisTc_->getPos().y });
     }
     else
     {
@@ -280,10 +240,14 @@ void HkConstraintContext::constrainSBKnob(bool isFromHorizontalSB, int overflowS
 }
 
 /* Keeps scrollbar object at the bottom or at the right of the container. */
-void HkConstraintContext::scrollBarConstrain(HkTransformContext& scrollBarTc, bool isHorizontalBar)
+void HkConstraintContext::scrollBarConstrain(HkTransformContext& scrollBarTc)
 {
-    const auto barScale = isHorizontalBar ? scrollBarTc.getScale().y : scrollBarTc.getScale().x;
-    if (isHorizontalBar && isOverflowX_)
+    ScrollbarMargin margins;
+    const auto sbScale = scrollBarTc.getScale();
+    (sbScale.x > sbScale.y) ? (margins.hsbMargin = sbScale.y) : (margins.vsbMargin = sbScale.x);
+
+    const auto barScale = std::max(margins.hsbMargin, margins.vsbMargin);
+    if (margins.hsbMargin && isOverflowX_)
     {
         /* We should take into account if vertical bar is present so that bottom right 'intersection'
            between bars is filled or not. Same thing shoukd apply for vertical calcs bellow */
@@ -291,7 +255,7 @@ void HkConstraintContext::scrollBarConstrain(HkTransformContext& scrollBarTc, bo
         scrollBarTc.setScale({ thisTc_->getScale().x - verticalBarAwareMargin, barScale });
         scrollBarTc.setPos({ thisTc_->getPos().x, thisTc_->getPos().y + thisTc_->getScale().y - barScale });
     }
-    else if (!isHorizontalBar && isOverflowY_)
+    else if (margins.vsbMargin && isOverflowY_)
     {
         const auto horizontalBarAwareMargin = isOverflowX_ ? barScale : 0;
         scrollBarTc.setScale({ barScale, thisTc_->getScale().y - horizontalBarAwareMargin });
@@ -305,50 +269,6 @@ void HkConstraintContext::windowFrameContainerConstraint(HkTransformContext& chi
 {
     /* TODO: dirty flags shall be used here to not do redundant repositioning */
     childTc.setPos({ thisTc_->getPos().x, thisTc_->getPos().y + thisTc_->getScale().y });
-}
-
-void HkConstraintContext::freeConstraint(const std::vector<HkTreeStructure<HkNodeBase>*>&)
-{
-    /*
-        Centers children horizontally inside the parent and places children one after the other horizontally.
-        Parent's Y value is used for the children Y value.
-    */
-    // const auto childrenWidth = std::accumulate(children.begin(), children.end(), 0,
-    //     [](int total, HkTreeStructure<HkNodeBase>* child)
-    //     {
-    //         return total + child->getPayload()->node_.transformContext.scale.x;
-    //     });
-
-    // const auto spaceLeft = thisTc_->scale.x - childrenWidth;
-
-    // auto startPosX = thisTc_->pos.x - thisTc_->scale.x / 2 + spaceLeft / 2;
-    // for (const auto& child : children)
-    // {
-    //     auto& childTc = child->getPayload()->node_.transformContext;
-    //     startPosX += childTc.scale.x / 2;
-    //     childTc.setPos({ startPosX , thisTc_->pos.y });
-    //     startPosX += childTc.scale.x / 2;
-    // }
-    // ---------------------------------------------------------------------------------------------------------
-    // /*
-    //     Centers children vertically inside the parent and places children one after the other vertically.
-    //     Parent's X value is used for the children X value.
-    // */
-    // const auto childrenHeight = std::accumulate(children.begin(), children.end(), 0,
-    //     [](int total, HkTreeStructure<HkNodeBase>* child)
-    //     {
-    //         return total + child->getPayload()->node_.transformContext.scale.y;
-    //     });
-
-    // const auto spaceLeft = thisTc_->scale.y - childrenHeight;
-
-    // auto startPosY = thisTc_->pos.y - thisTc_->scale.y / 2 + spaceLeft / 2;
-    // for (const auto& child : children)
-    // {
-    //     auto& childTc = child->getPayload()->node_.transformContext;
-    //     startPosY += childTc.scale.y / 2;
-    //     childTc.setPos({ thisTc_->pos.x, startPosY });
-    //     startPosY += childTc.scale.y / 2;
-    // }
+    childTc.setScale({ thisTc_->getScale().x, childTc.getScale().y });
 }
 } // hkui

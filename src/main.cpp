@@ -96,12 +96,12 @@ int main()
     ctr3->setColor({ 0.4f,0.5f,0.6f });
     ctr4->setColor({ 0.7f,0.8f,0.9f });
     ctr5->setColor({ 0.0f,0.1f,0.2f });
-    ctr->setSize({ 700, 600 });
+    ctr->setSize({ 400, 600 });
     ctr2->setSize({ 500, 200 });
     // ctr2->setSize({ 630, 200 });
-    ctr3->setSize({ 730, 200 });
+    ctr3->setSize({ 430, 200 });
     ctr4->setSize({ 370, 400 });
-    ctr5->setSize({ 1060, 30 });
+    ctr5->setSize({ 200, 30 });
 
     // windowFrame->setPos({ 1280 * 0.5, 720 * 0.25 });
     // windowFrame->setSize({ 1280 * 0.5, 720 * 0.5 });

@@ -15,6 +15,12 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
 
 void HkWindowFrame::rootUpdateMySelf() { updateMySelf(); }
 
+void HkWindowFrame::onScroll()
+{
+    std::cout << glfwGetTime() << " scroll value: " << sceneDataRef_.scrollPosY << '\n';
+    // node_.transformContext.addScale({ sceneDataRef_.scrollPosY * 4, 0 });
+}
+
 void HkWindowFrame::onDrag()
 {
     node_.transformContext.setPos(sceneDataRef_.mouseOffsetFromFocusedCenter + sceneDataRef_.mousePos);

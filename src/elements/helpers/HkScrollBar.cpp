@@ -66,6 +66,7 @@ void HkScrollBar::setScrollBarActive(const bool isActive)
 
 void HkScrollBar::setOverflowSize(int value)
 {
+    if (value < 0) overflowSize_ = 0;
     overflowSize_ = value;
 }
 

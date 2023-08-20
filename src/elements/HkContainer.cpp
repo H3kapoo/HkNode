@@ -32,10 +32,13 @@ void HkContainer::onDrag()
     //TODO: Should this really be here?
     //TODO: We cant realy use inside viewable area since it doesnt have a parent..
     /* Ignore mouse drags inside intersector area */
-    if (scrollbBarsCount_ == 2 && dummyXYIntersectorData_.transformContext.isPosInsideOfNodeViewableArea(sceneDataRef_.dragStartMousePosition))
+    if (scrollbBarsCount_ == 2 && dummyXYIntersectorData_.transformContext.isPosInsideOfNode(sceneDataRef_.dragStartMousePosition))
     {
-        std::cout << glfwGetTime() << "  " << sceneDataRef_.dragStartMousePosition.x << "  " <<
-            sceneDataRef_.dragStartMousePosition.y << "dragging ouside of intersector\n";
+    }
+    else
+    {
+        // std::cout << glfwGetTime() << "  " << sceneDataRef_.dragStartMousePosition.x << "  " <<
+            // sceneDataRef_.dragStartMousePosition.y << "dragging ouside of intersector\n";
     }
 }
 
@@ -79,42 +82,40 @@ void HkContainer::postRenderAdditionalDetails()
 void HkContainer::resolveScrollBarChildrenIfNeeded()
 {
     /* Place horizontal scrollbar if neeeded */
+    hScrollBar_.setOverflowSize(node_.constraintContext.overflowXYSize_.x);
     if (!hScrollBar_.isScrollBarActive() && node_.constraintContext.isOverflowX_)
     {
         scrollbBarsCount_++;
         treeStruct_.pushChild(&hScrollBar_.treeStruct_);
         hScrollBar_.setScrollBarActive(true);
-        hScrollBar_.setOverflowSize(node_.constraintContext.overflowXYSize_.x);
     }
     else if (hScrollBar_.isScrollBarActive() && !node_.constraintContext.isOverflowX_)
     {
         scrollbBarsCount_--;
-        hScrollBar_.setOverflowSize(0);
         hScrollBar_.setScrollBarActive(false);
         treeStruct_.removeChildren({ hScrollBar_.treeStruct_.getId() });
     }
 
     /* Place vertical scrollbar if neeeded */
+    vScrollBar_.setOverflowSize(node_.constraintContext.overflowXYSize_.y);
     if (!vScrollBar_.isScrollBarActive() && node_.constraintContext.isOverflowY_)
     {
         scrollbBarsCount_++;
         treeStruct_.pushChild(&vScrollBar_.treeStruct_);
-        vScrollBar_.setOverflowSize(node_.constraintContext.overflowXYSize_.y);
         vScrollBar_.setScrollBarActive(true);
     }
     else if (vScrollBar_.isScrollBarActive() && !node_.constraintContext.isOverflowY_)
     {
         scrollbBarsCount_--;
         vScrollBar_.setScrollBarActive(false);
-        vScrollBar_.setOverflowSize(0);
         treeStruct_.removeChildren({ vScrollBar_.treeStruct_.getId() });
     }
 
     //TODO: Note? somehow if we put these inside the ifs above, altough flow enters in IFs only one time,
     // in runtime, scrollbars will still constrain each frame somehow, but bellow functions arent called..
     // something to do with references ? Not really a but but worth noting.
-    node_.constraintContext.scrollBarConstrain(vScrollBar_.node_.transformContext, false);
-    node_.constraintContext.scrollBarConstrain(hScrollBar_.node_.transformContext, true);
+    node_.constraintContext.scrollBarConstrain(vScrollBar_.node_.transformContext);
+    node_.constraintContext.scrollBarConstrain(hScrollBar_.node_.transformContext);
 }
 
 void HkContainer::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)

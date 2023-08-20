@@ -88,7 +88,7 @@ public:
     void mouseMoveEvent(GLFWwindow*, double xPos, double yPos);
     void mouseClickEvent(GLFWwindow*, int button, int action, int);
     void mouseEnterEvent(GLFWwindow*, int entered);
-    void mouseScrollEvent(GLFWwindow*, double xOffset, double);
+    void mouseScrollEvent(GLFWwindow*, double, double yOffset);
     void dropEvent(GLFWwindow*, int count, const char** paths);
 
     void resolveFocus();

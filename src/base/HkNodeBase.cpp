@@ -64,7 +64,7 @@ void HkNodeBase::updateMySelf()
     case HkEvent::MouseMove: resolveMouseMovementEvent(); break;
     case HkEvent::MouseClick: resolveMouseClickEvent(); break;
     case HkEvent::MouseEnterExit: break;
-    case HkEvent::MouseScroll: break;
+    case HkEvent::MouseScroll: resolveMouseScrollEvent(); break;
     case HkEvent::DropPath: break;
     }
 
@@ -139,6 +139,16 @@ void HkNodeBase::resolveMouseClickEvent()
     onGeneralMouseClick();
 }
 
+/* Resolve specific and general mouse scroll evt */
+void HkNodeBase::resolveMouseScrollEvent()
+{
+    /* Notify scroll on actually scrolled object only*/
+    if (sceneDataRef_.focusedId == treeStruct_.getId())
+        onScroll();
+    /* Then notify the rest, notified already included */
+    onGeneralMouseScroll();
+}
+
 /* Resolve specific and general mouse mvmt evt */
 void HkNodeBase::resolveMouseMovementEvent()
 {
@@ -154,9 +164,12 @@ void HkNodeBase::resolveMouseMovementEvent()
 /* Events to be consumed by derived if needed */
 void HkNodeBase::postRenderAdditionalDetails() {}
 void HkNodeBase::onDrag() {}
+void HkNodeBase::onScroll() {}
 void HkNodeBase::onClick() {}
 void HkNodeBase::onGeneralUpdate() {}
 void HkNodeBase::onWindowResize() {}
 void HkNodeBase::onGeneralMouseMove() {}
 void HkNodeBase::onGeneralMouseClick() {}
+void HkNodeBase::onGeneralMouseScroll() {}
+
 } // hkui
