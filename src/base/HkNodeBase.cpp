@@ -26,9 +26,6 @@ void HkNodeBase::updateMySelf()
         tc.setVPos(tc.getPos());
         tc.setVScale(tc.getScale());
 
-        // HkDrawDebugger::get().pushDraw10x10({ tc.getVPos().x, tc.getVPos().y });
-        // HkDrawDebugger::get().pushDraw10x10({ tc.getVPos().x + tc.getVScale().x, tc.getVPos().y + tc.getVScale().y });
-
         glScissor(
             tc.getPos().x - 1,
             sceneDataRef_.windowHeight - tc.getPos().y - tc.getScale().y + 1,
@@ -38,7 +35,6 @@ void HkNodeBase::updateMySelf()
     /* Basically use parent's visible area to bound the rendering of it's children */
     else if (parentTreeStruct && parentTreeStruct->getType() != "RootWindowFrame")
     {
-        // glEnable(GL_SCISSOR_TEST);
         const auto& pTc = parentTreeStruct->getPayload()->node_.transformContext;
 
         HkTransformContext cx;
@@ -50,8 +46,6 @@ void HkNodeBase::updateMySelf()
         node_.transformContext.setVPos(bboxTc.pos);
         node_.transformContext.setVScale(bboxTc.scale);
 
-        // HkDrawDebugger::get().pushDraw10x10({ bboxTc.pos.x, bboxTc.pos.y });
-        // HkDrawDebugger::get().pushDraw10x10({ bboxTc.pos.x + bboxTc.scale.x, bboxTc.pos.y + bboxTc.scale.y });
         glScissor(
             bboxTc.pos.x - 1,
             sceneDataRef_.windowHeight - bboxTc.pos.y - bboxTc.scale.y + 1,
@@ -59,7 +53,7 @@ void HkNodeBase::updateMySelf()
             bboxTc.scale.y);
     }
 
-    /*Main HkEvents handler */
+    /* Main HkEvents handler */
     switch (sceneDataRef_.currentEvent)
     {
     case HkEvent::None: break;

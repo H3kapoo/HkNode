@@ -17,7 +17,7 @@ HkContainer::HkContainer(const std::string& containerName)
     dummyXYIntersectorData_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
     dummyXYIntersectorData_.renderContext.getShader().setVec3f("color", glm::vec3(0.7f, 1.0f, 0.2f));
 
-    //Dummy just to test nested scrollbars
+    //TODO: Dummy just to test nested scrollbars
     if (treeStruct_.getName() == "MyContainer2")
     {
         vScrollBar_.node_.renderContext.getShader().setVec3f("color", glm::vec3(0.4f, 0.2f, 0.6f));
@@ -25,75 +25,32 @@ HkContainer::HkContainer(const std::string& containerName)
     }
 }
 
-//TODO: Disable scrollbars outside of view area
+void HkContainer::onDrag()
+{
+    // node_.transformContext.setPos(sceneDataRef_.mouseOffsetFromFocusedCenter + sceneDataRef_.mousePos);
+
+    //TODO: Should this really be here?
+    //TODO: We cant realy use inside viewable area since it doesnt have a parent..
+    /* Ignore mouse drags inside intersector area */
+    if (scrollbBarsCount_ == 2 && dummyXYIntersectorData_.transformContext.isPosInsideOfNodeViewableArea(sceneDataRef_.dragStartMousePosition))
+    {
+        std::cout << glfwGetTime() << "  " << sceneDataRef_.dragStartMousePosition.x << "  " <<
+            sceneDataRef_.dragStartMousePosition.y << "dragging ouside of intersector\n";
+    }
+}
+
 void HkContainer::resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children)
 {
-    /* Resolve children constraints (ignores scrollbar children) */
-    HkNodeBase::resolveChildrenConstraints(children);
-
-    /* Exactly what it says, show bars or not if overflow occured*/
-    handleContainerOverflowIfNeeded();
-
-    /* Resolve scrollbar only constraints for axis */
-    constrainScrollbarsIfNeeded();
-
-    //Not sure about this one here..
+    /* We need to notify constraint ctx about scrollbars scroll value so we can offset the children if needed*/
     node_.constraintContext.offsetPercentage_.x = hScrollBar_.getScrollValue();
     node_.constraintContext.offsetPercentage_.y = vScrollBar_.getScrollValue();
 
-    //TODO: This could be set automatically from ConstraintContext
-    node_.constraintContext.hScrollBarWidth_ = hScrollBar_.node_.transformContext.getScale().y;
-    node_.constraintContext.vScrollBarHeight_ = vScrollBar_.node_.transformContext.getScale().x;
-}
+    /* Resolve children constraints (ignores scrollbar children) */
+    //TODO: This ^ resolve shall be done base on node constrain policy, add function here too for setting policy
+    HkNodeBase::resolveChildrenConstraints(children);
 
-/* Compute SB constraints only if needed */
-//TODO: This could be moved directly inside the constraint context
-void HkContainer::constrainScrollbarsIfNeeded()
-{
-    if (node_.constraintContext.isOverflowX_)
-    {
-        node_.constraintContext.scrollBarConstrain(hScrollBar_.node_.transformContext, true);
-    }
-    if (node_.constraintContext.isOverflowY_)
-    {
-        node_.constraintContext.scrollBarConstrain(vScrollBar_.node_.transformContext, false);
-    }
-}
-
-/* This determines if the container will have a scrollbar showing or not */
-void HkContainer::handleContainerOverflowIfNeeded()
-{
-    // hsb
-    if (!hScrollBar_.isScrollBarActive() && node_.constraintContext.isOverflowX_)
-    {
-        scrollbBarsCount_++;
-        hScrollBar_.setScrollBarActive(true);
-        hScrollBar_.setOverflowSize(node_.constraintContext.overflowXYSize_.x);
-        treeStruct_.pushChild(&hScrollBar_.treeStruct_);
-    }
-    else if (hScrollBar_.isScrollBarActive() && !node_.constraintContext.isOverflowX_)
-    {
-        scrollbBarsCount_--;
-        hScrollBar_.setOverflowSize(0);
-        hScrollBar_.setScrollBarActive(false);
-        treeStruct_.removeChildren({ hScrollBar_.treeStruct_.getId() });
-    }
-
-    // vsb
-    if (!vScrollBar_.isScrollBarActive() && node_.constraintContext.isOverflowY_)
-    {
-        scrollbBarsCount_++;
-        vScrollBar_.setOverflowSize(node_.constraintContext.overflowXYSize_.y);
-        vScrollBar_.setScrollBarActive(true);
-        treeStruct_.pushChild(&vScrollBar_.treeStruct_);
-    }
-    else if (vScrollBar_.isScrollBarActive() && !node_.constraintContext.isOverflowY_)
-    {
-        scrollbBarsCount_--;
-        vScrollBar_.setScrollBarActive(false);
-        vScrollBar_.setOverflowSize(0);
-        treeStruct_.removeChildren({ vScrollBar_.treeStruct_.getId() });
-    }
+    /* Reolve contraints but this time only for scrollbars, if needed */
+    resolveScrollBarChildrenIfNeeded();
 }
 
 /* Useful to render additional visual non children UI, like XY intersector. This will be called after all children (and sub children)
@@ -118,22 +75,47 @@ void HkContainer::postRenderAdditionalDetails()
     }
 }
 
-void HkContainer::onDrag()
+/* This determines if the container will have a scrollbar showing or not */
+void HkContainer::resolveScrollBarChildrenIfNeeded()
 {
-    // node_.transformContext.setPos(sceneDataRef_.mouseOffsetFromFocusedCenter + sceneDataRef_.mousePos);
+    /* Place horizontal scrollbar if neeeded */
+    if (!hScrollBar_.isScrollBarActive() && node_.constraintContext.isOverflowX_)
+    {
+        scrollbBarsCount_++;
+        treeStruct_.pushChild(&hScrollBar_.treeStruct_);
+        hScrollBar_.setScrollBarActive(true);
+        hScrollBar_.setOverflowSize(node_.constraintContext.overflowXYSize_.x);
+    }
+    else if (hScrollBar_.isScrollBarActive() && !node_.constraintContext.isOverflowX_)
+    {
+        scrollbBarsCount_--;
+        hScrollBar_.setOverflowSize(0);
+        hScrollBar_.setScrollBarActive(false);
+        treeStruct_.removeChildren({ hScrollBar_.treeStruct_.getId() });
+    }
 
-    //TODO: Should this really be here?
-    /* Ignore mouse drags inside intersector area */
-    // if (scrollbBarsCount_ == 2 && !dummyXYIntersectorData_.transformContext.isPosInsideOfNodeViewableArea(sceneDataRef_.dragStartMousePosition))
-    //     std::cout << glfwGetTime() << "  " << sceneDataRef_.dragStartMousePosition.x << "  " <<
-    //     sceneDataRef_.dragStartMousePosition.y << "dragging ouside of intersector\n";
+    /* Place vertical scrollbar if neeeded */
+    if (!vScrollBar_.isScrollBarActive() && node_.constraintContext.isOverflowY_)
+    {
+        scrollbBarsCount_++;
+        treeStruct_.pushChild(&vScrollBar_.treeStruct_);
+        vScrollBar_.setOverflowSize(node_.constraintContext.overflowXYSize_.y);
+        vScrollBar_.setScrollBarActive(true);
+    }
+    else if (vScrollBar_.isScrollBarActive() && !node_.constraintContext.isOverflowY_)
+    {
+        scrollbBarsCount_--;
+        vScrollBar_.setScrollBarActive(false);
+        vScrollBar_.setOverflowSize(0);
+        treeStruct_.removeChildren({ vScrollBar_.treeStruct_.getId() });
+    }
+
+    //TODO: Note? somehow if we put these inside the ifs above, altough flow enters in IFs only one time,
+    // in runtime, scrollbars will still constrain each frame somehow, but bellow functions arent called..
+    // something to do with references ? Not really a but but worth noting.
+    node_.constraintContext.scrollBarConstrain(vScrollBar_.node_.transformContext, false);
+    node_.constraintContext.scrollBarConstrain(hScrollBar_.node_.transformContext, true);
 }
-
-void HkContainer::onGeneralMouseMove()
-{}
-
-void HkContainer::onGeneralMouseClick()
-{}
 
 void HkContainer::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)
 {
@@ -154,7 +136,7 @@ void HkContainer::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)
     }
 }
 
-//TODO: bellow to be removed later when constraints come
+//TODO: bellow to be refactored later when style comes
 void HkContainer::setColor(const glm::vec3& color)
 {
     node_.renderContext.getShader().setVec3f("color", color);

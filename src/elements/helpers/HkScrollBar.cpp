@@ -14,6 +14,7 @@ HkScrollBar::HkScrollBar(const std::string& name, const bool isHorizontal)
     node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix());
 
     treeStruct_.pushChild(&knob_.treeStruct_);
+    setBarScale(20); /* default bar scale depending on orientation */
 }
 
 void HkScrollBar::onDrag()
@@ -28,21 +29,29 @@ void HkScrollBar::onClick()
            -knob_.node_.transformContext.getScale().y / 2 });
 }
 
-float HkScrollBar::getScrollValue() const
+void HkScrollBar::resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>&)
 {
-    return knob_.getValue();
+    node_.constraintContext.constrainSBKnob(isHorizontal_, overflowSize_, knob_.getValue(), knob_.node_.transformContext);
 }
 
-bool HkScrollBar::isScrollBarActive() const
+void HkScrollBar::setScrollValue(float value)
 {
-    return isActive_;
+    knob_.setValue(value);
 }
 
-void HkScrollBar::setOverflowSize(int value)
+/* Scale here refers to when a container has an overflow, how big of an outset this scrollbar will be. */
+void HkScrollBar::setBarScale(uint32_t scale)
 {
-    std::cout << value << '\n';
-
-    overflowSize_ = value;
+    //TODO: If scale is not an even number, we might have to inevitably do with off by one visual errors,
+    //      and in that case maybe it would be better to round to nearest even number.
+    if (isHorizontal_)
+    {
+        node_.transformContext.setScale({ node_.transformContext.getScale().x, scale });
+    }
+    else
+    {
+        node_.transformContext.setScale({ scale, node_.transformContext.getScale().y });
+    }
 }
 
 void HkScrollBar::setScrollBarActive(const bool isActive)
@@ -55,18 +64,23 @@ void HkScrollBar::setScrollBarActive(const bool isActive)
     // }
 }
 
-void HkScrollBar::setScrollValue(float value)
+void HkScrollBar::setOverflowSize(int value)
 {
-    knob_.setValue(value);
-}
-
-void HkScrollBar::resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>&)
-{
-    node_.constraintContext.constrainSBKnob(isHorizontal_, overflowSize_, knob_.getValue(), knob_.node_.transformContext);
+    overflowSize_ = value;
 }
 
 bool HkScrollBar::isHorizontalScrollBar() const
 {
     return isHorizontal_;
+}
+
+float HkScrollBar::getScrollValue() const
+{
+    return knob_.getValue();
+}
+
+bool HkScrollBar::isScrollBarActive() const
+{
+    return isActive_;
 }
 } // hkui

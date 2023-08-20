@@ -282,8 +282,8 @@ void HkConstraintContext::constrainSBKnob(bool isFromHorizontalSB, int overflowS
 /* Keeps scrollbar object at the bottom or at the right of the container. */
 void HkConstraintContext::scrollBarConstrain(HkTransformContext& scrollBarTc, bool isHorizontalBar)
 {
-    const auto barScale = 20;
-    if (isHorizontalBar)
+    const auto barScale = isHorizontalBar ? scrollBarTc.getScale().y : scrollBarTc.getScale().x;
+    if (isHorizontalBar && isOverflowX_)
     {
         /* We should take into account if vertical bar is present so that bottom right 'intersection'
            between bars is filled or not. Same thing shoukd apply for vertical calcs bellow */
@@ -291,14 +291,11 @@ void HkConstraintContext::scrollBarConstrain(HkTransformContext& scrollBarTc, bo
         scrollBarTc.setScale({ thisTc_->getScale().x - verticalBarAwareMargin, barScale });
         scrollBarTc.setPos({ thisTc_->getPos().x, thisTc_->getPos().y + thisTc_->getScale().y - barScale });
     }
-    else
+    else if (!isHorizontalBar && isOverflowY_)
     {
         const auto horizontalBarAwareMargin = isOverflowX_ ? barScale : 0;
         scrollBarTc.setScale({ barScale, thisTc_->getScale().y - horizontalBarAwareMargin });
         scrollBarTc.setPos({ thisTc_->getPos().x + thisTc_->getScale().x - barScale, thisTc_->getPos().y });
-
-        // scrollBarTc.setScale({ barScale, thisTc_->scale.y - horizontalBarAwareMargin });
-        // scrollBarTc.setPos({ thisTc_->pos.x + thisTc_->scale.x / 2 - barScale / 2, thisTc_->pos.y - horizontalBarAwareMargin / 2 });
     }
 }
 

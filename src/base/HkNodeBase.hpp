@@ -11,7 +11,6 @@ class HkNodeBase
     friend class HkSceneManagement;
     friend class HkWindowFrame;
     friend class HkContainer;
-
     friend class HkScrollBar;
     friend class HkKnob;
 
@@ -31,7 +30,6 @@ private:
     /* Events */
     virtual void onDrag();
     virtual void onClick();
-
     virtual void onGeneralUpdate();
     virtual void onWindowResize();
     virtual void onGeneralMouseMove();
@@ -45,7 +43,7 @@ private:
     void resolveMouseClickEvent();
     void resolveMouseMovementEvent();
 
-
+private:
     HkNodeData node_;
     HkTreeStructure<HkNodeBase> treeStruct_;
     HkSceneData& sceneDataRef_; /* This is safe as singleton will outlive THIS class anyway*/

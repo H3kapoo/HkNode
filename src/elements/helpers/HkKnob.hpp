@@ -11,11 +11,15 @@ public:
     HkKnob(const std::string& name, const bool isHorizontal);
 
     void onDrag() override;
+    void computeKnobValue(const glm::ivec2 offsetFromCenter);
 
+    /* Setters */
     void setValue(float value);
+
+    /* Getters */
     float getValue() const;
     bool isHorizontal() const;
-    void computeKnobValue(const glm::ivec2 offsetFromCenter);
+
 
 private:
     HkTransformContext* parentTc;

@@ -20,12 +20,6 @@ void HkWindowFrame::onDrag()
     node_.transformContext.setPos(sceneDataRef_.mouseOffsetFromFocusedCenter + sceneDataRef_.mousePos);
 }
 
-void HkWindowFrame::onGeneralMouseMove()
-{}
-
-//TODO: BUG: On rescaling, there are 1 pixel wide errors, maybe due tot some rounding errors. Or maybe due to 
-// calculating stuff relative to the center of the UI element?
-// Later edit: BUG can be fixed by not allowing odd scale/pos(maybe this not?). Maybe it can be mitigated by topLeft positioning in the future
 void HkWindowFrame::onWindowResize()
 {
     //TODO: Refactor if needed after topLeft coordinate change
@@ -44,19 +38,11 @@ void HkWindowFrame::onWindowResize()
 
 }
 
-void HkWindowFrame::onGeneralMouseClick()
-{
-    // std::cout << glfwGetTime() << '\n';
-    // printTree();
-}
-
 void HkWindowFrame::resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>&)
 {
     node_.constraintContext.windowFrameContainerConstraint(wfCont_.node_.transformContext);
 }
 
-void HkWindowFrame::onGeneralUpdate()
-{}
 
 void HkWindowFrame::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)
 {

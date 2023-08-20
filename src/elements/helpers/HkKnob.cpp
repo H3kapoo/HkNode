@@ -21,7 +21,7 @@ void HkKnob::onDrag()
    scrollbar max pos */
 void HkKnob::computeKnobValue(const glm::ivec2 offsetFromCenter)
 {
-    /* Cache parent TC since it will never change anwyaway for knobs */
+    /* Cache parent TC since it will never change anwyway for knobs */
     if (!parentTc)
     {
         parentTc = &treeStruct_.getParent()->getPayload()->node_.transformContext;
@@ -46,6 +46,13 @@ void HkKnob::computeKnobValue(const glm::ivec2 offsetFromCenter)
     }
 }
 
+void HkKnob::setValue(float value)
+{
+    value_ = value;
+    if (value_ < 0.0f) value_ = 0.0f;
+    if (value_ > 1.0f) value_ = 1.0f;
+}
+
 float HkKnob::getValue() const
 {
     return value_;
@@ -54,12 +61,5 @@ float HkKnob::getValue() const
 bool HkKnob::isHorizontal() const
 {
     return isHorizontalKnob_;
-}
-
-void HkKnob::setValue(float value)
-{
-    value_ = value;
-    if (value_ < 0.0f) value_ = 0.0f;
-    if (value_ > 1.0f) value_ = 1.0f;
 }
 } // hkui

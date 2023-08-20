@@ -30,10 +30,12 @@ class HkNodeBase;
 
 class HkConstraintContext
 {
-private:
 
+    //TODO: Each class shall have their global params default initted inside ctor
 public:
-    HkConstraintContext() : isOverflowX_{ false }, isOverflowY_{ false } {}
+    HkConstraintContext() : isOverflowX_{ false }, isOverflowY_{ false }
+        , overflowXYSize_{ 0,0 }, offsetPercentage_{ 0,0 }
+        , policy_{ HkConstraintPolicy::AlignLeftToRight } {}
 
     void setRootTc(HkTransformContext* rootTc);
 
@@ -65,15 +67,11 @@ public:
     bool isOverflowX_;
     bool isOverflowY_;
 
-    glm::ivec2 overflowXYSize_{ 0,0 };
-    glm::vec2 offsetPercentage_{ 0,0 };
-
-    //TODO: used??
-    uint32_t vScrollBarHeight_{ 0 };
-    uint32_t hScrollBarWidth_{ 0 };
+    glm::ivec2 overflowXYSize_;
+    glm::vec2 offsetPercentage_;
 
 private:
-    HkConstraintPolicy policy_{ HkConstraintPolicy::AlignLeftToRight }; /* Always set defaults */
+    HkConstraintPolicy policy_;
     HkTransformContext* thisTc_;
 };
 } // hkui

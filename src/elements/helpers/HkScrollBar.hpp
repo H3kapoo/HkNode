@@ -15,18 +15,20 @@ class HkScrollBar : public HkNodeBase
 public:
     HkScrollBar(const std::string& name, const bool isHorizontal);
 
-    bool isHorizontalScrollBar() const;
+    void onDrag() override;
+    void onClick() override;
+    void resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>&) override;
+
+    /* Setters */
     void setScrollValue(float value);
-    float getScrollValue() const;
-    bool isScrollBarActive() const;
+    void setBarScale(uint32_t scale);
     void setScrollBarActive(const bool isActive);
     void setOverflowSize(int value);
 
-    /* HkNodeBase */
-    void resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>&) override;
-
-    void onDrag() override;
-    void onClick() override;
+    /* Getters */
+    bool isHorizontalScrollBar() const;
+    float getScrollValue() const;
+    bool isScrollBarActive() const;
 
 private:
     HkKnob knob_;
