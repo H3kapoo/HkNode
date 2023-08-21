@@ -5,11 +5,28 @@ namespace hkui
 
 HkWindowFrame::HkWindowFrame(const std::string& windowName)
     : HkNodeBase(windowName, "RootWindowFrame")
+    , minimizeBtn_("{Internal}-MinimizeButtonFor " + windowName)
+    , exitBtn_("{Internal}-ExitButtonFor " + windowName)
     , wfCont_("{Internal}-ContainerFor " + windowName)
 {
     node_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
     node_.renderContext.getShader().setVec3f("color", glm::vec3(0.0f, 0.5f, 0.9f)); // BLUEish
     node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix());
+
+    treeStruct_.pushChild(&minimizeBtn_.treeStruct_);
+    treeStruct_.pushChild(&exitBtn_.treeStruct_);
+
+    minimizeBtn_.setOnClickListener([this]()
+        {
+            std::cout << "trying to minimize\n";
+            sceneDataRef_.isSceneMinimized = !sceneDataRef_.isSceneMinimized;
+        });
+
+    exitBtn_.setOnClickListener([this]()
+        {
+            sceneDataRef_.isSceneStillAlive = false;
+        });
+
     treeStruct_.pushChild(&wfCont_.treeStruct_);
 }
 
@@ -17,8 +34,8 @@ void HkWindowFrame::rootUpdateMySelf() { updateMySelf(); }
 
 void HkWindowFrame::onScroll()
 {
-    std::cout << glfwGetTime() << " scroll value: " << sceneDataRef_.scrollPosY << '\n';
-    // node_.transformContext.addScale({ sceneDataRef_.scrollPosY * 4, 0 });
+    // std::cout << glfwGetTime() << " scroll value: " << sceneDataRef_.scrollPosY << '\n';
+    node_.transformContext.addScale({ sceneDataRef_.scrollPosY * 4, 0 });
 }
 
 void HkWindowFrame::onDrag()
@@ -46,6 +63,18 @@ void HkWindowFrame::onWindowResize()
 
 void HkWindowFrame::resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>&)
 {
+    exitBtn_.node_.transformContext.setScale({ 20, 20 });
+    exitBtn_.node_.transformContext.setPos({
+        node_.transformContext.getPos().x + node_.transformContext.getScale().x - 20 - 5,
+        node_.transformContext.getPos().y + 20 / 2 - 5
+        });
+
+    minimizeBtn_.node_.transformContext.setScale({ 20, 20 });
+    minimizeBtn_.node_.transformContext.setPos({
+        node_.transformContext.getPos().x + node_.transformContext.getScale().x - 20 - 35,
+        node_.transformContext.getPos().y + 20 / 2 - 5
+        });
+
     node_.constraintContext.windowFrameContainerConstraint(wfCont_.node_.transformContext);
 }
 

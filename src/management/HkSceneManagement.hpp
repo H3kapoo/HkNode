@@ -53,18 +53,24 @@ struct HkSceneData
     const char** droppedPaths;
 
     /*Selection*/
-    uint32_t focusedId;
-    glm::ivec2 mouseOffsetFromFocusedCenter;
+    uint32_t focusedId{ 0 };
+    glm::ivec2 mouseOffsetFromFocusedCenter{ 0,0 };
 
     /*Drag*/
-    bool isDragging;
-    glm::ivec2 dragStartMousePosition;
+    bool isDragging{ false };
+    glm::ivec2 dragStartMousePosition{ 0,0 };
 
     /*Hover*/
-    uint32_t hoveredId;
+    uint32_t hoveredId{ 0 };
 
     /*Rendering*/
     glm::mat4 sceneProjMatrix;
+
+    /*Scene deletion*/ // will be more useful when multiple windowframe support comes
+    bool isSceneStillAlive{ true };
+
+    /*Visibility*/
+    bool isSceneMinimized{ false };
 
     /*Constants*/
     static constexpr uint32_t NO_SELECTION_ID = 0;

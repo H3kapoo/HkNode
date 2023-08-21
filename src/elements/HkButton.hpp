@@ -1,30 +1,26 @@
-// #pragma once
+#pragma once
 
-// #include <string>
-// #include <memory>
+#include <string>
+#include <memory>
+#include <functional>
 
-// #include "../management/HkSceneManagement.hpp"
-// #include "../base/HkNode.hpp"
+#include "../base/HkNodeBase.hpp"
 
-// namespace hkui
-// {
-// class HkButton : public HkNode
-// {
-// public:
-//     HkButton(const std::string& name);
+namespace hkui
+{
+class HkButton : public HkNodeBase
+{
+public:
+    HkButton(const std::string& name);
 
-//     //HkNode
-//     void updateMySelf() override;
+    void setOnClickListener(std::function<void()> callback);
 
-//     void setPos(const glm::vec2& pos);
-//     void setSize(const glm::vec2& size);
+private:
+    void onClick() override;
 
-// private:
-//     HkSceneData& sceneDataRef; /* This is safe as singleton will outlive THIS class anyway*/
-// };
+    std::function<void()> onClickCallback_{ nullptr };
+};
 
-// using HkButtonUPtr = std::unique_ptr<HkButton>;
-// using HkButtonPtr = std::shared_ptr<HkButton>;
-// using HkButtonCPtr = const std::shared_ptr<HkButton>;
-
-// } // hkui
+using HkButtonPtr = std::shared_ptr<HkButton>;
+using HkButtonCPtr = const std::shared_ptr<HkButton>;
+} // hkui

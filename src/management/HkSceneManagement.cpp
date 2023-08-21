@@ -28,6 +28,7 @@ void HkSceneManagement::init(int wWidth, int wHeight)
 void HkSceneManagement::setRoot(IHkRootNodeCPtr& newRootNode)
 {
     rootNode = newRootNode;
+    sceneData.isSceneStillAlive = true;
     HkWindowFrameCPtr dcRoot = std::dynamic_pointer_cast<HkWindowFrame>(newRootNode);
     if (dcRoot)
     {
@@ -47,10 +48,18 @@ void HkSceneManagement::update()
 
 void HkSceneManagement::update(const HkEvent& ev)
 {
+    /* Not consider the setted root as root anymore. Kind of emulate its deletion*/
+    if (!sceneData.isSceneStillAlive)
+    {
+        rootNode = nullptr;
+        return;
+    }
+
     sceneData.currentEvent = ev;
     rootNode->rootUpdateMySelf();
     /* Not sure that to do with this for now, maybe it will be useful later */
     sceneData.currentEvent = HkEvent::None; // HkEvent gets consumed
+
 }
 
 void HkSceneManagement::resizeWindowEvent(GLFWwindow*, int width, int height)

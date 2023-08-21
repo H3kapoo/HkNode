@@ -8,7 +8,7 @@
 #include "../base/HkNodeData.hpp"
 #include "../base/HkTreeStructure.hpp"
 #include "HkContainer.hpp"
-#include "helpers/HkScrollBar.hpp"
+#include "HkButton.hpp"
 
 namespace hkui
 {
@@ -35,6 +35,8 @@ public:
     void setSize(const glm::vec2& size);
     void setConstraintPolicy(const HkConstraintPolicy policy);
 private:
+    HkButton minimizeBtn_;
+    HkButton exitBtn_;
     HkContainer wfCont_;
 };
 using HkWindowFramePtr = std::shared_ptr<HkWindowFrame>;

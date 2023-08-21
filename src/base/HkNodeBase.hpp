@@ -11,6 +11,7 @@ class HkNodeBase
     friend class HkSceneManagement;
     friend class HkWindowFrame;
     friend class HkContainer;
+    friend class HkButton;
     friend class HkScrollBar;
     friend class HkKnob;
 

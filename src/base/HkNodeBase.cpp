@@ -19,8 +19,7 @@ void HkNodeBase::updateMySelf()
     glEnable(GL_SCISSOR_TEST);
 
     /* Compute renderable/inveractive area for each element */
-    if ((treeStruct_.getType() == "RootWindowFrame")
-        || (parentTreeStruct && parentTreeStruct->getType() == "RootWindowFrame"))
+    if (treeStruct_.getType() == "RootWindowFrame")
     {
         auto& tc = node_.transformContext;
         tc.setVPos(tc.getPos());
@@ -31,6 +30,30 @@ void HkNodeBase::updateMySelf()
             sceneDataRef_.windowHeight - tc.getPos().y - tc.getScale().y + 1,
             tc.getScale().x,
             tc.getScale().y);
+    }
+    else if (parentTreeStruct && parentTreeStruct->getType() == "RootWindowFrame")
+    {
+        /* Minimize only container of windowframe */
+        if (sceneDataRef_.isSceneMinimized && treeStruct_.getType() == "Container")
+        {
+            auto& tc = node_.transformContext;
+            tc.setVPos({ 0,0 });
+            tc.setVScale({ 0,0 });
+
+            glScissor(0, 0, 0, 0);
+        }
+        else
+        {
+            auto& tc = node_.transformContext;
+            tc.setVPos(tc.getPos());
+            tc.setVScale(tc.getScale());
+
+            glScissor(
+                tc.getPos().x - 1,
+                sceneDataRef_.windowHeight - tc.getPos().y - tc.getScale().y + 1,
+                tc.getScale().x,
+                tc.getScale().y);
+        }
     }
     /* Basically use parent's visible area to bound the rendering of it's children */
     else if (parentTreeStruct && parentTreeStruct->getType() != "RootWindowFrame")
