@@ -8,17 +8,21 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
     , minimizeBtn_("{Internal}-MinimizeButtonFor " + windowName)
     , exitBtn_("{Internal}-ExitButtonFor " + windowName)
     , wfCont_("{Internal}-ContainerFor " + windowName)
+    , mode_{ HkWindowFrameMode::Grabbable }
+    , cachedScale_{ 0,0 }
+    , cachedPos_{ 0,0 }
+
 {
     node_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
-    node_.renderContext.getShader().setVec3f("color", glm::vec3(0.0f, 0.5f, 0.9f)); // BLUEish
+    node_.renderContext.getShader().setVec3f("color", glm::vec3(0.0f, 0.5f, 0.9f));
     node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix());
 
     treeStruct_.pushChild(&minimizeBtn_.treeStruct_);
     treeStruct_.pushChild(&exitBtn_.treeStruct_);
+    treeStruct_.pushChild(&wfCont_.treeStruct_);
 
     minimizeBtn_.setOnClickListener([this]()
         {
-            std::cout << "trying to minimize\n";
             sceneDataRef_.isSceneMinimized = !sceneDataRef_.isSceneMinimized;
         });
 
@@ -26,11 +30,12 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
         {
             sceneDataRef_.isSceneStillAlive = false;
         });
-
-    treeStruct_.pushChild(&wfCont_.treeStruct_);
 }
 
 void HkWindowFrame::rootUpdateMySelf() { updateMySelf(); }
+
+void HkWindowFrame::onFirstHeartbeat()
+{}
 
 void HkWindowFrame::onScroll()
 {
@@ -40,11 +45,14 @@ void HkWindowFrame::onScroll()
 
 void HkWindowFrame::onDrag()
 {
+    if (mode_ != HkWindowFrameMode::Grabbable) return;
     node_.transformContext.setPos(sceneDataRef_.mouseOffsetFromFocusedCenter + sceneDataRef_.mousePos);
 }
 
 void HkWindowFrame::onWindowResize()
 {
+    // setPos({ 0,0 });
+    // setSize({ sceneDataRef_.windowWidth, sceneDataRef_.windowHeight - 30 });
     //TODO: Refactor if needed after topLeft coordinate change
     /* Techically root windows shall not resize with WINDOW itself, only children should resize with their parents */
     //TODO: Future: Refactor transforms so that they have pivot at top left corner instead of center
@@ -63,19 +71,17 @@ void HkWindowFrame::onWindowResize()
 
 void HkWindowFrame::resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>&)
 {
-    exitBtn_.node_.transformContext.setScale({ 20, 20 });
-    exitBtn_.node_.transformContext.setPos({
-        node_.transformContext.getPos().x + node_.transformContext.getScale().x - 20 - 5,
-        node_.transformContext.getPos().y + 20 / 2 - 5
-        });
+    /* If we go into fullscreen mode, remember our grabbable size and scale to help restore later */
+    if (cachedScale_.x == 0 && mode_ != HkWindowFrameMode::Grabbable)
+    {
+        cachedPos_ = wfCont_.node_.transformContext.getPos();
+        cachedScale_ = wfCont_.node_.transformContext.getScale();
+    }
 
-    minimizeBtn_.node_.transformContext.setScale({ 20, 20 });
-    minimizeBtn_.node_.transformContext.setPos({
-        node_.transformContext.getPos().x + node_.transformContext.getScale().x - 20 - 35,
-        node_.transformContext.getPos().y + 20 / 2 - 5
-        });
-
-    node_.constraintContext.windowFrameContainerConstraint(wfCont_.node_.transformContext);
+    node_.constraintContext.windowFrameContainerConstraint(wfCont_.node_.transformContext,
+        exitBtn_.node_.transformContext, minimizeBtn_.node_.transformContext, sceneDataRef_.windowSize,
+        /* Means we are in the fullscreen fixed mode, we hide the "grab bar"*/
+        (mode_ != HkWindowFrameMode::Grabbable ? true : false));
 }
 
 
@@ -96,11 +102,15 @@ void HkWindowFrame::setColor(const glm::vec3& color)
 
 void HkWindowFrame::setPos(const glm::vec2& pos)
 {
+    /* If we are not in grabbable mode, pos cannot be determined by user*/
+    if (mode_ != HkWindowFrameMode::Grabbable) return;
     node_.transformContext.setPos(pos);
 }
 
 void HkWindowFrame::setSize(const glm::vec2& size)
 {
+    /* If we are not in grabbable mode, size cannot be determined by user*/
+    if (mode_ != HkWindowFrameMode::Grabbable) return;
     node_.transformContext.setScale({ size.x, 30 });
     wfCont_.node_.transformContext.setScale(size);
 }
@@ -108,5 +118,23 @@ void HkWindowFrame::setSize(const glm::vec2& size)
 void HkWindowFrame::setConstraintPolicy(const HkConstraintPolicy policy)
 {
     wfCont_.node_.constraintContext.setPolicy(policy);
+}
+
+void HkWindowFrame::setWindowMode(const HkWindowFrameMode mode)
+{
+    mode_ = mode;
+    /* Not fully necessary, but a good cleanup */
+    if (mode_ != HkWindowFrameMode::Grabbable)
+    {
+        treeStruct_.removeChildren({ exitBtn_.treeStruct_.getId(), minimizeBtn_.treeStruct_.getId() });
+    }
+    else
+    {
+        setSize(cachedScale_);
+        setPos(cachedPos_);
+        cachedScale_.x = 0;// reset cache hack
+        treeStruct_.pushChild(&minimizeBtn_.treeStruct_);
+        treeStruct_.pushChild(&exitBtn_.treeStruct_);
+    }
 }
 } // hkui

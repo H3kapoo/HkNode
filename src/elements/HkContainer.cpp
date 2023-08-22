@@ -25,6 +25,20 @@ HkContainer::HkContainer(const std::string& containerName)
     }
 }
 
+void HkContainer::onClick()
+{
+    if (onClickCallback_ && sceneDataRef_.clickedMouseButton == HkMouseButton::Right)
+    {
+        onClickCallback_();
+    }
+}
+
+// these events shall be encapsulated in dedicated ctx
+void HkContainer::setOnClickListener(std::function<void()> callback)
+{
+    onClickCallback_ = callback;
+}
+
 void HkContainer::onDrag()
 {
     // node_.transformContext.setPos(sceneDataRef_.mouseOffsetFromFocusedCenter + sceneDataRef_.mousePos);

@@ -265,10 +265,39 @@ void HkConstraintContext::scrollBarConstrain(HkTransformContext& scrollBarTc)
 
 /* WindowFrame is a special UI element that 'drags' a container along with it that sits underneath the window frame. This
    function helps constraint that container to the windowFrame element */
-void HkConstraintContext::windowFrameContainerConstraint(HkTransformContext& childTc)
+void HkConstraintContext::windowFrameContainerConstraint(HkTransformContext& wfCtr,
+    HkTransformContext& exitBtn, HkTransformContext& minBtn) const
 {
     /* TODO: dirty flags shall be used here to not do redundant repositioning */
-    childTc.setPos({ thisTc_->getPos().x, thisTc_->getPos().y + thisTc_->getScale().y });
-    childTc.setScale({ thisTc_->getScale().x, childTc.getScale().y });
+    wfCtr.setPos({ thisTc_->getPos().x, thisTc_->getPos().y + thisTc_->getScale().y });
+    wfCtr.setScale({ thisTc_->getScale().x, wfCtr.getScale().y });
+
+    exitBtn.setScale({ 20, 20 }); // hardcoded, but technically ok situation
+    exitBtn.setPos({
+        thisTc_->getPos().x + thisTc_->getScale().x - 20 - 5,
+        thisTc_->getPos().y + 20 / 2 - 5
+        });
+
+    minBtn.setScale({ 20, 20 });
+    minBtn.setPos({
+        thisTc_->getPos().x + thisTc_->getScale().x - 20 - 35,
+        thisTc_->getPos().y + 20 / 2 - 5
+        });
+}
+
+void HkConstraintContext::windowFrameContainerConstraint(HkTransformContext& wfCtr, HkTransformContext& exitBtn,
+    HkTransformContext& minBtn, const glm::ivec2& windowSize, const bool isFullscreen) const
+{
+    if (!isFullscreen)
+    {
+        windowFrameContainerConstraint(wfCtr, exitBtn, minBtn);
+        return;
+    }
+
+    thisTc_->setPos({ 0,0 });
+    thisTc_->setScale({ 0,0 });
+
+    wfCtr.setScale(windowSize);
+    wfCtr.setPos({ 0,0 });
 }
 } // hkui

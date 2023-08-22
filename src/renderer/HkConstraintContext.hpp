@@ -60,7 +60,10 @@ public:
     void constrainSBKnob(bool isFromHorizontalSB, int overflowSize, float currKnobValue, HkTransformContext& knobTc);
 
     /* WindowFrame related */
-    void windowFrameContainerConstraint(HkTransformContext& childTc);
+    void windowFrameContainerConstraint(HkTransformContext& wfCtr, HkTransformContext& exitBtn,
+        HkTransformContext& minBtn) const;
+    void windowFrameContainerConstraint(HkTransformContext& wfCtr, HkTransformContext& exitBtn,
+        HkTransformContext& minBtn, const glm::ivec2& windowSize, const bool isFullscreen) const;
 
     // ConstraintParams..
     /* Scrollbar related */

@@ -22,6 +22,7 @@ void HkSceneManagement::init(int wWidth, int wHeight)
 
     sceneData.windowWidth = wWidth;
     sceneData.windowHeight = wHeight;
+    sceneData.windowSize = { wWidth, wHeight };
     sceneData.sceneProjMatrix = glm::ortho(0.0f, (float)wWidth, (float)wHeight, 0.0f, 0.0f, 100.0f);
 }
 
@@ -64,6 +65,7 @@ void HkSceneManagement::update(const HkEvent& ev)
 
 void HkSceneManagement::resizeWindowEvent(GLFWwindow*, int width, int height)
 {
+    sceneData.windowSize = { width, height };
     sceneData.windowWidth = width;
     sceneData.windowHeight = height;
     sceneData.sceneProjMatrix = glm::ortho(0.0f, (float)width, (float)height, 0.0f, 0.0f, 100.0f);

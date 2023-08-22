@@ -29,6 +29,7 @@ private:
     virtual void resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children);
 
     /* Events */
+    virtual void onFirstHeartbeat();
     virtual void onDrag();
     virtual void onClick();
     virtual void onScroll();
@@ -51,6 +52,8 @@ private:
     HkNodeData node_;
     HkTreeStructure<HkNodeBase> treeStruct_;
     HkSceneData& sceneDataRef_; /* This is safe as singleton will outlive THIS class anyway*/
+
+    bool hadFirstHeartbeat_;
 };
 
 using HkNodeBasePtr = std::shared_ptr<HkNodeBase>;

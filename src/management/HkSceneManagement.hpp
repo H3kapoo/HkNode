@@ -40,7 +40,8 @@ enum class HkEvent
 struct HkSceneData
 {
     HkEvent currentEvent;
-    int windowWidth, windowHeight;
+    int windowWidth, windowHeight; //TODO: Deprecate
+    glm::ivec2 windowSize;
     glm::ivec2 mousePos;
     glm::ivec2 lastMousePos;
     bool isMouseClicked;

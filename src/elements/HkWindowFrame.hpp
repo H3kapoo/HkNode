@@ -12,6 +12,12 @@
 
 namespace hkui
 {
+enum class HkWindowFrameMode
+{
+    Grabbable,
+    FullScreenFixed
+};
+
 class HkWindowFrame : public HkNodeBase, public IHkRootNode
 {
 public:
@@ -21,6 +27,7 @@ public:
     void rootUpdateMySelf() override;
 
     /* HkNodeBase */
+    void onFirstHeartbeat() override;
     void onScroll() override;
     void onDrag() override;
     void onWindowResize() override;
@@ -34,10 +41,16 @@ public:
     void setPos(const glm::vec2& pos);
     void setSize(const glm::vec2& size);
     void setConstraintPolicy(const HkConstraintPolicy policy);
+    void setWindowMode(const HkWindowFrameMode mode);
+
 private:
     HkButton minimizeBtn_;
     HkButton exitBtn_;
     HkContainer wfCont_;
+
+    HkWindowFrameMode mode_;
+    glm::ivec2 cachedScale_;
+    glm::ivec2 cachedPos_;
 };
 using HkWindowFramePtr = std::shared_ptr<HkWindowFrame>;
 using HkWindowFrameCPtr = const std::shared_ptr<HkWindowFrame>;

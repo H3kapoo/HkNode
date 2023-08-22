@@ -84,6 +84,8 @@ int main()
 
     // windowFrame->setConstraintPolicy(HkConstraintPolicy::AlignTopToBottom);
     windowFrame->setConstraintPolicy(HkConstraintPolicy::AlignLeftToRight);
+    windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
+    windowFrame->setWindowMode(HkWindowFrameMode::Grabbable);
 
     HkContainerPtr ctr = std::make_shared<HkContainer>("MyContainer");
     HkContainerPtr ctr2 = std::make_shared<HkContainer>("MyContainer2");
@@ -91,13 +93,22 @@ int main()
     HkContainerPtr ctr4 = std::make_shared<HkContainer>("MyContainer4");
     HkContainerPtr ctr5 = std::make_shared<HkContainer>("MyContainer5");
 
+    bool isFs = false;
+    ctr2->setOnClickListener([&windowFrame, &isFs]()
+        {
+            isFs ? windowFrame->setWindowMode(HkWindowFrameMode::Grabbable)
+                : windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
+            isFs = !isFs;
+            std::cout << "eu sunt\n";
+        });
+
     ctr->setColor({ 0.3f,0.3f,0.7f });
     ctr2->setColor({ 0.3f,0.4f,0.5f });
     ctr3->setColor({ 0.4f,0.5f,0.6f });
     ctr4->setColor({ 0.7f,0.8f,0.9f });
     ctr5->setColor({ 0.0f,0.1f,0.2f });
-    ctr->setSize({ 400, 600 });
-    ctr2->setSize({ 500, 200 });
+    ctr->setSize({ 1400, 600 });
+    ctr2->setSize({ 500, 2000 });
     // ctr2->setSize({ 630, 200 });
     ctr3->setSize({ 430, 200 });
     ctr4->setSize({ 370, 400 });

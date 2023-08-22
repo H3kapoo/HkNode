@@ -5,6 +5,7 @@ namespace hkui
 HkNodeBase::HkNodeBase(const std::string& windowName, const std::string& type)
     : treeStruct_(this, windowName, type)
     , sceneDataRef_(HkSceneManagement::get().getSceneDataRef())
+    , hadFirstHeartbeat_{ false }
 {
     node_.constraintContext.setRootTc(&node_.transformContext);
 }
@@ -91,6 +92,11 @@ void HkNodeBase::updateMySelf()
     case HkEvent::DropPath: break;
     }
 
+    if (!hadFirstHeartbeat_)
+    {
+        onFirstHeartbeat();
+        hadFirstHeartbeat_ = true;
+    }
     //TODO: For later: maybe just the generalUpdate event should render on the screen
     // and the other ones not
 
@@ -155,8 +161,9 @@ void HkNodeBase::resolveFocus()
 /* Resolve specific and general mouse click evt */
 void HkNodeBase::resolveMouseClickEvent()
 {
+    //TODO: Figure out how to do onRelease
     /* Notify click on actually clicked object only*/
-    if (sceneDataRef_.focusedId == treeStruct_.getId())
+    if (sceneDataRef_.hoveredId == treeStruct_.getId()) // maybe the hovered one? not the focused one?
         onClick();
     /* Then notify the rest, notified already included */
     onGeneralMouseClick();
@@ -186,6 +193,7 @@ void HkNodeBase::resolveMouseMovementEvent()
 
 /* Events to be consumed by derived if needed */
 void HkNodeBase::postRenderAdditionalDetails() {}
+void HkNodeBase::onFirstHeartbeat() {}
 void HkNodeBase::onDrag() {}
 void HkNodeBase::onScroll() {}
 void HkNodeBase::onClick() {}
