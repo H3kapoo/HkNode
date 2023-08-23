@@ -32,6 +32,7 @@ private:
     virtual void onFirstHeartbeat();
     virtual void onDrag();
     virtual void onClick();
+    virtual void onRelease();
     virtual void onScroll();
     virtual void onGeneralUpdate();
     virtual void onWindowResize();
@@ -43,6 +44,7 @@ private:
 
     /* Normal internal functions */
     void resolveHover();
+    void resolveNearestActiveScrollbar();
     void resolveFocus();
     void resolveMouseClickEvent();
     void resolveMouseScrollEvent();

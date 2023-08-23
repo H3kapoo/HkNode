@@ -138,9 +138,22 @@ void HkNodeBase::resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBa
 /* Try figure out if im the hovered one */
 void HkNodeBase::resolveHover()
 {
+    // we need the last scrollable content weve met
     if (node_.transformContext.isPosInsideOfNodeViewableArea(sceneDataRef_.mousePos))
     {
         sceneDataRef_.hoveredId = treeStruct_.getId();
+        resolveNearestActiveScrollbar();
+    }
+}
+
+/* Try to figure out closest active scrollbar context near our hover position */
+void HkNodeBase::resolveNearestActiveScrollbar()
+{
+    /* We shall ignore elements that overflow but that do not permit scrollbars */
+    if ((node_.constraintContext.isOverflowAllowedX_ || node_.constraintContext.isOverflowAllowedY_)
+        && (node_.constraintContext.overflowXYSize_.x || node_.constraintContext.overflowXYSize_.y))
+    {
+        sceneDataRef_.nearestScrollContainerId_ = treeStruct_.getId();
     }
 }
 
@@ -161,10 +174,12 @@ void HkNodeBase::resolveFocus()
 /* Resolve specific and general mouse click evt */
 void HkNodeBase::resolveMouseClickEvent()
 {
-    //TODO: Figure out how to do onRelease
     /* Notify click on actually clicked object only*/
-    if (sceneDataRef_.hoveredId == treeStruct_.getId()) // maybe the hovered one? not the focused one?
+    if (sceneDataRef_.isMouseClicked && sceneDataRef_.hoveredId == treeStruct_.getId()) // maybe the hovered one? not the focused one?
         onClick();
+    /* Notify release on actually released object only*/
+    else if (!sceneDataRef_.isMouseClicked && sceneDataRef_.hoveredId == treeStruct_.getId())
+        onRelease();
     /* Then notify the rest, notified already included */
     onGeneralMouseClick();
 }
@@ -173,7 +188,7 @@ void HkNodeBase::resolveMouseClickEvent()
 void HkNodeBase::resolveMouseScrollEvent()
 {
     /* Notify scroll on actually scrolled object only*/
-    if (sceneDataRef_.focusedId == treeStruct_.getId())
+    if (sceneDataRef_.hoveredId == treeStruct_.getId())
         onScroll();
     /* Then notify the rest, notified already included */
     onGeneralMouseScroll();
@@ -195,8 +210,9 @@ void HkNodeBase::resolveMouseMovementEvent()
 void HkNodeBase::postRenderAdditionalDetails() {}
 void HkNodeBase::onFirstHeartbeat() {}
 void HkNodeBase::onDrag() {}
-void HkNodeBase::onScroll() {}
 void HkNodeBase::onClick() {}
+void HkNodeBase::onRelease() {}
+void HkNodeBase::onScroll() {}
 void HkNodeBase::onGeneralUpdate() {}
 void HkNodeBase::onWindowResize() {}
 void HkNodeBase::onGeneralMouseMove() {}

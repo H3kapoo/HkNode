@@ -11,6 +11,8 @@ public:
     HkKnob(const std::string& name, const bool isHorizontal);
 
     void onDrag() override;
+    void onScroll() override;
+    void scrollOngoing();
     void computeKnobValue(const glm::ivec2 offsetFromCenter);
 
     /* Setters */
@@ -25,5 +27,6 @@ private:
     HkTransformContext* parentTc;
     float value_; /* From 0 to 1 */
     bool isHorizontalKnob_;
+    float scrollSensitivity_;
 };
 } // hkui

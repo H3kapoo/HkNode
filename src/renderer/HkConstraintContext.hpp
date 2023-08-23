@@ -37,7 +37,8 @@ class HkNodeBase;
 class HkConstraintContext
 {
 public:
-    HkConstraintContext() : isOverflowX_{ false }, isOverflowY_{ false }
+    HkConstraintContext() : isOverflowAllowedX_{ true }, isOverflowAllowedY_{ true }
+        , isOverflowX_{ false }, isOverflowY_{ false }
         , overflowXYSize_{ 0,0 }, offsetPercentage_{ 0,0 }
         , policy_{ HkConstraintPolicy::AlignLeftToRight } {}
 
@@ -67,6 +68,8 @@ public:
 
     // ConstraintParams..
     /* Scrollbar related */
+    bool isOverflowAllowedX_;
+    bool isOverflowAllowedY_;
     bool isOverflowX_;
     bool isOverflowY_;
     glm::ivec2 overflowXYSize_;

@@ -73,6 +73,9 @@ struct HkSceneData
     /*Visibility*/
     bool isSceneMinimized{ false };
 
+    /*Scrolling*/
+    uint32_t nearestScrollContainerId_{ 0 };
+
     /*Constants*/
     static constexpr uint32_t NO_SELECTION_ID = 0;
 };

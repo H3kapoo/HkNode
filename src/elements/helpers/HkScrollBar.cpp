@@ -17,6 +17,12 @@ HkScrollBar::HkScrollBar(const std::string& name, const bool isHorizontal)
     setBarScale(20); /* default bar scale depending on orientation */
 }
 
+void HkScrollBar::onScroll()
+{
+    // std::cout << glfwGetTime() << " hovering and scrolling on: " << treeStruct_.getName() << "\n";
+    knob_.scrollOngoing();
+}
+
 void HkScrollBar::onDrag()
 {
     knob_.computeKnobValue({ -knob_.node_.transformContext.getScale().x / 2,

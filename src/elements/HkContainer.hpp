@@ -13,7 +13,9 @@ class HkContainer : public HkNodeBase
 public:
     HkContainer(const std::string& containerName);
 
+    void onGeneralMouseScroll() override;
     void onClick() override;
+    void onRelease() override;
     void onDrag() override;
     void resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children) override;
     void postRenderAdditionalDetails() override;

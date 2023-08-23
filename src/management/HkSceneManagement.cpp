@@ -170,8 +170,10 @@ void HkSceneManagement::resolveFocus()
 
 void HkSceneManagement::resolveHover()
 {
+    //TODO: Some optimization could be done here so that if
+    // we are in the same hovered ID each frame, dont calculate nearest SB again
     sceneData.hoveredId = HkSceneData::NO_SELECTION_ID;
+    sceneData.nearestScrollContainerId_ = HkSceneData::NO_SELECTION_ID;
     update(HkEvent::HoverScan);
-    // std::cout << "hovered item is: " << sceneData.hoveredId << '\n';
 }
 } // hkui

@@ -6,6 +6,7 @@ HkKnob::HkKnob(const std::string& name, const bool isHorizontal)
     : HkNodeBase(name, "Knob")
     , value_{ 0 }
     , isHorizontalKnob_(isHorizontal)
+    , scrollSensitivity_{ 0.05f }
 {
     node_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
     node_.renderContext.getShader().setVec3f("color", glm::vec3(0.5f, 0.7f, 1.0f)); // gray
@@ -15,6 +16,16 @@ HkKnob::HkKnob(const std::string& name, const bool isHorizontal)
 void HkKnob::onDrag()
 {
     computeKnobValue(sceneDataRef_.mouseOffsetFromFocusedCenter);
+}
+
+void HkKnob::onScroll()
+{
+    setValue(getValue() - sceneDataRef_.scrollPosY * scrollSensitivity_);
+}
+
+void HkKnob::scrollOngoing()
+{
+    setValue(getValue() - sceneDataRef_.scrollPosY * scrollSensitivity_);
 }
 
 /* Based on where the mouse is at drag time, compute 0 to 1 range mapped from scrollbar min pos to

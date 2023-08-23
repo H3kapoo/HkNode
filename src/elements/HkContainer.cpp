@@ -25,6 +25,21 @@ HkContainer::HkContainer(const std::string& containerName)
     }
 }
 
+void HkContainer::onGeneralMouseScroll()
+{
+    if (sceneDataRef_.nearestScrollContainerId_ == treeStruct_.getId())
+    {
+        vScrollBar_.onScroll();
+        //TODO: Allow H movement but only if shift key or ctrl key is pressed as well
+        // hScrollBar_.onScroll();
+    }
+}
+
+void HkContainer::onRelease()
+{
+    // std::cout << "mouse released\n";
+}
+
 void HkContainer::onClick()
 {
     if (onClickCallback_ && sceneDataRef_.clickedMouseButton == HkMouseButton::Right)

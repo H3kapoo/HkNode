@@ -107,8 +107,8 @@ int main()
     ctr3->setColor({ 0.4f,0.5f,0.6f });
     ctr4->setColor({ 0.7f,0.8f,0.9f });
     ctr5->setColor({ 0.0f,0.1f,0.2f });
-    ctr->setSize({ 1400, 600 });
-    ctr2->setSize({ 500, 2000 });
+    ctr->setSize({ 300, 600 });
+    ctr2->setSize({ 500, 700 });
     // ctr2->setSize({ 630, 200 });
     ctr3->setSize({ 430, 200 });
     ctr4->setSize({ 370, 400 });
