@@ -147,6 +147,7 @@ void HkNodeBase::resolveHover()
 }
 
 /* Try to figure out closest active scrollbar context near our hover position */
+//TODO: Doesnt really do a great job but its fine for now. Refactor later
 void HkNodeBase::resolveNearestActiveScrollbar()
 {
     /* We shall ignore elements that overflow but that do not permit scrollbars */

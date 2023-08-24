@@ -6,8 +6,8 @@
 
 #include "../APIGate/GlfwGlewGate.hpp"
 
-#include "../renderer/HkRenderContext.hpp"
-#include "../renderer/HkTransformContext.hpp"
+#include "../contexts/HkRenderContext.hpp"
+#include "../contexts/HkTransformContext.hpp"
 
 namespace hkui
 {

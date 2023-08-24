@@ -13,6 +13,7 @@ class HkNodeBase
     friend class HkContainer;
     friend class HkButton;
     friend class HkScrollBar;
+    friend class HkImageView;
     friend class HkKnob;
 
     friend class HkConstraintContext;

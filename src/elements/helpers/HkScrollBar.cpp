@@ -37,6 +37,7 @@ void HkScrollBar::onClick()
 
 void HkScrollBar::resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>&)
 {
+    //TODO: Add modifiers such as: min knob size and overflow size impact on knob scale factor
     node_.constraintContext.constrainSBKnob(isHorizontal_, overflowSize_, knob_.getValue(), knob_.node_.transformContext);
 }
 

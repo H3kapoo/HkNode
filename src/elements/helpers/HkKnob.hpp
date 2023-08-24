@@ -24,7 +24,6 @@ public:
 
 
 private:
-    HkTransformContext* parentTc;
     float value_; /* From 0 to 1 */
     bool isHorizontalKnob_;
     float scrollSensitivity_;

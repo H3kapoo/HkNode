@@ -110,7 +110,7 @@ void HkConstraintContext::resolveChildrenOverflowVariables(const HkChildrenOrien
         overflowXYSize_.y = std::max(maxAndTotalVert.max - thisTc_->getScale().y, maxAndTotalVert.total - thisTc_->getScale().y);
         /*Account for scrollbar height */
         overflowXYSize_.y += isOverflowX_ ? scrollBarMargins.hsbMargin : 0;
-        if (overflowXYSize_.y >= 0)
+        if (overflowXYSize_.y > 0)
         {
             isOverflowY_ = true;
         }
@@ -124,7 +124,7 @@ void HkConstraintContext::resolveChildrenOverflowVariables(const HkChildrenOrien
         /* Compute the single possible X overflow situation */
         /* Overflow in this context can only occur if one children is too big X wise vs Parent */
         overflowXYSize_.x = thisTc_->getPos().x + maxAndTotalHori.max + (isOverflowY_ ? scrollBarMargins.vsbMargin : 0) - (thisTc_->getPos().x + thisTc_->getScale().x);
-        if (overflowXYSize_.x >= 0)
+        if (overflowXYSize_.x > 0)
         {
             isOverflowX_ = true;
         }
@@ -142,7 +142,7 @@ void HkConstraintContext::resolveChildrenOverflowVariables(const HkChildrenOrien
         overflowXYSize_.x = std::max(maxAndTotalHori.max - thisTc_->getScale().x, maxAndTotalHori.total - thisTc_->getScale().x);
         /*Account for scrollbar height */
         overflowXYSize_.x += isOverflowY_ ? scrollBarMargins.vsbMargin : 0;
-        if (overflowXYSize_.x >= 0)
+        if (overflowXYSize_.x > 0)
         {
             isOverflowX_ = true;
         }
@@ -156,7 +156,7 @@ void HkConstraintContext::resolveChildrenOverflowVariables(const HkChildrenOrien
         /* Compute the single possible Y overflow situation */
         /* Overflow in this context can only occur if one children is too big Y wise vs Parent */
         overflowXYSize_.y = thisTc_->getPos().y + maxAndTotalVert.max + (isOverflowX_ ? scrollBarMargins.hsbMargin : 0) - (thisTc_->getPos().y + thisTc_->getScale().y);
-        if (overflowXYSize_.y >= 0)
+        if (overflowXYSize_.y > 0)
         {
             isOverflowY_ = true;
         }
@@ -220,7 +220,7 @@ void HkConstraintContext::constrainSBKnob(bool isFromHorizontalSB, int overflowS
     /* Orientation calcs do differ */
     if (isFromHorizontalSB)
     {
-        const auto knobSizeX = thisTc_->getScale().x - overflowSize;
+        const auto knobSizeX = thisTc_->getScale().x - overflowSize / 1;
         knobTc.setScale({ std::max(minAxisKobSize, knobSizeX) - 2 * margins , preKNobSize - 2 * margins });
         const auto minX = thisTc_->getPos().x + margins;
         const auto maxX = thisTc_->getPos().x + thisTc_->getScale().x - knobTc.getScale().x - margins;

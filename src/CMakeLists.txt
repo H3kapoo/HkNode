@@ -13,6 +13,7 @@ add_executable(hkNode
 add_subdirectory(base)
 add_subdirectory(elements)
 add_subdirectory(management)
+add_subdirectory(contexts)
 add_subdirectory(renderer)
 add_subdirectory(utils)
 target_link_libraries(${PROJECT_NAME} glfw GLEW GL X11 pthread Xrandr dl)

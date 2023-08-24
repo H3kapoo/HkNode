@@ -32,12 +32,8 @@ void HkKnob::scrollOngoing()
    scrollbar max pos */
 void HkKnob::computeKnobValue(const glm::ivec2 offsetFromCenter)
 {
-    /* Cache parent TC since it will never change anwyway for knobs */
-    if (!parentTc)
-    {
-        parentTc = &treeStruct_.getParent()->getPayload()->node_.transformContext;
-    }
-
+    // Todo: removed parent caching because of crash happening when inside ctr is of size 580 and parent of size 600
+    const auto& parentTc = &treeStruct_.getParent()->getPayload()->node_.transformContext;
     const auto& parentPos = parentTc->getPos();
     const auto& parentScale = parentTc->getScale();
     if (isHorizontalKnob_)

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../renderer/HkRenderContext.hpp"
-#include "../renderer/HkTransformContext.hpp"
-#include "../renderer/HkConstraintContext.hpp"
+#include "../contexts/HkRenderContext.hpp"
+#include "../contexts/HkTransformContext.hpp"
+#include "../contexts/HkConstraintContext.hpp"
 
 namespace hkui
 {
