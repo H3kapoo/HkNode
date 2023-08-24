@@ -39,7 +39,6 @@ void HkRenderContext::render(const glm::mat4& projMat, const glm::mat4& modelMat
 
     //TODO: At some point batching will be needed to avoid context switching
     /* Dont try to bind texture if theres none to bind. Bind is expensive */
-    // std::cout << texInfos_.size() << "\n";
     for (const auto& texInfo : texInfos_)
     {
         /* Shader needs to know the name of the uniform and the texture unit assigned for that uniform,

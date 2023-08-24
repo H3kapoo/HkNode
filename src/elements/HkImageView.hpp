@@ -18,7 +18,6 @@ public:
 
 private:
     HkTextureContext textureContext_;
-    HkTextureContext textureContext2_;
 };
 using HkImageViewPtr = std::shared_ptr<HkImageView>;
 using HkImageViewCPtr = const std::shared_ptr<HkImageView>;

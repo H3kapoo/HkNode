@@ -94,7 +94,9 @@ int main()
     HkContainerPtr ctr5 = std::make_shared<HkContainer>("MyContainer5");
 
     HkImageViewPtr imgView = std::make_shared<HkImageView>("MyImgView");
+    HkImageViewPtr imgView2 = std::make_shared<HkImageView>("MyImgView2");
     imgView->loadImage("/home/hekapoo/container.jpg");
+    imgView2->loadImage("/home/hekapoo/imeg.jpeg");
 
     bool isFs = false;
     ctr2->setOnClickListener([&windowFrame, &isFs]()
@@ -117,6 +119,7 @@ int main()
     ctr4->setSize({ 370, 400 });
     ctr5->setSize({ 200, 30 });
     imgView->setSize({ 1280, 720 });
+    imgView2->setSize({ 1280 * 0.5f, 720 * 0.5f });
 
     // windowFrame->setPos({ 1280 * 0.5, 720 * 0.25 });
     // windowFrame->setSize({ 1280 * 0.5, 720 * 0.5 });
@@ -130,6 +133,7 @@ int main()
 
     windowFrame->pushChildren({ ctr,ctr2 });
     ctr->pushChildren({ imgView });
+    ctr2->pushChildren({ imgView2 });
     // ctr->pushChildren({ ctr3 });
     // ctr2->pushChildren({ ctr4, ctr5 });
 
