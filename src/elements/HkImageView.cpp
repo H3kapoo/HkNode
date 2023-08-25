@@ -12,8 +12,10 @@ HkImageView::HkImageView(const std::string& name)
 
 void HkImageView::loadImage(const std::string& loadPath)
 {
-    textureContext_.loadTexture(loadPath);
-    node_.renderContext.addTexture({ "texture1", GL_TEXTURE0, textureContext_.getTexture().getTextureId() });
+    if (textureContext_.loadTexture(loadPath))
+    {
+        node_.renderContext.addTexture({ "texture1", GL_TEXTURE0, textureContext_.getTexture().getTextureId() });
+    }
 }
 
 void HkImageView::setSize(const glm::vec2& size)

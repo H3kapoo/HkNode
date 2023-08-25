@@ -19,7 +19,6 @@ HkScrollBar::HkScrollBar(const std::string& name, const bool isHorizontal)
 
 void HkScrollBar::onScroll()
 {
-    // std::cout << glfwGetTime() << " hovering and scrolling on: " << treeStruct_.getName() << "\n";
     knob_.scrollOngoing();
 }
 

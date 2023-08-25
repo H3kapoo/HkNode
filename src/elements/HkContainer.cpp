@@ -27,6 +27,9 @@ HkContainer::HkContainer(const std::string& containerName)
 
 void HkContainer::onGeneralMouseScroll()
 {
+    /* This is in order to correct bug where scrolling H bar causes V bar to also scroll in the same container.
+       This is due to nearest scroll container id messing with the hovered scrollbar */
+       // if (sceneDataRef_.hoveredId != hScrollBar_.treeStruct_.getId()
     if (sceneDataRef_.nearestScrollContainerId_ == treeStruct_.getId())
     {
         vScrollBar_.onScroll();

@@ -20,7 +20,7 @@ void HkKnob::onDrag()
 
 void HkKnob::onScroll()
 {
-    setValue(getValue() - sceneDataRef_.scrollPosY * scrollSensitivity_);
+    scrollOngoing();
 }
 
 void HkKnob::scrollOngoing()

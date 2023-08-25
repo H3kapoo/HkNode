@@ -150,9 +150,10 @@ void HkNodeBase::resolveHover()
 //TODO: Doesnt really do a great job but its fine for now. Refactor later
 void HkNodeBase::resolveNearestActiveScrollbar()
 {
-    /* We shall ignore elements that overflow but that do not permit scrollbars */
-    if ((node_.constraintContext.isOverflowAllowedX_ || node_.constraintContext.isOverflowAllowedY_)
-        && (node_.constraintContext.overflowXYSize_.x || node_.constraintContext.overflowXYSize_.y))
+    /* We shall ignore elements that overflow but that do not permit scrollbars. If we are a scrollbar, bingo. */
+    if (treeStruct_.getType() == "ScrollBar" ||
+        ((node_.constraintContext.isOverflowAllowedX_ || node_.constraintContext.isOverflowAllowedY_)
+            && (node_.constraintContext.overflowXYSize_.x || node_.constraintContext.overflowXYSize_.y)))
     {
         sceneDataRef_.nearestScrollContainerId_ = treeStruct_.getId();
     }
@@ -191,8 +192,9 @@ void HkNodeBase::resolveMouseScrollEvent()
     /* Notify scroll on actually scrolled object only*/
     if (sceneDataRef_.hoveredId == treeStruct_.getId())
         onScroll();
-    /* Then notify the rest, notified already included */
-    onGeneralMouseScroll();
+    /* Then notify the rest */
+    else
+        onGeneralMouseScroll();
 }
 
 /* Resolve specific and general mouse mvmt evt */

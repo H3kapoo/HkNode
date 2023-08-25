@@ -99,11 +99,12 @@ int main()
     imgView2->loadImage("/home/hekapoo/imeg.jpeg");
 
     bool isFs = false;
-    ctr2->setOnClickListener([&windowFrame, &isFs]()
+    ctr2->setOnClickListener([&windowFrame, &isFs, &imgView2]()
         {
-            isFs ? windowFrame->setWindowMode(HkWindowFrameMode::Grabbable)
-                : windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
+            // isFs ? windowFrame->setWindowMode(HkWindowFrameMode::Grabbable)
+                // : windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
             isFs = !isFs;
+            imgView2->loadImage(isFs ? "/home/hekapoo/imeg.jpeg" : "/home/hekapoo/container.jpg");
             std::cout << "eu sunt\n";
         });
 
