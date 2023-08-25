@@ -8,7 +8,7 @@ HkContainer::HkContainer(const std::string& containerName)
     , vScrollBar_("{Internal}-VScrollBarFor " + containerName, false)
     , scrollbBarsCount_{ 0 }
 {
-    node_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
+    node_.renderContext.setShaderSource("assets/shaders/v1_me.glsl", "assets/shaders/f1_me.glsl");
     node_.renderContext.getShader().setVec3f("color", glm::vec3(0.5f, 0.5f, 0.5f)); // gray
     node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix());
 
@@ -25,11 +25,17 @@ HkContainer::HkContainer(const std::string& containerName)
     }
 }
 
+//TODO: The way we handle scroll inside scroll is now necessarly very intuitive. It needs to ve changed in the future
+void HkContainer::onScroll()
+{
+    if (vScrollBar_.isScrollBarActive())
+    {
+        vScrollBar_.onScroll();
+    }
+}
+
 void HkContainer::onGeneralMouseScroll()
 {
-    /* This is in order to correct bug where scrolling H bar causes V bar to also scroll in the same container.
-       This is due to nearest scroll container id messing with the hovered scrollbar */
-       // if (sceneDataRef_.hoveredId != hScrollBar_.treeStruct_.getId()
     if (sceneDataRef_.nearestScrollContainerId_ == treeStruct_.getId())
     {
         vScrollBar_.onScroll();
@@ -38,9 +44,36 @@ void HkContainer::onGeneralMouseScroll()
     }
 }
 
-void HkContainer::onRelease()
+void HkContainer::onGeneralMouseClick()
 {
-    // std::cout << "mouse released\n";
+    // if (sceneDataRef_.hoveredId == treeStruct_.getId() && sceneDataRef_.hoveredId == treeStruct_.getId())
+    // {
+    //     // node_.renderContext.getShader().setVec3f("hovered", glm::vec3(1, 1, 1));
+    //     node_.renderContext.getShader().setInt("hovered", 1);
+    // }
+    // else
+    // {
+    //     node_.renderContext.getShader().setInt("hovered", 0);
+    //     // node_.renderContext.getShader().setVec3f("hovered", glm::vec3(0, 1, 1));
+    // }
+    node_.renderContext.getShader().setInt("focused", 0);
+
+}
+
+void HkContainer::onGeneralMouseMove()
+{
+    if (sceneDataRef_.hoveredId == treeStruct_.getId() && sceneDataRef_.focusedId != treeStruct_.getId())
+    {
+        // node_.renderContext.getShader().setVec3f("hovered", glm::vec3(1, 1, 1));
+        node_.renderContext.getShader().setInt("hovered", 1);
+    }
+    else
+    {
+        node_.renderContext.getShader().setInt("hovered", 0);
+        // node_.renderContext.getShader().setVec3f("hovered", glm::vec3(0, 1, 1));
+    }
+
+    // std::cout << "hovered id is: " << sceneDataRef_.hoveredId << "\n";
 }
 
 void HkContainer::onClick()
@@ -49,6 +82,7 @@ void HkContainer::onClick()
     {
         onClickCallback_();
     }
+    node_.renderContext.getShader().setInt("focused", 1);
 }
 
 // these events shall be encapsulated in dedicated ctx

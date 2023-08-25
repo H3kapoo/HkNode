@@ -27,7 +27,6 @@ public:
     void rootUpdateMySelf() override;
 
     /* HkNodeBase */
-    void onFirstHeartbeat() override;
     void onScroll() override;
     void onDrag() override;
     void onWindowResize() override;

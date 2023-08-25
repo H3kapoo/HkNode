@@ -160,6 +160,7 @@ void HkSceneManagement::dropEvent(GLFWwindow*, int count, const char** paths)
 
 void HkSceneManagement::resolveFocus()
 {
+    //TODO: Only resolving focus on left click might not be the best always
     if (sceneData.clickedMouseButton == HkMouseButton::Left)
     {
         sceneData.focusedId = HkSceneData::NO_SELECTION_ID;

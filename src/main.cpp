@@ -89,9 +89,9 @@ int main()
 
     HkContainerPtr ctr = std::make_shared<HkContainer>("MyContainer");
     HkContainerPtr ctr2 = std::make_shared<HkContainer>("MyContainer2");
-    HkContainerPtr ctr3 = std::make_shared<HkContainer>("MyContainer3");
-    HkContainerPtr ctr4 = std::make_shared<HkContainer>("MyContainer4");
-    HkContainerPtr ctr5 = std::make_shared<HkContainer>("MyContainer5");
+    // HkContainerPtr ctr3 = std::make_shared<HkContainer>("MyContainer3");
+    // HkContainerPtr ctr4 = std::make_shared<HkContainer>("MyContainer4");
+    // HkContainerPtr ctr5 = std::make_shared<HkContainer>("MyContainer5");
 
     HkImageViewPtr imgView = std::make_shared<HkImageView>("MyImgView");
     HkImageViewPtr imgView2 = std::make_shared<HkImageView>("MyImgView2");
@@ -103,24 +103,25 @@ int main()
         {
             // isFs ? windowFrame->setWindowMode(HkWindowFrameMode::Grabbable)
                 // : windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
-            isFs = !isFs;
-            imgView2->loadImage(isFs ? "/home/hekapoo/imeg.jpeg" : "/home/hekapoo/container.jpg");
-            std::cout << "eu sunt\n";
+            // isFs = !isFs;
+            // imgView2->loadImage(isFs ? "/home/hekapoo/imeg.jpeg" : "/home/hekapoo/container.jpg");
+            // std::cout << "eu sunt\n";
         });
 
     ctr->setColor({ 0.3f,0.3f,0.7f });
     ctr2->setColor({ 0.3f,0.4f,0.5f });
-    ctr3->setColor({ 0.4f,0.5f,0.6f });
-    ctr4->setColor({ 0.7f,0.8f,0.9f });
-    ctr5->setColor({ 0.0f,0.1f,0.2f });
+    // ctr3->setColor({ 0.4f,0.5f,0.6f });
+    // ctr4->setColor({ 0.7f,0.8f,0.9f });
+    // ctr5->setColor({ 0.0f,0.1f,0.2f });
     ctr->setSize({ 800, 600 });
-    ctr2->setSize({ 500, 700 });
+    ctr2->setSize({ 200, 300 });
     // ctr2->setSize({ 630, 200 });
-    ctr3->setSize({ 430, 200 });
-    ctr4->setSize({ 370, 400 });
-    ctr5->setSize({ 200, 30 });
-    imgView->setSize({ 1280, 720 });
-    imgView2->setSize({ 1280 * 0.5f, 720 * 0.5f });
+    // ctr3->setSize({ 430, 200 });
+    // ctr4->setSize({ 370, 400 });
+    // ctr5->setSize({ 200, 30 });
+    imgView->setSize({ 700, 900 });
+    imgView2->setSize({ 1280 * 0.25f, 720 * 0.5f });
+    // ctr->setOnClickListener()
 
     // windowFrame->setPos({ 1280 * 0.5, 720 * 0.25 });
     // windowFrame->setSize({ 1280 * 0.5, 720 * 0.5 });
@@ -132,9 +133,9 @@ int main()
     // windowFrame->setPos({ 1280 * 0.5f, 15 });
     // windowFrame->setSize({ 1280, 720 - 30 });
 
-    windowFrame->pushChildren({ ctr,ctr2 });
-    ctr->pushChildren({ imgView });
-    ctr2->pushChildren({ imgView2 });
+    windowFrame->pushChildren({ ctr });
+    ctr->pushChildren({ ctr2 });
+    // ctr2->pushChildren({ imgView2 });
     // ctr->pushChildren({ ctr3 });
     // ctr2->pushChildren({ ctr4, ctr5 });
 

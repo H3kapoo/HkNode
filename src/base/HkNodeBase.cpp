@@ -182,8 +182,9 @@ void HkNodeBase::resolveMouseClickEvent()
     /* Notify release on actually released object only*/
     else if (!sceneDataRef_.isMouseClicked && sceneDataRef_.hoveredId == treeStruct_.getId())
         onRelease();
-    /* Then notify the rest, notified already included */
-    onGeneralMouseClick();
+    /* Then notify the rest */
+    if (sceneDataRef_.isMouseClicked && sceneDataRef_.hoveredId != treeStruct_.getId())
+        onGeneralMouseClick();
 }
 
 /* Resolve specific and general mouse scroll evt */
@@ -200,6 +201,16 @@ void HkNodeBase::resolveMouseScrollEvent()
 /* Resolve specific and general mouse mvmt evt */
 void HkNodeBase::resolveMouseMovementEvent()
 {
+    //TODO: It works here but all shaders need to have hovered uniform
+    // if (sceneDataRef_.hoveredId == treeStruct_.getId())
+    // {
+    //     node_.renderContext.getShader().setInt("hovered", 1);
+    // }
+    // else
+    // {
+    //     node_.renderContext.getShader().setInt("hovered", 0);
+    // }
+
     /* If scene detected a dragging action, separatelly specify that dragged element*/
     if (sceneDataRef_.isDragging && sceneDataRef_.focusedId == treeStruct_.getId())
         onDrag();

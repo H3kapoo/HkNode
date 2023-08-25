@@ -12,10 +12,20 @@ class HkContainer : public HkNodeBase
 {
 public:
     HkContainer(const std::string& containerName);
+    void pushChildren(const std::vector<HkNodeBasePtr>& newChildren);
 
+    /* Setters */
+    void setOnClickListener(std::function<void()> callback);
+    void setColor(const glm::vec3& color);
+    void setPos(const glm::vec2& pos);
+    void setSize(const glm::vec2& size);
+
+private:
+    void onScroll() override;
     void onGeneralMouseScroll() override;
     void onClick() override;
-    void onRelease() override;
+    void onGeneralMouseClick() override;
+    void onGeneralMouseMove() override;
     void onDrag() override;
     void resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children) override;
     void postRenderAdditionalDetails() override;
@@ -24,14 +34,6 @@ public:
     void resolveScrollBarChildrenIfNeeded();
     //TODO: maybe push those ^^ in constraint mgmt
     // Or SB dedicated constraint context?
-    void pushChildren(const std::vector<HkNodeBasePtr>& newChildren);
-
-    void setOnClickListener(std::function<void()> callback);
-
-    /* Setters */
-    void setColor(const glm::vec3& color);
-    void setPos(const glm::vec2& pos);
-    void setSize(const glm::vec2& size);
 
 private:
     HkScrollBar hScrollBar_;

@@ -24,6 +24,8 @@ void HkScrollBar::onScroll()
 
 void HkScrollBar::onDrag()
 {
+    /* Parameters represent offsets from drag or click area so that mouse doesnt snap to center
+       of object and instead keeps a natural distance from its center */
     knob_.computeKnobValue({ -knob_.node_.transformContext.getScale().x / 2,
             -knob_.node_.transformContext.getScale().y / 2 });
 }
