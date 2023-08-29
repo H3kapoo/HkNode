@@ -19,6 +19,7 @@ void HkNodeBase::updateMySelf()
     const auto& parentTreeStruct = treeStruct_.getParent();
     glEnable(GL_SCISSOR_TEST);
 
+    //TODO: If children dont have children themselves, maybe no need to scissor?
     /* Compute renderable/inveractive area for each element */
     if (treeStruct_.getType() == "RootWindowFrame")
     {
@@ -97,12 +98,14 @@ void HkNodeBase::updateMySelf()
         onFirstHeartbeat();
         hadFirstHeartbeat_ = true;
     }
-    //TODO: For later: maybe just the generalUpdate event should render on the screen
-    // and the other ones not
 
     /* Normal rendering */
     const auto& tc = node_.transformContext;
-    node_.renderContext.render(sceneDataRef_.sceneProjMatrix, tc.getModelMatrix());
+    //TODO: Extend this performance gain further
+    if (tc.getVScale().x && tc.getVScale().y)
+    {
+        node_.renderContext.render(sceneDataRef_.sceneProjMatrix, tc.getModelMatrix());
+    }
 
     auto& children = treeStruct_.getChildren();
     /* Resolve child constraints relative to parent */

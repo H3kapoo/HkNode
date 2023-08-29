@@ -26,6 +26,12 @@ void HkConstraintContext::resolveConstraints(std::vector<HkTreeStructure<HkNodeB
     case HkConstraintPolicy::AlignTopToBottom:
         alignTopBottom(children);
         break;
+    case HkConstraintPolicy::AlignEvenLeftToRight:
+        alignEvenLeftRight(children);
+        break;
+    case HkConstraintPolicy::AlignCenterLeftToRight:
+        alignCenterLeftRight(children);
+        break;
     }
 }
 
@@ -90,6 +96,7 @@ MaxAndTotal HkConstraintContext::getHorizontalMaxValueAndTotalWidthValue(
 
             return total + scaleX;
         });
+
     return mt;
 }
 
@@ -189,6 +196,102 @@ void HkConstraintContext::alignTopBottom(const std::vector<HkTreeStructure<HkNod
     }
 }
 
+void HkConstraintContext::alignCenterLeftRight(const std::vector<HkTreeStructure<HkNodeBase>*>& children)
+{
+    resolveChildrenOverflowVariables(HkChildrenOrientation::Horizontal, children);
+
+    const auto maxAndTotalHori = getHorizontalMaxValueAndTotalWidthValue(children);
+    // const auto slotSize = (thisTc_->getScale().x + overflowXYSize_.x) / children.size();
+    // const auto slotSize = (thisTc_->getScale().x) / children.size();
+    const auto center = thisTc_->getScale().x / 2;
+    const auto leftStart = center - maxAndTotalHori.total / 2;
+    const auto rightStart = center + maxAndTotalHori.total / 2;
+
+    auto startPosX = leftStart + offsetPercentage_.x * -overflowXYSize_.x;
+    auto startPosY = thisTc_->getPos().y + offsetPercentage_.y * -overflowXYSize_.y;
+
+    //TODO: overflow due to repositioning of children does not occur
+    //TODO: need new method to calculate if theres an overflow. Position should be taken into account as well
+    HkDrawDebugger::get().pushDraw10x10({
+        center,
+        300 });
+    HkDrawDebugger::get().pushDraw10x10({
+        leftStart,
+        300 });
+    HkDrawDebugger::get().pushDraw10x10({
+        rightStart,
+        300 });
+
+    for (const auto& child : children)
+    {
+        if (child->getType() == "ScrollBar") continue;
+
+        auto& childTc = child->getPayload()->node_.transformContext;
+        childTc.setPos({ startPosX , startPosY });
+        startPosX += childTc.getScale().x;
+    }
+}
+
+void HkConstraintContext::alignEvenLeftRight(const std::vector<HkTreeStructure<HkNodeBase>*>& children)
+{
+    uint32_t sbCount = 0;
+    sbCount += (isOverflowAllowedX_ && overflowXYSize_.x) ? 1 : 0;
+    sbCount += (isOverflowAllowedY_ && overflowXYSize_.y) ? 1 : 0;
+
+    const auto slotSize = thisTc_->getScale().x / (children.size() - sbCount);
+    auto startPosX = thisTc_->getPos().x + slotSize / 2;
+    auto startPosY = thisTc_->getPos().y;
+
+    // uint32_t i = 0;
+    for (uint32_t i = 0; i < children.size() - sbCount; i++)
+    {
+        auto& childTc = children[i]->getPayload()->node_.transformContext;
+        childTc.setPos({
+            startPosX + slotSize * i - childTc.getScale().x / 2,
+            startPosY });
+    }
+
+    int32_t minXLeft = 9999;
+    int32_t maxXRight = 0;
+    for (uint32_t i = 0; i < children.size() - sbCount; i++)
+    {
+        const auto& childTc = children[i]->getPayload()->node_.transformContext;
+        if (childTc.getPos().x <= minXLeft)
+        {
+            minXLeft = childTc.getPos().x;
+        }
+
+        if (childTc.getPos().x + childTc.getScale().x >= maxXRight)
+        {
+            maxXRight = childTc.getPos().x + childTc.getScale().x;
+        }
+    }
+
+    std::cout << glfwGetTime() << "   " << minXLeft;
+    std::cout << "   " << maxXRight << "\n";
+
+    isOverflowX_ = false;
+    overflowXYSize_.x = 0;
+    if (maxXRight > thisTc_->getScale().x)
+    {
+        isOverflowX_ = true;
+        overflowXYSize_.x = maxXRight - thisTc_->getScale().x;
+    }
+
+    if (minXLeft < thisTc_->getPos().x)
+    {
+        isOverflowX_ = true;
+        overflowXYSize_.x += thisTc_->getPos().x - minXLeft;
+    }
+
+    for (uint32_t i = 0; i < children.size() - sbCount; i++)
+    {
+        auto& childTc = children[i]->getPayload()->node_.transformContext;
+        const auto leftOverflow = minXLeft < 0 ? -minXLeft : 0;
+        childTc.addPos({ leftOverflow + offsetPercentage_.x * -overflowXYSize_.x   , childTc.getPos().y });
+    }
+}
+
 /*
     Place children from left to right, simple as that
 */
@@ -196,7 +299,7 @@ void HkConstraintContext::alignLeftRight(const std::vector<HkTreeStructure<HkNod
 {
     resolveChildrenOverflowVariables(HkChildrenOrientation::Horizontal, children);
 
-    auto startPosX = thisTc_->getPos().x + offsetPercentage_.x * -(overflowXYSize_.x);
+    auto startPosX = thisTc_->getPos().x + offsetPercentage_.x * -overflowXYSize_.x;
     auto startPosY = thisTc_->getPos().y + offsetPercentage_.y * -overflowXYSize_.y;
     for (const auto& child : children)
     {
@@ -297,7 +400,7 @@ void HkConstraintContext::windowFrameContainerConstraint(HkTransformContext& wfC
     thisTc_->setPos({ 0,0 });
     thisTc_->setScale({ 0,0 });
 
-    wfCtr.setScale(windowSize);
+    wfCtr.setScale(windowSize + 1); //TODO: hacK: looks like wfCtr gets a windowSize thats lacking exactly 1px behind
     wfCtr.setPos({ 0,0 });
 }
 } // hkui

@@ -34,21 +34,6 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
 
 void HkWindowFrame::rootUpdateMySelf() { updateMySelf(); }
 
-// void HkWindowFrame::onGeneralMouseScroll()
-// {
-//     /* This is in order to correct bug where scrolling H bar causes V bar to also scroll in the same container.
-//        This is due to nearest scroll container id messing with the hovered scrollbar */
-//        // if (sceneDataRef_.hoveredId != hScrollBar_.treeStruct_.getId()
-//     if (sceneDataRef_.nearestScrollContainerId_ == treeStruct_.getId())
-//     {
-//         vScrollBar_.onScroll();
-//         //TODO: Allow H movement but only if shift key or ctrl key is pressed as well
-//         // hScrollBar_.onScroll();
-//     }
-
-//     std::cout << "nearest: " << sceneDataRef_.nearestScrollContainerId_ << '\n';
-// }
-
 void HkWindowFrame::onScroll()
 {
     // std::cout << glfwGetTime() << " scroll value: " << sceneDataRef_.scrollPosY << '\n';

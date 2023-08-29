@@ -65,11 +65,11 @@ void HkSceneManagement::update(const HkEvent& ev)
 
 void HkSceneManagement::resizeWindowEvent(GLFWwindow*, int width, int height)
 {
+    glViewport(0, 0, width, height);
     sceneData.windowSize = { width, height };
     sceneData.windowWidth = width;
     sceneData.windowHeight = height;
     sceneData.sceneProjMatrix = glm::ortho(0.0f, (float)width, (float)height, 0.0f, 0.0f, 100.0f);
-    glViewport(0, 0, width, height);
 
     update(HkEvent::WindowResize);
 }

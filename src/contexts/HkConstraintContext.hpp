@@ -11,7 +11,9 @@ namespace hkui
 enum class HkConstraintPolicy
 {
     AlignLeftToRight,
-    AlignTopToBottom
+    AlignTopToBottom,
+    AlignEvenLeftToRight,
+    AlignCenterLeftToRight
 };
 
 enum class HkChildrenOrientation
@@ -30,6 +32,13 @@ struct ScrollbarMargin
 {
     uint32_t hsbMargin{ 0 };
     uint32_t vsbMargin{ 0 };
+};
+
+struct HkStyleParams
+{
+    /* Element's margins */
+    uint32_t marginLX{ 0 }, marginRX{ 0 };
+    uint32_t marginLY{ 0 }, marginRY{ 0 };
 };
 
 class HkNodeBase;
@@ -53,8 +62,10 @@ public:
     void resolveChildrenOverflowVariables(const HkChildrenOrientation orientation,
         const std::vector<HkTreeStructure<HkNodeBase>*>& children);
 
-    void alignLeftRight(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
     void alignTopBottom(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
+    void alignCenterLeftRight(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
+    void alignEvenLeftRight(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
+    void alignLeftRight(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
 
     /* Scrollbar related */
     void scrollBarConstrain(HkTransformContext& scrollBarTc);
@@ -66,6 +77,9 @@ public:
     void windowFrameContainerConstraint(HkTransformContext& wfCtr, HkTransformContext& exitBtn,
         HkTransformContext& minBtn, const glm::ivec2& windowSize, const bool isFullscreen) const;
 
+    /* Style related */
+    const HkStyleParams& getStyle() const;
+
     // ConstraintParams..
     /* Scrollbar related */
     bool isOverflowAllowedX_;
@@ -76,6 +90,7 @@ public:
     glm::vec2 offsetPercentage_;
 
 private:
+    HkStyleParams styleParams_;
     HkConstraintPolicy policy_;
     HkTransformContext* thisTc_;
 };

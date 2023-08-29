@@ -8,7 +8,7 @@ HkContainer::HkContainer(const std::string& containerName)
     , vScrollBar_("{Internal}-VScrollBarFor " + containerName, false)
     , scrollbBarsCount_{ 0 }
 {
-    node_.renderContext.setShaderSource("assets/shaders/v1_me.glsl", "assets/shaders/f1_me.glsl");
+    node_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
     node_.renderContext.getShader().setVec3f("color", glm::vec3(0.5f, 0.5f, 0.5f)); // gray
     node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix());
 
@@ -46,7 +46,14 @@ void HkContainer::onGeneralMouseScroll()
 
 void HkContainer::onGeneralMouseClick()
 {
-    // if (sceneDataRef_.hoveredId == treeStruct_.getId() && sceneDataRef_.hoveredId == treeStruct_.getId())
+    //TODO: Later bring back highlighting if needed
+    // node_.renderContext.getShader().setInt("focused", 0);
+}
+
+void HkContainer::onGeneralMouseMove()
+{
+    //TODO: Later bring back highlighting if needed
+    // if (sceneDataRef_.hoveredId == treeStruct_.getId())
     // {
     //     // node_.renderContext.getShader().setVec3f("hovered", glm::vec3(1, 1, 1));
     //     node_.renderContext.getShader().setInt("hovered", 1);
@@ -54,26 +61,8 @@ void HkContainer::onGeneralMouseClick()
     // else
     // {
     //     node_.renderContext.getShader().setInt("hovered", 0);
-    //     // node_.renderContext.getShader().setVec3f("hovered", glm::vec3(0, 1, 1));
+    //     //     // node_.renderContext.getShader().setVec3f("hovered", glm::vec3(0, 1, 1));
     // }
-    node_.renderContext.getShader().setInt("focused", 0);
-
-}
-
-void HkContainer::onGeneralMouseMove()
-{
-    if (sceneDataRef_.hoveredId == treeStruct_.getId() && sceneDataRef_.focusedId != treeStruct_.getId())
-    {
-        // node_.renderContext.getShader().setVec3f("hovered", glm::vec3(1, 1, 1));
-        node_.renderContext.getShader().setInt("hovered", 1);
-    }
-    else
-    {
-        node_.renderContext.getShader().setInt("hovered", 0);
-        // node_.renderContext.getShader().setVec3f("hovered", glm::vec3(0, 1, 1));
-    }
-
-    // std::cout << "hovered id is: " << sceneDataRef_.hoveredId << "\n";
 }
 
 void HkContainer::onClick()
@@ -82,7 +71,7 @@ void HkContainer::onClick()
     {
         onClickCallback_();
     }
-    node_.renderContext.getShader().setInt("focused", 1);
+    // node_.renderContext.getShader().setInt("focused", 1);
 }
 
 // these events shall be encapsulated in dedicated ctx
@@ -129,18 +118,31 @@ void HkContainer::postRenderAdditionalDetails()
     /* If both scrollbars are active, it's obvious we need the intersector at bottom right. It is handled in the Container class because
        container should know when both SBs are active and what to do with them. Also clicking on the dummy object basically means clicking
        on the container itself and since coordinates for this location are already known, maybe we can do some particular stuff with that info */
-    if (scrollbBarsCount_ == 2)
+       // if (scrollbBarsCount_ == 2)
     {
+        if (treeStruct_.getId() == 4) return;
         dummyXYIntersectorData_.transformContext.setScale({
             hScrollBar_.node_.transformContext.getScale().y,
             hScrollBar_.node_.transformContext.getScale().y });
 
+        // dummyXYIntersectorData_.transformContext.setPos({
+        //     hScrollBar_.node_.transformContext.getPos().x + hScrollBar_.node_.transformContext.getScale().x,
+        //     hScrollBar_.node_.transformContext.getPos().y });
+
         dummyXYIntersectorData_.transformContext.setPos({
-            hScrollBar_.node_.transformContext.getPos().x + hScrollBar_.node_.transformContext.getScale().x,
-            hScrollBar_.node_.transformContext.getPos().y });
+            // node_.transformContext.getPos().x + 1,
+            node_.transformContext.getPos().x + node_.transformContext.getScale().x - 1,
+            node_.transformContext.getPos().y });
 
         dummyXYIntersectorData_.renderContext.render(sceneDataRef_.sceneProjMatrix,
             dummyXYIntersectorData_.transformContext.getModelMatrix());
+
+        dummyXYIntersectorData_.transformContext.setPos({
+node_.transformContext.getPos().x,
+node_.transformContext.getPos().y });
+        dummyXYIntersectorData_.renderContext.render(sceneDataRef_.sceneProjMatrix,
+            dummyXYIntersectorData_.transformContext.getModelMatrix());
+
     }
 }
 
