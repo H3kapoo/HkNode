@@ -28,6 +28,12 @@ struct MaxAndTotal
     int total{ 0 };
 };
 
+struct MinMaxPos
+{
+    int min{ 0 };
+    int max{ 0 };
+};
+
 struct ScrollbarMargin
 {
     uint32_t hsbMargin{ 0 };
@@ -48,13 +54,18 @@ class HkConstraintContext
 public:
     HkConstraintContext() : isOverflowAllowedX_{ true }, isOverflowAllowedY_{ true }
         , isOverflowX_{ false }, isOverflowY_{ false }
-        , overflowXYSize_{ 0,0 }, offsetPercentage_{ 0,0 }
+        , overflowXYSize_{ 0,0 }, offsetPercentage_{ 0,0 }, sbCount_{ 0 }
         , policy_{ HkConstraintPolicy::AlignLeftToRight } {}
 
     void setRootTc(HkTransformContext* rootTc);
     void setPolicy(const HkConstraintPolicy policy);
     void resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children);
 
+    /* Computes */
+    void computeScrollBarCount();
+    void computeOverflowBasedOnMinMax(const MinMaxPos& minMax);
+
+    MinMaxPos getMinAndMaxPositions(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
     ScrollbarMargin getScrollbarMargins(const std::vector<HkTreeStructure<HkNodeBase>*>& children) const;
     MaxAndTotal getVerticalMaxValueAndTotalHeightValue(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
     MaxAndTotal getHorizontalMaxValueAndTotalWidthValue(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
@@ -88,6 +99,8 @@ public:
     bool isOverflowY_;
     glm::ivec2 overflowXYSize_;
     glm::vec2 offsetPercentage_;
+
+    uint32_t sbCount_;
 
 private:
     HkStyleParams styleParams_;
