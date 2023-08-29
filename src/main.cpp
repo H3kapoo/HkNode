@@ -84,7 +84,7 @@ int main()
 
     // windowFrame->setConstraintPolicy(HkConstraintPolicy::AlignTopToBottom);
     // windowFrame->setConstraintPolicy(HkConstraintPolicy::AlignLeftToRight);
-    windowFrame->setConstraintPolicy(HkConstraintPolicy::AlignEvenLeftToRight);
+    windowFrame->setConstraintPolicy(HkConstraintPolicy::AlignEvenTopToBottom);
     windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
     // windowFrame->setWindowMode(HkWindowFrameMode::Grabbable);
 
@@ -121,15 +121,21 @@ int main()
         });
 
     ctr->setColor({ 0.3f,0.3f,0.7f });
-    ctr2->setColor({ 0.3f,0.4f,0.5f });
+    ctr2->setColor({ 1.0f,0.4f,0.5f });
     ctr3->setColor({ 0.4f,0.5f,0.6f });
     ctr4->setColor({ 0.7f,0.8f,0.9f });
     ctr5->setColor({ 0.0f,0.1f,0.2f });
-    ctr->setSize({ 100, 200 });
-    ctr2->setSize({ 100, 300 });
-    ctr3->setSize({ 300, 200 });
-    ctr4->setSize({ 100, 100 });
-    ctr5->setSize({ 500, 30 });
+    // ctr->setSize({ 100, 200 });
+    // ctr2->setSize({ 100, 300 });
+    // ctr3->setSize({ 300, 200 });
+    // ctr4->setSize({ 100, 100 });
+    // ctr5->setSize({ 500, 30 });
+
+    ctr->setSize({ 200, 50 });
+    ctr2->setSize({ 300, 450 });
+    ctr3->setSize({ 200, 150 });
+    ctr4->setSize({ 100, 50 });
+    ctr5->setSize({ 30, 250 });
     // imgView->setSize({ 700, 900 });
     // imgView2->setSize({ 1280 * 0.25f, 720 * 0.5f });
     // ctr->setOnClickListener()
@@ -144,7 +150,8 @@ int main()
     // windowFrame->setPos({ 1280 * 0.5f, 15 });
     // windowFrame->setSize({ 1280, 720 - 30 });
 
-    windowFrame->pushChildren({ ctr, ctr2, ctr3, ctr4, ctr5 });
+    windowFrame->pushChildren({ ctr, ctr2 });
+    // windowFrame->pushChildren({ ctr, ctr2, ctr3, ctr4, ctr5 });
     // windowFrame->pushChildren(ctrs2);
     // ctr->pushChildren({ ctr2 });
     // ctr2->pushChildren({ imgView2 });

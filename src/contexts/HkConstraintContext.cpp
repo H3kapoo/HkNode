@@ -23,6 +23,13 @@ void HkConstraintContext::resolveConstraints(std::vector<HkTreeStructure<HkNodeB
     case HkConstraintPolicy::AlignLeftToRight:
         alignLeftRight(children);
         break;
+    case HkConstraintPolicy::AlignEvenTopToBottom:
+        lockXAxis_ = true;
+        lockYAxis_ = true;
+        alignEvenTopToBottom(children);
+        alignEvenLeftRight(children);
+        resolveAxisOverflow(children);
+        break;
     case HkConstraintPolicy::AlignTopToBottom:
         alignTopBottom(children);
         break;
@@ -45,36 +52,88 @@ void HkConstraintContext::computeScrollBarCount()
 void HkConstraintContext::computeOverflowBasedOnMinMax(const MinMaxPos& minMax)
 {
     isOverflowX_ = false;
+    isOverflowY_ = false;
     overflowXYSize_.x = 0;
-    if (minMax.max > thisTc_->getScale().x)
+    overflowXYSize_.y = 0;
+
+    /* X related */
+    if (minMax.maxX > thisTc_->getScale().x)
     {
         isOverflowX_ = true;
-        overflowXYSize_.x = minMax.max - thisTc_->getScale().x;
+        overflowXYSize_.x = minMax.maxX - thisTc_->getScale().x;
     }
 
-    if (minMax.min < thisTc_->getPos().x)
+    if (minMax.minX < thisTc_->getPos().x)
     {
         isOverflowX_ = true;
-        overflowXYSize_.x += thisTc_->getPos().x - minMax.min;
+        overflowXYSize_.x += thisTc_->getPos().x - minMax.minX;
+    }
+
+    /* Y related */
+    if (minMax.maxY > thisTc_->getScale().y)
+    {
+        isOverflowY_ = true;
+        overflowXYSize_.y = minMax.maxY - thisTc_->getScale().y;
+    }
+
+    if (minMax.minY < thisTc_->getPos().y)
+    {
+        isOverflowY_ = true;
+        overflowXYSize_.y += thisTc_->getPos().y - minMax.minY;
+    }
+}
+
+void HkConstraintContext::resolveAxisOverflow(const std::vector<HkTreeStructure<HkNodeBase>*>& children)
+{
+    MinMaxPos result = getMinAndMaxPositions(children);
+    computeOverflowBasedOnMinMax(result);
+
+    //TODO: Fors can be combined
+    for (uint32_t i = 0; i < children.size() - sbCount_; i++)
+    {
+        auto& childTc = children[i]->getPayload()->node_.transformContext;
+        const auto leftOverflow = result.minX < 0 ? -result.minX : 0;
+        childTc.addPos({ leftOverflow + offsetPercentage_.x * -overflowXYSize_.x, 0 });
+    }
+
+    for (uint32_t i = 0; i < children.size() - sbCount_; i++)
+    {
+        auto& childTc = children[i]->getPayload()->node_.transformContext;
+        const auto topOverflow = result.minY < 0 ? -result.minY : 0;
+        childTc.addPos({ 0, topOverflow + offsetPercentage_.y * -overflowXYSize_.y, });
     }
 }
 
 MinMaxPos HkConstraintContext::getMinAndMaxPositions(const std::vector<HkTreeStructure<HkNodeBase>*>& children)
 {
     MinMaxPos result;
-    result.min = 99999;//99999; // should be int32 max but this is good enough
-    result.max = -99999;
+    result.minX = 99999;//99999; // should be int32 max but this is good enough
+    result.maxX = -99999;
+    result.minY = 99999;//99999; // should be int32 max but this is good enough
+    result.maxY = -99999;
     for (uint32_t i = 0; i < children.size() - sbCount_; i++)
     {
+        /* X related */
         const auto& childTc = children[i]->getPayload()->node_.transformContext;
-        if (childTc.getPos().x <= result.min)
+        if (childTc.getPos().x <= result.minX)
         {
-            result.min = childTc.getPos().x;
+            result.minX = childTc.getPos().x;
         }
 
-        if (childTc.getPos().x + childTc.getScale().x >= result.max)
+        if (childTc.getPos().x + childTc.getScale().x >= result.maxX)
         {
-            result.max = childTc.getPos().x + childTc.getScale().x;
+            result.maxX = childTc.getPos().x + childTc.getScale().x;
+        }
+
+        /* Y related */
+        if (childTc.getPos().y <= result.minY)
+        {
+            result.minY = childTc.getPos().y;
+        }
+
+        if (childTc.getPos().y + childTc.getScale().y >= result.maxY)
+        {
+            result.maxY = childTc.getPos().y + childTc.getScale().y;
         }
     }
     return result;
@@ -220,6 +279,26 @@ void HkConstraintContext::resolveChildrenOverflowVariables(const HkChildrenOrien
     }
 }
 
+void HkConstraintContext::alignEvenTopToBottom(const std::vector<HkTreeStructure<HkNodeBase>*>& children)
+{
+    computeScrollBarCount();
+
+    const auto slotSize = thisTc_->getScale().y / (children.size() - sbCount_);
+    auto startPosX = thisTc_->getPos().x;
+    auto startPosY = thisTc_->getPos().y + slotSize / 2;
+
+    for (uint32_t i = 0; i < children.size() - sbCount_; i++)
+    {
+        auto& childTc = children[i]->getPayload()->node_.transformContext;
+        childTc.setPos({
+            // startPosX,
+            lockXAxis_ ? childTc.getPos().x : startPosX,
+            startPosY + slotSize * i - childTc.getScale().y / 2 });
+    }
+
+    /* Compute scrollbars count first as this can influence the result */
+    computeScrollBarCount();
+}
 //TODO: This shall be renamed something like "Layouting", horizontal or vertical so then we can
 //      use methods to center them or left/right align them
 /*
@@ -290,25 +369,11 @@ void HkConstraintContext::alignEvenLeftRight(const std::vector<HkTreeStructure<H
         auto& childTc = children[i]->getPayload()->node_.transformContext;
         childTc.setPos({
             startPosX + slotSize * i - childTc.getScale().x / 2,
-            startPosY });
+            lockYAxis_ ? childTc.getPos().y : startPosY });
     }
 
     /* Compute scrollbars count first as this can influence the result */
     computeScrollBarCount();
-
-    /* Compute min max values after initial children reposition , this also*/
-    MinMaxPos result = getMinAndMaxPositions(children);
-
-    /* Compute overflow variables */
-    computeOverflowBasedOnMinMax(result);
-
-    /* Account for scrollbar scrolling and left edge overflow */
-    for (uint32_t i = 0; i < children.size() - sbCount_; i++)
-    {
-        auto& childTc = children[i]->getPayload()->node_.transformContext;
-        const auto leftOverflow = result.min < 0 ? -result.min : 0;
-        childTc.addPos({ leftOverflow + offsetPercentage_.x * -overflowXYSize_.x, childTc.getPos().y });
-    }
 }
 
 /*

@@ -130,16 +130,16 @@ void HkContainer::postRenderAdditionalDetails()
         //     hScrollBar_.node_.transformContext.getPos().y });
 
         dummyXYIntersectorData_.transformContext.setPos({
-            // node_.transformContext.getPos().x + 1,
-            node_.transformContext.getPos().x + node_.transformContext.getScale().x - 1,
-            node_.transformContext.getPos().y });
+            node_.transformContext.getPos().x + node_.transformContext.getScale().x - 4,
+            node_.transformContext.getPos().y + node_.transformContext.getScale().y - 4 });
 
         dummyXYIntersectorData_.renderContext.render(sceneDataRef_.sceneProjMatrix,
             dummyXYIntersectorData_.transformContext.getModelMatrix());
 
         dummyXYIntersectorData_.transformContext.setPos({
-node_.transformContext.getPos().x,
-node_.transformContext.getPos().y });
+            node_.transformContext.getPos().x,
+            node_.transformContext.getPos().y });
+
         dummyXYIntersectorData_.renderContext.render(sceneDataRef_.sceneProjMatrix,
             dummyXYIntersectorData_.transformContext.getModelMatrix());
 

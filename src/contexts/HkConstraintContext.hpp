@@ -10,10 +10,11 @@ namespace hkui
 {
 enum class HkConstraintPolicy
 {
-    AlignLeftToRight,
-    AlignTopToBottom,
     AlignEvenLeftToRight,
-    AlignCenterLeftToRight
+    AlignCenterLeftToRight,
+    AlignLeftToRight,
+    AlignEvenTopToBottom,
+    AlignTopToBottom,
 };
 
 enum class HkChildrenOrientation
@@ -30,8 +31,8 @@ struct MaxAndTotal
 
 struct MinMaxPos
 {
-    int min{ 0 };
-    int max{ 0 };
+    int maxX{ 0 }, maxY{ 0 };
+    int minX{ 0 }, minY{ 0 };
 };
 
 struct ScrollbarMargin
@@ -65,6 +66,9 @@ public:
     void computeScrollBarCount();
     void computeOverflowBasedOnMinMax(const MinMaxPos& minMax);
 
+    /* Solvers */
+    void resolveAxisOverflow(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
+
     MinMaxPos getMinAndMaxPositions(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
     ScrollbarMargin getScrollbarMargins(const std::vector<HkTreeStructure<HkNodeBase>*>& children) const;
     MaxAndTotal getVerticalMaxValueAndTotalHeightValue(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
@@ -73,6 +77,7 @@ public:
     void resolveChildrenOverflowVariables(const HkChildrenOrientation orientation,
         const std::vector<HkTreeStructure<HkNodeBase>*>& children);
 
+    void alignEvenTopToBottom(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
     void alignTopBottom(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
     void alignCenterLeftRight(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
     void alignEvenLeftRight(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
@@ -101,6 +106,9 @@ public:
     glm::vec2 offsetPercentage_;
 
     uint32_t sbCount_;
+
+    bool lockXAxis_{ false };
+    bool lockYAxis_{ false };
 
 private:
     HkStyleParams styleParams_;
