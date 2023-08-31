@@ -18,7 +18,7 @@ public:
     void onScroll() override;
     void onDrag() override;
     void onClick() override;
-    void resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>&) override;
+    void resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>&, const HkScrollbarsSize) override;
 
     /* Setters */
     void setScrollValue(float value);

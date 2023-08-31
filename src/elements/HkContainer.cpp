@@ -97,7 +97,8 @@ void HkContainer::onDrag()
     }
 }
 
-void HkContainer::resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children)
+void HkContainer::resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children,
+    const HkScrollbarsSize)
 {
     /* We need to notify constraint ctx about scrollbars scroll value so we can offset the children if needed*/
     node_.constraintContext.offsetPercentage_.x = hScrollBar_.getScrollValue();
@@ -105,7 +106,11 @@ void HkContainer::resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeB
 
     /* Resolve children constraints (ignores scrollbar children) */
     //TODO: This ^ resolve shall be done base on node constrain policy, add function here too for setting policy
-    HkNodeBase::resolveChildrenConstraints(children);
+    HkNodeBase::resolveChildrenConstraints(children,
+        {
+            hScrollBar_.node_.transformContext.getScale().y,
+            vScrollBar_.node_.transformContext.getScale().x
+        });
 
     /* Reolve contraints but this time only for scrollbars, if needed */
     resolveScrollBarChildrenIfNeeded();

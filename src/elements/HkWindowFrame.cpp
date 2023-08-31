@@ -66,7 +66,8 @@ void HkWindowFrame::onWindowResize()
 
 }
 
-void HkWindowFrame::resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>&)
+void HkWindowFrame::resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>&,
+    const HkScrollbarsSize)
 {
     /* If we go into fullscreen mode, remember our grabbable size and scale to help restore later */
     if (cachedScale_.x == 0 && mode_ != HkWindowFrameMode::Grabbable)

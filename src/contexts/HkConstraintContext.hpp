@@ -41,6 +41,12 @@ struct ScrollbarMargin
     uint32_t vsbMargin{ 0 };
 };
 
+struct HkScrollbarsSize
+{
+    int32_t hsbSize{ 10 };
+    int32_t vsbSize{ 10 };
+};
+
 struct HkStyleParams
 {
     /* Element's margins */
@@ -60,15 +66,15 @@ public:
 
     void setRootTc(HkTransformContext* rootTc);
     void setPolicy(const HkConstraintPolicy policy);
-    void resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children);
+    void resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children, const HkScrollbarsSize sbSizes);
 
     /* Computes */
     void computeScrollBarCount();
     void computeChildrenOverflowBasedOnMinMax(const MinMaxPos& minMax,
-        const std::vector<HkTreeStructure<HkNodeBase>*>& children);
+        const HkScrollbarsSize sbSizes);
 
     /* Solvers */
-    void resolveAxisOverflow(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
+    void resolveAxisOverflow(const std::vector<HkTreeStructure<HkNodeBase>*>& children, const HkScrollbarsSize sbSizes);
 
     MinMaxPos getMinAndMaxPositions(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
     ScrollbarMargin getScrollbarMargins(const std::vector<HkTreeStructure<HkNodeBase>*>& children) const;

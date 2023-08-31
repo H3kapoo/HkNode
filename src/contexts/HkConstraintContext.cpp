@@ -12,7 +12,8 @@ void HkConstraintContext::setRootTc(HkTransformContext* rootTc) { thisTc_ = root
 /* Set policy of TC children */
 void HkConstraintContext::setPolicy(const HkConstraintPolicy policy) { policy_ = policy; }
 
-void HkConstraintContext::resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children)
+void HkConstraintContext::resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children,
+    const HkScrollbarsSize sbSizes)
 {
     if (children.empty())
         return;
@@ -22,14 +23,14 @@ void HkConstraintContext::resolveConstraints(std::vector<HkTreeStructure<HkNodeB
     {
     case HkConstraintPolicy::AlignLeftToRight:
         alignLeftRight(children);
-        resolveAxisOverflow(children);
+        resolveAxisOverflow(children, sbSizes);
         break;
     case HkConstraintPolicy::AlignEvenTopToBottom:
         lockXAxis_ = true;
         // lockYAxis_ = true;
         // alignEvenTopToBottom(children);
         alignEvenLeftRight(children);
-        resolveAxisOverflow(children);
+        resolveAxisOverflow(children, sbSizes);
         break;
     case HkConstraintPolicy::AlignTopToBottom:
         alignTopBottom(children);
@@ -51,15 +52,15 @@ void HkConstraintContext::computeScrollBarCount()
 }
 
 void HkConstraintContext::computeChildrenOverflowBasedOnMinMax(const MinMaxPos& minMax,
-    const std::vector<HkTreeStructure<HkNodeBase>*>& children)
+    const HkScrollbarsSize sbSizes)
 {
+    //TODO: Add overflow allowed or not guards so we dont calculate overflow when we dont need to
     isOverflowX_ = false;
     isOverflowY_ = false;
     overflowXYSize_.x = 0;
     overflowXYSize_.y = 0;
-    const auto scrollBarMargins = getScrollbarMargins(children);
 
-    /* X related */
+    /* Calculate X overflow */
     if (minMax.maxX > thisTc_->getPos().x + thisTc_->getScale().x)
     {
         isOverflowX_ = true;
@@ -72,7 +73,7 @@ void HkConstraintContext::computeChildrenOverflowBasedOnMinMax(const MinMaxPos& 
         overflowXYSize_.x += thisTc_->getPos().x - minMax.minX;
     }
 
-    /* Y related */
+    /* Calculate Y overflow */
     if (minMax.maxY > thisTc_->getPos().y + thisTc_->getScale().y)
     {
         isOverflowY_ = true;
@@ -85,13 +86,14 @@ void HkConstraintContext::computeChildrenOverflowBasedOnMinMax(const MinMaxPos& 
         overflowXYSize_.y += thisTc_->getPos().y - minMax.minY;
     }
 
-
-    const auto addedOverflowX = minMax.maxX - (thisTc_->getPos().x + thisTc_->getScale().x - 20);
-    const auto addedOverflowY = minMax.maxY - (thisTc_->getPos().y + thisTc_->getScale().y - 20);
+    const auto addedOverflowX = minMax.maxX - (thisTc_->getPos().x + thisTc_->getScale().x - sbSizes.vsbSize);
+    const auto addedOverflowY = minMax.maxY - (thisTc_->getPos().y + thisTc_->getScale().y - sbSizes.hsbSize);
+    /* Treat case when we have overflow on both X and Y. In that case, we need to increase overflow size
+       by how much each axis overflow and at most by the scrollbar size */
     if (addedOverflowX > 0 && addedOverflowY > 0)
     {
-        overflowXYSize_.x += addedOverflowX > 20 ? 20 : addedOverflowX; //scrollBarMargins.hsbMargin;
-        overflowXYSize_.y += addedOverflowY > 20 ? 20 : addedOverflowY; //scrollBarMargins.hsbMargin;
+        overflowXYSize_.x += addedOverflowX > sbSizes.vsbSize ? sbSizes.vsbSize : addedOverflowX; //scrollBarMargins.hsbMargin;
+        overflowXYSize_.y += addedOverflowY > sbSizes.hsbSize ? sbSizes.hsbSize : addedOverflowY; //scrollBarMargins.hsbMargin;
         isOverflowX_ = true;
         isOverflowY_ = true;
         return;
@@ -99,39 +101,40 @@ void HkConstraintContext::computeChildrenOverflowBasedOnMinMax(const MinMaxPos& 
 
     if (isOverflowY_ && addedOverflowX > 0)
     {
-        overflowXYSize_.x += addedOverflowX > 20 ? 20 : addedOverflowX; //scrollBarMargins.hsbMargin;
+        overflowXYSize_.x += addedOverflowX > sbSizes.vsbSize ? sbSizes.vsbSize : addedOverflowX; //scrollBarMargins.hsbMargin;
         isOverflowX_ = true;
     }
 
     if (isOverflowX_ && addedOverflowY > 0)
     {
-        overflowXYSize_.y += addedOverflowY > 20 ? 20 : addedOverflowY; //scrollBarMargins.hsbMargin;
+        overflowXYSize_.y += addedOverflowY > sbSizes.hsbSize ? sbSizes.hsbSize : addedOverflowY; //scrollBarMargins.hsbMargin;
         isOverflowY_ = true;
     }
 
 }
 
-void HkConstraintContext::resolveAxisOverflow(const std::vector<HkTreeStructure<HkNodeBase>*>& children)
+void HkConstraintContext::resolveAxisOverflow(const std::vector<HkTreeStructure<HkNodeBase>*>& children,
+    const HkScrollbarsSize sbSizes)
 {
     MinMaxPos result = getMinAndMaxPositions(children);
-    computeChildrenOverflowBasedOnMinMax(result, children);
+    computeChildrenOverflowBasedOnMinMax(result, sbSizes);
 
     //TODO: Fors can be combined
     for (uint32_t i = 0; i < children.size() - sbCount_; i++)
     {
         auto& childTc = children[i]->getPayload()->node_.transformContext;
         const auto leftOverflow = (result.minX < thisTc_->getPos().x) ? thisTc_->getPos().x - result.minX : 0;
-        childTc.addPos({ leftOverflow + offsetPercentage_.x * -overflowXYSize_.x, 0 });
-    }
-
-    for (uint32_t i = 0; i < children.size() - sbCount_; i++)
-    {
-        auto& childTc = children[i]->getPayload()->node_.transformContext;
-        // const auto topOverflow = result.minY < 0 ? -result.minY : 0;
+        // childTc.addPos({ leftOverflow + offsetPercentage_.x * -overflowXYSize_.x, 0 });
         const auto topOverflow = (result.minY < thisTc_->getPos().y) ? thisTc_->getPos().y - result.minY : 0;
 
-        childTc.addPos({ 0, topOverflow + offsetPercentage_.y * -overflowXYSize_.y, });
+        childTc.addPos({ leftOverflow + offsetPercentage_.x * -overflowXYSize_.x,
+            topOverflow + offsetPercentage_.y * -overflowXYSize_.y, });
     }
+
+    // for (uint32_t i = 0; i < children.size() - sbCount_; i++)
+    // {
+    //     auto& childTc = children[i]->getPayload()->node_.transformContext;
+    // }
 }
 
 MinMaxPos HkConstraintContext::getMinAndMaxPositions(const std::vector<HkTreeStructure<HkNodeBase>*>& children)

@@ -27,7 +27,8 @@ private:
     void onGeneralMouseClick() override;
     void onGeneralMouseMove() override;
     void onDrag() override;
-    void resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children) override;
+    void resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children,
+        const HkScrollbarsSize) override;
     void postRenderAdditionalDetails() override;
 
     void constrainScrollbarsIfNeeded();

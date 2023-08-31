@@ -27,7 +27,8 @@ private:
     virtual void updateMySelf();
 
     /* Constraints */
-    virtual void resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children);
+    virtual void resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children,
+        const HkScrollbarsSize sbSizes = {});
 
     /* Events */
     virtual void onFirstHeartbeat();
