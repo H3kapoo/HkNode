@@ -64,7 +64,8 @@ public:
 
     /* Computes */
     void computeScrollBarCount();
-    void computeOverflowBasedOnMinMax(const MinMaxPos& minMax);
+    void computeChildrenOverflowBasedOnMinMax(const MinMaxPos& minMax,
+        const std::vector<HkTreeStructure<HkNodeBase>*>& children);
 
     /* Solvers */
     void resolveAxisOverflow(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
@@ -106,6 +107,8 @@ public:
     glm::vec2 offsetPercentage_;
 
     uint32_t sbCount_;
+    uint32_t hsbMargin_{ 0 };
+    uint32_t vsbMargin_{ 0 };
 
     bool lockXAxis_{ false };
     bool lockYAxis_{ false };

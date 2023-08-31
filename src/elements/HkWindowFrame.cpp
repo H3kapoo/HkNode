@@ -9,7 +9,7 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
     , exitBtn_("{Internal}-ExitButtonFor " + windowName)
     , wfCont_("{Internal}-ContainerFor " + windowName)
     , mode_{ HkWindowFrameMode::Grabbable }
-    , cachedScale_{ 0,0 }
+    , cachedScale_{ 300, 400 }
     , cachedPos_{ 0,0 }
 
 {

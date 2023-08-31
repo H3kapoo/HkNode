@@ -82,9 +82,9 @@ int main()
 
     HkWindowFramePtr windowFrame = std::make_shared<HkWindowFrame>("MyWindowFrame");
 
+    windowFrame->setConstraintPolicy(HkConstraintPolicy::AlignLeftToRight);
     // windowFrame->setConstraintPolicy(HkConstraintPolicy::AlignTopToBottom);
-    // windowFrame->setConstraintPolicy(HkConstraintPolicy::AlignLeftToRight);
-    windowFrame->setConstraintPolicy(HkConstraintPolicy::AlignEvenTopToBottom);
+    // windowFrame->setConstraintPolicy(HkConstraintPolicy::AlignEvenTopToBottom);
     windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
     // windowFrame->setWindowMode(HkWindowFrameMode::Grabbable);
 
@@ -105,17 +105,17 @@ int main()
     //     // ctrs2.push_back(ctrs.at(i));
     // }
 
-    HkImageViewPtr imgView = std::make_shared<HkImageView>("MyImgView");
-    HkImageViewPtr imgView2 = std::make_shared<HkImageView>("MyImgView2");
-    imgView->loadImage("/home/hekapoo/container.jpg");
-    imgView2->loadImage("/home/hekapoo/imeg.jpeg");
+    // HkImageViewPtr imgView = std::make_shared<HkImageView>("MyImgView");
+    // HkImageViewPtr imgView2 = std::make_shared<HkImageView>("MyImgView2");
+    // imgView->loadImage("/home/hekapoo/container.jpg");
+    // imgView2->loadImage("/home/hekapoo/imeg.jpeg");
 
     bool isFs = false;
-    ctr2->setOnClickListener([&windowFrame, &isFs, &imgView2]()
+    ctr2->setOnClickListener([&windowFrame, &isFs]()
         {
-            // isFs ? windowFrame->setWindowMode(HkWindowFrameMode::Grabbable)
-                // : windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
-            // isFs = !isFs;
+            isFs ? windowFrame->setWindowMode(HkWindowFrameMode::Grabbable)
+                : windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
+            isFs = !isFs;
             // imgView2->loadImage(isFs ? "/home/hekapoo/imeg.jpeg" : "/home/hekapoo/container.jpg");
             // std::cout << "eu sunt\n";
         });
@@ -132,16 +132,16 @@ int main()
     // ctr5->setSize({ 500, 30 });
 
     ctr->setSize({ 200, 50 });
-    ctr2->setSize({ 300, 450 });
+    ctr2->setSize({ 300, 250 });
     ctr3->setSize({ 200, 150 });
     ctr4->setSize({ 100, 50 });
-    ctr5->setSize({ 30, 250 });
+    ctr5->setSize({ 330, 450 });
     // imgView->setSize({ 700, 900 });
     // imgView2->setSize({ 1280 * 0.25f, 720 * 0.5f });
     // ctr->setOnClickListener()
 
-    // windowFrame->setPos({ 1280 * 0.5, 720 * 0.25 });
-    // windowFrame->setSize({ 1280 * 0.5, 720 * 0.5 });
+    windowFrame->setPos({ 1280 * 0.25, 720 * 0.25 });
+    windowFrame->setSize({ 1280 * 0.7, 720 * 0.7 });
 
     // windowFrame->setPos({ 300, 100 });
     // windowFrame->setSize({ 1280 / 2, 720 / 2 });
@@ -150,8 +150,8 @@ int main()
     // windowFrame->setPos({ 1280 * 0.5f, 15 });
     // windowFrame->setSize({ 1280, 720 - 30 });
 
-    windowFrame->pushChildren({ ctr, ctr2 });
-    // windowFrame->pushChildren({ ctr, ctr2, ctr3, ctr4, ctr5 });
+    // windowFrame->pushChildren({ ctr, ctr2 });
+    windowFrame->pushChildren({ ctr, ctr2, ctr3, ctr4, ctr5 });
     // windowFrame->pushChildren(ctrs2);
     // ctr->pushChildren({ ctr2 });
     // ctr2->pushChildren({ imgView2 });
@@ -178,7 +178,7 @@ int main()
 
         //TODO: GLFWAPI void glfwPostEmptyEvent(void); could be used in the future in case of animations
         HkSceneManagement::get().update();
-        HkDrawDebugger::get().drawBuffer();
+        // HkDrawDebugger::get().drawBuffer();
         glfwSwapBuffers(window);
         glfwWaitEvents();
         // glfwPollEvents();
