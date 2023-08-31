@@ -82,9 +82,9 @@ int main()
 
     HkWindowFramePtr windowFrame = std::make_shared<HkWindowFrame>("MyWindowFrame");
 
-    windowFrame->setConstraintPolicy(HkConstraintPolicy::AlignLeftToRight);
+    // windowFrame->setConstraintPolicy(HkConstraintPolicy::AlignLeftToRight);
     // windowFrame->setConstraintPolicy(HkConstraintPolicy::AlignTopToBottom);
-    // windowFrame->setConstraintPolicy(HkConstraintPolicy::AlignEvenTopToBottom);
+    windowFrame->setConstraintPolicy(HkConstraintPolicy::AlignEvenTopToBottom);
     windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
     // windowFrame->setWindowMode(HkWindowFrameMode::Grabbable);
 
@@ -105,9 +105,9 @@ int main()
     //     // ctrs2.push_back(ctrs.at(i));
     // }
 
-    // HkImageViewPtr imgView = std::make_shared<HkImageView>("MyImgView");
+    HkImageViewPtr imgView = std::make_shared<HkImageView>("MyImgView");
     // HkImageViewPtr imgView2 = std::make_shared<HkImageView>("MyImgView2");
-    // imgView->loadImage("/home/hekapoo/container.jpg");
+    imgView->loadImage("/home/hekapoo/container.jpg");
     // imgView2->loadImage("/home/hekapoo/imeg.jpeg");
 
     bool isFs = false;
@@ -136,7 +136,7 @@ int main()
     ctr3->setSize({ 200, 150 });
     ctr4->setSize({ 100, 50 });
     ctr5->setSize({ 330, 450 });
-    // imgView->setSize({ 700, 900 });
+    imgView->setSize({ 700, 900 });
     // imgView2->setSize({ 1280 * 0.25f, 720 * 0.5f });
     // ctr->setOnClickListener()
 
@@ -154,7 +154,7 @@ int main()
     windowFrame->pushChildren({ ctr, ctr2, ctr3, ctr4, ctr5 });
     // windowFrame->pushChildren(ctrs2);
     // ctr->pushChildren({ ctr2 });
-    // ctr2->pushChildren({ imgView2 });
+    ctr2->pushChildren({ imgView });
     // ctr->pushChildren({ ctr3 });
     // ctr2->pushChildren({ ctr4, ctr5 });
 

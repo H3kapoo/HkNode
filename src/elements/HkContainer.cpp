@@ -23,6 +23,9 @@ HkContainer::HkContainer(const std::string& containerName)
         vScrollBar_.node_.renderContext.getShader().setVec3f("color", glm::vec3(0.4f, 0.2f, 0.6f));
         hScrollBar_.node_.renderContext.getShader().setVec3f("color", glm::vec3(0.4f, 0.2f, 0.6f));
     }
+
+    node_.constraintContext.isOverflowAllowedX_ = true;
+    node_.constraintContext.isOverflowAllowedY_ = true;
 }
 
 //TODO: The way we handle scroll inside scroll is now necessarly very intuitive. It needs to ve changed in the future
@@ -155,40 +158,46 @@ void HkContainer::postRenderAdditionalDetails()
 void HkContainer::resolveScrollBarChildrenIfNeeded()
 {
     /* Place horizontal scrollbar if neeeded */
-    hScrollBar_.setOverflowSize(node_.constraintContext.overflowXYSize_.x);
-    if (!hScrollBar_.isScrollBarActive() && node_.constraintContext.isOverflowX_)
+    if (node_.constraintContext.isOverflowAllowedX_)
     {
-        scrollbBarsCount_++;
-        treeStruct_.pushChild(&hScrollBar_.treeStruct_);
-        hScrollBar_.setScrollBarActive(true);
-    }
-    else if (hScrollBar_.isScrollBarActive() && !node_.constraintContext.isOverflowX_)
-    {
-        scrollbBarsCount_--;
-        hScrollBar_.setScrollBarActive(false);
-        treeStruct_.removeChildren({ hScrollBar_.treeStruct_.getId() });
+        hScrollBar_.setOverflowSize(node_.constraintContext.overflowXYSize_.x);
+        if (!hScrollBar_.isScrollBarActive() && node_.constraintContext.isOverflowX_)
+        {
+            scrollbBarsCount_++; //TODO: THis variable is now in constraint context
+            treeStruct_.pushChild(&hScrollBar_.treeStruct_);
+            hScrollBar_.setScrollBarActive(true);
+        }
+        else if (hScrollBar_.isScrollBarActive() && !node_.constraintContext.isOverflowX_)
+        {
+            scrollbBarsCount_--;
+            hScrollBar_.setScrollBarActive(false);
+            treeStruct_.removeChildren({ hScrollBar_.treeStruct_.getId() });
+        }
+        node_.constraintContext.scrollBarConstrain(hScrollBar_.node_.transformContext);
     }
 
     /* Place vertical scrollbar if neeeded */
-    vScrollBar_.setOverflowSize(node_.constraintContext.overflowXYSize_.y);
-    if (!vScrollBar_.isScrollBarActive() && node_.constraintContext.isOverflowY_)
+    if (node_.constraintContext.isOverflowAllowedY_)
     {
-        scrollbBarsCount_++;
-        treeStruct_.pushChild(&vScrollBar_.treeStruct_);
-        vScrollBar_.setScrollBarActive(true);
-    }
-    else if (vScrollBar_.isScrollBarActive() && !node_.constraintContext.isOverflowY_)
-    {
-        scrollbBarsCount_--;
-        vScrollBar_.setScrollBarActive(false);
-        treeStruct_.removeChildren({ vScrollBar_.treeStruct_.getId() });
-    }
+        vScrollBar_.setOverflowSize(node_.constraintContext.overflowXYSize_.y);
+        if (!vScrollBar_.isScrollBarActive() && node_.constraintContext.isOverflowY_)
+        {
+            scrollbBarsCount_++;
+            treeStruct_.pushChild(&vScrollBar_.treeStruct_);
+            vScrollBar_.setScrollBarActive(true);
+        }
+        else if (vScrollBar_.isScrollBarActive() && !node_.constraintContext.isOverflowY_)
+        {
+            scrollbBarsCount_--;
+            vScrollBar_.setScrollBarActive(false);
+            treeStruct_.removeChildren({ vScrollBar_.treeStruct_.getId() });
+        }
+        node_.constraintContext.scrollBarConstrain(vScrollBar_.node_.transformContext);
 
-    //TODO: Note? somehow if we put these inside the ifs above, altough flow enters in IFs only one time,
-    // in runtime, scrollbars will still constrain each frame somehow, but bellow functions arent called..
-    // something to do with references ? Not really a but but worth noting.
-    node_.constraintContext.scrollBarConstrain(vScrollBar_.node_.transformContext);
-    node_.constraintContext.scrollBarConstrain(hScrollBar_.node_.transformContext);
+        //TODO: Note? somehow if we put these inside the ifs above, altough flow enters in IFs only one time,
+        // in runtime, scrollbars will still constrain each frame somehow, but bellow functions arent called..
+        // something to do with references ? Not really a but but worth noting.
+    }
 }
 
 void HkContainer::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)
