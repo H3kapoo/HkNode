@@ -17,10 +17,19 @@ enum class HkConstraintPolicy
     AlignTopToBottom,
 };
 
-enum class HkChildrenOrientation
+enum class HkDirection
 {
     Horizontal,
     Vertical
+};
+
+enum class HkAlignment
+{
+    Top,
+    Bottom,
+    Left,
+    Center,
+    Right,
 };
 
 struct MaxAndTotal
@@ -64,9 +73,19 @@ public:
         , overflowXYSize_{ 0,0 }, offsetPercentage_{ 0,0 }, sbCount_{ 0 }
         , policy_{ HkConstraintPolicy::AlignLeftToRight } {}
 
+
+    void setDirection(HkDirection dir);
+
+    void setVAlignment(HkAlignment alignment);
+
+    void setHAlignment(HkAlignment alignment);
+
     void setRootTc(HkTransformContext* rootTc);
     void setPolicy(const HkConstraintPolicy policy);
     void resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children, const HkScrollbarsSize sbSizes);
+
+    void improvedConstraint(std::vector<HkTreeStructure<HkNodeBase>*>& children,
+        const HkScrollbarsSize sbSizes);
 
     /* Computes */
     void computeScrollBarCount();
@@ -77,9 +96,6 @@ public:
     void resolveAxisOverflow(const std::vector<HkTreeStructure<HkNodeBase>*>& children, const HkScrollbarsSize sbSizes);
 
     MinMaxPos getMinAndMaxPositions(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
-    // ScrollbarMargin getScrollbarMargins(const std::vector<HkTreeStructure<HkNodeBase>*>& children) const;
-    // MaxAndTotal getVerticalMaxValueAndTotalHeightValue(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
-    // MaxAndTotal getHorizontalMaxValueAndTotalWidthValue(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
 
     void alignEvenTopToBottom(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
     void alignTopBottom(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
@@ -110,8 +126,6 @@ public:
     glm::vec2 offsetPercentage_;
 
     uint32_t sbCount_;
-    uint32_t hsbMargin_{ 0 };
-    uint32_t vsbMargin_{ 0 };
 
     bool lockXAxis_{ false };
     bool lockYAxis_{ false };
@@ -120,5 +134,11 @@ private:
     HkStyleParams styleParams_;
     HkConstraintPolicy policy_;
     HkTransformContext* thisTc_;
+
+    // Container related
+    HkDirection direction_{ HkDirection::Vertical };
+    HkAlignment verticalAlignment_{ HkAlignment::Center };
+    HkAlignment horizontalAlignment_{ HkAlignment::Center };
+    //TODO: Bottom + RIght => permanent scrollbars??
 };
 } // hkui

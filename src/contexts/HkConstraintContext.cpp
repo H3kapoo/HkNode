@@ -6,6 +6,12 @@
 namespace hkui
 {
 
+void HkConstraintContext::setDirection(HkDirection dir) { direction_ = dir; }
+
+void HkConstraintContext::setVAlignment(HkAlignment alignment) { verticalAlignment_ = alignment; }
+
+void HkConstraintContext::setHAlignment(HkAlignment alignment) { horizontalAlignment_ = alignment; }
+
 /* Set TC this ctx will be based on*/
 void HkConstraintContext::setRootTc(HkTransformContext* rootTc) { thisTc_ = rootTc; }
 
@@ -15,9 +21,12 @@ void HkConstraintContext::setPolicy(const HkConstraintPolicy policy) { policy_ =
 void HkConstraintContext::resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children,
     const HkScrollbarsSize sbSizes)
 {
+    /* Extremely important to not do anything if element doesnt host any children */
     if (children.empty())
         return;
-
+    improvedConstraint(children, sbSizes);
+    resolveAxisOverflow(children, sbSizes);
+    return;
     /* TODO: dirty flags shall be used here to not do redundant repositioning */
     switch (policy_)
     {
@@ -27,8 +36,8 @@ void HkConstraintContext::resolveConstraints(std::vector<HkTreeStructure<HkNodeB
         break;
     case HkConstraintPolicy::AlignEvenTopToBottom:
         lockXAxis_ = true;
-        lockYAxis_ = true;
-        alignEvenTopToBottom(children);
+        // lockYAxis_ = true;
+        // alignEvenTopToBottom(children);
         alignEvenLeftRight(children);
         resolveAxisOverflow(children, sbSizes);
         break;
@@ -41,6 +50,92 @@ void HkConstraintContext::resolveConstraints(std::vector<HkTreeStructure<HkNodeB
     case HkConstraintPolicy::AlignCenterLeftToRight:
         alignCenterLeftRight(children);
         break;
+    }
+}
+
+void HkConstraintContext::improvedConstraint(std::vector<HkTreeStructure<HkNodeBase>*>& children,
+    const HkScrollbarsSize sbSizes)
+{
+    // if (!isOverflowAllowedX_ && !isOverflowAllowedY_) return;
+    //Figure out how we gonna put the next child
+
+    MinMaxPos result = getMinAndMaxPositions(children); // we calculate the same thing later. optimize
+    // std::cout << result.maxX - result.minX << "\n";
+    computeScrollBarCount();
+
+    int32_t startPosX = thisTc_->getPos().x;
+    int32_t startPosY = thisTc_->getPos().y;
+
+    if (horizontalAlignment_ == HkAlignment::Left)
+    {
+        startPosX = thisTc_->getPos().x;
+    }
+    else if (horizontalAlignment_ == HkAlignment::Center)
+    {
+        startPosX = (thisTc_->getPos().x + thisTc_->getScale().x) / 2 - ((result.maxX - result.minX) / 2);
+    }
+    else if (horizontalAlignment_ == HkAlignment::Right)
+    {
+        startPosX = (thisTc_->getPos().x + thisTc_->getScale().x) - (result.maxX - result.minX);
+    }
+
+    if (verticalAlignment_ == HkAlignment::Top)
+    {
+        startPosY = thisTc_->getPos().y;
+    }
+    else if (verticalAlignment_ == HkAlignment::Center)
+    {
+        startPosY = (thisTc_->getPos().y + thisTc_->getScale().y) / 2 - ((result.maxY - result.minY) / 2);
+    }
+    else if (verticalAlignment_ == HkAlignment::Bottom)
+    {
+        startPosY = (thisTc_->getPos().y + thisTc_->getScale().y) - (result.maxY - result.minY);
+    }
+
+    for (uint32_t i = 0; i < children.size() - sbCount_; i++)
+    {
+        auto& child = children[i]->getPayload()->node_;
+        auto& childTc = child.transformContext;
+        auto& childCc = child.constraintContext;
+
+        if (direction_ == HkDirection::Horizontal)
+        {
+            if (childCc.verticalAlignment_ == HkAlignment::Top)
+            {
+                childTc.setPos({ startPosX , startPosY });
+            }
+            else if (childCc.verticalAlignment_ == HkAlignment::Center)
+            {
+                childTc.setPos({ startPosX , startPosY });
+                childTc.addPos({ 0 , ((result.maxY - result.minY) / 2) - childTc.getScale().y / 2 });
+            }
+            else if (childCc.verticalAlignment_ == HkAlignment::Bottom)
+            {
+                childTc.setPos({ startPosX , startPosY });
+                childTc.addPos({ 0 , (result.maxY - result.minY) - childTc.getScale().y });
+            }
+
+            startPosX += childTc.getScale().x;
+        }
+        else if (direction_ == HkDirection::Vertical)
+        {
+            if (childCc.horizontalAlignment_ == HkAlignment::Left)
+            {
+                childTc.setPos({ startPosX , startPosY });
+            }
+            else if (childCc.horizontalAlignment_ == HkAlignment::Center)
+            {
+                childTc.setPos({ startPosX , startPosY });
+                childTc.addPos({ ((result.maxX - result.minX) / 2) - childTc.getScale().x / 2 ,0 });
+            }
+            else if (childCc.horizontalAlignment_ == HkAlignment::Right)
+            {
+                childTc.setPos({ startPosX , startPosY });
+                childTc.addPos({ (result.maxX - result.minX) - childTc.getScale().x ,0 });
+            }
+
+            startPosY += childTc.getScale().y;
+        }
     }
 }
 

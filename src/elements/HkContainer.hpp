@@ -16,9 +16,16 @@ public:
 
     /* Setters */
     void setOnClickListener(std::function<void()> callback);
+
+    void setOverflow(bool x, bool y);
     void setColor(const glm::vec3& color);
     void setPos(const glm::vec2& pos);
     void setSize(const glm::vec2& size);
+
+    void setDirection(const HkDirection dir);
+    void setVAlignment(const HkAlignment alignment);
+    void setHAlignment(const HkAlignment alignment);
+
 
 private:
     void onScroll() override;

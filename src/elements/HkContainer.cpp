@@ -24,8 +24,8 @@ HkContainer::HkContainer(const std::string& containerName)
         hScrollBar_.node_.renderContext.getShader().setVec3f("color", glm::vec3(0.4f, 0.2f, 0.6f));
     }
 
-    node_.constraintContext.isOverflowAllowedX_ = true;
-    node_.constraintContext.isOverflowAllowedY_ = true;
+    node_.constraintContext.isOverflowAllowedX_ = false;
+    node_.constraintContext.isOverflowAllowedY_ = false;
 }
 
 //TODO: The way we handle scroll inside scroll is now necessarly very intuitive. It needs to ve changed in the future
@@ -220,6 +220,12 @@ void HkContainer::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)
 }
 
 //TODO: bellow to be refactored later when style comes
+void HkContainer::setOverflow(bool x, bool y)
+{
+    node_.constraintContext.isOverflowAllowedX_ = x;
+    node_.constraintContext.isOverflowAllowedY_ = y;
+}
+
 void HkContainer::setColor(const glm::vec3& color)
 {
     node_.renderContext.getShader().setVec3f("color", color);
@@ -233,5 +239,20 @@ void HkContainer::setPos(const glm::vec2& pos)
 void HkContainer::setSize(const glm::vec2& size)
 {
     node_.transformContext.setScale(size);
+}
+
+void HkContainer::setDirection(const HkDirection dir)
+{
+    node_.constraintContext.setDirection(dir);
+}
+
+void HkContainer::setVAlignment(const HkAlignment alignment)
+{
+    node_.constraintContext.setVAlignment(alignment);
+}
+
+void HkContainer::setHAlignment(const HkAlignment alignment)
+{
+    node_.constraintContext.setHAlignment(alignment);
 }
 } // hkui

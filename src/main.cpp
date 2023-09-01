@@ -82,9 +82,9 @@ int main()
 
     HkWindowFramePtr windowFrame = std::make_shared<HkWindowFrame>("MyWindowFrame");
 
-    // windowFrame->setConstraintPolicy(HkConstraintPolicy::AlignLeftToRight);
+    windowFrame->setConstraintPolicy(HkConstraintPolicy::AlignLeftToRight);
     // windowFrame->setConstraintPolicy(HkConstraintPolicy::AlignTopToBottom);
-    windowFrame->setConstraintPolicy(HkConstraintPolicy::AlignEvenTopToBottom);
+    // windowFrame->setConstraintPolicy(HkConstraintPolicy::AlignEvenTopToBottom);
     windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
     // windowFrame->setWindowMode(HkWindowFrameMode::Grabbable);
 
@@ -93,9 +93,14 @@ int main()
     HkContainerPtr ctr3 = std::make_shared<HkContainer>("MyContainer3");
     HkContainerPtr ctr4 = std::make_shared<HkContainer>("MyContainer4");
     HkContainerPtr ctr5 = std::make_shared<HkContainer>("MyContainer5");
-
+    std::vector<HkContainerPtr> all_ctrs{ ctr,ctr2, ctr3, ctr4, ctr5 };
+    for (const auto& c : all_ctrs)
+    {
+        // c->setVAlignment(HkAlignment::Left);
+        c->setHAlignment(HkAlignment::Right);
+    }
     // std::vector<HkNodeBasePtr> ctrs2;
-    // for (int i = 0;i < 350;i++)
+    // for (int i = 0;i < 500;i++) // with O2 works ok 01.09.2023
     // {
     //     // ctrs.emplace_back("MyContainer" + std::to_string(i + 20));
     //     const auto ct = std::make_shared<HkContainer>("MyContauner");
@@ -111,15 +116,24 @@ int main()
     // imgView2->loadImage("/home/hekapoo/imeg.jpeg");
 
     bool isFs = false;
-    ctr2->setOnClickListener([&windowFrame, &isFs]()
+    int i = 2;
+    ctr2->setOnClickListener([&windowFrame, &isFs, &all_ctrs, &i]()
         {
-            isFs ? windowFrame->setWindowMode(HkWindowFrameMode::Grabbable)
-                : windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
-            isFs = !isFs;
+            // isFs ? windowFrame->setWindowMode(HkWindowFrameMode::Grabbable)
+            //     : windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
+            // isFs = !isFs;
             // imgView2->loadImage(isFs ? "/home/hekapoo/imeg.jpeg" : "/home/hekapoo/container.jpg");
             // std::cout << "eu sunt\n";
+            for (const auto& c : all_ctrs)
+            {
+                c->setVAlignment((HkAlignment)i);
+            }
+            i++;
+            if (i > 4) i = 2;
+
         });
 
+    std::cout << sizeof(*windowFrame) << "\n";
     ctr->setColor({ 0.3f,0.3f,0.7f });
     ctr2->setColor({ 1.0f,0.4f,0.5f });
     ctr3->setColor({ 0.4f,0.5f,0.6f });
@@ -151,10 +165,11 @@ int main()
     // windowFrame->setSize({ 1280, 720 - 30 });
 
     // windowFrame->pushChildren({ ctr, ctr2 });
+    windowFrame->setOverflow(true, true);
     windowFrame->pushChildren({ ctr, ctr2, ctr3, ctr4, ctr5 });
     // windowFrame->pushChildren(ctrs2);
     // ctr->pushChildren({ ctr2 });
-    ctr2->pushChildren({ imgView });
+    // ctr2->pushChildren({ imgView });
     // ctr->pushChildren({ ctr3 });
     // ctr2->pushChildren({ ctr4, ctr5 });
 
