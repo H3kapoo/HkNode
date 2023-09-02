@@ -66,7 +66,7 @@ int main()
     }
 
     glfwMakeContextCurrent(window);
-    // glfwSwapInterval(0); // zero to disable Vsync
+    glfwSwapInterval(0); // zero to disable Vsync
     glfwSetFramebufferSizeCallback(window, resizeCallback);
     glfwSetCursorPosCallback(window, mouseMoveCallback);
     glfwSetMouseButtonCallback(window, mouseClickCallback);
@@ -94,19 +94,21 @@ int main()
     HkContainerPtr ctr4 = std::make_shared<HkContainer>("MyContainer4");
     HkContainerPtr ctr5 = std::make_shared<HkContainer>("MyContainer5");
     std::vector<HkContainerPtr> all_ctrs{ ctr,ctr2, ctr3, ctr4, ctr5 };
-    for (const auto& c : all_ctrs)
-    {
-        // c->setVAlignment(HkAlignment::Left);
-        c->setHAlignment(HkAlignment::Right);
-    }
+    // for (const auto& c : all_ctrs)
+    // {
+    //     // c->setVAlignment(HkAlignment::Left);
+    //     c->setHAlignment(HkAlignment::Right);
+    // }
     // std::vector<HkNodeBasePtr> ctrs2;
-    // for (int i = 0;i < 500;i++) // with O2 works ok 01.09.2023
+    // ctrs2.reserve(50);
+    // for (int i = 0;i < 50;i++) // with O2 works ok 01.09.2023
     // {
     //     // ctrs.emplace_back("MyContainer" + std::to_string(i + 20));
-    //     const auto ct = std::make_shared<HkContainer>("MyContauner");
+    //     const auto& ct = std::make_shared<HkContainer>("MyContauner");
     //     ct->setColor(i % 2 == 0 ? glm::vec3{ 0.7f, 0.8f, 0.9f } : glm::vec3{ 0.6f, 0.7f, 0.8f });
     //     ct->setSize({ 100, 100 });
     //     ctrs2.push_back(ct);
+    //     // ctrs2.emplace_back(std::make_shared<HkContainer>("MyContauner"));
     //     // ctrs2.push_back(ctrs.at(i));
     // }
 
@@ -123,17 +125,18 @@ int main()
             //     : windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
             // isFs = !isFs;
             // imgView2->loadImage(isFs ? "/home/hekapoo/imeg.jpeg" : "/home/hekapoo/container.jpg");
-            // std::cout << "eu sunt\n";
+            std::cout << "eu sunt\n";
             for (const auto& c : all_ctrs)
             {
-                c->setVAlignment((HkAlignment)i);
+                c->setHAlignment((HkAlignment)i);
             }
             i++;
             if (i > 4) i = 2;
 
         });
 
-    std::cout << sizeof(*windowFrame) << "\n";
+    // std::cout << "-----" << (sizeof(*ctr) * ctrs2.size()) / 1024.0f / 1024.0f << "mb\n";
+
     ctr->setColor({ 0.3f,0.3f,0.7f });
     ctr2->setColor({ 1.0f,0.4f,0.5f });
     ctr3->setColor({ 0.4f,0.5f,0.6f });
@@ -154,8 +157,8 @@ int main()
     // imgView2->setSize({ 1280 * 0.25f, 720 * 0.5f });
     // ctr->setOnClickListener()
 
-    windowFrame->setPos({ 1280 * 0.25, 720 * 0.25 });
-    windowFrame->setSize({ 1280 * 0.7, 720 * 0.7 });
+    // windowFrame->setPos({ 1280 * 0.25, 720 * 0.25 });
+    // windowFrame->setSize({ 1280 * 0.7, 720 * 0.7 });
 
     // windowFrame->setPos({ 300, 100 });
     // windowFrame->setSize({ 1280 / 2, 720 / 2 });
@@ -177,9 +180,9 @@ int main()
     windowFrame->printTree();
 
     HkSceneManagement::get().setRoot(windowFrame);
-    HkSceneManagement::get().init(1280, 720);
+    HkSceneManagement::get().init(1280, 720); // <--- GET RID OF THIS, IT FUCKS UP IF NOT SET EXACTLY AS THE WINDOW CREATION SIZE
     // HkSceneManagement::get().init(1920, 1080);
-
+    int time = 200;
     double previousTime = glfwGetTime();
     int frameCount = 0;
     while (!glfwWindowShouldClose(window))
@@ -207,6 +210,7 @@ int main()
             frameCount = 0;
             previousTime = currentTime;
         }
+        time--;
     }
 
     glfwDestroyWindow(window);

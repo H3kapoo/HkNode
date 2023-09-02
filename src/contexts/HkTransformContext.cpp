@@ -223,6 +223,7 @@ const glm::ivec2& HkTransformContext::getScale() const
 
 const glm::mat4& HkTransformContext::getModelMatrix() const
 {
+    // computeModelMatrix();
     return modelMat;
 }
 } // hkui

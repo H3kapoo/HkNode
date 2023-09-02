@@ -76,6 +76,7 @@ void HkWindowFrame::resolveChildrenConstraints(std::vector<HkTreeStructure<HkNod
         cachedScale_ = wfCont_.node_.transformContext.getScale();
     }
 
+
     node_.constraintContext.windowFrameContainerConstraint(wfCont_.node_.transformContext,
         exitBtn_.node_.transformContext, minimizeBtn_.node_.transformContext, sceneDataRef_.windowSize,
         /* Means we are in the fullscreen fixed mode, we hide the "grab bar"*/

@@ -73,5 +73,6 @@
         "valarray": "cpp",
         "variant": "cpp"
     },
-    "cmake.configureOnOpen": false
+    "cmake.configureOnOpen": false,
+    "cmake.sourceDirectory": "/home/hekapoo/hkNode/src"
 }

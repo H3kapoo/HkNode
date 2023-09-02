@@ -24,6 +24,9 @@ HkContainer::HkContainer(const std::string& containerName)
         hScrollBar_.node_.renderContext.getShader().setVec3f("color", glm::vec3(0.4f, 0.2f, 0.6f));
     }
 
+    // node_.constraintContext.isOverflowAllowedX_ = true;
+    // node_.constraintContext.isOverflowAllowedY_ = true;
+
     node_.constraintContext.isOverflowAllowedX_ = false;
     node_.constraintContext.isOverflowAllowedY_ = false;
 }
@@ -104,6 +107,7 @@ void HkContainer::resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeB
     const HkScrollbarsSize)
 {
     /* We need to notify constraint ctx about scrollbars scroll value so we can offset the children if needed*/
+    //TODO: OPtimize: why do this even if we dont have SBs?
     node_.constraintContext.offsetPercentage_.x = hScrollBar_.getScrollValue();
     node_.constraintContext.offsetPercentage_.y = vScrollBar_.getScrollValue();
 

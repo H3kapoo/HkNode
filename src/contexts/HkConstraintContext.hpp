@@ -60,7 +60,7 @@ struct HkStyleParams
 {
     /* Element's margins */
     uint32_t marginLX{ 0 }, marginRX{ 0 };
-    uint32_t marginLY{ 0 }, marginRY{ 0 };
+    uint32_t marginTY{ 0 }, marginBY{ 0 };
 };
 
 class HkNodeBase;
@@ -84,9 +84,6 @@ public:
     void setPolicy(const HkConstraintPolicy policy);
     void resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children, const HkScrollbarsSize sbSizes);
 
-    void improvedConstraint(std::vector<HkTreeStructure<HkNodeBase>*>& children,
-        const HkScrollbarsSize sbSizes);
-
     /* Computes */
     void computeScrollBarCount();
     void computeChildrenOverflowBasedOnMinMax(const MinMaxPos& minMax,
@@ -98,10 +95,8 @@ public:
     MinMaxPos getMinAndMaxPositions(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
 
     void alignEvenTopToBottom(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
-    void alignTopBottom(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
     void alignCenterLeftRight(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
     void alignEvenLeftRight(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
-    void alignLeftRight(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
 
     /* Scrollbar related */
     void scrollBarConstrain(HkTransformContext& scrollBarTc);
@@ -127,18 +122,15 @@ public:
 
     uint32_t sbCount_;
 
-    bool lockXAxis_{ false };
-    bool lockYAxis_{ false };
-
-private:
     HkStyleParams styleParams_;
+private:
     HkConstraintPolicy policy_;
     HkTransformContext* thisTc_;
 
     // Container related
-    HkDirection direction_{ HkDirection::Vertical };
-    HkAlignment verticalAlignment_{ HkAlignment::Center };
-    HkAlignment horizontalAlignment_{ HkAlignment::Center };
+    HkDirection direction_{ HkDirection::Horizontal };
+    HkAlignment verticalAlignment_{ HkAlignment::Top };
+    HkAlignment horizontalAlignment_{ HkAlignment::Left };
     //TODO: Bottom + RIght => permanent scrollbars??
 };
 } // hkui

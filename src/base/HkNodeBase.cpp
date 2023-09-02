@@ -102,34 +102,34 @@ void HkNodeBase::updateMySelf()
     /* Normal rendering */
     const auto& tc = node_.transformContext;
     //TODO: Extend this performance gain further
-    if (tc.getVScale().x && tc.getVScale().y)
-    {
-        node_.renderContext.render(sceneDataRef_.sceneProjMatrix, tc.getModelMatrix());
-    }
+    // if (tc.getVScale().x && tc.getVScale().y)
+    // {
+    node_.renderContext.render(sceneDataRef_.sceneProjMatrix, tc.getModelMatrix());
+    // }
 
     auto& children = treeStruct_.getChildren();
     /* Resolve child constraints relative to parent */
     resolveChildrenConstraints(children, {});
 
     /* Update children */
-    for (const auto& child : children)
+    for (uint32_t i = 0;i < children.size(); i++)
     {
-        child->getPayload()->updateMySelf();
+        children[i]->getPayload()->updateMySelf();
     }
 
     /* Use this to render additional non interactive things if needed */
     /* Note: rescissoring to original parent is needed unfortunatelly */
-    glEnable(GL_SCISSOR_TEST);
-    glScissor(
-        tc.getVPos().x - 1,
-        sceneDataRef_.windowHeight - tc.getVPos().y - tc.getVScale().y + 1,
-        tc.getVScale().x,
-        tc.getVScale().y);
+    // glEnable(GL_SCISSOR_TEST);
+    // glScissor(
+    //     tc.getVPos().x - 1,
+    //     sceneDataRef_.windowHeight - tc.getVPos().y - tc.getVScale().y + 1,
+    //     tc.getVScale().x,
+    //     tc.getVScale().y);
 
-    postRenderAdditionalDetails();
+    // postRenderAdditionalDetails();
 
-    /* Disable scissors after rendering UI */
-    glDisable(GL_SCISSOR_TEST);
+    // /* Disable scissors after rendering UI */
+    // glDisable(GL_SCISSOR_TEST);
 }
 
 /* Resolve constraints based on set policy on this node */

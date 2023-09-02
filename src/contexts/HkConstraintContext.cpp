@@ -24,47 +24,11 @@ void HkConstraintContext::resolveConstraints(std::vector<HkTreeStructure<HkNodeB
     /* Extremely important to not do anything if element doesnt host any children */
     if (children.empty())
         return;
-    improvedConstraint(children, sbSizes);
-    resolveAxisOverflow(children, sbSizes);
-    return;
-    /* TODO: dirty flags shall be used here to not do redundant repositioning */
-    switch (policy_)
-    {
-    case HkConstraintPolicy::AlignLeftToRight:
-        alignLeftRight(children);
-        resolveAxisOverflow(children, sbSizes);
-        break;
-    case HkConstraintPolicy::AlignEvenTopToBottom:
-        lockXAxis_ = true;
-        // lockYAxis_ = true;
-        // alignEvenTopToBottom(children);
-        alignEvenLeftRight(children);
-        resolveAxisOverflow(children, sbSizes);
-        break;
-    case HkConstraintPolicy::AlignTopToBottom:
-        alignTopBottom(children);
-        break;
-    case HkConstraintPolicy::AlignEvenLeftToRight:
-        alignEvenLeftRight(children);
-        break;
-    case HkConstraintPolicy::AlignCenterLeftToRight:
-        alignCenterLeftRight(children);
-        break;
-    }
-}
-
-void HkConstraintContext::improvedConstraint(std::vector<HkTreeStructure<HkNodeBase>*>& children,
-    const HkScrollbarsSize sbSizes)
-{
-    // if (!isOverflowAllowedX_ && !isOverflowAllowedY_) return;
-    //Figure out how we gonna put the next child
-
-    MinMaxPos result = getMinAndMaxPositions(children); // we calculate the same thing later. optimize
-    // std::cout << result.maxX - result.minX << "\n";
     computeScrollBarCount();
 
     int32_t startPosX = thisTc_->getPos().x;
     int32_t startPosY = thisTc_->getPos().y;
+    MinMaxPos result = getMinAndMaxPositions(children); // we calculate the same thing later. optimize
 
     if (horizontalAlignment_ == HkAlignment::Left)
     {
@@ -115,7 +79,13 @@ void HkConstraintContext::improvedConstraint(std::vector<HkTreeStructure<HkNodeB
                 childTc.addPos({ 0 , (result.maxY - result.minY) - childTc.getScale().y });
             }
 
-            startPosX += childTc.getScale().x;
+            if (startPosX + childTc.getScale().x > 400)
+            {
+                // std::cout << glfwGetTime() << " ceva\n";
+                startPosY += childTc.getScale().y;;// +childCc.styleParams_.marginLX + childCc.styleParams_.marginRX;
+            }
+
+            startPosX += childTc.getScale().x;// + childCc.styleParams_.marginLX + childCc.styleParams_.marginRX;
         }
         else if (direction_ == HkDirection::Vertical)
         {
@@ -137,6 +107,8 @@ void HkConstraintContext::improvedConstraint(std::vector<HkTreeStructure<HkNodeB
             startPosY += childTc.getScale().y;
         }
     }
+
+    resolveAxisOverflow(children, sbSizes);
 }
 
 void HkConstraintContext::computeScrollBarCount()
@@ -231,8 +203,6 @@ void HkConstraintContext::resolveAxisOverflow(const std::vector<HkTreeStructure<
 
 MinMaxPos HkConstraintContext::getMinAndMaxPositions(const std::vector<HkTreeStructure<HkNodeBase>*>& children)
 {
-    computeScrollBarCount();
-
     MinMaxPos result;
     result.minX = 99999;//99999; // should be int32 max but this is good enough
     result.maxX = -99999;
@@ -270,45 +240,26 @@ MinMaxPos HkConstraintContext::getMinAndMaxPositions(const std::vector<HkTreeStr
 
 void HkConstraintContext::alignEvenTopToBottom(const std::vector<HkTreeStructure<HkNodeBase>*>& children)
 {
-    computeScrollBarCount();
+    // computeScrollBarCount();
 
-    const auto slotSize = thisTc_->getScale().y / (children.size() - sbCount_);
-    auto startPosX = thisTc_->getPos().x;
-    auto startPosY = thisTc_->getPos().y + slotSize / 2;
+    // const auto slotSize = thisTc_->getScale().y / (children.size() - sbCount_);
+    // auto startPosX = thisTc_->getPos().x;
+    // auto startPosY = thisTc_->getPos().y + slotSize / 2;
 
-    for (uint32_t i = 0; i < children.size() - sbCount_; i++)
-    {
-        auto& childTc = children[i]->getPayload()->node_.transformContext;
-        childTc.setPos({
-            lockXAxis_ ? childTc.getPos().x : startPosX,
-            startPosY + slotSize * i - childTc.getScale().y / 2 });
-    }
-
-    /* Compute scrollbars count first as this can influence the result */
-    computeScrollBarCount();
-}
-//TODO: This shall be renamed something like "Layouting", horizontal or vertical so then we can
-//      use methods to center them or left/right align them
-/*
-    Positions children one on top of the other, left aligned
-*/
-void HkConstraintContext::alignTopBottom(const std::vector<HkTreeStructure<HkNodeBase>*>& children)
-{
-
-    // auto startPosX = thisTc_->getPos().x + offsetPercentage_.x * -overflowXYSize_.x;
-    // auto startPosY = thisTc_->getPos().y + offsetPercentage_.y * -overflowXYSize_.y;
-
-    // for (const auto& child : children)
+    // for (uint32_t i = 0; i < children.size() - sbCount_; i++)
     // {
-    //     if (child->getType() == "ScrollBar") continue;
-
-    //     auto& childTc = child->getPayload()->node_.transformContext;
-    //     childTc.setPos({ startPosX, startPosY });
-    //     startPosY += childTc.getScale().y;
+    //     auto& childTc = children[i]->getPayload()->node_.transformContext;
+    //     childTc.setPos({
+    //         lockXAxis_ ? childTc.getPos().x : startPosX,
+    //         startPosY + slotSize * i - childTc.getScale().y / 2 });
     // }
+
+    // /* Compute scrollbars count first as this can influence the result */
+    // computeScrollBarCount();
 }
 
-void HkConstraintContext::alignCenterLeftRight(const std::vector<HkTreeStructure<HkNodeBase>*>& children)
+
+void HkConstraintContext::alignCenterLeftRight(const std::vector<HkTreeStructure<HkNodeBase>*>&)
 {
     // const auto maxAndTotalHori = getHorizontalMaxValueAndTotalWidthValue(children);
     // // const auto slotSize = (thisTc_->getScale().x + overflowXYSize_.x) / children.size();
@@ -344,36 +295,19 @@ void HkConstraintContext::alignCenterLeftRight(const std::vector<HkTreeStructure
 
 void HkConstraintContext::alignEvenLeftRight(const std::vector<HkTreeStructure<HkNodeBase>*>& children)
 {
-    computeScrollBarCount();
+    // computeScrollBarCount();
 
-    const auto slotSize = thisTc_->getScale().x / (children.size() - sbCount_);
-    auto startPosX = thisTc_->getPos().x + slotSize / 2;
-    auto startPosY = thisTc_->getPos().y;
+    // const auto slotSize = thisTc_->getScale().x / (children.size() - sbCount_);
+    // auto startPosX = thisTc_->getPos().x + slotSize / 2;
+    // auto startPosY = thisTc_->getPos().y;
 
-    for (uint32_t i = 0; i < children.size() - sbCount_; i++)
-    {
-        auto& childTc = children[i]->getPayload()->node_.transformContext;
-        childTc.setPos({
-            startPosX + slotSize * i - childTc.getScale().x / 2,
-            lockYAxis_ ? childTc.getPos().y : startPosY });
-    }
-}
-
-/*
-    Place children from left to right, simple as that
-*/
-void HkConstraintContext::alignLeftRight(const std::vector<HkTreeStructure<HkNodeBase>*>& children)
-{
-    computeScrollBarCount();
-
-    auto startPosX = thisTc_->getPos().x;
-    auto startPosY = thisTc_->getPos().y;
-    for (uint32_t i = 0; i < children.size() - sbCount_; i++)
-    {
-        auto& childTc = children[i]->getPayload()->node_.transformContext;
-        childTc.setPos({ startPosX , startPosY });
-        startPosX += childTc.getScale().x;
-    }
+    // for (uint32_t i = 0; i < children.size() - sbCount_; i++)
+    // {
+    //     auto& childTc = children[i]->getPayload()->node_.transformContext;
+    //     childTc.setPos({
+    //         startPosX + slotSize * i - childTc.getScale().x / 2,
+    //         lockYAxis_ ? childTc.getPos().y : startPosY });
+    // }
 }
 
 /* This simply constraints the Knob inside the scrollbar itself, at given currentValue (0 to 1) */
