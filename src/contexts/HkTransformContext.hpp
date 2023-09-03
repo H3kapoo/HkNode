@@ -39,7 +39,7 @@ public:
     const glm::ivec2& getVPos() const;
     const glm::ivec2& getVScale() const;
 
-    const glm::mat4& getModelMatrix() const;
+    const glm::mat4& getModelMatrix();
 
     /* Pub funcs */
     bool isPosInsideOfNode(const glm::ivec2& pin) const;

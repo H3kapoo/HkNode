@@ -39,8 +39,8 @@ public:
     /* Getters */
     HkShader& getShader(); /* Non const, use it as a gateway */
 
-public:
-    // private:
+    // public:
+private:
     HkRenderArch renderArch;
     uint32_t vaoId;
     HkShader shader_;

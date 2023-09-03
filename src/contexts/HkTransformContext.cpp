@@ -7,9 +7,7 @@ namespace hkui
 HkTransformContext::HkTransformContext()
     : scale{ 200, 100 }, rot{ 0,0 }, pos{ 100,100 }
     , vScale{ 200, 100 }, vPos{ 100, 100 }
-{
-    computeModelMatrix();
-}
+{}
 
 /* Absolute positioning. Doesn't take into account if position can actually be seen by user */
 bool HkTransformContext::isPosInsideOfNode(const glm::ivec2& posIn) const
@@ -170,25 +168,21 @@ void HkTransformContext::computeModelMatrix()
 void HkTransformContext::addPos(const glm::ivec2& pos)
 {
     this->pos += pos;
-    computeModelMatrix();
 }
 
 void HkTransformContext::setPos(const glm::ivec2& pos)
 {
     this->pos = pos;
-    computeModelMatrix();
 }
 
 void HkTransformContext::addScale(const glm::ivec2& scale)
 {
     this->scale += scale;
-    computeModelMatrix();
 }
 
 void HkTransformContext::setScale(const glm::ivec2& scale)
 {
     this->scale = scale;
-    computeModelMatrix();
 }
 
 void HkTransformContext::setVPos(const glm::ivec2& vPos)
@@ -221,9 +215,9 @@ const glm::ivec2& HkTransformContext::getScale() const
     return scale;
 }
 
-const glm::mat4& HkTransformContext::getModelMatrix() const
+const glm::mat4& HkTransformContext::getModelMatrix()
 {
-    // computeModelMatrix();
+    computeModelMatrix();
     return modelMat;
 }
 } // hkui

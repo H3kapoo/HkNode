@@ -9,7 +9,7 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
     , exitBtn_("{Internal}-ExitButtonFor " + windowName)
     , wfCont_("{Internal}-ContainerFor " + windowName)
     , mode_{ HkWindowFrameMode::Grabbable }
-    , cachedScale_{ 300, 400 }
+    , cachedScale_{ 1280 * 0.75, 720 * 0.75 - 30 } //TODO: hack just for now
     , cachedPos_{ 0,0 }
 
 {

@@ -66,7 +66,7 @@ int main()
     }
 
     glfwMakeContextCurrent(window);
-    glfwSwapInterval(0); // zero to disable Vsync
+    // glfwSwapInterval(0); // zero to disable Vsync
     glfwSetFramebufferSizeCallback(window, resizeCallback);
     glfwSetCursorPosCallback(window, mouseMoveCallback);
     glfwSetMouseButtonCallback(window, mouseClickCallback);
@@ -94,11 +94,14 @@ int main()
     HkContainerPtr ctr4 = std::make_shared<HkContainer>("MyContainer4");
     HkContainerPtr ctr5 = std::make_shared<HkContainer>("MyContainer5");
     std::vector<HkContainerPtr> all_ctrs{ ctr,ctr2, ctr3, ctr4, ctr5 };
-    // for (const auto& c : all_ctrs)
-    // {
-    //     // c->setVAlignment(HkAlignment::Left);
-    //     c->setHAlignment(HkAlignment::Right);
-    // }
+    for (const auto& c : all_ctrs)
+    {
+        c->setVAlignment(HkAlignment::Top);
+        // c->setHAlignment(HkAlignment::Right);
+        // c->setMargins(HkStyleParams{ .marginRX = 0, .marginBY = 20 });
+    }
+    // ctr4->setMargins(HkStyleParams{ .marginLX = 0, .marginRX = 0, .marginTY = 10 });
+
     // std::vector<HkNodeBasePtr> ctrs2;
     // ctrs2.reserve(50);
     // for (int i = 0;i < 50;i++) // with O2 works ok 01.09.2023
@@ -107,31 +110,31 @@ int main()
     //     const auto& ct = std::make_shared<HkContainer>("MyContauner");
     //     ct->setColor(i % 2 == 0 ? glm::vec3{ 0.7f, 0.8f, 0.9f } : glm::vec3{ 0.6f, 0.7f, 0.8f });
     //     ct->setSize({ 100, 100 });
-    //     ctrs2.push_back(ct);
+    //     ctrs2.push_back(std::move(ct));
     //     // ctrs2.emplace_back(std::make_shared<HkContainer>("MyContauner"));
     //     // ctrs2.push_back(ctrs.at(i));
     // }
 
     HkImageViewPtr imgView = std::make_shared<HkImageView>("MyImgView");
     // HkImageViewPtr imgView2 = std::make_shared<HkImageView>("MyImgView2");
-    imgView->loadImage("/home/hekapoo/container.jpg");
+    // imgView->loadImage("/home/hekapoo/container.jpg");
     // imgView2->loadImage("/home/hekapoo/imeg.jpeg");
 
     bool isFs = false;
     int i = 2;
     ctr2->setOnClickListener([&windowFrame, &isFs, &all_ctrs, &i]()
         {
-            // isFs ? windowFrame->setWindowMode(HkWindowFrameMode::Grabbable)
-            //     : windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
-            // isFs = !isFs;
+            isFs ? windowFrame->setWindowMode(HkWindowFrameMode::Grabbable)
+                : windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
+            isFs = !isFs;
             // imgView2->loadImage(isFs ? "/home/hekapoo/imeg.jpeg" : "/home/hekapoo/container.jpg");
-            std::cout << "eu sunt\n";
-            for (const auto& c : all_ctrs)
-            {
-                c->setHAlignment((HkAlignment)i);
-            }
-            i++;
-            if (i > 4) i = 2;
+            // std::cout << "eu sunt\n";
+            // for (const auto& c : all_ctrs)
+            // {
+            //     c->setHAlignment((HkAlignment)i);
+            // }
+            // i++;
+            // if (i > 4) i = 2;
 
         });
 
@@ -165,10 +168,11 @@ int main()
 
     /*Fill screen hack for not, later we shall position stuff relative to top left corner, not center*/
     // windowFrame->setPos({ 1280 * 0.5f, 15 });
-    // windowFrame->setSize({ 1280, 720 - 30 });
+    windowFrame->setSize({ 1280 * 0.75, 720 * 0.75 - 30 });
 
     // windowFrame->pushChildren({ ctr, ctr2 });
     windowFrame->setOverflow(true, true);
+    windowFrame->setHAlignment(HkAlignment::Right);
     windowFrame->pushChildren({ ctr, ctr2, ctr3, ctr4, ctr5 });
     // windowFrame->pushChildren(ctrs2);
     // ctr->pushChildren({ ctr2 });
@@ -196,7 +200,7 @@ int main()
 
         //TODO: GLFWAPI void glfwPostEmptyEvent(void); could be used in the future in case of animations
         HkSceneManagement::get().update();
-        // HkDrawDebugger::get().drawBuffer();
+        HkDrawDebugger::get().drawBuffer();
         glfwSwapBuffers(window);
         glfwWaitEvents();
         // glfwPollEvents();

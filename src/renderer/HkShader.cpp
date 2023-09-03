@@ -4,7 +4,9 @@ namespace hkui
 {
 HkShader::HkShader(const std::string& vertPath, const std::string& fragPath)
 {
-    setShaderSource(vertPath, fragPath);
+    //TODO:Better not to call ctor to load shader if we could change shader dymanically in the future.
+    // Commented out for now.
+    // setShaderSource(vertPath, fragPath);
 }
 
 void HkShader::setShaderSource(const std::string& vertPath, const std::string& fragPath)

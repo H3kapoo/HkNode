@@ -40,8 +40,13 @@ struct MaxAndTotal
 
 struct MinMaxPos
 {
-    int maxX{ 0 }, maxY{ 0 };
-    int minX{ 0 }, minY{ 0 };
+    int32_t maxX{ -99999 }, maxY{ -99999 };
+    int32_t minX{ 99999 }, minY{ 99999 };
+};
+
+struct MinMaxScale
+{
+    int32_t scaleX{ 0 }, scaleY{ 0 };
 };
 
 struct ScrollbarMargin
@@ -93,6 +98,7 @@ public:
     void resolveAxisOverflow(const std::vector<HkTreeStructure<HkNodeBase>*>& children, const HkScrollbarsSize sbSizes);
 
     MinMaxPos getMinAndMaxPositions(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
+    MinMaxScale getMinAndMaxScale(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
 
     void alignEvenTopToBottom(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
     void alignCenterLeftRight(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
@@ -122,7 +128,7 @@ public:
 
     uint32_t sbCount_;
 
-    HkStyleParams styleParams_;
+    HkStyleParams styleParams_; //TODOl Shall be its own context
 private:
     HkConstraintPolicy policy_;
     HkTransformContext* thisTc_;

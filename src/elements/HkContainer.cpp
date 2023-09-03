@@ -259,4 +259,9 @@ void HkContainer::setHAlignment(const HkAlignment alignment)
 {
     node_.constraintContext.setHAlignment(alignment);
 }
+
+void HkContainer::setMargins(const HkStyleParams styleParams)
+{
+    node_.constraintContext.styleParams_ = styleParams;
+}
 } // hkui

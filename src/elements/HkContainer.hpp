@@ -26,6 +26,7 @@ public:
     void setVAlignment(const HkAlignment alignment);
     void setHAlignment(const HkAlignment alignment);
 
+    void setMargins(const HkStyleParams styleParams);
 
 private:
     void onScroll() override;

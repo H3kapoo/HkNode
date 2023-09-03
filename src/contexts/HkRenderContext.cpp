@@ -7,8 +7,21 @@ HkRenderContext::HkRenderContext()
     : shader_("assets/shaders/v1.glsl", "assets/shaders/f1.glsl")
 {
     //TODO: This should be changable, hardcoded for now as we dont need another arch right now
-    const HkRenderArch rectangleArch = {
-    .vertices = {
+    // const HkRenderArch rectangleArch = {
+    // .vertices = {
+    //         // POS 3F         TEX 2F
+    //         0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
+    //         0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+    //         -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+    //         -0.5f,  0.5f, 0.0f, 0.0f, 1.0f
+    //         },
+    //     .indices = {
+    //         0, 1, 3,
+    //         1, 2, 3
+    //         }
+    // };
+    renderArch = {
+        .vertices = {
             // POS 3F         TEX 2F
             0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
             0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
@@ -20,7 +33,6 @@ HkRenderContext::HkRenderContext()
             1, 2, 3
             }
     };
-    renderArch = rectangleArch;
 }
 
 /* Sets shader code to be used */
@@ -50,7 +62,9 @@ void HkRenderContext::render(const glm::mat4& projMat, const glm::mat4& modelMat
 
     glBindVertexArray(vaoId);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    glBindTexture(GL_TEXTURE_2D, 0);
+
+    //TODO: Maybe unbinding is not really needed, just like with VAO
+    // glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 /* Setup buffers with the currently set architecture */
