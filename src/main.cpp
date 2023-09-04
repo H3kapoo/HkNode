@@ -96,7 +96,7 @@ int main()
     std::vector<HkContainerPtr> all_ctrs{ ctr,ctr2, ctr3, ctr4, ctr5 };
     for (const auto& c : all_ctrs)
     {
-        c->setVAlignment(HkAlignment::Top);
+        c->setVAlignment(HkAlignment::Bottom);
         // c->setHAlignment(HkAlignment::Right);
         // c->setMargins(HkStyleParams{ .marginRX = 0, .marginBY = 20 });
     }
@@ -168,11 +168,11 @@ int main()
 
     /*Fill screen hack for not, later we shall position stuff relative to top left corner, not center*/
     // windowFrame->setPos({ 1280 * 0.5f, 15 });
-    windowFrame->setSize({ 1280 * 0.75, 720 * 0.75 - 30 });
+    windowFrame->setSize({ 1280 * 0.40, 720 * 0.75 - 30 });
 
     // windowFrame->pushChildren({ ctr, ctr2 });
     windowFrame->setOverflow(true, true);
-    windowFrame->setHAlignment(HkAlignment::Right);
+    windowFrame->setHAlignment(HkAlignment::Center);
     windowFrame->pushChildren({ ctr, ctr2, ctr3, ctr4, ctr5 });
     // windowFrame->pushChildren(ctrs2);
     // ctr->pushChildren({ ctr2 });

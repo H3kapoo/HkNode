@@ -27,9 +27,84 @@ void HkConstraintContext::resolveConstraints(std::vector<HkTreeStructure<HkNodeB
         return;
     computeScrollBarCount();
 
-    int32_t startPosX = thisTc_->getPos().x;
-    int32_t startPosY = thisTc_->getPos().y;
+
+    int32_t startPosY = 0;
+    int32_t startPosX = 0;
+
+    bool rowWrapping = true;
+    // bool rowWrapping = false;
+    // int32_t rowIdToMaxHeight[10]; // max of 10 wrapped rows
+
+    int32_t highestYOnRow = 0;
+    uint32_t highestYOnRowId = 0;
+    uint32_t nextRowFirstId = 0;
+    uint32_t nextLastRowId = 0;
+    for (uint32_t i = 0; i < children.size() - sbCount_; i++)
+    {
+        auto& child = children[i]->getPayload()->node_;
+        auto& childTc = child.transformContext;
+        auto& childCc = child.constraintContext;
+
+        /*Horizontal container specific logic*/
+        if (direction_ == HkDirection::Horizontal)
+        {
+            /* How much we need to advance to place next child */
+            int32_t nextXAdvance = startPosX + childCc.styleParams_.marginLX + childCc.styleParams_.marginRX + childTc.getScale().x;
+            if (rowWrapping)
+            {
+                /* This basically "spawns" a new row */
+                if (nextXAdvance > thisTc_->getScale().x)
+                {
+                    // since we got here, its safe to say row ended before this. corner cases?
+                    nextLastRowId = i - 1;
+
+                    startPosX = 0;
+                    startPosY += highestYOnRow;
+
+                    /*Back Propagate child alignment now that we completed the row */
+                    for (uint32_t j = nextRowFirstId; j <= nextLastRowId;j++)
+                    {
+                        /* Skip aligning the highest itself. Might not be needed tho */
+                        if (j == highestYOnRowId) continue;
+                        auto& childBpTc = children[j]->getPayload()->node_.transformContext;
+
+                        childBpTc.addPos({ 0, highestYOnRow - childBpTc.getScale().y });
+                    }
+
+                    /* After back propagating, its the current element that starts the new row*/
+                    nextRowFirstId = i;
+
+                    nextXAdvance = childTc.getScale().x;
+                    highestYOnRow = 0;
+                }
+
+                /* Needed so Y of wrapped child starts at lowest Y possible */
+                const int32_t maybeHighest = childTc.getScale().y + childCc.styleParams_.marginBY;
+                if (maybeHighest > highestYOnRow)
+                {
+                    highestYOnRow = maybeHighest;
+                    highestYOnRowId = i;
+                }
+            }
+            childTc.setPos({ startPosX + childCc.styleParams_.marginLX  , startPosY + childCc.styleParams_.marginTY });
+            startPosX = nextXAdvance;
+
+        }
+    }
+
+    // // propagate here instead?
+    for (uint32_t i = nextRowFirstId; i < children.size() - sbCount_;i++)
+    {
+        /* Skip aligning the highest itself. Might not be needed tho */
+        if (i == highestYOnRowId) continue;
+        auto& childBpTc = children[i]->getPayload()->node_.transformContext;
+
+        // bottom
+        childBpTc.addPos({ 0, highestYOnRow - childBpTc.getScale().y });
+    }
+
     MinMaxPos result = getMinAndMaxPositions(children); // we calculate the same thing later. optimize
+    startPosX = 0;
 
     /* Calculate start point for placement on the X axis based on container options*/
     if (horizontalAlignment_ == HkAlignment::Left)
@@ -38,99 +113,151 @@ void HkConstraintContext::resolveConstraints(std::vector<HkTreeStructure<HkNodeB
     }
     else if (horizontalAlignment_ == HkAlignment::Center)
     {
-        startPosX = (thisTc_->getPos().x + thisTc_->getScale().x) / 2 - ((result.maxX - result.minX) / 2);
+        startPosX = thisTc_->getPos().x + thisTc_->getScale().x / 2 - ((result.maxX - result.minX) / 2);
     }
     else if (horizontalAlignment_ == HkAlignment::Right)
     {
         startPosX = (thisTc_->getPos().x + thisTc_->getScale().x) - (result.maxX - result.minX);
     }
 
-    /* Calculate start point for placement on the Y axis based on container options*/
-    if (verticalAlignment_ == HkAlignment::Top)
-    {
-        startPosY = thisTc_->getPos().y;
-    }
-    else if (verticalAlignment_ == HkAlignment::Center)
-    {
-        startPosY = (thisTc_->getPos().y + thisTc_->getScale().y) / 2 - ((result.maxY - result.minY) / 2);
-    }
-    else if (verticalAlignment_ == HkAlignment::Bottom)
-    {
-        startPosY = (thisTc_->getPos().y + thisTc_->getScale().y) - (result.maxY - result.minY);
-    }
-
-    /* Place children accoring to their own alignment starting at above calculated positions*/
-    bool rowWrapping = true;
-    int32_t highestYOnRow = 0;
     for (uint32_t i = 0; i < children.size() - sbCount_; i++)
     {
         auto& child = children[i]->getPayload()->node_;
         auto& childTc = child.transformContext;
         //TODO: these margins,borders, padding etc shall be retrieved from style context, not constraint one
         auto& childCc = child.constraintContext;
-
-        /*Horizontal container specific logic*/
-        if (direction_ == HkDirection::Horizontal)
-        {
-            int32_t nextXAdvance = 0;
-            if (childCc.verticalAlignment_ == HkAlignment::Top)
-            {
-                /* How much we need to advance to place next child */
-                // nextXAdvance = startPosX + childCc.styleParams_.marginLX + childCc.styleParams_.marginRX + childTc.getScale().x;
-                nextXAdvance = startPosX + childCc.styleParams_.marginLX + childCc.styleParams_.marginRX + childTc.getScale().x;
-                if (rowWrapping)
-                {
-                    //TODO: Account for scrollbars size as well somehow
-                    /* This basically "spawns" a new row */
-                    if (nextXAdvance > (thisTc_->getPos().x + thisTc_->getScale().x))
-                    {
-                        // std::cout << nextXAdvance << "  " << (thisTc_->getPos().x + thisTc_->getScale().x) << "\n";
-                        startPosX = thisTc_->getPos().x;
-                        startPosY += highestYOnRow;
-                        nextXAdvance = childTc.getPos().x + childTc.getScale().x;
-                        highestYOnRow = 0;
-                    }
-                    /* Needed so Y of wrapped child starts at lowest Y possible */
-                    const int32_t maybeHighest = childTc.getScale().y + childCc.styleParams_.marginBY;
-                    highestYOnRow = maybeHighest > highestYOnRow ? maybeHighest : highestYOnRow;
-                }
-                childTc.setPos({ startPosX + childCc.styleParams_.marginLX  , startPosY + childCc.styleParams_.marginTY });
-            }
-            else if (childCc.verticalAlignment_ == HkAlignment::Center)
-            {
-                //TODO: Tis can be combined in one pass of setPos
-                childTc.setPos({ startPosX + childCc.styleParams_.marginLX , startPosY });
-                childTc.addPos({ 0 , ((result.maxY - result.minY) / 2) - childTc.getScale().y / 2 });
-            }
-            else if (childCc.verticalAlignment_ == HkAlignment::Bottom)
-            {
-                childTc.setPos({ startPosX , startPosY });
-                childTc.addPos({ 0 , (result.maxY - result.minY) - childTc.getScale().y });
-            }
-
-            startPosX = nextXAdvance;
-        }
-        /*Vertical container specific logic */
-        else if (direction_ == HkDirection::Vertical)
-        {
-            if (childCc.horizontalAlignment_ == HkAlignment::Left)
-            {
-                childTc.setPos({ startPosX , startPosY });
-            }
-            else if (childCc.horizontalAlignment_ == HkAlignment::Center)
-            {
-                childTc.setPos({ startPosX , startPosY });
-                childTc.addPos({ ((result.maxX - result.minX) / 2) - childTc.getScale().x / 2 ,0 });
-            }
-            else if (childCc.horizontalAlignment_ == HkAlignment::Right)
-            {
-                childTc.setPos({ startPosX , startPosY });
-                childTc.addPos({ (result.maxX - result.minX) - childTc.getScale().x ,0 });
-            }
-            startPosY += childTc.getScale().y + childCc.styleParams_.marginTY;
-        }
+        childTc.addPos({ startPosX , 0 });
     }
 
+
+
+    // // int32_t startPosX = thisTc_->getPos().x;
+    // int32_t startPosY = 0;//thisTc_->getPos().y;
+
+    // /* Calculate start point for placement on the Y axis based on container options*/
+    // // if (verticalAlignment_ == HkAlignment::Top)
+    // // {
+    // //     startPosY = thisTc_->getPos().y;
+    // // }
+    // // else if (verticalAlignment_ == HkAlignment::Center)
+    // // {
+    // //     startPosY = (thisTc_->getPos().y + thisTc_->getScale().y) / 2 - ((result.maxY - result.minY) / 2);
+    // // }
+    // // else if (verticalAlignment_ == HkAlignment::Bottom)
+    // // {
+    // //     startPosY = (thisTc_->getPos().y + thisTc_->getScale().y) - (result.maxY - result.minY);
+    // // }
+
+    // /* Place children accoring to their own alignment starting at above calculated positions*/
+    // int32_t startPosX = 0;//thisTc_->getPos().x;
+
+    // bool rowWrapping = true;
+    // // bool rowWrapping = false;
+    // int32_t highestYOnRow = 0;
+    // for (uint32_t i = 0; i < children.size() - sbCount_; i++)
+    // {
+    //     auto& child = children[i]->getPayload()->node_;
+    //     auto& childTc = child.transformContext;
+    //     //TODO: these margins,borders, padding etc shall be retrieved from style context, not constraint one
+    //     auto& childCc = child.constraintContext;
+
+    //     /*Horizontal container specific logic*/
+    //     if (direction_ == HkDirection::Horizontal)
+    //     {
+    //         int32_t nextXAdvance = 0;
+    //         /* How much we need to advance to place next child */
+    //         nextXAdvance = startPosX + childCc.styleParams_.marginLX + childCc.styleParams_.marginRX + childTc.getScale().x;
+    //         if (rowWrapping)
+    //         {
+    //             //TODO: Account for scrollbars size as well somehow
+    //             /* This basically "spawns" a new row */
+    //             if (nextXAdvance > thisTc_->getScale().x)
+    //             {
+    //                 // MinMaxPos r2 = getMinAndMaxPositions(children); // we calculate the same thing later. optimize
+
+    //                 startPosX = 0;
+    //                 startPosY += highestYOnRow;
+    //                 nextXAdvance = childTc.getScale().x;
+    //                 highestYOnRow = 0;
+    //             }
+    //             /* Needed so Y of wrapped child starts at lowest Y possible */
+    //             const int32_t maybeHighest = childTc.getScale().y + childCc.styleParams_.marginBY;
+    //             highestYOnRow = maybeHighest > highestYOnRow ? maybeHighest : highestYOnRow;
+    //         }
+
+    //         if (childCc.verticalAlignment_ == HkAlignment::Top)
+    //         {
+    //             childTc.setPos({ startPosX + childCc.styleParams_.marginLX  , startPosY + childCc.styleParams_.marginTY });
+    //         }
+    //         // else if (childCc.verticalAlignment_ == HkAlignment::Center)
+    //         // {
+    //         //     // //TODO: Tis can be combined in one pass of setPos
+    //         //     // childTc.setPos({ startPosX + childCc.styleParams_.marginLX , startPosY });
+    //         //     // childTc.addPos({ 0 , ((result.maxY - result.minY) / 2) - childTc.getScale().y / 2 });
+    //         // }
+    //         else if (childCc.verticalAlignment_ == HkAlignment::Bottom)
+    //         {
+    //             childTc.setPos({ startPosX , startPosY });
+    //             // childTc.addPos({ 0 , (result.maxY - result.minY) - childTc.getScale().y });
+    //             // childTc.setPos({ startPosX + childCc.styleParams_.marginLX  , startPosY + childCc.styleParams_.marginTY });
+
+    //         }
+
+    //         startPosX = nextXAdvance;
+    //     }
+    //     /*Vertical container specific logic */
+    //     else if (direction_ == HkDirection::Vertical)
+    //     {
+    //         // if (childCc.horizontalAlignment_ == HkAlignment::Left)
+    //         // {
+    //         //     childTc.setPos({ startPosX , startPosY });
+    //         // }
+    //         // else if (childCc.horizontalAlignment_ == HkAlignment::Center)
+    //         // {
+    //         //     childTc.setPos({ startPosX , startPosY });
+    //         //     childTc.addPos({ ((result.maxX - result.minX) / 2) - childTc.getScale().x / 2 ,0 });
+    //         // }
+    //         // else if (childCc.horizontalAlignment_ == HkAlignment::Right)
+    //         // {
+    //         //     childTc.setPos({ startPosX , startPosY });
+    //         //     childTc.addPos({ (result.maxX - result.minX) - childTc.getScale().x ,0 });
+    //         // }
+    //         // startPosY += childTc.getScale().y + childCc.styleParams_.marginTY;
+    //     }
+    // }
+
+    // MinMaxPos result = getMinAndMaxPositions(children); // we calculate the same thing later. optimize
+    // startPosX = 0;
+
+    // /* Calculate start point for placement on the X axis based on container options*/
+    // if (horizontalAlignment_ == HkAlignment::Left)
+    // {
+    //     startPosX = thisTc_->getPos().x;
+    // }
+    // else if (horizontalAlignment_ == HkAlignment::Center)
+    // {
+    //     startPosX = thisTc_->getPos().x + thisTc_->getScale().x / 2 - ((result.maxX - result.minX) / 2);
+    // }
+    // else if (horizontalAlignment_ == HkAlignment::Right)
+    // {
+    //     startPosX = (thisTc_->getPos().x + thisTc_->getScale().x) - (result.maxX - result.minX);
+    // }
+
+    // for (uint32_t i = 0; i < children.size() - sbCount_; i++)
+    // {
+    //     auto& child = children[i]->getPayload()->node_;
+    //     auto& childTc = child.transformContext;
+    //     //TODO: these margins,borders, padding etc shall be retrieved from style context, not constraint one
+    //     auto& childCc = child.constraintContext;
+    //     childTc.addPos({ startPosX , 0 });
+
+    //     if (childCc.verticalAlignment_ == HkAlignment::Bottom)
+    //     {
+    //         // childTc.addPos({ 0 , (result.maxY - result.minY) - childTc.getScale().y });//(result.maxY - result.minY) - childTc.getScale().y });
+    //     }
+    //     // childTc.addPos({ 0 , (result.maxY - result.minY) - childTc.getScale().y });
+
+    // }
     /*After positioning all children, calculate to see if we got an overflow on both axis */
     resolveAxisOverflow(children, sbSizes);
 }
@@ -213,16 +340,16 @@ void HkConstraintContext::computeChildrenOverflowBasedOnMinMax(const MinMaxPos& 
 void HkConstraintContext::resolveAxisOverflow(const std::vector<HkTreeStructure<HkNodeBase>*>& children,
     const HkScrollbarsSize sbSizes)
 {
-    // MinMaxPos result = getMinAndMaxPositions(children);
-    // computeChildrenOverflowBasedOnMinMax(result, sbSizes);
-    // for (uint32_t i = 0; i < children.size() - sbCount_; i++)
-    // {
-    //     auto& childTc = children[i]->getPayload()->node_.transformContext;
-    //     const auto leftOverflow = (result.minX < thisTc_->getPos().x) ? thisTc_->getPos().x - result.minX : 0;
-    //     const auto topOverflow = (result.minY < thisTc_->getPos().y) ? thisTc_->getPos().y - result.minY : 0;
-    //     childTc.addPos({ leftOverflow + offsetPercentage_.x * -overflowXYSize_.x,
-    //         topOverflow + offsetPercentage_.y * -overflowXYSize_.y, });
-    // }
+    MinMaxPos result = getMinAndMaxPositions(children);
+    computeChildrenOverflowBasedOnMinMax(result, sbSizes);
+    for (uint32_t i = 0; i < children.size() - sbCount_; i++)
+    {
+        auto& childTc = children[i]->getPayload()->node_.transformContext;
+        const auto leftOverflow = (result.minX < thisTc_->getPos().x) ? thisTc_->getPos().x - result.minX : 0;
+        const auto topOverflow = (result.minY < thisTc_->getPos().y) ? thisTc_->getPos().y - result.minY : 0;
+        childTc.addPos({ leftOverflow + offsetPercentage_.x * -overflowXYSize_.x,
+            topOverflow + offsetPercentage_.y * -overflowXYSize_.y, });
+    }
 }
 
 MinMaxScale HkConstraintContext::getMinAndMaxScale(const std::vector<HkTreeStructure<HkNodeBase>*>& children)
