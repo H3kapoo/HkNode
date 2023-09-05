@@ -57,5 +57,10 @@ private:
 
     /* Whats the actual viewable by user part of the mesh */
     glm::ivec2 vScale, vPos;
+
+    /* Is matrix dirty? */
+    glm::ivec2 prevScale, prevPos;
+
+    bool isDirty_{ true };
 };
 } // hkui

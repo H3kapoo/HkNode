@@ -66,7 +66,7 @@ int main()
     }
 
     glfwMakeContextCurrent(window);
-    // glfwSwapInterval(0); // zero to disable Vsync
+    glfwSwapInterval(0); // zero to disable Vsync
     glfwSetFramebufferSizeCallback(window, resizeCallback);
     glfwSetCursorPosCallback(window, mouseMoveCallback);
     glfwSetMouseButtonCallback(window, mouseClickCallback);
@@ -96,8 +96,8 @@ int main()
     std::vector<HkContainerPtr> all_ctrs{ ctr,ctr2, ctr3, ctr4, ctr5 };
     for (const auto& c : all_ctrs)
     {
-        // c->setVAlignment(HkAlignment::Right);
-        c->setHAlignment(HkAlignment::Bottom);
+        c->setVAlignment(HkAlignment::Center);
+        // c->setHAlignment(HkAlignment::Bottom);
         // c->setMargins(HkStyleParams{ .marginLX = 10, .marginRX = 10, .marginTY = 10, .marginBY = 10 });
     }
 
@@ -183,8 +183,9 @@ int main()
 
     // windowFrame->pushChildren({ ctr, ctr2 });
     windowFrame->setOverflow(true, true);
-    windowFrame->setDirection(HkDirection::Horizontal);
-    windowFrame->setHAlignment(HkAlignment::Left);
+    windowFrame->setDirection(HkDirection::Vertical);
+    windowFrame->setHAlignment(HkAlignment::Center);
+    windowFrame->setVAlignment(HkAlignment::Bottom);
     windowFrame->pushChildren({ ctr, ctr2, ctr3, ctr4, ctr5 });
     // windowFrame->pushChildren(ctrs2);
     // ctr->pushChildren({ ctr2 });
@@ -198,10 +199,10 @@ int main()
     HkSceneManagement::get().setRoot(windowFrame);
     HkSceneManagement::get().init(1280, 720); // <--- GET RID OF THIS, IT FUCKS UP IF NOT SET EXACTLY AS THE WINDOW CREATION SIZE
     // HkSceneManagement::get().init(1920, 1080);
-    int time = 200;
+    int time = 20000;
     double previousTime = glfwGetTime();
     int frameCount = 0;
-    while (!glfwWindowShouldClose(window))
+    while (!glfwWindowShouldClose(window) && time >= 0)
     {
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -212,10 +213,11 @@ int main()
 
         //TODO: GLFWAPI void glfwPostEmptyEvent(void); could be used in the future in case of animations
         HkSceneManagement::get().update();
-        HkDrawDebugger::get().drawBuffer();
+        //TODO: ^^ we might have to split rendering and updating
+        // HkDrawDebugger::get().drawBuffer();
         glfwSwapBuffers(window);
-        glfwWaitEvents();
-        // glfwPollEvents();
+        // glfwWaitEvents();
+        glfwPollEvents();
 
         // Measure speed
         double currentTime = glfwGetTime();

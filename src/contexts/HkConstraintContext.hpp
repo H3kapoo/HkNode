@@ -96,8 +96,7 @@ public:
     void backPropagateColChange(std::vector<HkTreeStructure<HkNodeBase>*>& children, const uint32_t nextColFirstId,
         const uint32_t lastColEndId, const uint32_t longestXOnCol);
 
-    void applyFinalHorizontalOffsets(std::vector<HkTreeStructure<HkNodeBase>*>& children);
-    void applyFinalVerticalOffsets(std::vector<HkTreeStructure<HkNodeBase>*>& children);
+    void applyFinalOffsets(std::vector<HkTreeStructure<HkNodeBase>*>& children);
 
     /* Computes */
     void computeScrollBarCount();
@@ -141,7 +140,6 @@ public:
 private:
     HkConstraintPolicy policy_;
     HkTransformContext* thisTc_;
-
     // Container related
     HkDirection direction_{ HkDirection::Horizontal };
     HkAlignment verticalAlignment_{ HkAlignment::Top };

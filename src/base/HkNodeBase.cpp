@@ -109,7 +109,10 @@ void HkNodeBase::updateMySelf()
 
     auto& children = treeStruct_.getChildren();
     /* Resolve child constraints relative to parent */
+    // if (sceneDataRef_.currentEvent != HkEvent::GeneralUpdate)
+    // {
     resolveChildrenConstraints(children, {});
+    // }
 
     /* Update children */
     for (uint32_t i = 0;i < children.size(); i++)
@@ -126,7 +129,7 @@ void HkNodeBase::updateMySelf()
         tc.getVScale().x,
         tc.getVScale().y);
 
-    postRenderAdditionalDetails();
+    // postRenderAdditionalDetails();
 
     // /* Disable scissors after rendering UI */
     glDisable(GL_SCISSOR_TEST);

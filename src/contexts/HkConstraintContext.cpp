@@ -98,7 +98,7 @@ void HkConstraintContext::resolveHorizontalContainer(std::vector<HkTreeStructure
        by the container's alignment type.
        This needs to be done here because otherwise we can get wrong min max information and bottom/center alignments
        need this information. It's a trade-off. */
-    applyFinalHorizontalOffsets(children);
+    applyFinalOffsets(children);
 }
 
 void HkConstraintContext::resolveVerticalContainer(std::vector<HkTreeStructure<HkNodeBase>*>& children,
@@ -155,6 +155,7 @@ void HkConstraintContext::resolveVerticalContainer(std::vector<HkTreeStructure<H
                 longestXOnCol = maybeLongest;
             }
         }
+
         childTc.setPos({ startPosX + childCc.styleParams_.marginLX  , startPosY + childCc.styleParams_.marginTY });
         startPosY = nextYAdvance;
     }
@@ -166,7 +167,7 @@ void HkConstraintContext::resolveVerticalContainer(std::vector<HkTreeStructure<H
        by the container's alignment type.
        This needs to be done here because otherwise we can get wrong min max information and bottom/center alignments
        need this information. It's a trade-off. */
-    applyFinalVerticalOffsets(children);
+    applyFinalOffsets(children);
 }
 
 
@@ -178,7 +179,7 @@ void HkConstraintContext::backPropagateRowChange(std::vector<HkTreeStructure<HkN
         auto& childBpTc = children[j]->getPayload()->node_.transformContext;
         auto& childBpCc = children[j]->getPayload()->node_.constraintContext;
 
-        switch (childBpCc.horizontalAlignment_) // here's wrong, it should be child's HA
+        switch (childBpCc.verticalAlignment_) // here's wrong, it should be child's HA
         {
         case HkAlignment::Left:
         case HkAlignment::Right:
@@ -203,7 +204,7 @@ void HkConstraintContext::backPropagateColChange(std::vector<HkTreeStructure<HkN
         auto& childBpTc = children[j]->getPayload()->node_.transformContext;
         auto& childBpCc = children[j]->getPayload()->node_.constraintContext;
 
-        switch (childBpCc.verticalAlignment_)
+        switch (childBpCc.horizontalAlignment_)
         {
         case HkAlignment::Top:
         case HkAlignment::Bottom:
@@ -220,9 +221,9 @@ void HkConstraintContext::backPropagateColChange(std::vector<HkTreeStructure<HkN
     }
 }
 
-void HkConstraintContext::applyFinalHorizontalOffsets(std::vector<HkTreeStructure<HkNodeBase>*>& children)
+void HkConstraintContext::applyFinalOffsets(std::vector<HkTreeStructure<HkNodeBase>*>& children)
 {
-    int32_t startPosX = 0;
+    int32_t startPosX = 0, startPosY = 0;
     MinMaxPos result = getMinAndMaxPositions(children); // we calculate the same thing later. optimize
 
     /* Calculate start point for placement on the X axis based on container options*/
@@ -240,22 +241,6 @@ void HkConstraintContext::applyFinalHorizontalOffsets(std::vector<HkTreeStructur
         startPosX = (thisTc_->getPos().x + thisTc_->getScale().x) - (result.maxX - result.minX);
         break;
     }
-
-    /* Finnaly offset the elements */
-    for (uint32_t i = 0; i < children.size() - sbCount_; i++)
-    {
-        auto& child = children[i]->getPayload()->node_;
-        auto& childTc = child.transformContext;
-        //TODO: these margins,borders, padding etc shall be retrieved from style context, not constraint one
-        // auto& childCc = child.constraintContext;
-        childTc.addPos({ startPosX , thisTc_->getPos().y });
-    }
-}
-
-void HkConstraintContext::applyFinalVerticalOffsets(std::vector<HkTreeStructure<HkNodeBase>*>& children)
-{
-    int32_t startPosY = 0;
-    MinMaxPos result = getMinAndMaxPositions(children); // we calculate the same thing later. optimize
 
     /* Calculate start point for placement on the X axis based on container options*/
     switch (verticalAlignment_)
@@ -280,7 +265,7 @@ void HkConstraintContext::applyFinalVerticalOffsets(std::vector<HkTreeStructure<
         auto& childTc = child.transformContext;
         //TODO: these margins,borders, padding etc shall be retrieved from style context, not constraint one
         // auto& childCc = child.constraintContext;
-        childTc.addPos({ thisTc_->getPos().x , startPosY });
+        childTc.addPos({ startPosX , startPosY });
     }
 }
 

@@ -122,6 +122,12 @@ HKAxisBoundsPoints HkTransformContext::computeYIntersectionPointsWith(const HkTr
 /* Compute the model matrix of this TC. Used for rendering */
 void HkTransformContext::computeModelMatrix()
 {
+    /* Massive optimization in order to not calculate the same model matrix if nothing chaged */
+    if (pos.x == prevPos.x && pos.y == prevPos.y && scale.x == prevScale.x && scale.y == prevScale.y)
+    {
+        return;
+    }
+
     /*
         NDC Screen looks like:
                            1
@@ -163,6 +169,9 @@ void HkTransformContext::computeModelMatrix()
     modelMat = glm::scale(modelMat, glm::vec3(scale, 1.0f));
     modelMat = glm::translate(modelMat, glm::vec3(0.5f, 0.5f, 0));
     //TODO: Maybe off by one pixel visual bug is caused by offseting with 0.5f, maybe try offrtging by 1.0f
+
+    prevPos = pos;
+    prevScale = scale;
 }
 
 void HkTransformContext::addPos(const glm::ivec2& pos)

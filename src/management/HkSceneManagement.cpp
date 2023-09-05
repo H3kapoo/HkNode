@@ -44,7 +44,8 @@ void HkSceneManagement::setRoot(IHkRootNodeCPtr& newRootNode)
 //TODO: Investigate in the future why calling update() one time generates more than one event loop
 void HkSceneManagement::update()
 {
-    update(HkEvent::GeneralUpdate);
+    // update(HkEvent::GeneralUpdate);
+    update(HkEvent::None); //TODO: Hack just for now. We must split rendering and updating
 }
 
 void HkSceneManagement::update(const HkEvent& ev)
