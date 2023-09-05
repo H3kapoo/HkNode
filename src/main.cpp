@@ -96,24 +96,27 @@ int main()
     std::vector<HkContainerPtr> all_ctrs{ ctr,ctr2, ctr3, ctr4, ctr5 };
     for (const auto& c : all_ctrs)
     {
-        c->setVAlignment(HkAlignment::Bottom);
-        // c->setHAlignment(HkAlignment::Right);
-        // c->setMargins(HkStyleParams{ .marginRX = 0, .marginBY = 20 });
+        // c->setVAlignment(HkAlignment::Right);
+        c->setHAlignment(HkAlignment::Top);
+        // c->setMargins(HkStyleParams{ .marginLX = 10, .marginRX = 10, .marginTY = 10, .marginBY = 10 });
     }
-    // ctr4->setMargins(HkStyleParams{ .marginLX = 0, .marginRX = 0, .marginTY = 10 });
 
-    // std::vector<HkNodeBasePtr> ctrs2;
-    // ctrs2.reserve(50);
-    // for (int i = 0;i < 50;i++) // with O2 works ok 01.09.2023
-    // {
-    //     // ctrs.emplace_back("MyContainer" + std::to_string(i + 20));
-    //     const auto& ct = std::make_shared<HkContainer>("MyContauner");
-    //     ct->setColor(i % 2 == 0 ? glm::vec3{ 0.7f, 0.8f, 0.9f } : glm::vec3{ 0.6f, 0.7f, 0.8f });
-    //     ct->setSize({ 100, 100 });
-    //     ctrs2.push_back(std::move(ct));
-    //     // ctrs2.emplace_back(std::make_shared<HkContainer>("MyContauner"));
-    //     // ctrs2.push_back(ctrs.at(i));
-    // }
+    // uint32_t marginLX{ 0 }, marginRX{ 0 };
+// uint32_t marginTY{ 0 }, marginBY{ 0 };
+// ctr4->setMargins(HkStyleParams{ .marginLX = 0, .marginRX = 0, .marginTY = 10 });
+
+// std::vector<HkNodeBasePtr> ctrs2;
+// ctrs2.reserve(50);
+// for (int i = 0;i < 50;i++) // with O2 works ok 01.09.2023
+// {
+//     // ctrs.emplace_back("MyContainer" + std::to_string(i + 20));
+//     const auto& ct = std::make_shared<HkContainer>("MyContauner");
+//     ct->setColor(i % 2 == 0 ? glm::vec3{ 0.7f, 0.8f, 0.9f } : glm::vec3{ 0.6f, 0.7f, 0.8f });
+//     ct->setSize({ 100, 100 });
+//     ctrs2.push_back(std::move(ct));
+//     // ctrs2.emplace_back(std::make_shared<HkContainer>("MyContauner"));
+//     // ctrs2.push_back(ctrs.at(i));
+// }
 
     HkImageViewPtr imgView = std::make_shared<HkImageView>("MyImgView");
     // HkImageViewPtr imgView2 = std::make_shared<HkImageView>("MyImgView2");
@@ -156,7 +159,15 @@ int main()
     ctr3->setSize({ 200, 150 });
     ctr4->setSize({ 100, 50 });
     ctr5->setSize({ 330, 450 });
-    imgView->setSize({ 700, 900 });
+
+
+    // ctr->setSize({ 50, 200 });
+    // ctr2->setSize({ 250, 300 });
+    // ctr3->setSize({ 150, 200 });
+    // ctr4->setSize({ 50, 100 });
+    // ctr5->setSize({ 450, 330 });
+
+    // imgView->setSize({ 700, 900 });
     // imgView2->setSize({ 1280 * 0.25f, 720 * 0.5f });
     // ctr->setOnClickListener()
 
@@ -172,7 +183,8 @@ int main()
 
     // windowFrame->pushChildren({ ctr, ctr2 });
     windowFrame->setOverflow(true, true);
-    windowFrame->setHAlignment(HkAlignment::Center);
+    windowFrame->setDirection(HkDirection::Horizontal);
+    windowFrame->setHAlignment(HkAlignment::Left);
     windowFrame->pushChildren({ ctr, ctr2, ctr3, ctr4, ctr5 });
     // windowFrame->pushChildren(ctrs2);
     // ctr->pushChildren({ ctr2 });
