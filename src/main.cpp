@@ -97,7 +97,7 @@ int main()
     for (const auto& c : all_ctrs)
     {
         // c->setVAlignment(HkAlignment::Right);
-        c->setHAlignment(HkAlignment::Top);
+        c->setHAlignment(HkAlignment::Bottom);
         // c->setMargins(HkStyleParams{ .marginLX = 10, .marginRX = 10, .marginTY = 10, .marginBY = 10 });
     }
 

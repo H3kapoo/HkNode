@@ -88,11 +88,13 @@ public:
     void setRootTc(HkTransformContext* rootTc);
     void setPolicy(const HkConstraintPolicy policy);
     void resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children, const HkScrollbarsSize sbSizes);
+    void resolveHorizontalContainer(std::vector<HkTreeStructure<HkNodeBase>*>& children, const HkScrollbarsSize sbSizes);
+    void resolveVerticalContainer(std::vector<HkTreeStructure<HkNodeBase>*>& children, const HkScrollbarsSize sbSizes);
 
     void backPropagateRowChange(std::vector<HkTreeStructure<HkNodeBase>*>& children, const uint32_t nextRowFirstId,
-        const uint32_t lastRowEndId, const uint32_t highestYOnRow, const uint32_t highestYOnRowId);
+        const uint32_t lastRowEndId, const uint32_t highestYOnRow);
     void backPropagateColChange(std::vector<HkTreeStructure<HkNodeBase>*>& children, const uint32_t nextColFirstId,
-        const uint32_t lastColEndId, const uint32_t longestXOnCol, const uint32_t longestXOnColId);
+        const uint32_t lastColEndId, const uint32_t longestXOnCol);
 
     void applyFinalHorizontalOffsets(std::vector<HkTreeStructure<HkNodeBase>*>& children);
     void applyFinalVerticalOffsets(std::vector<HkTreeStructure<HkNodeBase>*>& children);
