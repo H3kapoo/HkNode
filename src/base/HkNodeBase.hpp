@@ -6,6 +6,21 @@
 
 namespace hkui
 {
+
+enum class HkNodeType
+{
+    Invalid,
+    RootWindowFrame,
+    Container,
+    ScrollBar,
+    Knob,
+    Button,
+    ImageView
+};
+
+class HkNodeBase;
+using HkTreeStruct = std::vector<HkTreeStructure<HkNodeBase, HkNodeType>*>;
+
 class HkNodeBase
 {
     friend class HkSceneManagement;
@@ -19,7 +34,7 @@ class HkNodeBase
     friend class HkConstraintContext;
 
 public:
-    HkNodeBase(const std::string& windowName, const std::string& type);
+    HkNodeBase(const std::string& windowName, const HkNodeType& type);
     virtual ~HkNodeBase() = default;
 private:
     /* These functions/params will be accessible to friend classes but will not be accessible to user */
@@ -27,7 +42,7 @@ private:
     virtual void updateMySelf();
 
     /* Constraints */
-    virtual void resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children,
+    virtual void resolveChildrenConstraints(HkTreeStruct& children,
         const HkScrollbarsSize sbSizes = {});
 
     /* Events */
@@ -54,7 +69,7 @@ private:
 
 private:
     HkNodeData node_;
-    HkTreeStructure<HkNodeBase> treeStruct_;
+    HkTreeStructure<HkNodeBase, HkNodeType> treeStruct_;
     HkSceneData& sceneDataRef_; /* This is safe as singleton will outlive THIS class anyway*/
 
     bool hadFirstHeartbeat_;

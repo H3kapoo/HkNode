@@ -3,7 +3,7 @@
 namespace hkui
 {
 HkContainer::HkContainer(const std::string& containerName)
-    : HkNodeBase(containerName, "Container")
+    : HkNodeBase(containerName, HkNodeType::Container)
     , hScrollBar_("{Internal}-HScrollBarFor " + containerName, true)
     , vScrollBar_("{Internal}-VScrollBarFor " + containerName, false)
     , scrollbBarsCount_{ 0 }
@@ -103,7 +103,7 @@ void HkContainer::onDrag()
     }
 }
 
-void HkContainer::resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children,
+void HkContainer::resolveChildrenConstraints(HkTreeStruct& children,
     const HkScrollbarsSize)
 {
     /* We need to notify constraint ctx about scrollbars scroll value so we can offset the children if needed*/

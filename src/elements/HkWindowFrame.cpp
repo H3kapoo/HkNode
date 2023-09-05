@@ -4,7 +4,7 @@ namespace hkui
 {
 
 HkWindowFrame::HkWindowFrame(const std::string& windowName)
-    : HkNodeBase(windowName, "RootWindowFrame")
+    : HkNodeBase(windowName, HkNodeType::RootWindowFrame)
     , minimizeBtn_("{Internal}-MinimizeButtonFor " + windowName)
     , exitBtn_("{Internal}-ExitButtonFor " + windowName)
     , wfCont_("{Internal}-ContainerFor " + windowName)
@@ -66,7 +66,7 @@ void HkWindowFrame::onWindowResize()
 
 }
 
-void HkWindowFrame::resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>&,
+void HkWindowFrame::resolveChildrenConstraints(HkTreeStruct&,
     const HkScrollbarsSize)
 {
     /* If we go into fullscreen mode, remember our grabbable size and scale to help restore later */

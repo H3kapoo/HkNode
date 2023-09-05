@@ -2,7 +2,7 @@
 
 namespace hkui
 {
-HkNodeBase::HkNodeBase(const std::string& windowName, const std::string& type)
+HkNodeBase::HkNodeBase(const std::string& windowName, const HkNodeType& type)
     : treeStruct_(this, windowName, type)
     , sceneDataRef_(HkSceneManagement::get().getSceneDataRef())
     , hadFirstHeartbeat_{ false }
@@ -21,7 +21,7 @@ void HkNodeBase::updateMySelf()
 
     //TODO: If children dont have children themselves, maybe no need to scissor?
     /* Compute renderable/inveractive area for each element */
-    if (treeStruct_.getType() == "RootWindowFrame")
+    if (treeStruct_.getType() == HkNodeType::RootWindowFrame)
     {
         auto& tc = node_.transformContext;
         tc.setVPos(tc.getPos());
@@ -33,10 +33,10 @@ void HkNodeBase::updateMySelf()
             tc.getScale().x,
             tc.getScale().y);
     }
-    else if (parentTreeStruct && parentTreeStruct->getType() == "RootWindowFrame")
+    else if (parentTreeStruct && parentTreeStruct->getType() == HkNodeType::RootWindowFrame)
     {
         /* Minimize only container of windowframe */
-        if (sceneDataRef_.isSceneMinimized && treeStruct_.getType() == "Container")
+        if (sceneDataRef_.isSceneMinimized && treeStruct_.getType() == HkNodeType::Container)
         {
             auto& tc = node_.transformContext;
             tc.setVPos({ 0,0 });
@@ -58,7 +58,7 @@ void HkNodeBase::updateMySelf()
         }
     }
     /* Basically use parent's visible area to bound the rendering of it's children */
-    else if (parentTreeStruct && parentTreeStruct->getType() != "RootWindowFrame")
+    else if (parentTreeStruct && parentTreeStruct->getType() != HkNodeType::RootWindowFrame)
     {
         const auto& pTc = parentTreeStruct->getPayload()->node_.transformContext;
 
@@ -129,14 +129,14 @@ void HkNodeBase::updateMySelf()
         tc.getVScale().x,
         tc.getVScale().y);
 
-    // postRenderAdditionalDetails();
+    postRenderAdditionalDetails();
 
     // /* Disable scissors after rendering UI */
     glDisable(GL_SCISSOR_TEST);
 }
 
 /* Resolve constraints based on set policy on this node */
-void HkNodeBase::resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children, const HkScrollbarsSize sbSizes)
+void HkNodeBase::resolveChildrenConstraints(HkTreeStruct& children, const HkScrollbarsSize sbSizes)
 {
     node_.constraintContext.resolveConstraints(children, sbSizes);
 }
@@ -157,7 +157,7 @@ void HkNodeBase::resolveHover()
 void HkNodeBase::resolveNearestActiveScrollbar()
 {
     /* We shall ignore elements that overflow but that do not permit scrollbars. If we are a scrollbar, bingo. */
-    if (treeStruct_.getType() == "ScrollBar" ||
+    if (treeStruct_.getType() == HkNodeType::ScrollBar ||
         ((node_.constraintContext.isOverflowAllowedX_ || node_.constraintContext.isOverflowAllowedY_)
             && (node_.constraintContext.overflowXYSize_.x || node_.constraintContext.overflowXYSize_.y)))
     {

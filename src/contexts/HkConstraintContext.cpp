@@ -18,7 +18,7 @@ void HkConstraintContext::setRootTc(HkTransformContext* rootTc) { thisTc_ = root
 /* Set policy of TC children */
 void HkConstraintContext::setPolicy(const HkConstraintPolicy policy) { policy_ = policy; }
 
-void HkConstraintContext::resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children,
+void HkConstraintContext::resolveConstraints(HkTreeStruct& children,
     const HkScrollbarsSize sbSizes)
 {
     /* Extremely important to not do anything if element doesnt host any children */
@@ -34,7 +34,7 @@ void HkConstraintContext::resolveConstraints(std::vector<HkTreeStructure<HkNodeB
     resolveAxisOverflow(children, sbSizes);
 }
 
-void HkConstraintContext::resolveHorizontalContainer(std::vector<HkTreeStructure<HkNodeBase>*>& children,
+void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children,
     const HkScrollbarsSize sbSizes)
 {
     int32_t startPosX = 0, startPosY = 0;
@@ -101,7 +101,7 @@ void HkConstraintContext::resolveHorizontalContainer(std::vector<HkTreeStructure
     applyFinalOffsets(children);
 }
 
-void HkConstraintContext::resolveVerticalContainer(std::vector<HkTreeStructure<HkNodeBase>*>& children,
+void HkConstraintContext::resolveVerticalContainer(HkTreeStruct& children,
     const HkScrollbarsSize sbSizes)
 {
     int32_t startPosX = 0, startPosY = 0;
@@ -171,7 +171,7 @@ void HkConstraintContext::resolveVerticalContainer(std::vector<HkTreeStructure<H
 }
 
 
-void HkConstraintContext::backPropagateRowChange(std::vector<HkTreeStructure<HkNodeBase>*>& children,
+void HkConstraintContext::backPropagateRowChange(HkTreeStruct& children,
     const uint32_t nextRowFirstId, const uint32_t lastRowEndId, const uint32_t highestYOnRow)
 {
     for (uint32_t j = nextRowFirstId; j <= lastRowEndId;j++)
@@ -196,7 +196,7 @@ void HkConstraintContext::backPropagateRowChange(std::vector<HkTreeStructure<HkN
     }
 }
 
-void HkConstraintContext::backPropagateColChange(std::vector<HkTreeStructure<HkNodeBase>*>& children,
+void HkConstraintContext::backPropagateColChange(HkTreeStruct& children,
     const uint32_t nextColFirstId, const uint32_t lastColEndId, const uint32_t longestXOnCol)
 {
     for (uint32_t j = nextColFirstId; j <= lastColEndId;j++)
@@ -221,7 +221,7 @@ void HkConstraintContext::backPropagateColChange(std::vector<HkTreeStructure<HkN
     }
 }
 
-void HkConstraintContext::applyFinalOffsets(std::vector<HkTreeStructure<HkNodeBase>*>& children)
+void HkConstraintContext::applyFinalOffsets(HkTreeStruct& children)
 {
     int32_t startPosX = 0, startPosY = 0;
     MinMaxPos result = getMinAndMaxPositions(children); // we calculate the same thing later. optimize
@@ -344,7 +344,7 @@ void HkConstraintContext::computeChildrenOverflowBasedOnMinMax(const MinMaxPos& 
     }
 }
 
-void HkConstraintContext::resolveAxisOverflow(const std::vector<HkTreeStructure<HkNodeBase>*>& children,
+void HkConstraintContext::resolveAxisOverflow(const HkTreeStruct& children,
     const HkScrollbarsSize sbSizes)
 {
     MinMaxPos result = getMinAndMaxPositions(children);
@@ -359,7 +359,7 @@ void HkConstraintContext::resolveAxisOverflow(const std::vector<HkTreeStructure<
     }
 }
 
-MinMaxPos HkConstraintContext::getMinAndMaxPositions(const std::vector<HkTreeStructure<HkNodeBase>*>& children)
+MinMaxPos HkConstraintContext::getMinAndMaxPositions(const HkTreeStruct& children)
 {
     MinMaxPos result;
     for (uint32_t i = 0; i < children.size() - sbCount_; i++)
@@ -429,7 +429,7 @@ MinMaxPos HkConstraintContext::getMinAndMaxPositions(const std::vector<HkTreeStr
     return result;
 }
 
-void HkConstraintContext::alignEvenTopToBottom(const std::vector<HkTreeStructure<HkNodeBase>*>&)
+void HkConstraintContext::alignEvenTopToBottom(const HkTreeStruct&)
 {
     // computeScrollBarCount();
 
@@ -450,7 +450,7 @@ void HkConstraintContext::alignEvenTopToBottom(const std::vector<HkTreeStructure
 }
 
 
-void HkConstraintContext::alignCenterLeftRight(const std::vector<HkTreeStructure<HkNodeBase>*>&)
+void HkConstraintContext::alignCenterLeftRight(const HkTreeStruct&)
 {
     // const auto maxAndTotalHori = getHorizontalMaxValueAndTotalWidthValue(children);
     // // const auto slotSize = (thisTc_->getScale().x + overflowXYSize_.x) / children.size();
@@ -484,7 +484,7 @@ void HkConstraintContext::alignCenterLeftRight(const std::vector<HkTreeStructure
     // }
 }
 
-void HkConstraintContext::alignEvenLeftRight(const std::vector<HkTreeStructure<HkNodeBase>*>&)
+void HkConstraintContext::alignEvenLeftRight(const HkTreeStruct&)
 {
     // computeScrollBarCount();
 

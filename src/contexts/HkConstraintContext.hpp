@@ -69,6 +69,8 @@ struct HkStyleParams
 };
 
 class HkNodeBase;
+enum class HkNodeType;
+using HkTreeStruct = std::vector<HkTreeStructure<HkNodeBase, HkNodeType>*>;
 
 class HkConstraintContext
 {
@@ -87,16 +89,16 @@ public:
 
     void setRootTc(HkTransformContext* rootTc);
     void setPolicy(const HkConstraintPolicy policy);
-    void resolveConstraints(std::vector<HkTreeStructure<HkNodeBase>*>& children, const HkScrollbarsSize sbSizes);
-    void resolveHorizontalContainer(std::vector<HkTreeStructure<HkNodeBase>*>& children, const HkScrollbarsSize sbSizes);
-    void resolveVerticalContainer(std::vector<HkTreeStructure<HkNodeBase>*>& children, const HkScrollbarsSize sbSizes);
+    void resolveConstraints(HkTreeStruct& children, const HkScrollbarsSize sbSizes);
+    void resolveHorizontalContainer(HkTreeStruct& children, const HkScrollbarsSize sbSizes);
+    void resolveVerticalContainer(HkTreeStruct& children, const HkScrollbarsSize sbSizes);
 
-    void backPropagateRowChange(std::vector<HkTreeStructure<HkNodeBase>*>& children, const uint32_t nextRowFirstId,
+    void backPropagateRowChange(HkTreeStruct& children, const uint32_t nextRowFirstId,
         const uint32_t lastRowEndId, const uint32_t highestYOnRow);
-    void backPropagateColChange(std::vector<HkTreeStructure<HkNodeBase>*>& children, const uint32_t nextColFirstId,
+    void backPropagateColChange(HkTreeStruct& children, const uint32_t nextColFirstId,
         const uint32_t lastColEndId, const uint32_t longestXOnCol);
 
-    void applyFinalOffsets(std::vector<HkTreeStructure<HkNodeBase>*>& children);
+    void applyFinalOffsets(HkTreeStruct& children);
 
     /* Computes */
     void computeScrollBarCount();
@@ -104,13 +106,13 @@ public:
         const HkScrollbarsSize sbSizes);
 
     /* Solvers */
-    void resolveAxisOverflow(const std::vector<HkTreeStructure<HkNodeBase>*>& children, const HkScrollbarsSize sbSizes);
+    void resolveAxisOverflow(const HkTreeStruct& children, const HkScrollbarsSize sbSizes);
 
-    MinMaxPos getMinAndMaxPositions(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
+    MinMaxPos getMinAndMaxPositions(const HkTreeStruct& children);
 
-    void alignEvenTopToBottom(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
-    void alignCenterLeftRight(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
-    void alignEvenLeftRight(const std::vector<HkTreeStructure<HkNodeBase>*>& children);
+    void alignEvenTopToBottom(const HkTreeStruct& children);
+    void alignCenterLeftRight(const HkTreeStruct& children);
+    void alignEvenLeftRight(const HkTreeStruct& children);
 
     /* Scrollbar related */
     void scrollBarConstrain(HkTransformContext& scrollBarTc);

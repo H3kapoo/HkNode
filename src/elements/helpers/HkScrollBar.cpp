@@ -3,7 +3,7 @@
 namespace hkui
 {
 HkScrollBar::HkScrollBar(const std::string& name, const bool isHorizontal)
-    : HkNodeBase(name, "ScrollBar")
+    : HkNodeBase(name, HkNodeType::ScrollBar)
     , knob_("{Internal}-KnobFor " + name, isHorizontal)
     , overflowSize_{ 0 }
     , isHorizontal_(isHorizontal)
@@ -36,7 +36,7 @@ void HkScrollBar::onClick()
            -knob_.node_.transformContext.getScale().y / 2 });
 }
 
-void HkScrollBar::resolveChildrenConstraints(std::vector<HkTreeStructure<HkNodeBase>*>&, const HkScrollbarsSize)
+void HkScrollBar::resolveChildrenConstraints(HkTreeStruct&, const HkScrollbarsSize)
 {
     //TODO: Add modifiers such as: min knob size and overflow size impact on knob scale factor
     node_.constraintContext.constrainSBKnob(isHorizontal_, overflowSize_, knob_.getValue(), knob_.node_.transformContext);

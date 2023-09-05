@@ -11,14 +11,14 @@
 namespace hkui
 {
 
-template <typename T>
+template <typename T, typename NodeType>
 class HkTreeStructure
 {
 public:
-    // think about reparent later
+    //TODO: think about reparent later
     // static void reParent(const std::vector<std::shared_ptr<HkTreeStructure>>& nodes, const std::shared_ptr<HkTreeStructure> newParent);
 
-    HkTreeStructure(T* payload, const std::string& name, const std::string& type)
+    HkTreeStructure(T* payload, const std::string& name, const NodeType& type)
         : name_{ name }, type_{ type }, id_{ genId() }, payload_{ payload }, parent_{ nullptr }
     {}
 
@@ -41,7 +41,7 @@ public:
         children_.erase(it, children_.end());
     }
 
-    void pushChild(HkTreeStructure<T>* child)
+    void pushChild(HkTreeStructure<T, NodeType>* child)
     {
         if (child)
         {
@@ -51,7 +51,7 @@ public:
         }
     }
 
-    void pushChildAfter(const std::vector<HkTreeStructure<T>*>::iterator index, HkTreeStructure<T>* child)
+    void pushChildAfter(const std::vector<HkTreeStructure<T, NodeType>*>::iterator index, HkTreeStructure<T, NodeType>* child)
     {
         if (child)
         {
@@ -69,14 +69,14 @@ public:
     /*Overloads*/
     //TODO: THis causes redefinition problems
     template<class U>
-    friend std::ostream& operator<<(std::ostream& os, const HkTreeStructure<U>* node)
+    friend std::ostream& operator<<(std::ostream& os, const HkTreeStructure<U, NodeType>* node)
     {
-        os << "(" << node->type_ << ": " << node->name_ << ", Id = " << node->id_ << ")";
+        os << "(" << (uint32_t)node->type_ << ": " << node->name_ << ", Id = " << node->id_ << ")";
         return os;
     }
 
     std::string getName() { return name_; }
-    std::string getType() { return type_; }
+    NodeType getType() { return type_; }
     uint32_t getId() { return id_; }
     HkTreeStructure* getParent() { return parent_; }
     /* Necessary & so no copying occurs each frame */
@@ -106,7 +106,7 @@ private:
         return currentId++;
     }
 
-    void setParent(HkTreeStructure<T>* newParent)
+    void setParent(HkTreeStructure<T, NodeType>* newParent)
     {
         parent_ = newParent;
         level_ = newParent != nullptr ? newParent->level_ + 1 : 0;
@@ -114,13 +114,13 @@ private:
     }
 
     std::string name_{ "UNSET_NODE" };
-    std::string type_{ "UNSET_TYPE" };
+    NodeType type_{ 0 };
     uint32_t id_{ 0 };
     uint32_t level_{ 0 };
     bool isParented_{ false };
 
     T* payload_;
     HkTreeStructure* parent_;
-    std::vector<HkTreeStructure<T>*> children_;
+    std::vector<HkTreeStructure<T, NodeType>*> children_;
 };
 } // hkui

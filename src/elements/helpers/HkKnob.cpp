@@ -3,7 +3,7 @@
 namespace hkui
 {
 HkKnob::HkKnob(const std::string& name, const bool isHorizontal)
-    : HkNodeBase(name, "Knob")
+    : HkNodeBase(name, HkNodeType::Knob)
     , value_{ 0 }
     , isHorizontalKnob_(isHorizontal)
     , scrollSensitivity_{ 0.05f }

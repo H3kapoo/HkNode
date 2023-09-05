@@ -202,7 +202,7 @@ int main()
     int time = 20000;
     double previousTime = glfwGetTime();
     int frameCount = 0;
-    while (!glfwWindowShouldClose(window) && time >= 0)
+    while (!glfwWindowShouldClose(window))
     {
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);

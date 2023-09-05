@@ -3,7 +3,7 @@
 namespace hkui
 {
 HkImageView::HkImageView(const std::string& name)
-    : HkNodeBase(name, "ImageView")
+    : HkNodeBase(name, HkNodeType::ImageView)
 {
     node_.renderContext.setShaderSource("assets/shaders/vTextured.glsl", "assets/shaders/fTextured.glsl");
     // node_.renderContext.getShader().setVec3f("color", glm::vec3(0.761f, 0.267f, 0.78f));
