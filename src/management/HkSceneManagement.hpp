@@ -86,7 +86,6 @@ public:
     HkSceneManagement(const HkSceneManagement&) = delete;
     void operator=(const HkSceneManagement&) = delete;
 
-    // To be NOTED: It's not thread safe
     static HkSceneManagement& get();
 
     HkSceneData& getSceneDataRef();

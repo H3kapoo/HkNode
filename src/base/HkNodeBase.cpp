@@ -8,6 +8,7 @@ HkNodeBase::HkNodeBase(const std::string& windowName, const HkNodeType& type)
     , hadFirstHeartbeat_{ false }
 {
     node_.constraintContext.setRootTc(&node_.transformContext);
+    node_.renderContext.injectStyleContext(&node_.styleContext);
 }
 
 /*
@@ -99,9 +100,9 @@ void HkNodeBase::updateMySelf()
         hadFirstHeartbeat_ = true;
     }
 
-    /* Normal rendering */
+    // /* Normal rendering */
     auto& tc = node_.transformContext;
-    //TODO: Extend this performance gain further
+    // //TODO: Extend this performance gain further
     if (tc.getVScale().x && tc.getVScale().y)
     {
         node_.renderContext.render(sceneDataRef_.sceneProjMatrix, tc.getModelMatrix());
@@ -109,13 +110,10 @@ void HkNodeBase::updateMySelf()
 
     auto& children = treeStruct_.getChildren();
     /* Resolve child constraints relative to parent */
-    // if (sceneDataRef_.currentEvent != HkEvent::GeneralUpdate)
-    // {
     resolveChildrenConstraints(children, {});
-    // }
 
     /* Update children */
-    for (uint32_t i = 0;i < children.size(); i++)
+    for (uint32_t i = 0;i < children.size(); i++) //TODO: Maybe also cull tree branches unable to be seen?
     {
         children[i]->getPayload()->updateMySelf();
     }
@@ -129,14 +127,14 @@ void HkNodeBase::updateMySelf()
         tc.getVScale().x,
         tc.getVScale().y);
 
-    postRenderAdditionalDetails();
+    // postRenderAdditionalDetails();
 
-    // /* Disable scissors after rendering UI */
+    /* Disable scissors after rendering UI */
     glDisable(GL_SCISSOR_TEST);
 }
 
 /* Resolve constraints based on set policy on this node */
-void HkNodeBase::resolveChildrenConstraints(HkTreeStruct& children, const HkScrollbarsSize sbSizes)
+void HkNodeBase::resolveChildrenConstraints(HkTreeStruct& children, const HkScrollbarsSize& sbSizes)
 {
     node_.constraintContext.resolveConstraints(children, sbSizes);
 }
@@ -208,15 +206,17 @@ void HkNodeBase::resolveMouseScrollEvent()
 void HkNodeBase::resolveMouseMovementEvent()
 {
     //TODO: It works here but all shaders need to have hovered uniform
-    // if (sceneDataRef_.hoveredId == treeStruct_.getId())
+    // if (treeStruct_.getType() == HkNodeType::Container)
     // {
-    //     node_.renderContext.getShader().setInt("hovered", 1);
+    //     if (sceneDataRef_.hoveredId == treeStruct_.getId())
+    //     {
+    //         // node_.renderContext.getShader().setInt("hovered", 1);
+    //     }
+    //     else
+    //     {
+    //         // node_.renderContext.getShader().setInt("hovered", 0);
+    //     }
     // }
-    // else
-    // {
-    //     node_.renderContext.getShader().setInt("hovered", 0);
-    // }
-
     /* If scene detected a dragging action, separatelly specify that dragged element*/
     if (sceneDataRef_.isDragging && sceneDataRef_.focusedId == treeStruct_.getId())
         onDrag();

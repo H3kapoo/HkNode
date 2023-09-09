@@ -36,7 +36,7 @@ void HkScrollBar::onClick()
            -knob_.node_.transformContext.getScale().y / 2 });
 }
 
-void HkScrollBar::resolveChildrenConstraints(HkTreeStruct&, const HkScrollbarsSize)
+void HkScrollBar::resolveChildrenConstraints(HkTreeStruct&, const HkScrollbarsSize&)
 {
     //TODO: Add modifiers such as: min knob size and overflow size impact on knob scale factor
     node_.constraintContext.constrainSBKnob(isHorizontal_, overflowSize_, knob_.getValue(), knob_.node_.transformContext);

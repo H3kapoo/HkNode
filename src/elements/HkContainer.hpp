@@ -36,7 +36,7 @@ private:
     void onGeneralMouseMove() override;
     void onDrag() override;
     void resolveChildrenConstraints(HkTreeStruct& children,
-        const HkScrollbarsSize) override;
+        const HkScrollbarsSize&) override;
     void postRenderAdditionalDetails() override;
 
     void constrainScrollbarsIfNeeded();

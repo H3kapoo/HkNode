@@ -93,6 +93,7 @@ void HkSceneManagement::mouseMoveEvent(GLFWwindow*, double xPos, double yPos)
     // std::cout << glfwGetTime() << " Hovered: " << sceneData.hoveredId << " is dragging id: " << sceneData.focusedId << "\n";
 
     update(HkEvent::MouseMove);
+    // std::cout << glfwGetTime() << " input mouse movement\n";
 }
 
 void HkSceneManagement::mouseClickEvent(GLFWwindow*, int button, int action, int)

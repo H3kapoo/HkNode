@@ -43,7 +43,7 @@ private:
 
     /* Constraints */
     virtual void resolveChildrenConstraints(HkTreeStruct& children,
-        const HkScrollbarsSize sbSizes = {});
+        const HkScrollbarsSize& sbSizes = {});
 
     /* Events */
     virtual void onFirstHeartbeat();

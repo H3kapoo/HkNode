@@ -3,51 +3,43 @@
 namespace hkui
 {
 
-HkRenderContext::HkRenderContext()
-    : shader_("assets/shaders/v1.glsl", "assets/shaders/f1.glsl")
-{
-    //TODO: This should be changable, hardcoded for now as we dont need another arch right now
-    // const HkRenderArch rectangleArch = {
-    // .vertices = {
-    //         // POS 3F         TEX 2F
-    //         0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
-    //         0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-    //         -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-    //         -0.5f,  0.5f, 0.0f, 0.0f, 1.0f
-    //         },
-    //     .indices = {
-    //         0, 1, 3,
-    //         1, 2, 3
-    //         }
-    // };
-    renderArch = {
-        .vertices = {
-            // POS 3F         TEX 2F
-            0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
-            0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-            -0.5f,  0.5f, 0.0f, 0.0f, 1.0f
-            },
-        .indices = {
-            0, 1, 3,
-            1, 2, 3
-            }
-    };
-}
+HkRenderArch HkRenderContext::renderArch = {
+    .vertices = {
+        // POS 3F         TEX 2F
+        0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
+        0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+        -0.5f,  0.5f, 0.0f, 0.0f, 1.0f
+        },
+    .indices = {
+        0, 1, 3,
+        1, 2, 3
+        }
+};
+
+uint32_t HkRenderContext::boundVaoId_ = 0;
+bool HkRenderContext::archCreated_ = false;
 
 /* Sets shader code to be used */
 void HkRenderContext::setShaderSource(const std::string& vertSource, const std::string& fragSource)
 {
     shader_.setShaderSource(vertSource, fragSource);
-    setupArch();
+    if (!archCreated_)
+    {
+        setupArch();
+        archCreated_ = true;
+    }
 }
 
 /* Actually render the mesh */
 void HkRenderContext::render(const glm::mat4& projMat, const glm::mat4& modelMat)
 {
-    shader_.bind();
     shader_.setMatrix4("proj", projMat);
     shader_.setMatrix4("model", modelMat);
+    shader_.setVec3f("color", styleContextInj_->color);
+
+    // shader_.setVec3f("color", glm::vec3(0.0f, 0.5f, 0.9f));
+
 
     //TODO: At some point batching will be needed to avoid context switching
     /* Dont try to bind texture if theres none to bind. Bind is expensive */
@@ -60,7 +52,13 @@ void HkRenderContext::render(const glm::mat4& projMat, const glm::mat4& modelMat
         glBindTexture(GL_TEXTURE_2D, texInfo.texId);
     }
 
-    glBindVertexArray(vaoId);
+    if (boundVaoId_ == 0)
+    {
+        glBindVertexArray(vaoId);
+        std::cout << "VAO " << vaoId << " is now bound\n";
+        boundVaoId_ = vaoId;
+
+    }
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
     //TODO: Maybe unbinding is not really needed, just like with VAO
@@ -102,4 +100,10 @@ HkShader& HkRenderContext::getShader()
 {
     return shader_;
 }
+
+void HkRenderContext::injectStyleContext(HkStyleContext* styleContext)
+{
+    styleContextInj_ = styleContext;
+}
+
 } // hkui

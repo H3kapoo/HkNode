@@ -8,9 +8,13 @@ HkContainer::HkContainer(const std::string& containerName)
     , vScrollBar_("{Internal}-VScrollBarFor " + containerName, false)
     , scrollbBarsCount_{ 0 }
 {
+    // node_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
     node_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
-    node_.renderContext.getShader().setVec3f("color", glm::vec3(0.5f, 0.5f, 0.5f)); // gray
+    // node_.renderContext.getShader().setVec3f("color", glm::vec3(0.5f, 0.5f, 0.5f)); // gray
     node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix());
+
+    node_.styleContext.color = glm::vec3(0.5f, 0.5f, 0.5f);
+
 
     /* NOTE: In the future maybe this dummy can be an actual small UI element, but for now let it be
        just a normal renderable detail */
@@ -58,7 +62,7 @@ void HkContainer::onGeneralMouseClick()
 
 void HkContainer::onGeneralMouseMove()
 {
-    //TODO: Later bring back highlighting if needed
+    // //TODO: Later bring back highlighting if needed
     // if (sceneDataRef_.hoveredId == treeStruct_.getId())
     // {
     //     // node_.renderContext.getShader().setVec3f("hovered", glm::vec3(1, 1, 1));
@@ -104,22 +108,24 @@ void HkContainer::onDrag()
 }
 
 void HkContainer::resolveChildrenConstraints(HkTreeStruct& children,
-    const HkScrollbarsSize)
+    const HkScrollbarsSize&)
 {
-    /* We need to notify constraint ctx about scrollbars scroll value so we can offset the children if needed*/
-    //TODO: OPtimize: why do this even if we dont have SBs?
+    // HkNodeBase::resolveChildrenConstraints(children, {});
+    // HkNodeBase::resolveChildrenConstraints(children, { 50,50 });
+    // /* We need to notify constraint ctx about scrollbars scroll value so we can offset the children if needed*/
+    // //TODO: OPtimize: why do this even if we dont have SBs?
     node_.constraintContext.offsetPercentage_.x = hScrollBar_.getScrollValue();
     node_.constraintContext.offsetPercentage_.y = vScrollBar_.getScrollValue();
 
-    /* Resolve children constraints (ignores scrollbar children) */
-    //TODO: This ^ resolve shall be done base on node constrain policy, add function here too for setting policy
+    // /* Resolve children constraints (ignores scrollbar children) */
+    // //TODO: This ^ resolve shall be done base on node constrain policy, add function here too for setting policy
     HkNodeBase::resolveChildrenConstraints(children,
         {
-            hScrollBar_.node_.transformContext.getScale().y,
-            vScrollBar_.node_.transformContext.getScale().x
+    hScrollBar_.node_.transformContext.getScale().y,
+    vScrollBar_.node_.transformContext.getScale().x
         });
 
-    /* Reolve contraints but this time only for scrollbars, if needed */
+    // // /* Reolve contraints but this time only for scrollbars, if needed */
     resolveScrollBarChildrenIfNeeded();
 }
 
@@ -232,7 +238,8 @@ void HkContainer::setOverflow(bool x, bool y)
 
 void HkContainer::setColor(const glm::vec3& color)
 {
-    node_.renderContext.getShader().setVec3f("color", color);
+    // node_.renderContext.getShader().setVec3f("color", color);
+    node_.styleContext.color = color;
 }
 
 void HkContainer::setPos(const glm::vec2& pos)

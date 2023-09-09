@@ -71,7 +71,8 @@
         "typeindex": "cpp",
         "typeinfo": "cpp",
         "valarray": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "*.ipp": "cpp"
     },
     "cmake.configureOnOpen": false,
     "cmake.sourceDirectory": "/home/hekapoo/hkNode/src"

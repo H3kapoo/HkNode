@@ -31,7 +31,7 @@ public:
     void onDrag() override;
     void onWindowResize() override;
     void resolveChildrenConstraints(HkTreeStruct&,
-        const HkScrollbarsSize) override;
+        const HkScrollbarsSize&) override;
 
     void pushChildren(const std::vector<HkNodeBasePtr>& newChildren);
     void printTree();

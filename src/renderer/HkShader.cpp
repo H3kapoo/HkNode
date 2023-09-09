@@ -2,23 +2,34 @@
 
 namespace hkui
 {
-HkShader::HkShader(const std::string& vertPath, const std::string& fragPath)
-{
-    //TODO:Better not to call ctor to load shader if we could change shader dymanically in the future.
-    // Commented out for now.
-    // setShaderSource(vertPath, fragPath);
-}
+
+std::unordered_map<std::string, int> HkShader::shaderSourceToId_ = {};
+uint32_t HkShader::currentlyActiveShaderId_ = 0;
 
 void HkShader::setShaderSource(const std::string& vertPath, const std::string& fragPath)
 {
-    linkShaders(compileShader(vertPath, GL_VERTEX_SHADER),
-        compileShader(fragPath, GL_FRAGMENT_SHADER));
+    const uint32_t storedShaderId = shaderSourceToId_[vertPath + fragPath];
+    if (storedShaderId == 0)
+    {
+        const int generatedShaderId = linkShaders(compileShader(vertPath, GL_VERTEX_SHADER),
+            compileShader(fragPath, GL_FRAGMENT_SHADER));
+
+        if (generatedShaderId != -1)
+        {
+            shaderSourceToId_[vertPath + fragPath] = generatedShaderId;
+        }
+        std::cout << "Generated shader id: " << generatedShaderId << "\n";
+    }
+    else
+    {
+        shaderId_ = storedShaderId;
+    }
 }
 
 void HkShader::setInt(const char* location, int value)
 {
     bind();
-    int loc = glGetUniformLocation(shaderId, location);
+    int loc = glGetUniformLocation(shaderId_, location);
     if (loc == -1)
     {
         std::cerr << "Uniform '" << location << "' has not been found in bound shader!" << std::endl;
@@ -30,7 +41,7 @@ void HkShader::setInt(const char* location, int value)
 void HkShader::setVec3f(const char* location, glm::vec3 value)
 {
     bind();
-    int loc = glGetUniformLocation(shaderId, location);
+    int loc = glGetUniformLocation(shaderId_, location);
     if (loc == -1)
     {
         std::cerr << "Uniform '" << location << "' has not been found in bound shader!" << std::endl;
@@ -42,7 +53,7 @@ void HkShader::setVec3f(const char* location, glm::vec3 value)
 void HkShader::setMatrix4(const char* location, const glm::mat4 transform)
 {
     bind();
-    int transformLoc = glGetUniformLocation(shaderId, location);
+    int transformLoc = glGetUniformLocation(shaderId_, location);
     if (transformLoc == -1)
     {
         std::cerr << "Uniform '" << location << "' has not been found in bound shader!" << std::endl;
@@ -51,7 +62,13 @@ void HkShader::setMatrix4(const char* location, const glm::mat4 transform)
     glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
 }
 
-void HkShader::bind() const { glUseProgram(shaderId); }
+void HkShader::bind() const
+{
+    if (currentlyActiveShaderId_ == shaderId_) return;
+    currentlyActiveShaderId_ = shaderId_;
+    glUseProgram(shaderId_);
+    std::cout << "Shader " << shaderId_ << " is now bound\n";
+}
 
 void HkShader::unbind() const { glUseProgram(0); }
 
@@ -60,19 +77,19 @@ int HkShader::linkShaders(int vertShaderId, int fragShaderId)
     if (!vertShaderId || !fragShaderId)
         return -1;
 
-    shaderId = glCreateProgram();
+    shaderId_ = glCreateProgram();
 
-    glAttachShader(shaderId, vertShaderId);
-    glAttachShader(shaderId, fragShaderId);
-    glLinkProgram(shaderId);
+    glAttachShader(shaderId_, vertShaderId);
+    glAttachShader(shaderId_, fragShaderId);
+    glLinkProgram(shaderId_);
 
     int success;
     char infoLog[512];
-    glGetProgramiv(shaderId, GL_LINK_STATUS, &success);
+    glGetProgramiv(shaderId_, GL_LINK_STATUS, &success);
 
     if (!success)
     {
-        glGetProgramInfoLog(shaderId, 512, nullptr, infoLog);
+        glGetProgramInfoLog(shaderId_, 512, nullptr, infoLog);
         std::cerr << "Could not link program "
             << ": " << infoLog << std::endl;
         return -1;
@@ -81,7 +98,7 @@ int HkShader::linkShaders(int vertShaderId, int fragShaderId)
     glDeleteShader(vertShaderId);
     glDeleteShader(fragShaderId);
 
-    return shaderId;
+    return shaderId_;
 }
 
 int HkShader::compileShader(const std::string& sourcePath, int32_t shaderType)
@@ -117,4 +134,8 @@ int HkShader::compileShader(const std::string& sourcePath, int32_t shaderType)
     return shaderPart;
 }
 
+uint32_t HkShader::getShaderId() const
+{
+    return shaderId_;
+}
 } // hkui

@@ -44,6 +44,7 @@ void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children,
     int32_t nextXAdvance = 0;
     int32_t maybeHighest = 0;
     bool rowWrapping = true; // make style
+    // bool rowWrapping = false; // make style
     for (uint32_t i = 0; i < children.size() - sbCount_; i++)
     {
         auto& child = children[i]->getPayload()->node_;
@@ -58,7 +59,8 @@ void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children,
             if (nextXAdvance > thisTc_->getScale().x)
             {
                 /* Since we got here, its safe to say row ended before this element */
-                lastRowEndId = i - 1;
+                lastRowEndId = i == 0 ? 0 : i - 1; // prevent underflow
+
                 startPosX = 0;
                 startPosY += highestYOnRow;
 
@@ -104,6 +106,7 @@ void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children,
 void HkConstraintContext::resolveVerticalContainer(HkTreeStruct& children,
     const HkScrollbarsSize sbSizes)
 {
+    //TODO: move into hpp so we dont redeclare them each frame
     int32_t startPosX = 0, startPosY = 0;
     int32_t longestXOnCol = 0;
     uint32_t nextColFirstId = 0;
@@ -118,14 +121,15 @@ void HkConstraintContext::resolveVerticalContainer(HkTreeStruct& children,
         auto& childCc = child.constraintContext;
 
         /* How much we need to advance to place next child */
-        nextYAdvance = startPosY + childCc.styleParams_.marginBY + childCc.styleParams_.marginTY + childTc.getScale().y;
+        nextYAdvance = startPosY + childCc.styleParams_.marginBY + childCc.styleParams_.marginTY + childTc.getScale().y; //TODO: Minimize this call
         if (colWrapping)
         {
             /* This basically "spawns" a new col */
             if (nextYAdvance > thisTc_->getScale().y)
             {
                 /* Since we got here, its safe to say row ended before this element */
-                lastColEndId = i - 1;
+                lastColEndId = i == 0 ? 0 : i - 1; // prevent underflow
+
                 startPosX += longestXOnCol;
                 startPosY = 0;
 
@@ -176,7 +180,7 @@ void HkConstraintContext::backPropagateRowChange(HkTreeStruct& children,
 {
     for (uint32_t j = nextRowFirstId; j <= lastRowEndId;j++)
     {
-        auto& childBpTc = children[j]->getPayload()->node_.transformContext;
+        auto& childBpTc = children[j]->getPayload()->node_.transformContext; //TODO: Minimize this call
         auto& childBpCc = children[j]->getPayload()->node_.constraintContext;
 
         switch (childBpCc.verticalAlignment_) // here's wrong, it should be child's HA

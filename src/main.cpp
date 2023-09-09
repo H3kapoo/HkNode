@@ -17,11 +17,21 @@ void resizeCallback(GLFWwindow* window, int width, int height)
     // let the user call the functions
     HkSceneManagement::get().resizeWindowEvent(window, width, height);
 }
-
+//TODO: Input throttling
+double lastMoveTime = 0.0;
+// double CALLBACK_THRESHOLD = 0.3;
+double CALLBACK_THRESHOLD = 0.05;
 void mouseMoveCallback(GLFWwindow* window, double xpos, double ypos)
 {
+    double currentTime = glfwGetTime();
+
+    if (currentTime - lastMoveTime < CALLBACK_THRESHOLD)
+    {
+        return;
+    }
     // let the user call the functions
     HkSceneManagement::get().mouseMoveEvent(window, xpos, ypos);
+    lastMoveTime = currentTime;
 }
 
 void mouseClickCallback(GLFWwindow* window, int button, int action, int mods)
@@ -105,27 +115,27 @@ int main()
 // uint32_t marginTY{ 0 }, marginBY{ 0 };
 // ctr4->setMargins(HkStyleParams{ .marginLX = 0, .marginRX = 0, .marginTY = 10 });
 
-// std::vector<HkNodeBasePtr> ctrs2;
-// ctrs2.reserve(50);
-// for (int i = 0;i < 50;i++) // with O2 works ok 01.09.2023
-// {
-//     // ctrs.emplace_back("MyContainer" + std::to_string(i + 20));
-//     const auto& ct = std::make_shared<HkContainer>("MyContauner");
-//     ct->setColor(i % 2 == 0 ? glm::vec3{ 0.7f, 0.8f, 0.9f } : glm::vec3{ 0.6f, 0.7f, 0.8f });
-//     ct->setSize({ 100, 100 });
-//     ctrs2.push_back(std::move(ct));
-//     // ctrs2.emplace_back(std::make_shared<HkContainer>("MyContauner"));
-//     // ctrs2.push_back(ctrs.at(i));
-// }
+    // std::vector<HkNodeBasePtr> ctrs2;
+    // ctrs2.reserve(500);
+    // for (int i = 0;i < 500;i++) // with O2 works ok 01.09.2023
+    // {
+    //     // ctrs.emplace_back("MyContainer" + std::to_string(i + 20));
+    //     const auto& ct = std::make_shared<HkContainer>("MyContauner");
+    //     ct->setColor(i % 2 == 0 ? glm::vec3{ 0.7f, 0.8f, 0.9f } : glm::vec3{ 0.6f, 0.7f, 0.8f });
+    //     ct->setSize({ 20, 20 });
+    //     ctrs2.push_back(std::move(ct));
+    //     // ctrs2.emplace_back(std::make_shared<HkContainer>("MyContauner"));
+    //     // ctrs2.push_back(ctrs.at(i));
+    // }
 
-    HkImageViewPtr imgView = std::make_shared<HkImageView>("MyImgView");
+    // HkImageViewPtr imgView = std::make_shared<HkImageView>("MyImgView");
     // HkImageViewPtr imgView2 = std::make_shared<HkImageView>("MyImgView2");
     // imgView->loadImage("/home/hekapoo/container.jpg");
     // imgView2->loadImage("/home/hekapoo/imeg.jpeg");
 
     bool isFs = false;
     int i = 2;
-    ctr2->setOnClickListener([&windowFrame, &isFs, &all_ctrs, &i]()
+    ctr3->setOnClickListener([&windowFrame, &isFs, &all_ctrs, &i]()
         {
             isFs ? windowFrame->setWindowMode(HkWindowFrameMode::Grabbable)
                 : windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
@@ -183,26 +193,27 @@ int main()
 
     // windowFrame->pushChildren({ ctr, ctr2 });
     windowFrame->setOverflow(true, true);
-    windowFrame->setDirection(HkDirection::Vertical);
+    windowFrame->setDirection(HkDirection::Horizontal);
     windowFrame->setHAlignment(HkAlignment::Center);
-    windowFrame->setVAlignment(HkAlignment::Bottom);
+    windowFrame->setVAlignment(HkAlignment::Center);
     windowFrame->pushChildren({ ctr, ctr2, ctr3, ctr4, ctr5 });
     // windowFrame->pushChildren(ctrs2);
     // ctr->pushChildren({ ctr2 });
     // ctr2->pushChildren({ imgView });
+    // ctr2->setOverflow(true, true);
     // ctr->pushChildren({ ctr3 });
     // ctr2->pushChildren({ ctr4, ctr5 });
 
     // windowFrame->pushChildren({ ctr, ctr2, ctr3, ctr4, ctr5 });
-    windowFrame->printTree();
+    // windowFrame->printTree();
 
     HkSceneManagement::get().setRoot(windowFrame);
     HkSceneManagement::get().init(1280, 720); // <--- GET RID OF THIS, IT FUCKS UP IF NOT SET EXACTLY AS THE WINDOW CREATION SIZE
     // HkSceneManagement::get().init(1920, 1080);
-    int time = 20000;
+    int time = 60'000;
     double previousTime = glfwGetTime();
     int frameCount = 0;
-    while (!glfwWindowShouldClose(window))
+    while (!glfwWindowShouldClose(window) && time > 0)
     {
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);

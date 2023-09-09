@@ -5,7 +5,9 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
+#include "../contexts/HkStyleContext.hpp"
 #include "../renderer/HkShader.hpp"
 
 namespace hkui
@@ -27,7 +29,7 @@ struct HkTextureInfo
 class HkRenderContext
 {
 public:
-    HkRenderContext();
+    HkRenderContext() = default;
     void setShaderSource(const std::string& vertSource, const std::string& fragSource);
     void render(const glm::mat4& projMat, const glm::mat4& modelMat);
     void setTextureRefId(const unsigned int textureId);
@@ -39,12 +41,22 @@ public:
     /* Getters */
     HkShader& getShader(); /* Non const, use it as a gateway */
 
-    // public:
+    /* Injects */
+    void injectStyleContext(HkStyleContext* styleContext);
+
 private:
-    HkRenderArch renderArch;
+    static HkRenderArch renderArch;
     uint32_t vaoId;
     HkShader shader_;
     std::vector<HkTextureInfo> texInfos_;
+
+    /* Injects */
+    HkStyleContext* styleContextInj_;
+
+    /* Statics */
+    static bool archCreated_;
+    static uint32_t boundVaoId_;
+
     // shader
     // Texture
     // Pos
