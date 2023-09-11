@@ -66,8 +66,8 @@ int main()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glEnable(GL_DEPTH_TEST); // this shows nothing now
 
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "HkUI", NULL, NULL);
-    // GLFWwindow* window = glfwCreateWindow(1920, 1080, "LearnOpenGL", NULL, NULL);
+    // GLFWwindow* window = glfwCreateWindow(1280, 720, "HkUI", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(1920, 1080, "HkUI", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -95,8 +95,8 @@ int main()
     windowFrame->setConstraintPolicy(HkConstraintPolicy::AlignLeftToRight);
     // windowFrame->setConstraintPolicy(HkConstraintPolicy::AlignTopToBottom);
     // windowFrame->setConstraintPolicy(HkConstraintPolicy::AlignEvenTopToBottom);
-    windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
-    // windowFrame->setWindowMode(HkWindowFrameMode::Grabbable);
+    // windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
+    windowFrame->setWindowMode(HkWindowFrameMode::Grabbable);
 
     HkContainerPtr ctr = std::make_shared<HkContainer>("MyContainer");
     HkContainerPtr ctr2 = std::make_shared<HkContainer>("MyContainer2");
@@ -116,21 +116,22 @@ int main()
 // ctr4->setMargins(HkStyleParams{ .marginLX = 0, .marginRX = 0, .marginTY = 10 });
 
     // std::vector<HkNodeBasePtr> ctrs2;
-    // ctrs2.reserve(500);
-    // for (int i = 0;i < 500;i++) // with O2 works ok 01.09.2023
+    // ctrs2.reserve(5'000);
+    // for (int i = 0;i < 5'000;i++) // with O2 works ok 01.09.2023
     // {
     //     // ctrs.emplace_back("MyContainer" + std::to_string(i + 20));
     //     const auto& ct = std::make_shared<HkContainer>("MyContauner");
-    //     ct->setColor(i % 2 == 0 ? glm::vec3{ 0.7f, 0.8f, 0.9f } : glm::vec3{ 0.6f, 0.7f, 0.8f });
+    //     // ct->setColor(i % 2 == 0 ? glm::vec3{ 0.7f, 0.8f, 0.9f } : glm::vec3{ 0.6f, 0.7f, 0.8f });
+    //     ct->setColor(i % 2 == 0 ? glm::vec3{ 0.75f, 0.75f, 0.75f } : glm::vec3{ 1.0f, 1.0f, 1.0f });
     //     ct->setSize({ 20, 20 });
     //     ctrs2.push_back(std::move(ct));
     //     // ctrs2.emplace_back(std::make_shared<HkContainer>("MyContauner"));
     //     // ctrs2.push_back(ctrs.at(i));
     // }
 
-    // HkImageViewPtr imgView = std::make_shared<HkImageView>("MyImgView");
+    HkImageViewPtr imgView = std::make_shared<HkImageView>("MyImgView");
     // HkImageViewPtr imgView2 = std::make_shared<HkImageView>("MyImgView2");
-    // imgView->loadImage("/home/hekapoo/container.jpg");
+    imgView->loadImage("/home/hekapoo/container.jpg");
     // imgView2->loadImage("/home/hekapoo/imeg.jpeg");
 
     bool isFs = false;
@@ -164,10 +165,10 @@ int main()
     // ctr4->setSize({ 100, 100 });
     // ctr5->setSize({ 500, 30 });
 
-    ctr->setSize({ 200, 50 });
-    ctr2->setSize({ 300, 250 });
-    ctr3->setSize({ 200, 150 });
-    ctr4->setSize({ 100, 50 });
+    ctr->setSize({ 200, 300 });
+    ctr2->setSize({ 300, 350 });
+    ctr3->setSize({ 200, 250 });
+    ctr4->setSize({ 100, 150 });
     ctr5->setSize({ 330, 450 });
 
 
@@ -177,19 +178,19 @@ int main()
     // ctr4->setSize({ 50, 100 });
     // ctr5->setSize({ 450, 330 });
 
-    // imgView->setSize({ 700, 900 });
+    imgView->setSize({ 300, 300 });
     // imgView2->setSize({ 1280 * 0.25f, 720 * 0.5f });
     // ctr->setOnClickListener()
 
-    // windowFrame->setPos({ 1280 * 0.25, 720 * 0.25 });
-    // windowFrame->setSize({ 1280 * 0.7, 720 * 0.7 });
+    windowFrame->setPos({ 1280 * 0.25, 720 * 0.25 });
+    windowFrame->setSize({ 1280 * 0.4, 720 * 0.7 });
 
     // windowFrame->setPos({ 300, 100 });
     // windowFrame->setSize({ 1280 / 2, 720 / 2 });
 
     /*Fill screen hack for not, later we shall position stuff relative to top left corner, not center*/
     // windowFrame->setPos({ 1280 * 0.5f, 15 });
-    windowFrame->setSize({ 1280 * 0.40, 720 * 0.75 - 30 });
+    // windowFrame->setSize({ 1280 * 0.40, 720 * 0.75 - 30 });
 
     // windowFrame->pushChildren({ ctr, ctr2 });
     windowFrame->setOverflow(true, true);
@@ -199,7 +200,10 @@ int main()
     windowFrame->pushChildren({ ctr, ctr2, ctr3, ctr4, ctr5 });
     // windowFrame->pushChildren(ctrs2);
     // ctr->pushChildren({ ctr2 });
-    // ctr2->pushChildren({ imgView });
+    ctr2->pushChildren({ ctr3 });
+    ctr3->pushChildren({ imgView });
+    ctr3->setOverflow(true, true);
+    ctr2->setOverflow(true, true);
     // ctr2->setOverflow(true, true);
     // ctr->pushChildren({ ctr3 });
     // ctr2->pushChildren({ ctr4, ctr5 });
@@ -208,8 +212,8 @@ int main()
     // windowFrame->printTree();
 
     HkSceneManagement::get().setRoot(windowFrame);
-    HkSceneManagement::get().init(1280, 720); // <--- GET RID OF THIS, IT FUCKS UP IF NOT SET EXACTLY AS THE WINDOW CREATION SIZE
-    // HkSceneManagement::get().init(1920, 1080);
+    // HkSceneManagement::get().init(1280, 720); // <--- GET RID OF THIS, IT FUCKS UP IF NOT SET EXACTLY AS THE WINDOW CREATION SIZE
+    HkSceneManagement::get().init(1920, 1080);
     int time = 60'000;
     double previousTime = glfwGetTime();
     int frameCount = 0;

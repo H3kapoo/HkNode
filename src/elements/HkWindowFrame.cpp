@@ -14,10 +14,9 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
 
 {
     node_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
-    // node_.renderContext.getShader().setVec3f("color", glm::vec3(0.0f, 0.5f, 0.9f));
     node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix());
 
-    node_.styleContext.color = glm::vec3(0.0f, 0.5f, 0.9f);
+    node_.styleContext.setColor(glm::vec3(0.0f, 0.5f, 0.9f));
 
 
     treeStruct_.pushChild(&minimizeBtn_.treeStruct_);
@@ -104,7 +103,7 @@ void HkWindowFrame::setOverflow(bool x, bool y)
 
 void HkWindowFrame::setColor(const glm::vec3& color)
 {
-    node_.renderContext.getShader().setVec3f("color", color);
+    node_.styleContext.setColor(color);
 }
 
 void HkWindowFrame::setPos(const glm::vec2& pos)

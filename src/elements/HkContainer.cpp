@@ -8,24 +8,22 @@ HkContainer::HkContainer(const std::string& containerName)
     , vScrollBar_("{Internal}-VScrollBarFor " + containerName, false)
     , scrollbBarsCount_{ 0 }
 {
-    // node_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
+    node_.styleContext.setColor(glm::vec3(0.5f, 0.5f, 0.5f));
     node_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
-    // node_.renderContext.getShader().setVec3f("color", glm::vec3(0.5f, 0.5f, 0.5f)); // gray
     node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix());
-
-    node_.styleContext.color = glm::vec3(0.5f, 0.5f, 0.5f);
-
 
     /* NOTE: In the future maybe this dummy can be an actual small UI element, but for now let it be
        just a normal renderable detail */
     dummyXYIntersectorData_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
-    dummyXYIntersectorData_.renderContext.getShader().setVec3f("color", glm::vec3(0.7f, 1.0f, 0.2f));
+    dummyXYIntersectorData_.renderContext.injectStyleContext(&dummyXYIntersectorData_.styleContext);
+    dummyXYIntersectorData_.styleContext.setColor(glm::vec3(0.7f, 1.0f, 0.2f));
+
 
     //TODO: Dummy just to test nested scrollbars
     if (treeStruct_.getName() == "MyContainer2")
     {
-        vScrollBar_.node_.renderContext.getShader().setVec3f("color", glm::vec3(0.4f, 0.2f, 0.6f));
-        hScrollBar_.node_.renderContext.getShader().setVec3f("color", glm::vec3(0.4f, 0.2f, 0.6f));
+        vScrollBar_.node_.styleContext.setColor(glm::vec3(0.4f, 0.2f, 0.6f));
+        hScrollBar_.node_.styleContext.setColor(glm::vec3(0.4f, 0.2f, 0.6f));
     }
 
     // node_.constraintContext.isOverflowAllowedX_ = true;
@@ -238,8 +236,7 @@ void HkContainer::setOverflow(bool x, bool y)
 
 void HkContainer::setColor(const glm::vec3& color)
 {
-    // node_.renderContext.getShader().setVec3f("color", color);
-    node_.styleContext.color = color;
+    node_.styleContext.setColor(color);
 }
 
 void HkContainer::setPos(const glm::vec2& pos)

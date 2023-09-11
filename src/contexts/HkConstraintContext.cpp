@@ -43,8 +43,8 @@ void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children,
     uint32_t lastRowEndId = 0;
     int32_t nextXAdvance = 0;
     int32_t maybeHighest = 0;
-    bool rowWrapping = true; // make style
-    // bool rowWrapping = false; // make style
+    // bool rowWrapping = true; // make style
+    bool rowWrapping = false; // make style
     for (uint32_t i = 0; i < children.size() - sbCount_; i++)
     {
         auto& child = children[i]->getPayload()->node_;

@@ -36,9 +36,8 @@ void HkRenderContext::render(const glm::mat4& projMat, const glm::mat4& modelMat
 {
     shader_.setMatrix4("proj", projMat);
     shader_.setMatrix4("model", modelMat);
-    shader_.setVec3f("color", styleContextInj_->color);
 
-    // shader_.setVec3f("color", glm::vec3(0.0f, 0.5f, 0.9f));
+    styleContextInj_->setUniforms(shader_);
 
 
     //TODO: At some point batching will be needed to avoid context switching

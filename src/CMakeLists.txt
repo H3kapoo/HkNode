@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.22)
 project(hkNode)
 
 set(CMAKE_CXX_STANDARD 23)
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -g") # debug mode
-# set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -O2") # optimized
+# set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -g") # debug mode
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -O2") # optimized
 # set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pg") # profiling (gprof hkNode gmon.out | gprof2dot -w -s --color-nodes-by-selftime | dot -Gdpi=100 -Tpng -o output.png)
 
 #valgrind --tool=massif ./hkNode 

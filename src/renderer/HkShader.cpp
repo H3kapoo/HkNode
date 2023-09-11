@@ -67,7 +67,7 @@ void HkShader::bind() const
     if (currentlyActiveShaderId_ == shaderId_) return;
     currentlyActiveShaderId_ = shaderId_;
     glUseProgram(shaderId_);
-    std::cout << "Shader " << shaderId_ << " is now bound\n";
+    // std::cout << "Shader " << shaderId_ << " is now bound\n";
 }
 
 void HkShader::unbind() const { glUseProgram(0); }
