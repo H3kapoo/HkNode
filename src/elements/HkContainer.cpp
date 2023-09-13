@@ -108,15 +108,13 @@ void HkContainer::onDrag()
 void HkContainer::resolveChildrenConstraints(HkTreeStruct& children,
     const HkScrollbarsSize&)
 {
-    // HkNodeBase::resolveChildrenConstraints(children, {});
-    // HkNodeBase::resolveChildrenConstraints(children, { 50,50 });
-    // /* We need to notify constraint ctx about scrollbars scroll value so we can offset the children if needed*/
-    // //TODO: OPtimize: why do this even if we dont have SBs?
+    /* We need to notify constraint ctx about scrollbars scroll value so we can offset the children if needed*/
+    //TODO: OPtimize: why do this even if we dont have SBs?
     node_.constraintContext.offsetPercentage_.x = hScrollBar_.getScrollValue();
     node_.constraintContext.offsetPercentage_.y = vScrollBar_.getScrollValue();
 
-    // /* Resolve children constraints (ignores scrollbar children) */
-    // //TODO: This ^ resolve shall be done base on node constrain policy, add function here too for setting policy
+    /* Resolve children constraints (ignores scrollbar children) */
+    //TODO: This ^ resolve shall be done base on node constrain policy, add function here too for setting policy
     HkNodeBase::resolveChildrenConstraints(children,
         {
     hScrollBar_.node_.transformContext.getScale().y,

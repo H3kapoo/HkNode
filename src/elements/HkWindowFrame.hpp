@@ -24,7 +24,9 @@ public:
     HkWindowFrame(const std::string& windowName);
 
     /* IHRootNode */
-    void rootUpdateMySelf() override;
+    void rootUpdate() override;
+    HkNodeBase* getUnderlayingNode() override;
+
 
     /* HkNodeBase */
     void onScroll() override;

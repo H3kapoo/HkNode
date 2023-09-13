@@ -34,9 +34,11 @@ void HkRenderContext::setShaderSource(const std::string& vertSource, const std::
 /* Actually render the mesh */
 void HkRenderContext::render(const glm::mat4& projMat, const glm::mat4& modelMat)
 {
+    /* Set always mandatory to have uniforms */
     shader_.setMatrix4("proj", projMat);
     shader_.setMatrix4("model", modelMat);
 
+    /* Setup whatever user defined uniforms need to be set */
     styleContextInj_->setUniforms(shader_);
 
 
@@ -64,6 +66,7 @@ void HkRenderContext::render(const glm::mat4& projMat, const glm::mat4& modelMat
     // glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+//TODO: Shall be better separated in the future
 /* Setup buffers with the currently set architecture */
 void HkRenderContext::setupArch()
 {

@@ -1,13 +1,16 @@
 #pragma once
 
 #include <memory>
+#include "HkNodeBase.hpp"
 
 namespace hkui
 {
+class HkNodeBase;
 class IHkRootNode
 {
 public:
-    virtual void rootUpdateMySelf() = 0;
+    virtual void rootUpdate() = 0;
+    virtual HkNodeBase* getUnderlayingNode() = 0;
     virtual ~IHkRootNode() = default;
 };
 using IHkRootNodeCPtr = const std::shared_ptr<IHkRootNode>;

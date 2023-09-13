@@ -14,18 +14,13 @@ class HkStyleContext
 public:
     HkStyleContext() = default;
 
-    HkStyleContext& setColor(const glm::vec3 color)
-    {
-        colorPair.enabled = true;
-        colorPair.value = color;
-        return *this;
-    }
+    /* Setters */
+    HkStyleContext& setColor(const glm::vec3 color);
+    void setUniforms(HkShader& shader);
 
-    void setUniforms(HkShader& shader)
-    {
-        if (colorPair.enabled)
-            shader.setVec3f("color", colorPair.value);
-    }
+    /* Getters */
+    bool isRowWrappingEnabled();
+    bool isColWrappingEnabled();
 
 private:
     template<typename T>
@@ -35,7 +30,11 @@ private:
         T value;
     };
 
+    /* Shader enablers */
+    EnablerPair<glm::vec3> colorEn;
+
     /* Attribs */
-    EnablerPair<glm::vec3> colorPair;
+    bool rowWrap{ false };
+    bool colWrap{ false };
 };
 } // hkui

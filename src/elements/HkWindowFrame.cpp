@@ -9,15 +9,12 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
     , exitBtn_("{Internal}-ExitButtonFor " + windowName)
     , wfCont_("{Internal}-ContainerFor " + windowName)
     , mode_{ HkWindowFrameMode::Grabbable }
-    , cachedScale_{ 1280 * 0.75, 720 * 0.75 - 30 } //TODO: hack just for now
+    , cachedScale_{ 680, 480 } //TODO: hack just for now
     , cachedPos_{ 0,0 }
-
 {
     node_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
     node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix());
-
     node_.styleContext.setColor(glm::vec3(0.0f, 0.5f, 0.9f));
-
 
     treeStruct_.pushChild(&minimizeBtn_.treeStruct_);
     treeStruct_.pushChild(&exitBtn_.treeStruct_);
@@ -34,7 +31,9 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
         });
 }
 
-void HkWindowFrame::rootUpdateMySelf() { updateMySelf(); }
+void HkWindowFrame::rootUpdate() { updateMySelf(); renderMySelf(); }
+
+HkNodeBase* HkWindowFrame::getUnderlayingNode() { return this; }
 
 void HkWindowFrame::onScroll()
 {

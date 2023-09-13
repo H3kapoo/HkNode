@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../management/HkSceneManagement.hpp"
+#include "../management/HkSceneData.hpp"
 #include "../base/HkNodeData.hpp"
 #include "../base/HkTreeStructure.hpp"
 
@@ -24,6 +24,8 @@ using HkTreeStruct = std::vector<HkTreeStructure<HkNodeBase, HkNodeType>*>;
 class HkNodeBase
 {
     friend class HkSceneManagement;
+    friend class HkSceneRenderer;
+
     friend class HkWindowFrame;
     friend class HkContainer;
     friend class HkButton;
@@ -39,6 +41,7 @@ public:
 private:
     /* These functions/params will be accessible to friend classes but will not be accessible to user */
     /* Derived can override whatever function it needs */
+    virtual void renderMySelf();
     virtual void updateMySelf();
 
     /* Constraints */
@@ -46,7 +49,6 @@ private:
         const HkScrollbarsSize& sbSizes = {});
 
     /* Events */
-    virtual void onFirstHeartbeat();
     virtual void onDrag();
     virtual void onClick();
     virtual void onRelease();
@@ -71,8 +73,6 @@ private:
     HkNodeData node_;
     HkTreeStructure<HkNodeBase, HkNodeType> treeStruct_;
     HkSceneData& sceneDataRef_; /* This is safe as singleton will outlive THIS class anyway*/
-
-    bool hadFirstHeartbeat_;
 };
 
 using HkNodeBasePtr = std::shared_ptr<HkNodeBase>;

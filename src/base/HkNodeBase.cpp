@@ -1,14 +1,55 @@
 #include "HkNodeBase.hpp"
 
+#include "../management/HkSceneManagement.hpp" //TODO: THis needs to disappear when no more static scene manager
+
 namespace hkui
 {
 HkNodeBase::HkNodeBase(const std::string& windowName, const HkNodeType& type)
     : treeStruct_(this, windowName, type)
     , sceneDataRef_(HkSceneManagement::get().getSceneDataRef())
-    , hadFirstHeartbeat_{ false }
 {
     node_.constraintContext.setRootTc(&node_.transformContext);
     node_.renderContext.injectStyleContext(&node_.styleContext);
+}
+
+void HkNodeBase::renderMySelf()
+{
+    auto& tc = node_.transformContext;
+
+    /* We only render the visible area of the UI element as calculated in the update pass*/
+    glEnable(GL_SCISSOR_TEST);
+    glScissor(
+        tc.getVPos().x - 1,
+        sceneDataRef_.windowHeight - tc.getVPos().y - tc.getVScale().y + 1,
+        tc.getVScale().x,
+        tc.getVScale().y);
+
+    /* Normal rendering */
+    if (tc.getVScale().x && tc.getVScale().y)
+    {
+        node_.renderContext.render(sceneDataRef_.sceneProjMatrix, tc.getModelMatrix());
+
+        /* Update children. Also don't require bellow children to be rendered if parent can't be rendered itself */
+        auto& children = treeStruct_.getChildren();
+        for (uint32_t i = 0;i < children.size(); i++)
+        {
+            children[i]->getPayload()->renderMySelf();
+        }
+    }
+
+    /* Use this to render additional non interactive things if needed */
+    /* Note: rescissoring to original parent is needed unfortunatelly */
+    glEnable(GL_SCISSOR_TEST);
+    glScissor(
+        tc.getVPos().x - 1,
+        sceneDataRef_.windowHeight - tc.getVPos().y - tc.getVScale().y + 1,
+        tc.getVScale().x,
+        tc.getVScale().y);
+
+    postRenderAdditionalDetails();
+
+    /* Disable scissors after rendering UI */
+    glDisable(GL_SCISSOR_TEST);
 }
 
 /*
@@ -18,44 +59,26 @@ HkNodeBase::HkNodeBase(const std::string& windowName, const HkNodeType& type)
 void HkNodeBase::updateMySelf()
 {
     const auto& parentTreeStruct = treeStruct_.getParent();
-    glEnable(GL_SCISSOR_TEST);
+    auto& tc = node_.transformContext;
 
-    //TODO: If children dont have children themselves, maybe no need to scissor?
     /* Compute renderable/inveractive area for each element */
     if (treeStruct_.getType() == HkNodeType::RootWindowFrame)
     {
-        auto& tc = node_.transformContext;
         tc.setVPos(tc.getPos());
         tc.setVScale(tc.getScale());
-
-        glScissor(
-            tc.getPos().x - 1,
-            sceneDataRef_.windowHeight - tc.getPos().y - tc.getScale().y + 1,
-            tc.getScale().x,
-            tc.getScale().y);
     }
     else if (parentTreeStruct && parentTreeStruct->getType() == HkNodeType::RootWindowFrame)
     {
         /* Minimize only container of windowframe */
         if (sceneDataRef_.isSceneMinimized && treeStruct_.getType() == HkNodeType::Container)
         {
-            auto& tc = node_.transformContext;
             tc.setVPos({ 0,0 });
             tc.setVScale({ 0,0 });
-
-            glScissor(0, 0, 0, 0);
         }
         else
         {
-            auto& tc = node_.transformContext;
             tc.setVPos(tc.getPos());
             tc.setVScale(tc.getScale());
-
-            glScissor(
-                tc.getPos().x - 1,
-                sceneDataRef_.windowHeight - tc.getPos().y - tc.getScale().y + 1,
-                tc.getScale().x,
-                tc.getScale().y);
         }
     }
     /* Basically use parent's visible area to bound the rendering of it's children */
@@ -71,12 +94,6 @@ void HkNodeBase::updateMySelf()
         const auto bboxTc = node_.transformContext.computeBBoxWith(cx);
         node_.transformContext.setVPos(bboxTc.pos);
         node_.transformContext.setVScale(bboxTc.scale);
-
-        glScissor(
-            bboxTc.pos.x - 1,
-            sceneDataRef_.windowHeight - bboxTc.pos.y - bboxTc.scale.y + 1,
-            bboxTc.scale.x,
-            bboxTc.scale.y);
     }
 
     /* Main HkEvents handler */
@@ -94,43 +111,15 @@ void HkNodeBase::updateMySelf()
     case HkEvent::DropPath: break;
     }
 
-    if (!hadFirstHeartbeat_)
-    {
-        onFirstHeartbeat();
-        hadFirstHeartbeat_ = true;
-    }
-
-    // /* Normal rendering */
-    auto& tc = node_.transformContext;
-    // //TODO: Extend this performance gain further
-    if (tc.getVScale().x && tc.getVScale().y)
-    {
-        node_.renderContext.render(sceneDataRef_.sceneProjMatrix, tc.getModelMatrix());
-    }
-
     auto& children = treeStruct_.getChildren();
     /* Resolve child constraints relative to parent */
     resolveChildrenConstraints(children, {});
 
     /* Update children */
-    for (uint32_t i = 0;i < children.size(); i++) //TODO: Maybe also cull tree branches unable to be seen?
+    for (uint32_t i = 0;i < children.size(); i++)
     {
         children[i]->getPayload()->updateMySelf();
     }
-
-    /* Use this to render additional non interactive things if needed */
-    /* Note: rescissoring to original parent is needed unfortunatelly */
-    glEnable(GL_SCISSOR_TEST);
-    glScissor(
-        tc.getVPos().x - 1,
-        sceneDataRef_.windowHeight - tc.getVPos().y - tc.getVScale().y + 1,
-        tc.getVScale().x,
-        tc.getVScale().y);
-
-    // postRenderAdditionalDetails();
-
-    /* Disable scissors after rendering UI */
-    glDisable(GL_SCISSOR_TEST);
 }
 
 /* Resolve constraints based on set policy on this node */
@@ -228,7 +217,6 @@ void HkNodeBase::resolveMouseMovementEvent()
 
 /* Events to be consumed by derived if needed */
 void HkNodeBase::postRenderAdditionalDetails() {}
-void HkNodeBase::onFirstHeartbeat() {}
 void HkNodeBase::onDrag() {}
 void HkNodeBase::onClick() {}
 void HkNodeBase::onRelease() {}

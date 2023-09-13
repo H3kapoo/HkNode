@@ -13,6 +13,11 @@ HkSceneManagement& HkSceneManagement::get()
 
 HkSceneData& HkSceneManagement::getSceneDataRef() { return sceneData; }
 
+//TODO: Cant do this yet, get rid of singleton
+// HkSceneManagement::HkSceneManagement()
+//     : sceneRenderer_(sceneData)
+// {}
+
 //TODO: this function shall be deprecated
 void HkSceneManagement::init(int wWidth, int wHeight)
 {
@@ -41,11 +46,10 @@ void HkSceneManagement::setRoot(IHkRootNodeCPtr& newRootNode)
     }
 }
 
-//TODO: Investigate in the future why calling update() one time generates more than one event loop
+//TODO: Maybe this shall be used in the future for over time animations when no events are spawned
 void HkSceneManagement::update()
 {
-    // update(HkEvent::GeneralUpdate);
-    update(HkEvent::None); //TODO: Hack just for now. We must split rendering and updating
+    update(HkEvent::GeneralUpdate);
 }
 
 void HkSceneManagement::update(const HkEvent& ev)
@@ -58,10 +62,8 @@ void HkSceneManagement::update(const HkEvent& ev)
     }
 
     sceneData.currentEvent = ev;
-    rootNode->rootUpdateMySelf();
-    /* Not sure that to do with this for now, maybe it will be useful later */
-    sceneData.currentEvent = HkEvent::None; // HkEvent gets consumed
-
+    rootNode->rootUpdate();
+    sceneData.currentEvent = HkEvent::None; /* Reset current event */
 }
 
 void HkSceneManagement::resizeWindowEvent(GLFWwindow*, int width, int height)

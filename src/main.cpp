@@ -95,8 +95,8 @@ int main()
     windowFrame->setConstraintPolicy(HkConstraintPolicy::AlignLeftToRight);
     // windowFrame->setConstraintPolicy(HkConstraintPolicy::AlignTopToBottom);
     // windowFrame->setConstraintPolicy(HkConstraintPolicy::AlignEvenTopToBottom);
-    // windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
-    windowFrame->setWindowMode(HkWindowFrameMode::Grabbable);
+    windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
+    // windowFrame->setWindowMode(HkWindowFrameMode::Grabbable);
 
     HkContainerPtr ctr = std::make_shared<HkContainer>("MyContainer");
     HkContainerPtr ctr2 = std::make_shared<HkContainer>("MyContainer2");
@@ -115,19 +115,19 @@ int main()
 // uint32_t marginTY{ 0 }, marginBY{ 0 };
 // ctr4->setMargins(HkStyleParams{ .marginLX = 0, .marginRX = 0, .marginTY = 10 });
 
-    // std::vector<HkNodeBasePtr> ctrs2;
-    // ctrs2.reserve(5'000);
-    // for (int i = 0;i < 5'000;i++) // with O2 works ok 01.09.2023
-    // {
-    //     // ctrs.emplace_back("MyContainer" + std::to_string(i + 20));
-    //     const auto& ct = std::make_shared<HkContainer>("MyContauner");
-    //     // ct->setColor(i % 2 == 0 ? glm::vec3{ 0.7f, 0.8f, 0.9f } : glm::vec3{ 0.6f, 0.7f, 0.8f });
-    //     ct->setColor(i % 2 == 0 ? glm::vec3{ 0.75f, 0.75f, 0.75f } : glm::vec3{ 1.0f, 1.0f, 1.0f });
-    //     ct->setSize({ 20, 20 });
-    //     ctrs2.push_back(std::move(ct));
-    //     // ctrs2.emplace_back(std::make_shared<HkContainer>("MyContauner"));
-    //     // ctrs2.push_back(ctrs.at(i));
-    // }
+    std::vector<HkNodeBasePtr> ctrs2;
+    ctrs2.reserve(5'000);
+    for (int i = 0;i < 5'000;i++) // with O2 works ok 01.09.2023
+    {
+        // ctrs.emplace_back("MyContainer" + std::to_string(i + 20));
+        const auto& ct = std::make_shared<HkContainer>("MyContauner");
+        // ct->setColor(i % 2 == 0 ? glm::vec3{ 0.7f, 0.8f, 0.9f } : glm::vec3{ 0.6f, 0.7f, 0.8f });
+        ct->setColor(i % 2 == 0 ? glm::vec3{ 0.75f, 0.75f, 0.75f } : glm::vec3{ 1.0f, 1.0f, 1.0f });
+        ct->setSize({ 20, 20 });
+        ctrs2.push_back(std::move(ct));
+        // ctrs2.emplace_back(std::make_shared<HkContainer>("MyContauner"));
+        // ctrs2.push_back(ctrs.at(i));
+    }
 
     HkImageViewPtr imgView = std::make_shared<HkImageView>("MyImgView");
     // HkImageViewPtr imgView2 = std::make_shared<HkImageView>("MyImgView2");

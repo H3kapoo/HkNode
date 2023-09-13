@@ -5,8 +5,8 @@ namespace hkui
 HkImageView::HkImageView(const std::string& name)
     : HkNodeBase(name, HkNodeType::ImageView)
 {
-    node_.renderContext.setShaderSource("assets/shaders/vTextured.glsl", "assets/shaders/fTextured.glsl");
-    node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix());
+    node_.renderContext.setShaderSource("assets/shaders/vTextured.glsl", "assets/shaders/fTextured.glsl"); //TODO: Could be grabbed from style?
+    node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix()); //TODO: Not needed anymore
 }
 
 void HkImageView::loadImage(const std::string& loadPath)

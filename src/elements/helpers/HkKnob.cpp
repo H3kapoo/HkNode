@@ -56,6 +56,7 @@ void HkKnob::computeKnobValue(const glm::ivec2 offsetFromCenter)
 void HkKnob::setValue(float value)
 {
     value_ = value;
+
     if (value_ < 0.0f) value_ = 0.0f;
     if (value_ > 1.0f) value_ = 1.0f;
 }
