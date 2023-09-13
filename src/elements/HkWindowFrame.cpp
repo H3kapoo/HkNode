@@ -16,6 +16,7 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
     node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix());
     node_.styleContext.setColor(glm::vec3(0.0f, 0.5f, 0.9f));
 
+    wfCont_.node_.styleContext.setRowWrapping(true);
     treeStruct_.pushChild(&minimizeBtn_.treeStruct_);
     treeStruct_.pushChild(&exitBtn_.treeStruct_);
     treeStruct_.pushChild(&wfCont_.treeStruct_);

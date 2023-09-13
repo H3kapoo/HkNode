@@ -9,6 +9,7 @@ HkNodeBase::HkNodeBase(const std::string& windowName, const HkNodeType& type)
     , sceneDataRef_(HkSceneManagement::get().getSceneDataRef())
 {
     node_.constraintContext.setRootTc(&node_.transformContext);
+    node_.constraintContext.injectStyleContext(&node_.styleContext);
     node_.renderContext.injectStyleContext(&node_.styleContext);
 }
 

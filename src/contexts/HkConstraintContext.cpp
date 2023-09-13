@@ -43,8 +43,6 @@ void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children,
     uint32_t lastRowEndId = 0;
     int32_t nextXAdvance = 0;
     int32_t maybeHighest = 0;
-    bool rowWrapping = true; // make style
-    // bool rowWrapping = false; // make style
     for (uint32_t i = 0; i < children.size() - sbCount_; i++)
     {
         auto& child = children[i]->getPayload()->node_;
@@ -53,7 +51,7 @@ void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children,
 
         /* How much we need to advance to place next child */
         nextXAdvance = startPosX + childCc.styleParams_.marginLX + childCc.styleParams_.marginRX + childTc.getScale().x;
-        if (rowWrapping)
+        if (styleContextInj_->isRowWrappingEnabled())
         {
             /* This basically "spawns" a new row */
             if (nextXAdvance > thisTc_->getScale().x)
@@ -113,7 +111,6 @@ void HkConstraintContext::resolveVerticalContainer(HkTreeStruct& children,
     uint32_t lastColEndId = 0;
     int32_t nextYAdvance = 0;
     int32_t maybeLongest = 0;
-    bool colWrapping = true; // make style
     for (uint32_t i = 0; i < children.size() - sbCount_; i++)
     {
         auto& child = children[i]->getPayload()->node_;
@@ -122,7 +119,7 @@ void HkConstraintContext::resolveVerticalContainer(HkTreeStruct& children,
 
         /* How much we need to advance to place next child */
         nextYAdvance = startPosY + childCc.styleParams_.marginBY + childCc.styleParams_.marginTY + childTc.getScale().y; //TODO: Minimize this call
-        if (colWrapping)
+        if (styleContextInj_->isColWrappingEnabled())
         {
             /* This basically "spawns" a new col */
             if (nextYAdvance > thisTc_->getScale().y)
@@ -487,4 +484,10 @@ void HkConstraintContext::windowFrameContainerConstraint(HkTransformContext& wfC
     wfCtr.setScale(windowSize + 1); //TODO: hacK: looks like wfCtr gets a windowSize thats lacking exactly 1px behind
     wfCtr.setPos({ 0,0 });
 }
+
+void HkConstraintContext::injectStyleContext(HkStyleContext* styleContext)
+{
+    styleContextInj_ = styleContext;
+}
+
 } // hkui

@@ -5,6 +5,7 @@
 
 #include "../base/HkTreeStructure.hpp"
 #include "HkTransformContext.hpp"
+#include "HkStyleContext.hpp"
 
 namespace hkui
 {
@@ -124,6 +125,9 @@ public:
     void windowFrameContainerConstraint(HkTransformContext& wfCtr, HkTransformContext& exitBtn,
         HkTransformContext& minBtn, const glm::ivec2& windowSize, const bool isFullscreen) const;
 
+    /* Injects */
+    void injectStyleContext(HkStyleContext* styleContext);
+
     /* Style related */
     const HkStyleParams& getStyle() const;
 
@@ -140,6 +144,8 @@ public:
 
     HkStyleParams styleParams_; //TODOl Shall be its own context
 private:
+    HkStyleContext* styleContextInj_;
+
     HkConstraintPolicy policy_;
     HkTransformContext* thisTc_;
     // Container related

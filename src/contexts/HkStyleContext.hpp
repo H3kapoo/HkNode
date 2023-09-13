@@ -16,6 +16,9 @@ public:
 
     /* Setters */
     HkStyleContext& setColor(const glm::vec3 color);
+    void setRowWrapping(const bool value);
+    void setColWrapping(const bool value);
+
     void setUniforms(HkShader& shader);
 
     /* Getters */
