@@ -48,13 +48,15 @@ public:
 
 private:
     static HkRenderArch renderArch;
-    uint32_t vaoId;
+    uint32_t vaoId; /* Note: only the first element created with this renderArch will have vao variable filled. THe rest of the object will have garbage
+                                   Maybe in the future we could abstract this class even more.
+                                   Let it slide for now (overflow and garbage val) but I shall come back later for it
+    */
     HkShader shader_;
     std::vector<HkTextureInfo> texInfos_;
 
     /* Injects */
     HkStyleContext* styleContextInj_;
-
 
     /* Element enabled shader uniforms */
     bool colorUniformEnabled_{ false };

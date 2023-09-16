@@ -26,7 +26,7 @@ void HkConstraintContext::resolveConstraints(HkTreeStruct& children,
 }
 
 void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children,
-    const HkScrollbarsSize sbSizes)
+    const HkScrollbarsSize) //TODO: Take into account sbSize in the future
 {
     int32_t startPosX = 0, startPosY = 0;
     int32_t highestYOnRow = 0;
@@ -93,7 +93,7 @@ void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children,
 }
 
 void HkConstraintContext::resolveVerticalContainer(HkTreeStruct& children,
-    const HkScrollbarsSize sbSizes)
+    const HkScrollbarsSize) //TODO: Take into account sbSize in the future
 {
     //TODO: move into hpp so we dont redeclare them each frame
     int32_t startPosX = 0, startPosY = 0;

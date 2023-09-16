@@ -10,7 +10,6 @@ HkKnob::HkKnob(const std::string& name, const bool isHorizontal)
 {
     node_.styleContext.setColor(glm::vec3(0.5f, 0.7f, 0.9f));
     node_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
-    node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix());
 }
 
 void HkKnob::onDrag()

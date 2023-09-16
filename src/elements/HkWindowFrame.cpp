@@ -13,7 +13,6 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
     , cachedPos_{ 0,0 }
 {
     node_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
-    node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix());
     node_.styleContext.setColor(glm::vec3(0.0f, 0.5f, 0.9f));
 
     wfCont_.node_.styleContext.setRowWrapping(true);

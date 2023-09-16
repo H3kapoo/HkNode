@@ -60,8 +60,8 @@ void HkRenderContext::render(const glm::mat4& projMat, const glm::mat4& modelMat
         glBindVertexArray(vaoId);
         std::cout << "VAO " << vaoId << " is now bound\n";
         boundVaoId_ = vaoId;
-
     }
+
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
     //TODO: Maybe unbinding is not really needed, just like with VAO
