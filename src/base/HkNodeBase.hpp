@@ -37,6 +37,10 @@ class HkNodeBase
 
 public:
     HkNodeBase(const std::string& windowName, const HkNodeType& type);
+
+    /* Getters */
+    virtual HkStyleContext& getStyle();
+
     virtual ~HkNodeBase() = default;
 private:
     /* These functions/params will be accessible to friend classes but will not be accessible to user */

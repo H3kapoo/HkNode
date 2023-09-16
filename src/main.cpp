@@ -92,9 +92,6 @@ int main()
 
     HkWindowFramePtr windowFrame = std::make_shared<HkWindowFrame>("MyWindowFrame");
 
-    windowFrame->setConstraintPolicy(HkConstraintPolicy::AlignLeftToRight);
-    // windowFrame->setConstraintPolicy(HkConstraintPolicy::AlignTopToBottom);
-    // windowFrame->setConstraintPolicy(HkConstraintPolicy::AlignEvenTopToBottom);
     windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
     // windowFrame->setWindowMode(HkWindowFrameMode::Grabbable);
 
@@ -106,7 +103,7 @@ int main()
     std::vector<HkContainerPtr> all_ctrs{ ctr,ctr2, ctr3, ctr4, ctr5 };
     for (const auto& c : all_ctrs)
     {
-        c->setVAlignment(HkAlignment::Center);
+        c->getStyle().setVAlignment(HkVAlignment::Center);
         // c->setHAlignment(HkAlignment::Bottom);
         // c->setMargins(HkStyleParams{ .marginLX = 10, .marginRX = 10, .marginTY = 10, .marginBY = 10 });
     }
@@ -116,8 +113,8 @@ int main()
 // ctr4->setMargins(HkStyleParams{ .marginLX = 0, .marginRX = 0, .marginTY = 10 });
 
     std::vector<HkNodeBasePtr> ctrs2;
-    ctrs2.reserve(5'000);
-    for (int i = 0;i < 5'000;i++) // with O2 works ok 01.09.2023
+    ctrs2.reserve(10'000);
+    for (int i = 0;i < 10'000;i++) // with O2 works ok 01.09.2023
     {
         // ctrs.emplace_back("MyContainer" + std::to_string(i + 20));
         const auto& ct = std::make_shared<HkContainer>("MyContauner");
@@ -130,9 +127,9 @@ int main()
     }
 
     HkImageViewPtr imgView = std::make_shared<HkImageView>("MyImgView");
-    // HkImageViewPtr imgView2 = std::make_shared<HkImageView>("MyImgView2");
+    HkImageViewPtr imgView2 = std::make_shared<HkImageView>("MyImgView2");
     imgView->loadImage("/home/hekapoo/container.jpg");
-    // imgView2->loadImage("/home/hekapoo/imeg.jpeg");
+    imgView2->loadImage("/home/hekapoo/imeg.jpeg");
 
     bool isFs = false;
     int i = 2;
@@ -167,10 +164,11 @@ int main()
 
     ctr->setSize({ 200, 300 });
     ctr2->setSize({ 300, 350 });
-    ctr3->setSize({ 200, 250 });
+    ctr3->setSize({ 400, 450 });
     ctr4->setSize({ 100, 150 });
     ctr5->setSize({ 330, 450 });
 
+    // ctr5->getStyle().setColor({ 1.0f, 1.0f, 1.0f });
 
     // ctr->setSize({ 50, 200 });
     // ctr2->setSize({ 250, 300 });
@@ -193,21 +191,23 @@ int main()
     // windowFrame->setSize({ 1280 * 0.40, 720 * 0.75 - 30 });
 
     // windowFrame->pushChildren({ ctr, ctr2 });
-    windowFrame->setOverflow(true, true);
-    windowFrame->setDirection(HkDirection::Horizontal);
-    windowFrame->setHAlignment(HkAlignment::Center);
-    windowFrame->setVAlignment(HkAlignment::Center);
+    windowFrame->getStyle().setOverflowAllowedXY(true)
+        .setDirection(HkDirection::Horizontal)
+        .setHAlignment(HkHAlignment::Left)
+        .setVAlignment(HkVAlignment::Center);
     windowFrame->pushChildren({ ctr, ctr2, ctr3, ctr4, ctr5 });
     // windowFrame->pushChildren(ctrs2);
-    // ctr->pushChildren({ ctr2 });
+    ctr->pushChildren({ ctr2 });
     ctr2->pushChildren({ ctr3 });
-    ctr3->pushChildren({ imgView });
-    ctr3->setOverflow(true, true);
-    ctr2->setOverflow(true, true);
+    ctr3->pushChildren({ imgView, imgView2 });
+    ctr3->getStyle().setOverflowAllowedXY(true);
+    ctr2->getStyle().setOverflowAllowedXY(true);
+    imgView->getStyle().setAllMargins(20);
+
+    ctr->getStyle().setLeftRightMargins(30);
     // ctr2->setOverflow(true, true);
     // ctr->pushChildren({ ctr3 });
     // ctr2->pushChildren({ ctr4, ctr5 });
-
     // windowFrame->pushChildren({ ctr, ctr2, ctr3, ctr4, ctr5 });
     // windowFrame->printTree();
 

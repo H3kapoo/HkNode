@@ -8,9 +8,10 @@ HkNodeBase::HkNodeBase(const std::string& windowName, const HkNodeType& type)
     : treeStruct_(this, windowName, type)
     , sceneDataRef_(HkSceneManagement::get().getSceneDataRef())
 {
-    node_.constraintContext.setRootTc(&node_.transformContext);
+    node_.constraintContext.injectTransformContext(&node_.transformContext);
     node_.constraintContext.injectStyleContext(&node_.styleContext);
     node_.renderContext.injectStyleContext(&node_.styleContext);
+    node_.renderContext.setColorUniformEnabled(true);
 }
 
 void HkNodeBase::renderMySelf()
@@ -40,14 +41,14 @@ void HkNodeBase::renderMySelf()
 
     /* Use this to render additional non interactive things if needed */
     /* Note: rescissoring to original parent is needed unfortunatelly */
-    glEnable(GL_SCISSOR_TEST);
-    glScissor(
-        tc.getVPos().x - 1,
-        sceneDataRef_.windowHeight - tc.getVPos().y - tc.getVScale().y + 1,
-        tc.getVScale().x,
-        tc.getVScale().y);
+    // glEnable(GL_SCISSOR_TEST);
+    // glScissor(
+    //     tc.getVPos().x - 1,
+    //     sceneDataRef_.windowHeight - tc.getVPos().y - tc.getVScale().y + 1,
+    //     tc.getVScale().x,
+    //     tc.getVScale().y);
 
-    postRenderAdditionalDetails();
+    // postRenderAdditionalDetails();
 
     /* Disable scissors after rendering UI */
     glDisable(GL_SCISSOR_TEST);
@@ -146,7 +147,7 @@ void HkNodeBase::resolveNearestActiveScrollbar()
 {
     /* We shall ignore elements that overflow but that do not permit scrollbars. If we are a scrollbar, bingo. */
     if (treeStruct_.getType() == HkNodeType::ScrollBar ||
-        ((node_.constraintContext.isOverflowAllowedX_ || node_.constraintContext.isOverflowAllowedY_)
+        ((node_.styleContext.isOverflowAllowedX() || node_.styleContext.isOverflowAllowedY())
             && (node_.constraintContext.overflowXYSize_.x || node_.constraintContext.overflowXYSize_.y)))
     {
         sceneDataRef_.nearestScrollContainerId_ = treeStruct_.getId();
@@ -227,5 +228,8 @@ void HkNodeBase::onWindowResize() {}
 void HkNodeBase::onGeneralMouseMove() {}
 void HkNodeBase::onGeneralMouseClick() {}
 void HkNodeBase::onGeneralMouseScroll() {}
+
+/* Getters */
+HkStyleContext& HkNodeBase::getStyle() { return node_.styleContext; }
 
 } // hkui

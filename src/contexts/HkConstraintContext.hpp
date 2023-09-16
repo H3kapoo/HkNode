@@ -18,20 +18,6 @@ enum class HkConstraintPolicy
     AlignTopToBottom,
 };
 
-enum class HkDirection
-{
-    Horizontal,
-    Vertical
-};
-
-enum class HkAlignment
-{
-    Top,
-    Bottom,
-    Left,
-    Center,
-    Right,
-};
 
 struct MaxAndTotal
 {
@@ -62,13 +48,6 @@ struct HkScrollbarsSize
     int32_t vsbSize{ 10 };
 };
 
-struct HkStyleParams
-{
-    /* Element's margins */
-    uint32_t marginLX{ 0 }, marginRX{ 0 };
-    uint32_t marginTY{ 0 }, marginBY{ 0 };
-};
-
 class HkNodeBase;
 enum class HkNodeType;
 using HkTreeStruct = std::vector<HkTreeStructure<HkNodeBase, HkNodeType>*>;
@@ -76,48 +55,32 @@ using HkTreeStruct = std::vector<HkTreeStructure<HkNodeBase, HkNodeType>*>;
 class HkConstraintContext
 {
 public:
-    HkConstraintContext() : isOverflowAllowedX_{ true }, isOverflowAllowedY_{ true }
-        , isOverflowX_{ false }, isOverflowY_{ false }
+    HkConstraintContext() : isOverflowX_{ false }, isOverflowY_{ false }
         , overflowXYSize_{ 0,0 }, offsetPercentage_{ 0,0 }, sbCount_{ 0 }
-        , policy_{ HkConstraintPolicy::AlignLeftToRight } {}
+    {}
 
 
-    void setDirection(HkDirection dir);
-
-    void setVAlignment(HkAlignment alignment);
-
-    void setHAlignment(HkAlignment alignment);
-
-    void setRootTc(HkTransformContext* rootTc);
-    void setPolicy(const HkConstraintPolicy policy);
     void resolveConstraints(HkTreeStruct& children, const HkScrollbarsSize sbSizes);
     void resolveHorizontalContainer(HkTreeStruct& children, const HkScrollbarsSize sbSizes);
     void resolveVerticalContainer(HkTreeStruct& children, const HkScrollbarsSize sbSizes);
+    void resolveAxisOverflow(const HkTreeStruct& children, const HkScrollbarsSize sbSizes);
 
     void backPropagateRowChange(HkTreeStruct& children, const uint32_t nextRowFirstId,
-        const uint32_t lastRowEndId, const uint32_t highestYOnRow);
+        const uint32_t lastRowEndId, const uint32_t highestYOnRow) const;
     void backPropagateColChange(HkTreeStruct& children, const uint32_t nextColFirstId,
-        const uint32_t lastColEndId, const uint32_t longestXOnCol);
+        const uint32_t lastColEndId, const uint32_t longestXOnCol) const;
+    void applyFinalOffsets(HkTreeStruct& children) const;
 
-    void applyFinalOffsets(HkTreeStruct& children);
-
-    /* Computes */
     void computeScrollBarCount();
     void computeChildrenOverflowBasedOnMinMax(const MinMaxPos& minMax,
         const HkScrollbarsSize sbSizes);
 
-    /* Solvers */
-    void resolveAxisOverflow(const HkTreeStruct& children, const HkScrollbarsSize sbSizes);
-
-    MinMaxPos getMinAndMaxPositions(const HkTreeStruct& children);
-
-    void alignEvenTopToBottom(const HkTreeStruct& children);
-    void alignCenterLeftRight(const HkTreeStruct& children);
-    void alignEvenLeftRight(const HkTreeStruct& children);
+    MinMaxPos getMinAndMaxPositions(const HkTreeStruct& children) const;
 
     /* Scrollbar related */
-    void scrollBarConstrain(HkTransformContext& scrollBarTc);
-    void constrainSBKnob(bool isFromHorizontalSB, int overflowSize, float currKnobValue, HkTransformContext& knobTc);
+    void scrollBarConstrain(HkTransformContext& scrollBarTc) const;
+    void constrainSBKnob(bool isFromHorizontalSB, int overflowSize, float currKnobValue,
+        HkTransformContext& knobTc) const;
 
     /* WindowFrame related */
     void windowFrameContainerConstraint(HkTransformContext& wfCtr, HkTransformContext& exitBtn,
@@ -127,31 +90,17 @@ public:
 
     /* Injects */
     void injectStyleContext(HkStyleContext* styleContext);
+    void injectTransformContext(HkTransformContext* styleContext);
 
-    /* Style related */
-    const HkStyleParams& getStyle() const;
-
-    // ConstraintParams..
     /* Scrollbar related */
-    bool isOverflowAllowedX_;
-    bool isOverflowAllowedY_;
     bool isOverflowX_;
     bool isOverflowY_;
     glm::ivec2 overflowXYSize_;
     glm::vec2 offsetPercentage_;
-
     uint32_t sbCount_;
 
-    HkStyleParams styleParams_; //TODOl Shall be its own context
 private:
     HkStyleContext* styleContextInj_;
-
-    HkConstraintPolicy policy_;
     HkTransformContext* thisTc_;
-    // Container related
-    HkDirection direction_{ HkDirection::Horizontal };
-    HkAlignment verticalAlignment_{ HkAlignment::Top };
-    HkAlignment horizontalAlignment_{ HkAlignment::Left };
-    //TODO: Bottom + RIght => permanent scrollbars??
 };
 } // hkui

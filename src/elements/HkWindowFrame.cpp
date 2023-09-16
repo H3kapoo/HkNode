@@ -96,11 +96,6 @@ void HkWindowFrame::printTree()
     treeStruct_.printTree();
 }
 
-void HkWindowFrame::setOverflow(bool x, bool y)
-{
-    wfCont_.setOverflow(x, y);
-}
-
 void HkWindowFrame::setColor(const glm::vec3& color)
 {
     node_.styleContext.setColor(color);
@@ -121,27 +116,6 @@ void HkWindowFrame::setSize(const glm::vec2& size)
     wfCont_.node_.transformContext.setScale(size);
 }
 
-void HkWindowFrame::setConstraintPolicy(const HkConstraintPolicy policy)
-{
-    wfCont_.node_.constraintContext.setPolicy(policy);
-}
-
-void HkWindowFrame::setDirection(const HkDirection dir)
-{
-    wfCont_.node_.constraintContext.setDirection(dir);
-}
-
-void HkWindowFrame::setVAlignment(const HkAlignment alignment)
-{
-    wfCont_.node_.constraintContext.setVAlignment(alignment);
-}
-
-void HkWindowFrame::setHAlignment(const HkAlignment alignment)
-{
-    wfCont_.node_.constraintContext.setHAlignment(alignment);
-}
-
-
 void HkWindowFrame::setWindowMode(const HkWindowFrameMode mode)
 {
     mode_ = mode;
@@ -158,5 +132,10 @@ void HkWindowFrame::setWindowMode(const HkWindowFrameMode mode)
         treeStruct_.pushChild(&minimizeBtn_.treeStruct_);
         treeStruct_.pushChild(&exitBtn_.treeStruct_);
     }
+}
+
+HkStyleContext& HkWindowFrame::getStyle()
+{
+    return wfCont_.getStyle();
 }
 } // hkui

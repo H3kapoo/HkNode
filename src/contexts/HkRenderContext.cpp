@@ -39,8 +39,10 @@ void HkRenderContext::render(const glm::mat4& projMat, const glm::mat4& modelMat
     shader_.setMatrix4("model", modelMat);
 
     /* Setup whatever user defined uniforms need to be set */
-    styleContextInj_->setUniforms(shader_);
-
+    if (colorUniformEnabled_)
+    {
+        shader_.setVec3f("color", styleContextInj_->getColor());
+    }
 
     //TODO: At some point batching will be needed to avoid context switching
     /* Dont try to bind texture if theres none to bind. Bind is expensive */
@@ -95,6 +97,11 @@ void HkRenderContext::setupArch()
 void HkRenderContext::addTexture(const HkTextureInfo& texInfo)
 {
     texInfos_.push_back(texInfo);
+}
+
+void HkRenderContext::setColorUniformEnabled(const bool value)
+{
+    colorUniformEnabled_ = value;
 }
 
 /* Return gateway to shader object */

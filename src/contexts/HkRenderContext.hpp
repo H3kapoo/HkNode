@@ -38,6 +38,8 @@ public:
     /* Setters */
     void addTexture(const HkTextureInfo& texInfo);
 
+    void setColorUniformEnabled(const bool value);
+
     /* Getters */
     HkShader& getShader(); /* Non const, use it as a gateway */
 
@@ -52,6 +54,10 @@ private:
 
     /* Injects */
     HkStyleContext* styleContextInj_;
+
+
+    /* Element enabled shader uniforms */
+    bool colorUniformEnabled_{ false };
 
     /* Statics */
     static bool archCreated_;

@@ -38,18 +38,12 @@ public:
     void pushChildren(const std::vector<HkNodeBasePtr>& newChildren);
     void printTree();
 
-    /* Setters */
+    HkStyleContext& getStyle() override;
 
-    void setOverflow(bool x, bool y);
+    /* Setters */
     void setColor(const glm::vec3& color);
     void setPos(const glm::vec2& pos);
     void setSize(const glm::vec2& size);
-
-    void setDirection(const HkDirection dir);
-    void setVAlignment(const HkAlignment alignment);
-    void setHAlignment(const HkAlignment alignment);
-
-    void setConstraintPolicy(const HkConstraintPolicy policy);
     void setWindowMode(const HkWindowFrameMode mode);
 
 private:

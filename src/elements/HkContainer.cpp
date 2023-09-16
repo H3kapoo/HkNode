@@ -10,13 +10,14 @@ HkContainer::HkContainer(const std::string& containerName)
 {
     node_.styleContext.setColor(glm::vec3(0.5f, 0.5f, 0.5f));
     node_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
-    node_.renderContext.render(sceneDataRef_.sceneProjMatrix, node_.transformContext.getModelMatrix());
 
     /* NOTE: In the future maybe this dummy can be an actual small UI element, but for now let it be
        just a normal renderable detail */
     dummyXYIntersectorData_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
     dummyXYIntersectorData_.renderContext.injectStyleContext(&dummyXYIntersectorData_.styleContext);
+    dummyXYIntersectorData_.renderContext.setColorUniformEnabled(true);
     dummyXYIntersectorData_.styleContext.setColor(glm::vec3(0.7f, 1.0f, 0.2f));
+
 
 
     //TODO: Dummy just to test nested scrollbars
@@ -25,12 +26,6 @@ HkContainer::HkContainer(const std::string& containerName)
         vScrollBar_.node_.styleContext.setColor(glm::vec3(0.4f, 0.2f, 0.6f));
         hScrollBar_.node_.styleContext.setColor(glm::vec3(0.4f, 0.2f, 0.6f));
     }
-
-    // node_.constraintContext.isOverflowAllowedX_ = true;
-    // node_.constraintContext.isOverflowAllowedY_ = true;
-
-    node_.constraintContext.isOverflowAllowedX_ = false;
-    node_.constraintContext.isOverflowAllowedY_ = false;
 }
 
 //TODO: The way we handle scroll inside scroll is now necessarly very intuitive. It needs to ve changed in the future
@@ -164,7 +159,7 @@ void HkContainer::postRenderAdditionalDetails()
 void HkContainer::resolveScrollBarChildrenIfNeeded()
 {
     /* Place horizontal scrollbar if neeeded */
-    if (node_.constraintContext.isOverflowAllowedX_)
+    if (node_.styleContext.isOverflowAllowedX())
     {
         hScrollBar_.setOverflowSize(node_.constraintContext.overflowXYSize_.x);
         if (!hScrollBar_.isScrollBarActive() && node_.constraintContext.isOverflowX_)
@@ -183,7 +178,7 @@ void HkContainer::resolveScrollBarChildrenIfNeeded()
     }
 
     /* Place vertical scrollbar if neeeded */
-    if (node_.constraintContext.isOverflowAllowedY_)
+    if (node_.styleContext.isOverflowAllowedY())
     {
         vScrollBar_.setOverflowSize(node_.constraintContext.overflowXYSize_.y);
         if (!vScrollBar_.isScrollBarActive() && node_.constraintContext.isOverflowY_)
@@ -225,13 +220,6 @@ void HkContainer::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)
     }
 }
 
-//TODO: bellow to be refactored later when style comes
-void HkContainer::setOverflow(bool x, bool y)
-{
-    node_.constraintContext.isOverflowAllowedX_ = x;
-    node_.constraintContext.isOverflowAllowedY_ = y;
-}
-
 void HkContainer::setColor(const glm::vec3& color)
 {
     node_.styleContext.setColor(color);
@@ -245,25 +233,5 @@ void HkContainer::setPos(const glm::vec2& pos)
 void HkContainer::setSize(const glm::vec2& size)
 {
     node_.transformContext.setScale(size);
-}
-
-void HkContainer::setDirection(const HkDirection dir)
-{
-    node_.constraintContext.setDirection(dir);
-}
-
-void HkContainer::setVAlignment(const HkAlignment alignment)
-{
-    node_.constraintContext.setVAlignment(alignment);
-}
-
-void HkContainer::setHAlignment(const HkAlignment alignment)
-{
-    node_.constraintContext.setHAlignment(alignment);
-}
-
-void HkContainer::setMargins(const HkStyleParams styleParams)
-{
-    node_.constraintContext.styleParams_ = styleParams;
 }
 } // hkui
