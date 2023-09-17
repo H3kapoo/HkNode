@@ -18,6 +18,13 @@ enum class HkNodeType
     ImageView
 };
 
+struct HkNodeInfo
+{
+    std::string name;
+    HkNodeType type;
+    uint32_t id;
+};
+
 class HkNodeBase;
 using HkTreeStruct = std::vector<HkTreeStructure<HkNodeBase, HkNodeType>*>;
 
@@ -42,6 +49,7 @@ public:
     /* Getters */
     virtual HkStyleContext& getStyle();
     virtual HkEventsContext& getEvents();
+    virtual HkNodeInfo getNodeInfo();
 
     virtual ~HkNodeBase() = default;
 private:

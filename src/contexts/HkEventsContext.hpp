@@ -16,20 +16,24 @@ public:
 
     /* Basic, Left mouse click based */
     HkEventsContext& setOnClickListener(const std::function<void()>& callback);
+    /* Complex mouse response */
+    HkEventsContext& setOnClickListener(const std::function<void(int32_t x, int32_t y,
+        HkMouseAction action, HkMouseButton btn)>& callback);
     /* Basic, Left mouse release based */
     HkEventsContext& setOnReleaseListener(const std::function<void()>& callback);
-    /* Complex mouse response */
-    HkEventsContext& setOnMouseListener(const std::function<void(int32_t x, int32_t y,
-        HkMouseAction action, HkMouseButton btn)>& callback);
 
     /* Basic hover callback */
-    HkEventsContext& setOnMouseMoveListener(const std::function<void()>& callback);
+    HkEventsContext& setOnMoveListener(const std::function<void()>& callback);
     /* Complex hover callback */
-    HkEventsContext& setOnMouseMoveListener(const std::function<void(int32_t x, int32_t y)>& callback);
+    HkEventsContext& setOnMoveListener(const std::function<void(int32_t x, int32_t y)>& callback);
 
-    /* Basic mouse enter/exit*/
-    HkEventsContext& setOnMouseExitListener(const std::function<void()>& callback);
-    HkEventsContext& setOnMouseEnterListener(const std::function<void()>& callback);
+    /* Basic mouse enter/exit*/ //TODO: To be implemented when inside window pane grabbing comes
+    HkEventsContext& setOnExitListener(const std::function<void()>& callback);
+    HkEventsContext& setOnEnterListener(const std::function<void()>& callback);
+
+    /* Basic mouse scroll*/
+    HkEventsContext& setOnScrollListener(const std::function<void()>& callback);
+    HkEventsContext& setOnScrollListener(const std::function<void(int32_t value)>& callback);
 
 private:
     /* Invokers */
@@ -45,6 +49,9 @@ private:
 
     std::function<void()> basicMouseExitCallback;
     std::function<void()> basicMouseEnterCallback;
+
+    std::function<void()> basicMouseScrollCallback;
+    std::function<void(int32_t x)> mouseScrollCallback;
 
     //TODO: Maybe to minimize memory, we could create the callbacks on demand
 };

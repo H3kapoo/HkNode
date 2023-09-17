@@ -19,13 +19,15 @@ void resizeCallback(GLFWwindow* window, int width, int height)
 }
 //TODO: Input throttling
 double lastMoveTime = 0.0;
+double lastMoveTime2 = 0.0;
 // double CALLBACK_THRESHOLD = 0.3;
-double CALLBACK_THRESHOLD = 0.05;
+double MM_CALLBACK_THRESHOLD = 0.05;
+double MS_CALLBACK_THRESHOLD = 0.04;
 void mouseMoveCallback(GLFWwindow* window, double xpos, double ypos)
 {
     double currentTime = glfwGetTime();
 
-    if (currentTime - lastMoveTime < CALLBACK_THRESHOLD)
+    if (currentTime - lastMoveTime < MM_CALLBACK_THRESHOLD)
     {
         return;
     }
@@ -48,8 +50,15 @@ void mouseEnterCallback(GLFWwindow* window, int entered)
 
 void mouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
+    double currentTime = glfwGetTime();
+
+    if (currentTime - lastMoveTime2 < MS_CALLBACK_THRESHOLD)
+    {
+        return;
+    }
     // let the user call the functions
     HkSceneManagement::get().mouseScrollEvent(window, xoffset, yoffset);
+    lastMoveTime2 = currentTime;
 }
 
 void dropCallback(GLFWwindow* window, int count, const char** paths)
@@ -64,7 +73,7 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glEnable(GL_DEPTH_TEST); // this shows nothing now
+    // glEnable(GL_DEPTH_TEST); // this shows nothing now
 
     // GLFWwindow* window = glfwCreateWindow(1280, 720, "HkUI", NULL, NULL);
     GLFWwindow* window = glfwCreateWindow(1920, 1080, "HkUI", NULL, NULL);
@@ -159,7 +168,8 @@ int main()
 
     ctr5->getEvents()
         .setOnClickListener([]() {std::cout << "hello\n";})
-        .setOnMouseMoveListener([](auto x, auto y) {std::cout << glfwGetTime() << " hovered " << x << " " << y << " \n";});
+        .setOnScrollListener([&ctr5]() { std::cout << "now scrolling me " << ctr5->getNodeInfo().name << "\n"; });
+
     // ctr5->getStyle().setColor({ 1.0f, 1.0f, 1.0f });
 
     // ctr->setSize({ 50, 200 });

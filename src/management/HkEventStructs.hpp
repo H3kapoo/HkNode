@@ -10,7 +10,8 @@ enum class HkMouseAction
     Move,
     Drag,
     Entered,
-    Exited
+    Exited,
+    Scroll
 };
 
 enum class HkMouseButton

@@ -149,7 +149,7 @@ void HkSceneManagement::mouseScrollEvent(GLFWwindow*, double, double yOffset)
     sceneData.lastScrollPosY = sceneData.scrollPosY;
     sceneData.scrollPosY = yOffset;
 
-    /*TODO: Here we should resolve both focus and hover in the future. Think of recycle view */
+    update(HkEvent::HoverScan);
     update(HkEvent::MouseScroll);
 }
 

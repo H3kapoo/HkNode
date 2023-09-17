@@ -116,8 +116,13 @@ void HkNodeBase::updateMySelf()
     }
 
     auto& children = treeStruct_.getChildren();
-    /* Resolve child constraints relative to parent */
-    resolveChildrenConstraints(children, {});
+
+    /* We don't need to update children's transform data in these events*/
+    if (sceneDataRef_.currentEvent != HkEvent::FocusScan && sceneDataRef_.currentEvent != HkEvent::HoverScan)
+    {
+        /* Resolve child constraints relative to parent */
+        resolveChildrenConstraints(children, {});
+    }
 
     /* Update children */
     for (uint32_t i = 0;i < children.size(); i++)
@@ -135,7 +140,7 @@ void HkNodeBase::resolveChildrenConstraints(HkTreeStruct& children, const HkScro
 /* Try figure out if im the hovered one */
 void HkNodeBase::resolveHover()
 {
-    // we need the last scrollable content weve met
+    // we need the last scrollable conte    nt weve met
     if (node_.transformContext.isPosInsideOfNodeViewableArea(sceneDataRef_.mousePos))
     {
         sceneDataRef_.hoveredId = treeStruct_.getId();
@@ -200,10 +205,17 @@ void HkNodeBase::resolveMouseScrollEvent()
 {
     /* Notify scroll on actually scrolled object only*/
     if (sceneDataRef_.hoveredId == treeStruct_.getId())
+    {
         onScroll();
+        node_.eventsContext.invokeMouseEvent(0, sceneDataRef_.scrollPosY,
+            HkMouseAction::Scroll, HkMouseButton::None);
+    }
     /* Then notify the rest */
     else
+    {
+        //TODO: Don't really know how useful it really is
         onGeneralMouseScroll();
+    }
 }
 
 /* Resolve specific and general mouse mvmt evt */
@@ -253,4 +265,9 @@ void HkNodeBase::onGeneralMouseScroll() {}
 HkStyleContext& HkNodeBase::getStyle() { return node_.styleContext; }
 
 HkEventsContext& HkNodeBase::getEvents() { return node_.eventsContext; }
+
+HkNodeInfo HkNodeBase::getNodeInfo()
+{
+    return { treeStruct_.getName(), treeStruct_.getType(), treeStruct_.getId() };
+};
 } // hkui
