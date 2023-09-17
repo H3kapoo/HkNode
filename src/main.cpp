@@ -113,8 +113,8 @@ int main()
 // ctr4->setMargins(HkStyleParams{ .marginLX = 0, .marginRX = 0, .marginTY = 10 });
 
     std::vector<HkNodeBasePtr> ctrs2;
-    ctrs2.reserve(10'000);
-    for (int i = 0;i < 10'000;i++) // with O2 works ok 01.09.2023
+    ctrs2.reserve(5'000);
+    for (int i = 0;i < 5'000;i++) // with O2 works ok 01.09.2023
     {
         // ctrs.emplace_back("MyContainer" + std::to_string(i + 20));
         const auto& ct = std::make_shared<HkContainer>("MyContauner");
@@ -159,9 +159,7 @@ int main()
 
     ctr5->getEvents()
         .setOnClickListener([]() {std::cout << "hello\n";})
-        .setOnReleaseListener([]() {std::cout << "bye\n";})
-        .setOnMouseListener([](auto x, auto y, auto act, auto btn) {std::cout << "complex\n";});
-
+        .setOnMouseMoveListener([](auto x, auto y) {std::cout << glfwGetTime() << " hovered " << x << " " << y << " \n";});
     // ctr5->getStyle().setColor({ 1.0f, 1.0f, 1.0f });
 
     // ctr->setSize({ 50, 200 });
@@ -189,8 +187,8 @@ int main()
         .setDirection(HkDirection::Horizontal)
         .setHAlignment(HkHAlignment::Left)
         .setVAlignment(HkVAlignment::Center);
-    windowFrame->pushChildren({ ctr, ctr2, ctr3, ctr4, ctr5 });
-    // windowFrame->pushChildren(ctrs2);
+    // windowFrame->pushChildren({ ctr, ctr2, ctr3, ctr4, ctr5 });
+    windowFrame->pushChildren(ctrs2);
     ctr->pushChildren({ ctr2 });
     ctr2->pushChildren({ ctr3 });
     ctr3->pushChildren({ imgView, imgView2 });

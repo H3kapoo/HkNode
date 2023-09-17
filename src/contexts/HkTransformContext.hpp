@@ -45,6 +45,7 @@ public:
     bool isPosInsideOfNode(const glm::ivec2& pin) const;
     bool isPosInsideOfNodeViewableArea(const glm::ivec2& pin) const;
     HkTransformBBox computeBBoxWith(const HkTransformContext& otherTc) const;
+    bool isAnyDifference() const;
 private:
     HKAxisBoundsPoints computeXIntersectionPointsWith(const HkTransformContext& otherTc) const;
     HKAxisBoundsPoints computeYIntersectionPointsWith(const HkTransformContext& otherTc) const;

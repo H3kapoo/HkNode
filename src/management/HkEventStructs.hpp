@@ -6,7 +6,11 @@ enum class HkMouseAction
 {
     None,
     Click,
-    Release
+    Release,
+    Move,
+    Drag,
+    Entered,
+    Exited
 };
 
 enum class HkMouseButton

@@ -25,6 +25,13 @@ bool HkTransformContext::isPosInsideOfNodeViewableArea(const glm::ivec2& posIn) 
     return false;
 }
 
+bool HkTransformContext::isAnyDifference() const
+{
+    if (pos.x == prevPos.x && pos.y == prevPos.y && scale.x == prevScale.x && scale.y == prevScale.y)
+        return false;
+    return true;
+}
+
 /* Simply computes the axis aligned Bounding Box between this TC and otherTC */
 HkTransformBBox HkTransformContext::computeBBoxWith(const HkTransformContext& otherTc) const
 {
@@ -123,7 +130,7 @@ HKAxisBoundsPoints HkTransformContext::computeYIntersectionPointsWith(const HkTr
 void HkTransformContext::computeModelMatrix()
 {
     /* Massive optimization in order to not calculate the same model matrix if nothing chaged */
-    if (pos.x == prevPos.x && pos.y == prevPos.y && scale.x == prevScale.x && scale.y == prevScale.y)
+    if (!isAnyDifference())
     {
         return;
     }

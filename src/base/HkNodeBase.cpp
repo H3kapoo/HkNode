@@ -26,6 +26,8 @@ void HkNodeBase::renderMySelf()
         tc.getVScale().x,
         tc.getVScale().y);
 
+    //TODO: tc.isAnyDifference() is correct here but main() loop doesnt know not to clear screen on each pass anymore
+    // A flag maybe is needed? Conditional clear?
     /* Normal rendering */
     if (tc.getVScale().x && tc.getVScale().y)
     {
@@ -226,6 +228,13 @@ void HkNodeBase::resolveMouseMovementEvent()
     /* And notify in general the rest of the tree objects. Dragged+Selected node will get a call from
        this function too.*/
     onGeneralMouseMove();
+
+    /* Here we should already know for sure who's the hovered element */
+    if (sceneDataRef_.hoveredId == treeStruct_.getId())
+    {
+        node_.eventsContext.invokeMouseEvent(sceneDataRef_.mousePos.x, sceneDataRef_.mousePos.x,
+            HkMouseAction::Move, HkMouseButton::None);
+    }
 }
 
 /* Events to be consumed by derived if needed */
