@@ -34,12 +34,14 @@ class HkNodeBase
     friend class HkKnob;
 
     friend class HkConstraintContext;
+    friend class HkEventsContext;
 
 public:
     HkNodeBase(const std::string& windowName, const HkNodeType& type);
 
     /* Getters */
     virtual HkStyleContext& getStyle();
+    virtual HkEventsContext& getEvents();
 
     virtual ~HkNodeBase() = default;
 private:

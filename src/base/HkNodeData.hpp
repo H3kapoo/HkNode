@@ -4,6 +4,7 @@
 #include "../contexts/HkTransformContext.hpp"
 #include "../contexts/HkConstraintContext.hpp"
 #include "../contexts/HkStyleContext.hpp"
+#include "../contexts/HkEventsContext.hpp"
 
 namespace hkui
 {
@@ -14,5 +15,6 @@ public:
     HkTransformContext transformContext;
     HkConstraintContext constraintContext;
     HkStyleContext styleContext;
+    HkEventsContext eventsContext;
 };
 } // hkui

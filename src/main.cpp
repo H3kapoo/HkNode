@@ -131,25 +131,14 @@ int main()
     imgView->loadImage("/home/hekapoo/container.jpg");
     imgView2->loadImage("/home/hekapoo/imeg.jpeg");
 
-    bool isFs = false;
+    bool isFs = true;
     int i = 2;
-    ctr3->setOnClickListener([&windowFrame, &isFs, &all_ctrs, &i]()
+    ctr3->getEvents().setOnReleaseListener([&windowFrame, &isFs, &all_ctrs, &i]()
         {
             isFs ? windowFrame->setWindowMode(HkWindowFrameMode::Grabbable)
                 : windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
             isFs = !isFs;
-            // imgView2->loadImage(isFs ? "/home/hekapoo/imeg.jpeg" : "/home/hekapoo/container.jpg");
-            // std::cout << "eu sunt\n";
-            // for (const auto& c : all_ctrs)
-            // {
-            //     c->setHAlignment((HkAlignment)i);
-            // }
-            // i++;
-            // if (i > 4) i = 2;
-
         });
-
-    // std::cout << "-----" << (sizeof(*ctr) * ctrs2.size()) / 1024.0f / 1024.0f << "mb\n";
 
     ctr->setColor({ 0.3f,0.3f,0.7f });
     ctr2->setColor({ 1.0f,0.4f,0.5f });
@@ -167,6 +156,11 @@ int main()
     ctr3->setSize({ 400, 450 });
     ctr4->setSize({ 100, 150 });
     ctr5->setSize({ 330, 450 });
+
+    ctr5->getEvents()
+        .setOnClickListener([]() {std::cout << "hello\n";})
+        .setOnReleaseListener([]() {std::cout << "bye\n";})
+        .setOnMouseListener([](auto x, auto y, auto act, auto btn) {std::cout << "complex\n";});
 
     // ctr5->getStyle().setColor({ 1.0f, 1.0f, 1.0f });
 

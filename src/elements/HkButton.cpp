@@ -11,7 +11,7 @@ HkButton::HkButton(const std::string& name)
 
 void HkButton::onClick()
 {
-    if (onClickCallback_ && sceneDataRef_.clickedMouseButton == HkMouseButton::Left)
+    if (onClickCallback_ && sceneDataRef_.lastActiveMouseButton == HkMouseButton::Left)
     {
         onClickCallback_();
     }

@@ -3,5 +3,6 @@ target_sources(${PROJECT_NAME} PRIVATE
     HkStyleContext.cpp
     HkTransformContext.cpp
     HkConstraintContext.cpp
+    HkEventsContext.cpp
     HkTextureContext.cpp
     )

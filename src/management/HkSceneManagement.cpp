@@ -86,7 +86,7 @@ void HkSceneManagement::mouseMoveEvent(GLFWwindow*, double xPos, double yPos)
     dispatch mouseMove event. The dragged element will become the 'focusedId'. Dragged element will be set only if
     there's not already someone being dragged */
     resolveHover();
-    if (!sceneData.isDragging && sceneData.clickedMouseButton == HkMouseButton::Left && sceneData.hoveredId != HkSceneData::NO_SELECTION_ID)
+    if (!sceneData.isDragging && sceneData.lastActiveMouseButton == HkMouseButton::Left && sceneData.hoveredId != HkSceneData::NO_SELECTION_ID)
     {
         sceneData.isDragging = true;
         sceneData.dragStartMousePosition = sceneData.mousePos;
@@ -105,27 +105,26 @@ void HkSceneManagement::mouseClickEvent(GLFWwindow*, int button, int action, int
         sceneData.isMouseClicked = true;
         if (button == GLFW_MOUSE_BUTTON_LEFT)
         {
-            sceneData.clickedMouseButton = HkMouseButton::Left;
+            sceneData.lastActiveMouseButton = HkMouseButton::Left;
         }
         else if (button == GLFW_MOUSE_BUTTON_RIGHT)
         {
-            sceneData.clickedMouseButton = HkMouseButton::Right;
+            sceneData.lastActiveMouseButton = HkMouseButton::Right;
         }
         else if (button == GLFW_MOUSE_BUTTON_MIDDLE)
         {
-            sceneData.clickedMouseButton = HkMouseButton::Middle;
+            sceneData.lastActiveMouseButton = HkMouseButton::Middle;
         }
         else
         {
             std::cout << "Unhandled mouse button press\n";
-            sceneData.clickedMouseButton = HkMouseButton::Unknown;
+            sceneData.lastActiveMouseButton = HkMouseButton::Unknown;
         }
     }
     else if (action == GLFW_RELEASE)
     {
         sceneData.isMouseClicked = false;
-        sceneData.clickedMouseButton = HkMouseButton::None;
-
+        // sceneData.lastActiveMouseButton = HkMouseButton::None;
         sceneData.isDragging = false;
     }
 
@@ -165,7 +164,7 @@ void HkSceneManagement::dropEvent(GLFWwindow*, int count, const char** paths)
 void HkSceneManagement::resolveFocus()
 {
     //TODO: Only resolving focus on left click might not be the best always
-    if (sceneData.clickedMouseButton == HkMouseButton::Left)
+    if (sceneData.lastActiveMouseButton == HkMouseButton::Left)
     {
         sceneData.focusedId = HkSceneData::NO_SELECTION_ID;
         sceneData.mouseOffsetFromFocusedCenter = { 0,0 };

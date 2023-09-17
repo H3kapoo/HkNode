@@ -1,33 +1,11 @@
 #pragma once
 
+#include "HkEventStructs.hpp"
+
 #include <glm/glm.hpp>
 
 namespace hkui
 {
-enum class HkMouseButton
-{
-    None,
-    Left,
-    Right,
-    Middle,
-    Unknown
-};
-
-enum class HkEvent
-{
-    None,
-    FocusScan,
-    HoverScan,
-    GeneralUpdate,
-    WindowResize,
-    MouseMove,
-    MouseClick,
-    MouseEnterExit,
-    MouseScroll,
-    DropPath,
-    // Keyboard // TO DO:
-};
-
 //TODO: Default init each variable to avoid garbage
 struct HkSceneData
 {
@@ -37,7 +15,7 @@ struct HkSceneData
     glm::ivec2 mousePos;
     glm::ivec2 lastMousePos;
     bool isMouseClicked;
-    HkMouseButton clickedMouseButton;
+    HkMouseButton lastActiveMouseButton;
     bool mouseEntered, mouseExited;
     double scrollPosY;
     double lastScrollPosY;

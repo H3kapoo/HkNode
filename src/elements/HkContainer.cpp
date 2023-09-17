@@ -70,7 +70,7 @@ void HkContainer::onGeneralMouseMove()
 
 void HkContainer::onClick()
 {
-    if (onClickCallback_ && sceneDataRef_.clickedMouseButton == HkMouseButton::Right)
+    if (onClickCallback_ && sceneDataRef_.lastActiveMouseButton == HkMouseButton::Right)
     {
         onClickCallback_();
     }

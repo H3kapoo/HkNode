@@ -160,7 +160,7 @@ void HkNodeBase::resolveFocus()
     /*Element is in focus only if mouse if clicked and the mouse pos is inside thr element.
       Mouse offsets also get computed so is dragging occurs later on focused object, object doesn't
       just snap to clicked mouse position */
-    if (sceneDataRef_.isMouseClicked && sceneDataRef_.clickedMouseButton == HkMouseButton::Left
+    if (sceneDataRef_.isMouseClicked && sceneDataRef_.lastActiveMouseButton == HkMouseButton::Left
         && node_.transformContext.isPosInsideOfNodeViewableArea(sceneDataRef_.mousePos))
     {
         sceneDataRef_.focusedId = treeStruct_.getId();
@@ -171,12 +171,23 @@ void HkNodeBase::resolveFocus()
 /* Resolve specific and general mouse click evt */
 void HkNodeBase::resolveMouseClickEvent()
 {
+    //TODO: We shall handle the mouse buttons too somehow..not only the left one
+
     /* Notify click on actually clicked object only*/
     if (sceneDataRef_.isMouseClicked && sceneDataRef_.hoveredId == treeStruct_.getId()) // maybe the hovered one? not the focused one?
+    {
         onClick();
+        node_.eventsContext.invokeMouseEvent(sceneDataRef_.mousePos.x, sceneDataRef_.mousePos.x,
+            HkMouseAction::Click, sceneDataRef_.lastActiveMouseButton);
+    }
     /* Notify release on actually released object only*/
     else if (!sceneDataRef_.isMouseClicked && sceneDataRef_.hoveredId == treeStruct_.getId())
+    {
         onRelease();
+        node_.eventsContext.invokeMouseEvent(sceneDataRef_.mousePos.x, sceneDataRef_.mousePos.x,
+            HkMouseAction::Release, sceneDataRef_.lastActiveMouseButton);
+    }
+
     /* Then notify the rest */
     if (sceneDataRef_.isMouseClicked && sceneDataRef_.hoveredId != treeStruct_.getId())
         onGeneralMouseClick();
@@ -229,7 +240,8 @@ void HkNodeBase::onGeneralMouseMove() {}
 void HkNodeBase::onGeneralMouseClick() {}
 void HkNodeBase::onGeneralMouseScroll() {}
 
-/* Getters */
+/* Public Getters */
 HkStyleContext& HkNodeBase::getStyle() { return node_.styleContext; }
 
+HkEventsContext& HkNodeBase::getEvents() { return node_.eventsContext; }
 } // hkui
