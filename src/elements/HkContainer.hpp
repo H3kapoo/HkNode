@@ -17,8 +17,6 @@ public:
     /* Setters */
     void setOnClickListener(std::function<void()> callback);
 
-    void setColor(const glm::vec3& color);
-    void setPos(const glm::vec2& pos);
     void setSize(const glm::vec2& size);
 
 private:
@@ -35,15 +33,12 @@ private:
     void constrainScrollbarsIfNeeded();
     void resolveScrollBarChildrenIfNeeded();
     //TODO: maybe push those ^^ in constraint mgmt
-    // Or SB dedicated constraint context?
 
 private:
     HkScrollBar hScrollBar_;
     HkScrollBar vScrollBar_;
     uint32_t scrollbBarsCount_;
     HkNodeData dummyXYIntersectorData_;
-
-    std::function<void()> onClickCallback_{ nullptr };
 };
 using HkContainerPtr = std::shared_ptr<HkContainer>;
 using HkContainerCPtr = const std::shared_ptr<HkContainer>;

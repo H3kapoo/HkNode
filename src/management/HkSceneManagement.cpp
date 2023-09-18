@@ -13,11 +13,6 @@ HkSceneManagement& HkSceneManagement::get()
 
 HkSceneData& HkSceneManagement::getSceneDataRef() { return sceneData; }
 
-//TODO: Cant do this yet, get rid of singleton
-// HkSceneManagement::HkSceneManagement()
-//     : sceneRenderer_(sceneData)
-// {}
-
 //TODO: this function shall be deprecated
 void HkSceneManagement::init(int wWidth, int wHeight)
 {
@@ -25,8 +20,6 @@ void HkSceneManagement::init(int wWidth, int wHeight)
     sceneData.focusedId = HkSceneData::NO_SELECTION_ID;
     sceneData.hoveredId = HkSceneData::NO_SELECTION_ID;
 
-    sceneData.windowWidth = wWidth;
-    sceneData.windowHeight = wHeight;
     sceneData.windowSize = { wWidth, wHeight };
     sceneData.sceneProjMatrix = glm::ortho(0.0f, (float)wWidth, (float)wHeight, 0.0f, 0.0f, 100.0f);
 }
@@ -49,7 +42,8 @@ void HkSceneManagement::setRoot(IHkRootNodeCPtr& newRootNode)
 //TODO: Maybe this shall be used in the future for over time animations when no events are spawned
 void HkSceneManagement::update()
 {
-    update(HkEvent::GeneralUpdate);
+    // rootNode->getUnderlayingNode()->renderMySelf();
+    rootNode->rootUpdate();
 }
 
 void HkSceneManagement::update(const HkEvent& ev)
@@ -70,8 +64,6 @@ void HkSceneManagement::resizeWindowEvent(GLFWwindow*, int width, int height)
 {
     glViewport(0, 0, width, height);
     sceneData.windowSize = { width, height };
-    sceneData.windowWidth = width;
-    sceneData.windowHeight = height;
     sceneData.sceneProjMatrix = glm::ortho(0.0f, (float)width, (float)height, 0.0f, 0.0f, 100.0f);
 
     update(HkEvent::WindowResize);

@@ -70,17 +70,7 @@ void HkContainer::onGeneralMouseMove()
 
 void HkContainer::onClick()
 {
-    if (onClickCallback_ && sceneDataRef_.lastActiveMouseButton == HkMouseButton::Right)
-    {
-        onClickCallback_();
-    }
     // node_.renderContext.getShader().setInt("focused", 1);
-}
-
-// these events shall be encapsulated in dedicated ctx
-void HkContainer::setOnClickListener(std::function<void()> callback)
-{
-    onClickCallback_ = callback;
 }
 
 void HkContainer::onDrag()
@@ -218,16 +208,6 @@ void HkContainer::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)
             treeStruct_.pushChild(&child->treeStruct_);
         }
     }
-}
-
-void HkContainer::setColor(const glm::vec3& color)
-{
-    node_.styleContext.setColor(color);
-}
-
-void HkContainer::setPos(const glm::vec2& pos)
-{
-    node_.transformContext.setPos(pos);
 }
 
 void HkContainer::setSize(const glm::vec2& size)

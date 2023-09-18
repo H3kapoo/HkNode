@@ -22,7 +22,7 @@ void HkNodeBase::renderMySelf()
     glEnable(GL_SCISSOR_TEST);
     glScissor(
         tc.getVPos().x - 1,
-        sceneDataRef_.windowHeight - tc.getVPos().y - tc.getVScale().y + 1,
+        sceneDataRef_.windowSize.y - tc.getVPos().y - tc.getVScale().y + 1,
         tc.getVScale().x,
         tc.getVScale().y);
 
@@ -118,7 +118,9 @@ void HkNodeBase::updateMySelf()
     auto& children = treeStruct_.getChildren();
 
     /* We don't need to update children's transform data in these events*/
-    if (sceneDataRef_.currentEvent != HkEvent::FocusScan && sceneDataRef_.currentEvent != HkEvent::HoverScan)
+    if (sceneDataRef_.currentEvent != HkEvent::FocusScan
+        && sceneDataRef_.currentEvent != HkEvent::HoverScan
+        && sceneDataRef_.currentEvent != HkEvent::DropPath)
     {
         /* Resolve child constraints relative to parent */
         resolveChildrenConstraints(children, {});
@@ -154,8 +156,8 @@ void HkNodeBase::resolveNearestActiveScrollbar()
 {
     /* We shall ignore elements that overflow but that do not permit scrollbars. If we are a scrollbar, bingo. */
     if (treeStruct_.getType() == HkNodeType::ScrollBar ||
-        ((node_.styleContext.isOverflowAllowedX() || node_.styleContext.isOverflowAllowedY())
-            && (node_.constraintContext.overflowXYSize_.x || node_.constraintContext.overflowXYSize_.y)))
+        ((false || node_.styleContext.isOverflowAllowedY())
+            && (false || node_.constraintContext.overflowXYSize_.y)))
     {
         sceneDataRef_.nearestScrollContainerId_ = treeStruct_.getId();
     }

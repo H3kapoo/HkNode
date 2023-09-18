@@ -9,44 +9,43 @@ namespace hkui
 //TODO: Default init each variable to avoid garbage
 struct HkSceneData
 {
-    HkEvent currentEvent;
-    int windowWidth, windowHeight; //TODO: Deprecate
-    glm::ivec2 windowSize;
-    glm::ivec2 mousePos;
-    glm::ivec2 lastMousePos;
-    bool isMouseClicked;
-    HkMouseButton lastActiveMouseButton;
-    bool mouseEntered, mouseExited;
-    double scrollPosY;
-    double lastScrollPosY;
-    bool receivedDrop;
-    int dropCount;
-    const char** droppedPaths;
+    HkEvent currentEvent; //G
+    glm::ivec2 windowSize; //L
+    glm::ivec2 mousePos; //G
+    glm::ivec2 lastMousePos; //G
+    bool isMouseClicked; //G
+    HkMouseButton lastActiveMouseButton; //G
+    bool mouseEntered, mouseExited; //L
+    double scrollPosY; //L
+    double lastScrollPosY; //L
+    bool receivedDrop; //L
+    int dropCount; //L
+    const char** droppedPaths; //L
 
     /*Selection*/
-    uint32_t focusedId{ 0 };
-    glm::ivec2 mouseOffsetFromFocusedCenter{ 0,0 };
+    uint32_t focusedId{ 0 }; //G
+    glm::ivec2 mouseOffsetFromFocusedCenter{ 0,0 }; //G
 
     /*Drag*/
-    bool isDragging{ false };
-    glm::ivec2 dragStartMousePosition{ 0,0 };
+    bool isDragging{ false }; //G
+    glm::ivec2 dragStartMousePosition{ 0,0 }; //G
 
     /*Hover*/
-    uint32_t hoveredId{ 0 };
+    uint32_t hoveredId{ 0 }; //G
 
     /*Rendering*/
-    glm::mat4 sceneProjMatrix;
+    glm::mat4 sceneProjMatrix; //G (could be L in the future)
 
     /*Scene deletion*/ // will be more useful when multiple windowframe support comes
-    bool isSceneStillAlive{ true };
+    bool isSceneStillAlive{ true }; //L
 
     /*Visibility*/
-    bool isSceneMinimized{ false };
+    bool isSceneMinimized{ false }; //L
 
     /*Scrolling*/
-    uint32_t nearestScrollContainerId_{ 0 };
+    uint32_t nearestScrollContainerId_{ 0 }; //G
 
     /*Constants*/
-    static constexpr uint32_t NO_SELECTION_ID = 0;
+    static constexpr uint32_t NO_SELECTION_ID = 0;  //G
 };
 } // hkui
