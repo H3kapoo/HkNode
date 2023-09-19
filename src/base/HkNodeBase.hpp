@@ -1,6 +1,7 @@
 #pragma once
 
-#include "../management/HkSceneData.hpp"
+#include "../management/HkSceneData.hpp" // to be deprecated
+#include "../management/HkWindowData.hpp" // new
 #include "../base/HkNodeData.hpp"
 #include "../base/HkTreeStructure.hpp"
 
@@ -30,7 +31,9 @@ using HkTreeStruct = std::vector<HkTreeStructure<HkNodeBase, HkNodeType>*>;
 
 class HkNodeBase
 {
-    friend class HkSceneManagement;
+    friend class HkWindowManager;
+
+    friend class HkSceneManagement; //TBD
     friend class HkSceneRenderer;
 
     friend class HkWindowFrame;
@@ -83,10 +86,15 @@ private:
     void resolveMouseScrollEvent();
     void resolveMouseMovementEvent();
 
+    /* Injects */
+    virtual void injectWindowDataPtr(HkWindowData* windowDataPtr);
+
 private:
     HkNodeData node_;
     HkTreeStructure<HkNodeBase, HkNodeType> treeStruct_;
-    HkSceneData& sceneDataRef_; /* This is safe as singleton will outlive THIS class anyway*/
+    HkSceneData& sceneDataRef_; /* This is safe as singleton will outlive THIS class anyway*/ // to be deprecated
+
+    HkWindowData* windowDataPtr_; /* This is safe as singleton will outlive THIS class anyway*/ // new
 };
 
 using HkNodeBasePtr = std::shared_ptr<HkNodeBase>;

@@ -15,8 +15,11 @@ public:
 
     /* Instance getter */
     static HkAppManager& get();
+
     static void windowCloseCallback(GLFWwindow* window);
     static void resizeCallback(GLFWwindow* window, int width, int height);
+    static void mouseMoveCallback(GLFWwindow* window, double xpos, double ypos);
+    static void mouseClickCallback(GLFWwindow* window, int button, int action, int mods);
 
     bool setup();
     void teardown();
@@ -27,9 +30,15 @@ public:
 private:
     HkAppManager() = default;
 
+    /* Input throtling*/
+    static double lastMoveTime;
+    static double lastMoveTime2;
+    static const double MM_CALLBACK_THRESHOLD;
+    static const double MS_CALLBACK_THRESHOLD;
+
     /* Stats related */
-    double previousTime_{0};
-    int frameCount_{0};
+    double previousTime_{ 0 };
+    int frameCount_{ 0 };
     //TODO: App specific params
     //TODO: Add who's the master window. Without it alive, app will exit even if we have other children windows active
     //TODO: Maybe for best results, each window shal run it's update loop in a separate thread and the render thread in common somehow?
@@ -37,6 +46,7 @@ private:
 
 
     uint32_t currentlyBoundContextId_{ 0 };
+
     static std::vector<HkWindowManagerPtr> windows_;
 };
 } // hkui

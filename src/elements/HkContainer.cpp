@@ -201,11 +201,13 @@ void HkContainer::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)
         {
             const auto it = treeStruct_.getChildren().begin() + treeStruct_.getChildren().size() - scrollbBarsCount_;
             treeStruct_.pushChildAfter(it, &child->treeStruct_);
+            child->injectWindowDataPtr(windowDataPtr_);
         }
         /* If no scrollbars, push normally */
         else
         {
             treeStruct_.pushChild(&child->treeStruct_);
+            child->injectWindowDataPtr(windowDataPtr_);
         }
     }
 }

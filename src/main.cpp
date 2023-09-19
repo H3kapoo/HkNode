@@ -70,20 +70,31 @@ using namespace hkui;
 
 int main()
 {
-    if (!HkAppManager::get().setup())
-    {
-        return -1;
-    }
+    if (!HkAppManager::get().setup()) { return -1; }
 
-    HkWindowManagerPtr sceneWindow1 = std::make_shared<HkWindowManager>("MyWindowManager");
+    HkWindowManagerPtr sceneWindow1 = std::make_shared<HkWindowManager>("MyWindowManager",
+        HkWindowManager::HkWindowConfig{ .width = 1920, .height = 1080, .isMaster = true });
+    // HkWindowManagerPtr sceneWindow2 = std::make_shared<HkWindowManager>("MyWindowManager2",
+    //     HkWindowManager::HkWindowConfig{ .width = 800, .height = 600 });
     HkAppManager::get().addWindow(sceneWindow1);
+    // HkAppManager::get().addWindow(sceneWindow2);
 
     HkWindowFramePtr windowFrame = std::make_shared<HkWindowFrame>("MyWindowFrame");
+    // windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
+    windowFrame->getStyle().setOverflowAllowedXY(true)
+        .setDirection(HkDirection::Horizontal)
+        .setHAlignment(HkHAlignment::Left)
+        .setVAlignment(HkVAlignment::Center);
+
+    windowFrame->setPos({ 1280 * 0.25, 720 * 0.25 });
+    windowFrame->setSize({ 1280 * 0.4, 720 * 0.7 });
+
     sceneWindow1->addSubWindow(windowFrame);
 
     HkAppManager::get().runLoop(); // Blocking from here on, maybe could be run in separate thread
 
-    HkAppManager::get().removeWindow(sceneWindow1);
+    // HkAppManager::get().removeWindow(sceneWindow2); //TODO: To be done automatically at teardown
+    HkAppManager::get().removeWindow(sceneWindow1); //TODO: To be done automatically at teardown
     HkAppManager::get().teardown();
     // glfwInit();
     // glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);

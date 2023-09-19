@@ -22,7 +22,7 @@ void HkNodeBase::renderMySelf()
     glEnable(GL_SCISSOR_TEST);
     glScissor(
         tc.getVPos().x - 1,
-        sceneDataRef_.windowSize.y - tc.getVPos().y - tc.getVScale().y + 1,
+        windowDataPtr_->windowSize.y - tc.getVPos().y - tc.getVScale().y + 1,
         tc.getVScale().x,
         tc.getVScale().y);
 
@@ -31,7 +31,7 @@ void HkNodeBase::renderMySelf()
     /* Normal rendering */
     if (tc.getVScale().x && tc.getVScale().y)
     {
-        node_.renderContext.render(sceneDataRef_.sceneProjMatrix, tc.getModelMatrix());
+        node_.renderContext.render(windowDataPtr_->sceneProjMatrix, tc.getModelMatrix());
 
         /* Update children. Also don't require bellow children to be rendered if parent can't be rendered itself */
         auto& children = treeStruct_.getChildren();
@@ -46,7 +46,7 @@ void HkNodeBase::renderMySelf()
     // glEnable(GL_SCISSOR_TEST);
     // glScissor(
     //     tc.getVPos().x - 1,
-    //     sceneDataRef_.windowHeight - tc.getVPos().y - tc.getVScale().y + 1,
+    //     windowDataPtr_->windowHeight - tc.getVPos().y - tc.getVScale().y + 1,
     //     tc.getVScale().x,
     //     tc.getVScale().y);
 
@@ -62,6 +62,7 @@ void HkNodeBase::renderMySelf()
 */
 void HkNodeBase::updateMySelf()
 {
+    // return;
     const auto& parentTreeStruct = treeStruct_.getParent();
     auto& tc = node_.transformContext;
 
@@ -74,7 +75,7 @@ void HkNodeBase::updateMySelf()
     else if (parentTreeStruct && parentTreeStruct->getType() == HkNodeType::RootWindowFrame)
     {
         /* Minimize only container of windowframe */
-        if (sceneDataRef_.isSceneMinimized && treeStruct_.getType() == HkNodeType::Container)
+        if (windowDataPtr_->isSceneMinimized && treeStruct_.getType() == HkNodeType::Container)
         {
             tc.setVPos({ 0,0 });
             tc.setVScale({ 0,0 });
@@ -101,7 +102,7 @@ void HkNodeBase::updateMySelf()
     }
 
     /* Main HkEvents handler */
-    switch (sceneDataRef_.currentEvent)
+    switch (windowDataPtr_->currentEvent)
     {
     case HkEvent::None: break;
     case HkEvent::HoverScan: resolveHover(); break;
@@ -118,9 +119,9 @@ void HkNodeBase::updateMySelf()
     auto& children = treeStruct_.getChildren();
 
     /* We don't need to update children's transform data in these events*/
-    if (sceneDataRef_.currentEvent != HkEvent::FocusScan
-        && sceneDataRef_.currentEvent != HkEvent::HoverScan
-        && sceneDataRef_.currentEvent != HkEvent::DropPath)
+    if (windowDataPtr_->currentEvent != HkEvent::FocusScan
+        && windowDataPtr_->currentEvent != HkEvent::HoverScan
+        && windowDataPtr_->currentEvent != HkEvent::DropPath)
     {
         /* Resolve child constraints relative to parent */
         resolveChildrenConstraints(children, {});
@@ -143,9 +144,9 @@ void HkNodeBase::resolveChildrenConstraints(HkTreeStruct& children, const HkScro
 void HkNodeBase::resolveHover()
 {
     // we need the last scrollable conte    nt weve met
-    if (node_.transformContext.isPosInsideOfNodeViewableArea(sceneDataRef_.mousePos))
+    if (node_.transformContext.isPosInsideOfNodeViewableArea(windowDataPtr_->mousePos))
     {
-        sceneDataRef_.hoveredId = treeStruct_.getId();
+        windowDataPtr_->hoveredId = treeStruct_.getId();
         resolveNearestActiveScrollbar();
     }
 }
@@ -159,7 +160,7 @@ void HkNodeBase::resolveNearestActiveScrollbar()
         ((false || node_.styleContext.isOverflowAllowedY())
             && (false || node_.constraintContext.overflowXYSize_.y)))
     {
-        sceneDataRef_.nearestScrollContainerId_ = treeStruct_.getId();
+        windowDataPtr_->nearestScrollContainerId_ = treeStruct_.getId();
     }
 }
 
@@ -169,11 +170,11 @@ void HkNodeBase::resolveFocus()
     /*Element is in focus only if mouse if clicked and the mouse pos is inside thr element.
       Mouse offsets also get computed so is dragging occurs later on focused object, object doesn't
       just snap to clicked mouse position */
-    if (sceneDataRef_.isMouseClicked && sceneDataRef_.lastActiveMouseButton == HkMouseButton::Left
-        && node_.transformContext.isPosInsideOfNodeViewableArea(sceneDataRef_.mousePos))
+    if (windowDataPtr_->isMouseClicked && windowDataPtr_->lastActiveMouseButton == HkMouseButton::Left
+        && node_.transformContext.isPosInsideOfNodeViewableArea(windowDataPtr_->mousePos))
     {
-        sceneDataRef_.focusedId = treeStruct_.getId();
-        sceneDataRef_.mouseOffsetFromFocusedCenter = node_.transformContext.getPos() - sceneDataRef_.mousePos;
+        windowDataPtr_->focusedId = treeStruct_.getId();
+        windowDataPtr_->mouseOffsetFromFocusedCenter = node_.transformContext.getPos() - windowDataPtr_->mousePos;
     }
 }
 
@@ -183,22 +184,22 @@ void HkNodeBase::resolveMouseClickEvent()
     //TODO: We shall handle the mouse buttons too somehow..not only the left one
 
     /* Notify click on actually clicked object only*/
-    if (sceneDataRef_.isMouseClicked && sceneDataRef_.hoveredId == treeStruct_.getId()) // maybe the hovered one? not the focused one?
+    if (windowDataPtr_->isMouseClicked && windowDataPtr_->hoveredId == treeStruct_.getId()) // maybe the hovered one? not the focused one?
     {
         onClick();
-        node_.eventsContext.invokeMouseEvent(sceneDataRef_.mousePos.x, sceneDataRef_.mousePos.x,
-            HkMouseAction::Click, sceneDataRef_.lastActiveMouseButton);
+        node_.eventsContext.invokeMouseEvent(windowDataPtr_->mousePos.x, windowDataPtr_->mousePos.x,
+            HkMouseAction::Click, windowDataPtr_->lastActiveMouseButton);
     }
     /* Notify release on actually released object only*/
-    else if (!sceneDataRef_.isMouseClicked && sceneDataRef_.hoveredId == treeStruct_.getId())
+    else if (!windowDataPtr_->isMouseClicked && windowDataPtr_->hoveredId == treeStruct_.getId())
     {
         onRelease();
-        node_.eventsContext.invokeMouseEvent(sceneDataRef_.mousePos.x, sceneDataRef_.mousePos.x,
-            HkMouseAction::Release, sceneDataRef_.lastActiveMouseButton);
+        node_.eventsContext.invokeMouseEvent(windowDataPtr_->mousePos.x, windowDataPtr_->mousePos.x,
+            HkMouseAction::Release, windowDataPtr_->lastActiveMouseButton);
     }
 
     /* Then notify the rest */
-    if (sceneDataRef_.isMouseClicked && sceneDataRef_.hoveredId != treeStruct_.getId())
+    if (windowDataPtr_->isMouseClicked && windowDataPtr_->hoveredId != treeStruct_.getId())
         onGeneralMouseClick();
 }
 
@@ -206,10 +207,10 @@ void HkNodeBase::resolveMouseClickEvent()
 void HkNodeBase::resolveMouseScrollEvent()
 {
     /* Notify scroll on actually scrolled object only*/
-    if (sceneDataRef_.hoveredId == treeStruct_.getId())
+    if (windowDataPtr_->hoveredId == treeStruct_.getId())
     {
         onScroll();
-        node_.eventsContext.invokeMouseEvent(0, sceneDataRef_.scrollPosY,
+        node_.eventsContext.invokeMouseEvent(0, windowDataPtr_->scrollPosY,
             HkMouseAction::Scroll, HkMouseButton::None);
     }
     /* Then notify the rest */
@@ -226,7 +227,7 @@ void HkNodeBase::resolveMouseMovementEvent()
     //TODO: It works here but all shaders need to have hovered uniform
     // if (treeStruct_.getType() == HkNodeType::Container)
     // {
-    //     if (sceneDataRef_.hoveredId == treeStruct_.getId())
+    //     if (windowDataPtr_->hoveredId == treeStruct_.getId())
     //     {
     //         // node_.renderContext.getShader().setInt("hovered", 1);
     //     }
@@ -236,7 +237,7 @@ void HkNodeBase::resolveMouseMovementEvent()
     //     }
     // }
     /* If scene detected a dragging action, separatelly specify that dragged element*/
-    if (sceneDataRef_.isDragging && sceneDataRef_.focusedId == treeStruct_.getId())
+    if (windowDataPtr_->isDragging && windowDataPtr_->focusedId == treeStruct_.getId())
         onDrag();
 
     /* And notify in general the rest of the tree objects. Dragged+Selected node will get a call from
@@ -244,9 +245,9 @@ void HkNodeBase::resolveMouseMovementEvent()
     onGeneralMouseMove();
 
     /* Here we should already know for sure who's the hovered element */
-    if (sceneDataRef_.hoveredId == treeStruct_.getId())
+    if (windowDataPtr_->hoveredId == treeStruct_.getId())
     {
-        node_.eventsContext.invokeMouseEvent(sceneDataRef_.mousePos.x, sceneDataRef_.mousePos.x,
+        node_.eventsContext.invokeMouseEvent(windowDataPtr_->mousePos.x, windowDataPtr_->mousePos.x,
             HkMouseAction::Move, HkMouseButton::None);
     }
 }
@@ -262,6 +263,9 @@ void HkNodeBase::onWindowResize() {}
 void HkNodeBase::onGeneralMouseMove() {}
 void HkNodeBase::onGeneralMouseClick() {}
 void HkNodeBase::onGeneralMouseScroll() {}
+
+/* Injects */
+void HkNodeBase::injectWindowDataPtr(HkWindowData* windowDataPtr) { windowDataPtr_ = windowDataPtr; }
 
 /* Public Getters */
 HkStyleContext& HkNodeBase::getStyle() { return node_.styleContext; }

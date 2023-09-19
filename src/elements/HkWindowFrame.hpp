@@ -46,11 +46,18 @@ public:
     void setSize(const glm::vec2& size);
     void setWindowMode(const HkWindowFrameMode mode);
 
+    /* Getters */
+    bool isAlive() const override;
+
+    /* Injects */
+    void injectWindowDataPtr(HkWindowData* windowDataPtr) override;
+
 private:
     HkButton minimizeBtn_;
     HkButton exitBtn_;
     HkContainer wfCont_;
 
+    bool stillAlive_{ true };
     HkWindowFrameMode mode_;
     glm::ivec2 cachedScale_;
     glm::ivec2 cachedPos_;

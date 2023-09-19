@@ -5,18 +5,35 @@
 namespace hkui
 {
 
+double HkAppManager::lastMoveTime = 0.0;
+double HkAppManager::lastMoveTime2 = 0.0;
+const double HkAppManager::MM_CALLBACK_THRESHOLD = 0.05;
+const double HkAppManager::MS_CALLBACK_THRESHOLD = 0.04;
+
 std::vector<HkWindowManagerPtr> HkAppManager::windows_ = {};
 
-void HkAppManager::windowCloseCallback(GLFWwindow*) {
-    // Remove the closed window from the vector
-    // auto it = std::find(windows_.begin(), windows_.end(), window);
-    // if (it != windows_.end())
-    // {
-    //     windows_.erase(it);
-    // }
+void HkAppManager::windowCloseCallback(GLFWwindow* window)
+{
+    /* Remove the closed window from the vector */
+    std::cout << "A window needs to be closed..\n";
+    for (auto it = windows_.begin(); it != windows_.end(); ++it)
+    {
+        if ((*it)->getWindowHandle() == window)
+        {
+            if ((*it)->isMasterWindow())
+            {
+                std::cout << "Found need to close window " << (*it)->getWindowName() << " is master window. Erasing all.\n";
+                for (auto windowObj : windows_) { windowObj->teardown(); }
+                windows_.clear();
+                return;
+            }
 
-    //TODO: Hack for just one window for now
-    windows_.clear();
+            std::cout << "Found need to close window " << (*it)->getWindowName() << " in vector of windows. Erasing.\n";
+            (*it)->teardown();
+            windows_.erase(it);
+            return;
+        }
+    }
 }
 
 void HkAppManager::resizeCallback(GLFWwindow* window, int width, int height)
@@ -24,59 +41,69 @@ void HkAppManager::resizeCallback(GLFWwindow* window, int width, int height)
     //TODO: We shall only notify the visible/in focus window maybe
     for (uint32_t i = 0; i < windows_.size(); i++)
     {
-        windows_[i]->resizeEventCalled(window, width, height);
+        if (windows_[i]->getWindowHandle() == window)
+        {
+            windows_[i]->resizeEventCalled(window, width, height);
+            break;
+        }
     }
 }
 
-//TODO: Input throttling
-// double lastMoveTime = 0.0;
-// double lastMoveTime2 = 0.0;
-// // double CALLBACK_THRESHOLD = 0.3;
-// double MM_CALLBACK_THRESHOLD = 0.05;
-// double MS_CALLBACK_THRESHOLD = 0.04;
-// void mouseMoveCallback(GLFWwindow* window, double xpos, double ypos)
-// {
-//     // double currentTime = glfwGetTime();
+void HkAppManager::mouseMoveCallback(GLFWwindow* window, double xpos, double ypos)
+{
+    double currentTime = glfwGetTime();
+    if (currentTime - lastMoveTime < MM_CALLBACK_THRESHOLD)
+    {
+        return;
+    }
 
-//     // if (currentTime - lastMoveTime < MM_CALLBACK_THRESHOLD)
-//     // {
-//     //     return;
-//     // }
-//     // // let the user call the functions
-//     // HkSceneManagement::get().mouseMoveEvent(window, xpos, ypos);
-//     // lastMoveTime = currentTime;
-// }
+    for (uint32_t i = 0; i < windows_.size(); i++)
+    {
+        if (windows_[i]->getWindowHandle() == window)
+        {
+            windows_[i]->mouseMovedEventCalled(window, xpos, ypos);
+            break;
+        }
+    }
+    lastMoveTime = currentTime;
+}
 
-// void mouseClickCallback(GLFWwindow* window, int button, int action, int mods)
-// {
-//     // let the user call the functions
-//     // HkSceneManagement::get().mouseClickEvent(window, button, action, mods);
-// }
+void HkAppManager::mouseClickCallback(GLFWwindow* window, int button, int action, int mods)
+{
+    for (uint32_t i = 0; i < windows_.size(); i++)
+    {
+        if (windows_[i]->getWindowHandle() == window)
+        {
+            windows_[i]->mouseClickedEventCalled(window, button, action, mods);
+            break;
+        }
+    }
+}
 
-// void mouseEnterCallback(GLFWwindow* window, int entered)
-// {
-//     // let the user call the functions
-//     // HkSceneManagement::get().mouseEnterEvent(window, entered);
-// }
+void mouseEnterCallback(GLFWwindow* window, int entered)
+{
+    // let the user call the functions
+    // HkSceneManagement::get().mouseEnterEvent(window, entered);
+}
 
-// void mouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
-// {
-//     // double currentTime = glfwGetTime();
+void mouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    // double currentTime = glfwGetTime();
 
-//     // if (currentTime - lastMoveTime2 < MS_CALLBACK_THRESHOLD)
-//     // {
-//     //     return;
-//     // }
-//     // // let the user call the functions
-//     // // HkSceneManagement::get().mouseScrollEvent(window, xoffset, yoffset);
-//     // lastMoveTime2 = currentTime;
-// }
+    // if (currentTime - lastMoveTime2 < MS_CALLBACK_THRESHOLD)
+    // {
+    //     return;
+    // }
+    // // let the user call the functions
+    // // HkSceneManagement::get().mouseScrollEvent(window, xoffset, yoffset);
+    // lastMoveTime2 = currentTime;
+}
 
-// void dropCallback(GLFWwindow* window, int count, const char** paths)
-// {
-//     // let the user call the functions
-//     // HkSceneManagement::get().dropEvent(window, count, paths);
-// }
+void dropCallback(GLFWwindow* window, int count, const char** paths)
+{
+    // let the user call the functions
+    // HkSceneManagement::get().dropEvent(window, count, paths);
+}
 
 HkAppManager& HkAppManager::get()
 {
@@ -99,7 +126,6 @@ bool HkAppManager::setup()
     // glfwSwapInterval(0); // zero to disable Vsync
 
     /* Create mock window just to succeed initializing glew*/
-    // GLFWwindow* window = glfwCreateWindow(1280, 720, "HkUI", NULL, NULL);
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
     GLFWwindow* window = glfwCreateWindow(1, 1, "InitWindow", NULL, NULL);
     if (window == NULL)
@@ -158,40 +184,49 @@ void HkAppManager::runLoop()
             // HkSceneManagement::get().update();
             //TODO: ^^ we might have to split rendering and updating
             // HkDrawDebugger::get().drawBuffer();
+            windows_[i]->forceUpdate();
+
             glfwSwapBuffers(windows_[i]->getWindowHandle());
             // glfwWaitEvents();
             glfwPollEvents();
 
             // Measure speed
-            double currentTime = glfwGetTime();
-            frameCount_++;
-            if (currentTime - previousTime_ >= 1.0)
-            {
-                glfwSetWindowTitle(windows_[i]->getWindowHandle(), std::to_string(frameCount_).c_str());
-                frameCount_ = 0;
-                previousTime_ = currentTime;
-            }
+            // double currentTime = glfwGetTime();
+            // frameCount_++;
+            // if (currentTime - previousTime_ >= 1.0)
+            // {
+            //     glfwSetWindowTitle(windows_[i]->getWindowHandle(), std::to_string(frameCount_).c_str());
+            //     frameCount_ = 0;
+            //     previousTime_ = currentTime;
+            // }
         }
-
     }
 }
 
 void HkAppManager::addWindow(const HkWindowManagerPtr& window)
 {
     windows_.push_back(window);
-    // glfwMakeContextCurrent(window);
-    // glfwSwapInterval(0); // zero to disable Vsync
     glfwSetWindowCloseCallback(window->getWindowHandle(), windowCloseCallback);
     glfwSetFramebufferSizeCallback(window->getWindowHandle(), resizeCallback);
-    // glfwSetCursorPosCallback(window->getWindowHandle(), mouseMoveCallback);
-    // glfwSetMouseButtonCallback(window->getWindowHandle(), mouseClickCallback);
-    // glfwSetCursorEnterCallback(window->getWindowHandle(), mouseEnterCallback);
-    // glfwSetScrollCallback(window->getWindowHandle(), mouseScrollCallback);
-    // glfwSetDropCallback(window->getWindowHandle(), dropCallback);
+    glfwSetCursorPosCallback(window->getWindowHandle(), mouseMoveCallback);
+    glfwSetMouseButtonCallback(window->getWindowHandle(), mouseClickCallback);
+    glfwSetCursorEnterCallback(window->getWindowHandle(), mouseEnterCallback);
+    glfwSetScrollCallback(window->getWindowHandle(), mouseScrollCallback);
+    glfwSetDropCallback(window->getWindowHandle(), dropCallback);
 }
 
 void HkAppManager::removeWindow(const HkWindowManagerPtr& window)
 {
-    glfwDestroyWindow(window->getWindowHandle());
+    std::cout << "A window needs to be closed on user demand..\n";
+    for (auto it = windows_.begin(); it != windows_.end(); ++it)
+    {
+        if ((*it)->getWindowId() == window->getWindowId())
+        {
+            std::cout << "Found need to close window " << (*it)->getWindowName() << " in vector of windows. Erasing.\n";
+            (*it)->teardown();
+            windows_.erase(it);
+            return;
+        }
+    }
 }
 } // hkui

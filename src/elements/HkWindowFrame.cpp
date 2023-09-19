@@ -22,12 +22,12 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
 
     minimizeBtn_.setOnClickListener([this]()
         {
-            sceneDataRef_.isSceneMinimized = !sceneDataRef_.isSceneMinimized;
+            windowDataPtr_->isSceneMinimized = !windowDataPtr_->isSceneMinimized;
         });
 
     exitBtn_.setOnClickListener([this]()
         {
-            sceneDataRef_.isSceneStillAlive = false;
+            stillAlive_ = false;
         });
 }
 
@@ -37,33 +37,33 @@ HkNodeBase* HkWindowFrame::getUnderlayingNode() { return this; }
 
 void HkWindowFrame::onScroll()
 {
-    // std::cout << glfwGetTime() << " scroll value: " << sceneDataRef_.scrollPosY << '\n';
-    node_.transformContext.addScale({ sceneDataRef_.scrollPosY * 4, 0 });
+    // std::cout << glfwGetTime() << " scroll value: " << windowDataPtr_->scrollPosY << '\n';
+    node_.transformContext.addScale({ windowDataPtr_->scrollPosY * 4, 0 });
 }
 
 void HkWindowFrame::onDrag()
 {
     if (mode_ != HkWindowFrameMode::Grabbable) return;
-    node_.transformContext.setPos(sceneDataRef_.mouseOffsetFromFocusedCenter + sceneDataRef_.mousePos);
+    node_.transformContext.setPos(windowDataPtr_->mouseOffsetFromFocusedCenter + windowDataPtr_->mousePos);
 }
 
 void HkWindowFrame::onWindowResize()
 {
     // setPos({ 0,0 });
-    // setSize({ sceneDataRef_.windowWidth, sceneDataRef_.windowHeight - 30 });
+    // setSize({ windowDataPtr_->windowWidth, windowDataPtr_->windowHeight - 30 });
     //TODO: Refactor if needed after topLeft coordinate change
     /* Techically root windows shall not resize with WINDOW itself, only children should resize with their parents */
     //TODO: Future: Refactor transforms so that they have pivot at top left corner instead of center
     // auto factor = 0.5f;
     // auto factor2 = 0.25f;
     // //Just for now
-    // auto width_factor = std::round(sceneDataRef_.windowWidth * factor / 2) * 2;
-    // auto height_factor2 = std::round(sceneDataRef_.windowHeight * factor2 / 2) * 2;
-    // auto height_factor = std::round(sceneDataRef_.windowHeight * factor / 2) * 2;
+    // auto width_factor = std::round(windowDataPtr_->windowWidth * factor / 2) * 2;
+    // auto height_factor2 = std::round(windowDataPtr_->windowHeight * factor2 / 2) * 2;
+    // auto height_factor = std::round(windowDataPtr_->windowHeight * factor / 2) * 2;
 
-    // node_.transformContext.setScale({ sceneDataRef_.windowWidth * factor, 30 });
-    // node_.transformContext.setPos({ sceneDataRef_.windowWidth * factor, sceneDataRef_.windowHeight * factor });
-    // wfCont_.node_.transformContext.setScale({ sceneDataRef_.windowWidth * factor, wfCont_.node_.transformContext.scale.y });
+    // node_.transformContext.setScale({ windowDataPtr_->windowWidth * factor, 30 });
+    // node_.transformContext.setPos({ windowDataPtr_->windowWidth * factor, windowDataPtr_->windowHeight * factor });
+    // wfCont_.node_.transformContext.setScale({ windowDataPtr_->windowWidth * factor, wfCont_.node_.transformContext.scale.y });
 
 }
 
@@ -79,7 +79,7 @@ void HkWindowFrame::resolveChildrenConstraints(HkTreeStruct&,
 
 
     node_.constraintContext.windowFrameContainerConstraint(wfCont_.node_.transformContext,
-        exitBtn_.node_.transformContext, minimizeBtn_.node_.transformContext, sceneDataRef_.windowSize,
+        exitBtn_.node_.transformContext, minimizeBtn_.node_.transformContext, windowDataPtr_->windowSize,
         /* Means we are in the fullscreen fixed mode, we hide the "grab bar"*/
         (mode_ != HkWindowFrameMode::Grabbable ? true : false));
 }
@@ -136,5 +136,20 @@ void HkWindowFrame::setWindowMode(const HkWindowFrameMode mode)
 HkStyleContext& HkWindowFrame::getStyle()
 {
     return wfCont_.getStyle();
+}
+
+void HkWindowFrame::injectWindowDataPtr(HkWindowData* windowDataPtr)
+{
+    /* Window frame is special and has children UI elements,
+       each of them need to know about the same window data*/
+    windowDataPtr_ = windowDataPtr;
+    minimizeBtn_.windowDataPtr_ = windowDataPtr;
+    exitBtn_.windowDataPtr_ = windowDataPtr;
+    wfCont_.windowDataPtr_ = windowDataPtr;
+}
+
+bool HkWindowFrame::isAlive() const
+{
+    return stillAlive_;
 }
 } // hkui

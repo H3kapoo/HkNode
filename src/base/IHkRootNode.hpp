@@ -11,6 +11,7 @@ class IHkRootNode
 public:
     virtual void rootUpdate() = 0;
     virtual HkNodeBase* getUnderlayingNode() = 0;
+    virtual bool isAlive() const = 0;
     virtual ~IHkRootNode() = default;
 };
 using IHkRootNodeCPtr = const std::shared_ptr<IHkRootNode>;
