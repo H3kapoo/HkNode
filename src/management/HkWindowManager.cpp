@@ -139,6 +139,15 @@ void HkWindowManager::mouseClickedEventCalled(GLFWwindow*, int button, int actio
     updateAllSubWindows(HkEvent::MouseClick);
 }
 
+void HkWindowManager::mouseScrollEventCalled(GLFWwindow* window, double, double yOffset)
+{
+    windowData_.lastScrollPosY = windowData_.scrollPosY;
+    windowData_.scrollPosY = yOffset;
+
+    updateAllSubWindows(HkEvent::HoverScan);
+    updateAllSubWindows(HkEvent::MouseScroll);
+}
+
 void HkWindowManager::resolveFocus()
 {
     //TODO: Only resolving focus on left click might not be the best always

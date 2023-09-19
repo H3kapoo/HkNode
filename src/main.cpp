@@ -80,7 +80,8 @@ int main()
     // HkAppManager::get().addWindow(sceneWindow2);
 
     HkWindowFramePtr windowFrame = std::make_shared<HkWindowFrame>("MyWindowFrame");
-    // windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
+    windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
+    sceneWindow1->addSubWindow(windowFrame); //NOTE: Needs to be added before adding any children
     windowFrame->getStyle().setOverflowAllowedXY(true)
         .setDirection(HkDirection::Horizontal)
         .setHAlignment(HkHAlignment::Left)
@@ -89,7 +90,39 @@ int main()
     windowFrame->setPos({ 1280 * 0.25, 720 * 0.25 });
     windowFrame->setSize({ 1280 * 0.4, 720 * 0.7 });
 
-    sceneWindow1->addSubWindow(windowFrame);
+
+    std::vector<HkNodeBasePtr> ctrs2;
+    ctrs2.reserve(5'000);
+    for (int i = 0;i < 5'000;i++) // with O2 works ok 01.09.2023
+    {
+        const auto& ct = std::make_shared<HkContainer>("MyContauner");
+        ct->getStyle().setColor(i % 2 == 0 ? glm::vec3{ 0.75f, 0.75f, 0.75f } : glm::vec3{ 1.0f, 1.0f, 1.0f });
+        ct->setSize({ 20, 20 });
+        ctrs2.push_back(std::move(ct));
+    }
+
+    HkContainerPtr ctr = std::make_shared<HkContainer>("MyContainer");
+    HkContainerPtr ctr2 = std::make_shared<HkContainer>("MyContainer2");
+    HkContainerPtr ctr3 = std::make_shared<HkContainer>("MyContainer3");
+    HkContainerPtr ctr4 = std::make_shared<HkContainer>("MyContainer4");
+    HkContainerPtr ctr5 = std::make_shared<HkContainer>("MyContainer5");
+
+
+    ctr->getStyle().setColor({ 0.3f,0.3f,0.7f });
+    ctr2->getStyle().setColor({ 1.0f,0.4f,0.5f });
+    ctr3->getStyle().setColor({ 0.4f,0.5f,0.6f });
+    ctr4->getStyle().setColor({ 0.7f,0.8f,0.9f });
+    ctr5->getStyle().setColor({ 0.0f,0.1f,0.2f });
+
+    ctr->setSize({ 200, 300 });
+    ctr2->setSize({ 300, 350 });
+    ctr3->setSize({ 400, 450 });
+    ctr4->setSize({ 100, 150 });
+    ctr5->setSize({ 330, 450 });
+
+    // windowFrame->pushChildren({ ctr, ctr2, ctr3, ctr4, ctr5 });
+    windowFrame->pushChildren(ctrs2);
+
 
     HkAppManager::get().runLoop(); // Blocking from here on, maybe could be run in separate thread
 

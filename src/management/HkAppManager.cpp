@@ -86,17 +86,23 @@ void mouseEnterCallback(GLFWwindow* window, int entered)
     // HkSceneManagement::get().mouseEnterEvent(window, entered);
 }
 
-void mouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+void HkAppManager::mouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    // double currentTime = glfwGetTime();
+    double currentTime = glfwGetTime();
+    if (currentTime - lastMoveTime2 < MS_CALLBACK_THRESHOLD)
+    {
+        return;
+    }
 
-    // if (currentTime - lastMoveTime2 < MS_CALLBACK_THRESHOLD)
-    // {
-    //     return;
-    // }
-    // // let the user call the functions
-    // // HkSceneManagement::get().mouseScrollEvent(window, xoffset, yoffset);
-    // lastMoveTime2 = currentTime;
+    for (uint32_t i = 0; i < windows_.size(); i++)
+    {
+        if (windows_[i]->getWindowHandle() == window)
+        {
+            windows_[i]->mouseScrollEventCalled(window, xoffset, yoffset);
+            break;
+        }
+    }
+    lastMoveTime2 = currentTime;
 }
 
 void dropCallback(GLFWwindow* window, int count, const char** paths)
@@ -191,14 +197,14 @@ void HkAppManager::runLoop()
             glfwPollEvents();
 
             // Measure speed
-            // double currentTime = glfwGetTime();
-            // frameCount_++;
-            // if (currentTime - previousTime_ >= 1.0)
-            // {
-            //     glfwSetWindowTitle(windows_[i]->getWindowHandle(), std::to_string(frameCount_).c_str());
-            //     frameCount_ = 0;
-            //     previousTime_ = currentTime;
-            // }
+            double currentTime = glfwGetTime();
+            frameCount_++;
+            if (currentTime - previousTime_ >= 1.0)
+            {
+                glfwSetWindowTitle(windows_[i]->getWindowHandle(), std::to_string(frameCount_).c_str());
+                frameCount_ = 0;
+                previousTime_ = currentTime;
+            }
         }
     }
 }

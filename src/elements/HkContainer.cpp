@@ -18,8 +18,6 @@ HkContainer::HkContainer(const std::string& containerName)
     dummyXYIntersectorData_.renderContext.setColorUniformEnabled(true);
     dummyXYIntersectorData_.styleContext.setColor(glm::vec3(0.7f, 1.0f, 0.2f));
 
-
-
     //TODO: Dummy just to test nested scrollbars
     if (treeStruct_.getName() == "MyContainer2")
     {
@@ -39,7 +37,7 @@ void HkContainer::onScroll()
 
 void HkContainer::onGeneralMouseScroll()
 {
-    if (sceneDataRef_.nearestScrollContainerId_ == treeStruct_.getId())
+    if (windowDataPtr_->nearestScrollContainerId_ == treeStruct_.getId())
     {
         vScrollBar_.onScroll();
         //TODO: Allow H movement but only if shift key or ctrl key is pressed as well
@@ -156,6 +154,8 @@ void HkContainer::resolveScrollBarChildrenIfNeeded()
         {
             scrollbBarsCount_++; //TODO: THis variable is now in constraint context
             treeStruct_.pushChild(&hScrollBar_.treeStruct_);
+            hScrollBar_.injectWindowDataPtr(windowDataPtr_); //NOTE: Not really needed each time
+            hScrollBar_.knob_.injectWindowDataPtr(windowDataPtr_);
             hScrollBar_.setScrollBarActive(true);
         }
         else if (hScrollBar_.isScrollBarActive() && !node_.constraintContext.isOverflowX_)
@@ -175,6 +175,9 @@ void HkContainer::resolveScrollBarChildrenIfNeeded()
         {
             scrollbBarsCount_++;
             treeStruct_.pushChild(&vScrollBar_.treeStruct_);
+            //TODO: There has to be a better way
+            vScrollBar_.injectWindowDataPtr(windowDataPtr_);
+            vScrollBar_.knob_.injectWindowDataPtr(windowDataPtr_);
             vScrollBar_.setScrollBarActive(true);
         }
         else if (vScrollBar_.isScrollBarActive() && !node_.constraintContext.isOverflowY_)
@@ -195,13 +198,15 @@ void HkContainer::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)
 {
     for (const auto& child : newChildren)
     {
+        /* Inject ref to windowData to each children so they all have a common source of truth*/
+        child->injectWindowDataPtr(windowDataPtr_);
+
         /* What this does is basically push any new children before the scrollbars children so that the
         scrollbars will always be rendered last */
         if (scrollbBarsCount_)
         {
             const auto it = treeStruct_.getChildren().begin() + treeStruct_.getChildren().size() - scrollbBarsCount_;
             treeStruct_.pushChildAfter(it, &child->treeStruct_);
-            child->injectWindowDataPtr(windowDataPtr_);
         }
         /* If no scrollbars, push normally */
         else

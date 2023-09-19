@@ -20,6 +20,7 @@ public:
     static void resizeCallback(GLFWwindow* window, int width, int height);
     static void mouseMoveCallback(GLFWwindow* window, double xpos, double ypos);
     static void mouseClickCallback(GLFWwindow* window, int button, int action, int mods);
+    static void mouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
     bool setup();
     void teardown();

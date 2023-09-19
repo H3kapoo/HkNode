@@ -31,8 +31,8 @@ public:
     float getScrollValue() const;
     bool isScrollBarActive() const;
 
-private:
     HkKnob knob_;
+private:
     float overflowSize_;
     bool isHorizontal_;
     bool isActive_;

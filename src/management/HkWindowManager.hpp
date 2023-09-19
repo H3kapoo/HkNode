@@ -37,6 +37,7 @@ private:
     void resizeEventCalled(GLFWwindow* window, int width, int height);
     void mouseMovedEventCalled(GLFWwindow* window, int x, int y);
     void mouseClickedEventCalled(GLFWwindow* window, int button, int action, int mods);
+    void mouseScrollEventCalled(GLFWwindow* window, double xOffset, double yOffset);
 
     void resolveFocus();
     void resolveHover();

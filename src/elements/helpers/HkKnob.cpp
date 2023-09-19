@@ -14,7 +14,7 @@ HkKnob::HkKnob(const std::string& name, const bool isHorizontal)
 
 void HkKnob::onDrag()
 {
-    computeKnobValue(sceneDataRef_.mouseOffsetFromFocusedCenter);
+    computeKnobValue(windowDataPtr_->mouseOffsetFromFocusedCenter);
 }
 
 void HkKnob::onScroll()
@@ -24,7 +24,7 @@ void HkKnob::onScroll()
 
 void HkKnob::scrollOngoing()
 {
-    setValue(getValue() - sceneDataRef_.scrollPosY * scrollSensitivity_);
+    setValue(getValue() - windowDataPtr_->scrollPosY * scrollSensitivity_);
 }
 
 /* Based on where the mouse is at drag time, compute 0 to 1 range mapped from scrollbar min pos to
@@ -40,15 +40,15 @@ void HkKnob::computeKnobValue(const glm::ivec2 offsetFromCenter)
         const float minX = parentPos.x;
         const float maxX = parentPos.x + parentScale.x - node_.transformContext.getScale().x;
         // https://rosettacode.org/wiki/Map_range
-        // std::cout << sceneDataRef_.mouseOffsetFromFocusedCenter.x << "\n";
-        setValue(((sceneDataRef_.mousePos.x + offsetFromCenter.x) - minX) / (maxX - minX));
+        // std::cout << windowDataPtr_->mouseOffsetFromFocusedCenter.x << "\n";
+        setValue(((windowDataPtr_->mousePos.x + offsetFromCenter.x) - minX) / (maxX - minX));
     }
     else
     {
         const float minY = parentPos.y;
         const float maxY = parentPos.y + parentScale.y - node_.transformContext.getScale().y;
         // https://rosettacode.org/wiki/Map_range
-        setValue(((sceneDataRef_.mousePos.y + offsetFromCenter.y) - minY) / (maxY - minY));
+        setValue(((windowDataPtr_->mousePos.y + offsetFromCenter.y) - minY) / (maxY - minY));
     }
 }
 
