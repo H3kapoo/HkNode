@@ -45,9 +45,6 @@ void HkWindowManager::forceUpdate()
 
 void HkWindowManager::updateAllSubWindows(const HkEvent& ev)
 {
-    //TODO: Maybe update just the focused sub window
-    //TODO: Update the infocus window first (win priority)
-
     /* Focus scan event is special here. We need to find the first subWindow that the mouse click and do so from front
     most subWindow to back most one (reverse iteration, last element in vector is always the frontmost window). Once we
     found a fist match, we bail out. In case we don't find any suitable subWindow, we return from function,
@@ -55,6 +52,7 @@ void HkWindowManager::updateAllSubWindows(const HkEvent& ev)
     windowData_.currentEvent = ev;
     if (windowData_.currentEvent == HkEvent::FocusScan)
     {
+        std::cout << "size of subwins: " << rootSubWindows_.size() << "\n";
         for (int32_t i = rootSubWindows_.size() - 1; i >= 0; i--)
         {
             rootSubWindows_[i]->rootUpdate(); // TODO: Here it's not mandatory to render. Small optimization
@@ -62,9 +60,17 @@ void HkWindowManager::updateAllSubWindows(const HkEvent& ev)
             {
                 windowData_.focusedSubWindowId = i;
 
-                /* Swap the found window with the current from most one so that the new focused one is in the front of everything */
-                std::swap(rootSubWindows_[rootSubWindows_.size() - 1], rootSubWindows_[windowData_.focusedSubWindowId]);
+                /* Logic example:
+                    1 3 2 4   - window order, we want to make '3' the focused one
+                    1 3 2 4 3 - add focus to the end again
+                    1 2 4 3   -delete pos where focused was before
+
+                    This nicely preserves order of untoched windows.
+                */
+                rootSubWindows_.push_back(rootSubWindows_[windowData_.focusedSubWindowId]);
+                rootSubWindows_.erase(rootSubWindows_.begin() + windowData_.focusedSubWindowId);
                 return;
+
             }
         }
         return;
@@ -202,7 +208,6 @@ void HkWindowManager::resolveFocus()
         windowData_.focusedSubWindowId = HkWindowData::NO_SELECTION_ID;
         windowData_.mouseOffsetFromFocusedCenter = { 0,0 };
         updateAllSubWindows(HkEvent::FocusScan);
-        std::cout << "focus scan\n";
     }
 }
 

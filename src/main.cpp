@@ -18,10 +18,10 @@ int main()
 
     HkWindowManagerPtr sceneWindow1 = std::make_shared<HkWindowManager>("MyWindowManager",
         HkWindowManager::HkWindowConfig{ .width = 1920, .height = 1080, .isMaster = true });
-    // HkWindowManagerPtr sceneWindow2 = std::make_shared<HkWindowManager>("MyWindowManager2",
-    //     HkWindowManager::HkWindowConfig{ .width = 800, .height = 600 });
+    HkWindowManagerPtr sceneWindow2 = std::make_shared<HkWindowManager>("MyWindowManager2",
+        HkWindowManager::HkWindowConfig{ .width = 800, .height = 600 });
     HkAppManager::get().addWindow(sceneWindow1);
-    // HkAppManager::get().addWindow(sceneWindow2);
+    HkAppManager::get().addWindow(sceneWindow2);
 
     HkWindowFramePtr windowFrame = std::make_shared<HkWindowFrame>("MyWindowFrame");
     windowFrame->setWindowMode(HkWindowFrameMode::Grabbable);
@@ -29,8 +29,12 @@ int main()
     HkWindowFramePtr windowFrame2 = std::make_shared<HkWindowFrame>("MyWindowFrame2");
     windowFrame2->setWindowMode(HkWindowFrameMode::Grabbable);
 
+    // HkWindowFramePtr windowFrame3 = std::make_shared<HkWindowFrame>("MyWindowFrame3");
+    // windowFrame3->setWindowMode(HkWindowFrameMode::Grabbable);
+
     sceneWindow1->addSubWindow(windowFrame); //NOTE: Needs to be added before adding any children
-    sceneWindow1->addSubWindow(windowFrame2); //NOTE: Needs to be added before adding any children
+    sceneWindow2->addSubWindow(windowFrame2); //NOTE: Needs to be added before adding any children
+    // sceneWindow1->addSubWindow(windowFrame3); //NOTE: Needs to be added before adding any children
 
     windowFrame->getStyle().setOverflowAllowedXY(true)
         .setDirection(HkDirection::Horizontal)
@@ -40,11 +44,16 @@ int main()
     windowFrame->setPos({ 1280 * 0.25, 720 * 0.25 });
     windowFrame->setSize({ 1280 * 0.4, 720 * 0.7 });
 
-
     windowFrame2->getStyle().setOverflowAllowedXY(true)
         .setDirection(HkDirection::Horizontal)
         .setHAlignment(HkHAlignment::Right)
         .setVAlignment(HkVAlignment::Center);
+
+
+    // windowFrame3->getStyle().setOverflowAllowedXY(true)
+    //     .setDirection(HkDirection::Horizontal)
+    //     .setHAlignment(HkHAlignment::Right)
+    //     .setVAlignment(HkVAlignment::Center);
 
     // std::vector<HkNodeBasePtr> ctrs2;
     // ctrs2.reserve(5'000);
@@ -61,6 +70,7 @@ int main()
     HkContainerPtr ctr3 = std::make_shared<HkContainer>("MyContainer3");
     HkContainerPtr ctr4 = std::make_shared<HkContainer>("MyContainer4");
     HkContainerPtr ctr5 = std::make_shared<HkContainer>("MyContainer5");
+    HkContainerPtr ctr6 = std::make_shared<HkContainer>("MyContainer6");
 
 
     ctr->getStyle().setColor({ 1.3f,0.3f,0.7f });
@@ -68,17 +78,18 @@ int main()
     ctr3->getStyle().setColor({ 0.4f,0.5f,0.6f });
     ctr4->getStyle().setColor({ 0.7f,0.8f,0.9f });
     ctr5->getStyle().setColor({ 0.0f,0.1f,0.2f });
+    ctr6->getStyle().setColor({ 1.0f,0.4f,0.5f });
 
     ctr->setSize({ 200, 300 });
     ctr2->setSize({ 300, 350 });
     ctr3->setSize({ 400, 450 });
     ctr4->setSize({ 100, 150 });
     ctr5->setSize({ 330, 450 });
+    ctr6->setSize({ 400, 450 });
 
-    windowFrame->pushChildren({ ctr, ctr4, ctr5 });
+    windowFrame->pushChildren({ ctr, ctr4 });
     windowFrame2->pushChildren({ ctr2, ctr3 });
-    // windowFrame->pushChildren(ctrs2);
-
+    // windowFrame3->pushChildren({ ctr5, ctr6 });
 
     HkAppManager::get().runLoop(); // Blocking from here on, maybe could be run in separate thread
 
