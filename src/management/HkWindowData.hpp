@@ -2,6 +2,7 @@
 
 #include "HkEventStructs.hpp"
 
+#include <unordered_map>
 #include <glm/glm.hpp>
 
 namespace hkui
@@ -23,6 +24,7 @@ struct HkWindowData
     const char** droppedPaths; //L
 
     /*Selection*/
+    uint32_t focusedSubWindowId{ 0 }; //G
     uint32_t focusedId{ 0 }; //G
     glm::ivec2 mouseOffsetFromFocusedCenter{ 0,0 }; //G
 
@@ -36,11 +38,11 @@ struct HkWindowData
     /*Rendering*/
     glm::mat4 sceneProjMatrix; //G (could be L in the future)
 
-    /*Scene deletion*/ // will be more useful when multiple windowframe support comes
-    bool isSceneStillAlive{ true }; //L
+    /*Scene deletion*/
+    bool isWindowStillAlive{ true }; //L
 
     /*Visibility*/
-    bool isSceneMinimized{ false }; //L
+    std::unordered_map<uint32_t, bool> subWindowIdToIsMinimizedMap_; //L
 
     /*Scrolling*/
     uint32_t nearestScrollContainerId_{ 0 }; //G

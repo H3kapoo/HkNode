@@ -59,7 +59,7 @@ private:
     /* These functions/params will be accessible to friend classes but will not be accessible to user */
     /* Derived can override whatever function it needs */
     virtual void renderMySelf();
-    virtual void updateMySelf();
+    virtual void updateMySelf(const bool isSubWindowMinimized);
 
     /* Constraints */
     virtual void resolveChildrenConstraints(HkTreeStruct& children,

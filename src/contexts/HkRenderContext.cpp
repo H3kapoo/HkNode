@@ -18,6 +18,7 @@ HkRenderArch HkRenderContext::renderArch = {
 };
 
 uint32_t HkRenderContext::boundVaoId_ = 0;
+uint32_t HkRenderContext::vaoId_ = 0;
 bool HkRenderContext::archCreated_ = false;
 
 /* Sets shader code to be used */
@@ -57,9 +58,9 @@ void HkRenderContext::render(const glm::mat4& projMat, const glm::mat4& modelMat
 
     if (boundVaoId_ == 0)
     {
-        glBindVertexArray(vaoId);
-        std::cout << "VAO " << vaoId << " is now bound\n";
-        boundVaoId_ = vaoId;
+        glBindVertexArray(vaoId_);
+        std::cout << "VAO " << vaoId_ << " is now bound\n";
+        boundVaoId_ = vaoId_;
     }
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -73,10 +74,10 @@ void HkRenderContext::render(const glm::mat4& projMat, const glm::mat4& modelMat
 void HkRenderContext::setupArch()
 {
     unsigned int VBO, EBO;
-    glGenVertexArrays(1, &vaoId);
+    glGenVertexArrays(1, &vaoId_);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
-    glBindVertexArray(vaoId);
+    glBindVertexArray(vaoId_);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * renderArch.vertices.size(),

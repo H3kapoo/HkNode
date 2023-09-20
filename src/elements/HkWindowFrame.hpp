@@ -61,6 +61,7 @@ private:
     HkWindowFrameMode mode_;
     glm::ivec2 cachedScale_;
     glm::ivec2 cachedPos_;
+    bool isMinimized_{ false };
 };
 using HkWindowFramePtr = std::shared_ptr<HkWindowFrame>;
 using HkWindowFrameCPtr = const std::shared_ptr<HkWindowFrame>;

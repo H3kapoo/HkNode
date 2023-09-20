@@ -22,7 +22,7 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
 
     minimizeBtn_.setOnClickListener([this]()
         {
-            windowDataPtr_->isSceneMinimized = !windowDataPtr_->isSceneMinimized;
+            isMinimized_ = !isMinimized_;
         });
 
     exitBtn_.setOnClickListener([this]()
@@ -31,7 +31,7 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
         });
 }
 
-void HkWindowFrame::rootUpdate() { updateMySelf(); renderMySelf(); }
+void HkWindowFrame::rootUpdate() { updateMySelf(isMinimized_); renderMySelf(); }
 
 HkNodeBase* HkWindowFrame::getUnderlayingNode() { return this; }
 

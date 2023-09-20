@@ -60,7 +60,7 @@ void HkNodeBase::renderMySelf()
     Handles any event sent by the SM to the node, redering, and scissoring.
     Shall not be implemented by the child unless you really have no other choice.
 */
-void HkNodeBase::updateMySelf()
+void HkNodeBase::updateMySelf(const bool isSubWindowMinimized)
 {
     // return;
     const auto& parentTreeStruct = treeStruct_.getParent();
@@ -75,7 +75,7 @@ void HkNodeBase::updateMySelf()
     else if (parentTreeStruct && parentTreeStruct->getType() == HkNodeType::RootWindowFrame)
     {
         /* Minimize only container of windowframe */
-        if (windowDataPtr_->isSceneMinimized && treeStruct_.getType() == HkNodeType::Container)
+        if (isSubWindowMinimized && treeStruct_.getType() == HkNodeType::Container)
         {
             tc.setVPos({ 0,0 });
             tc.setVScale({ 0,0 });
@@ -130,7 +130,7 @@ void HkNodeBase::updateMySelf()
     /* Update children */
     for (uint32_t i = 0;i < children.size(); i++)
     {
-        children[i]->getPayload()->updateMySelf();
+        children[i]->getPayload()->updateMySelf(isSubWindowMinimized);
     }
 }
 

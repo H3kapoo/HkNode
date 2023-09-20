@@ -40,24 +40,52 @@ HkWindowManager::HkWindowManager(const std::string& windowName, const HkWindowCo
 
 void HkWindowManager::forceUpdate()
 {
-    //TODO: set event
     updateAllSubWindows(HkEvent::None);
 }
 
 void HkWindowManager::updateAllSubWindows(const HkEvent& ev)
 {
+    //TODO: Maybe update just the focused sub window
+    //TODO: Update the infocus window first (win priority)
+
+    /* Focus scan event is special here. We need to find the first subWindow that the mouse click and do so from front
+    most subWindow to back most one (reverse iteration, last element in vector is always the frontmost window). Once we
+    found a fist match, we bail out. In case we don't find any suitable subWindow, we return from function,
+    there's nothing left to be done.*/
     windowData_.currentEvent = ev;
-    for (uint32_t i = 0;i < rootSubWindows_.size();i++)
+    if (windowData_.currentEvent == HkEvent::FocusScan)
     {
-        if (rootSubWindows_[i]->isAlive())
+        for (int32_t i = rootSubWindows_.size() - 1; i >= 0; i--)
         {
-            rootSubWindows_[i]->rootUpdate();
+            rootSubWindows_[i]->rootUpdate(); // TODO: Here it's not mandatory to render. Small optimization
+            if (windowData_.focusedId != HkWindowData::NO_SELECTION_ID)
+            {
+                windowData_.focusedSubWindowId = i;
+
+                /* Swap the found window with the current from most one so that the new focused one is in the front of everything */
+                std::swap(rootSubWindows_[rootSubWindows_.size() - 1], rootSubWindows_[windowData_.focusedSubWindowId]);
+                return;
+            }
+        }
+        return;
+    }
+
+    for (auto it = rootSubWindows_.begin(); it != rootSubWindows_.end();)
+    {
+        if ((*it)->isAlive())
+        {
+            /* Update subwindow */
+            (*it)->rootUpdate();
+            ++it;
         }
         else
         {
-            //TODO: Cleanup subWindow from vector
+            std::cout << "SubWindow '" << (*it)->getUnderlayingNode()->getNodeInfo().name << "' requested close.\n";
+            /* This will not deallocate the pointer */
+            it = rootSubWindows_.erase(it);
         }
     }
+
     windowData_.currentEvent = HkEvent::None; /* Reset current event */
 }
 
@@ -70,6 +98,16 @@ void HkWindowManager::teardown()
 void HkWindowManager::addSubWindow(const IHkRootNodePtr& subWindowRoot)
 {
     subWindowRoot->getUnderlayingNode()->injectWindowDataPtr(&windowData_);
+    /* Two methods of possible push:
+        rootSubWindows_.push_back(subWindowRoot); // 1 2
+        ^ will put new window as the front most one
+
+        rootSubWindows_.insert(rootSubWindows_.begin(), subWindowRoot); // 2 1
+        ^ will put new window as the back most one
+
+        Code should stick to new one being the front-most one. Last element in the vector
+        is always the window on top of everything
+    */
     rootSubWindows_.push_back(subWindowRoot);
 }
 
@@ -83,7 +121,6 @@ void HkWindowManager::resizeEventCalled(GLFWwindow*, int width, int height)
 
 void HkWindowManager::mouseMovedEventCalled(GLFWwindow*, int xPos, int yPos)
 {
-    //TODO: set event
     windowData_.lastMousePos = windowData_.mousePos;
     windowData_.mousePos = { xPos, yPos };
 
@@ -91,7 +128,10 @@ void HkWindowManager::mouseMovedEventCalled(GLFWwindow*, int xPos, int yPos)
     dispatch mouseMove event. The dragged element will become the 'focusedId'. Dragged element will be set only if
     there's not already someone being dragged */
     resolveHover();
-    if (!windowData_.isDragging && windowData_.lastActiveMouseButton == HkMouseButton::Left && windowData_.hoveredId != HkWindowData::NO_SELECTION_ID)
+    if (!windowData_.isDragging
+        && windowData_.lastActiveMouseButton == HkMouseButton::Left
+        && windowData_.hoveredId != HkWindowData::NO_SELECTION_ID
+        && windowData_.isMouseClicked)
     {
         windowData_.isDragging = true;
         windowData_.dragStartMousePosition = windowData_.mousePos;
@@ -123,6 +163,12 @@ void HkWindowManager::mouseClickedEventCalled(GLFWwindow*, int button, int actio
             std::cout << "Unhandled mouse button press\n";
             windowData_.lastActiveMouseButton = HkMouseButton::Unknown;
         }
+        /* At this point mouse state is already applied and we want to find what's been clicked, it's ID.
+        After that normal mouse click event can be dispatched, this helps isolate things even more.
+        Once this function exits, 'focusedId' is guaranteed to be the currenctly selected node.
+        Note: only calculate the focus at mouse click, not at release. At release the object can still be
+        in focus */
+        resolveFocus();
     }
     else if (action == GLFW_RELEASE)
     {
@@ -131,10 +177,6 @@ void HkWindowManager::mouseClickedEventCalled(GLFWwindow*, int button, int actio
         windowData_.isDragging = false;
     }
 
-    /* At this point mouse state is already applied and we want to find what's been clicked, it's ID.
-    After that normal mouse click event can be dispatched, this helps isolate things even more.
-    Once this function exits, 'focusedId' is guaranteed to be the currenctly selected node */
-    resolveFocus();
 
     updateAllSubWindows(HkEvent::MouseClick);
 }
@@ -148,14 +190,19 @@ void HkWindowManager::mouseScrollEventCalled(GLFWwindow* window, double, double 
     updateAllSubWindows(HkEvent::MouseScroll);
 }
 
+/* This will traverse the whole tree structure from top to bottom (back to front) and return in the
+  function's variable which element is the focused one (the last one to be found on mouse's position
+  after click). Same logic applies for hover. */ //TODO: maybe resolve focus/hover can be merged?
 void HkWindowManager::resolveFocus()
 {
     //TODO: Only resolving focus on left click might not be the best always
     if (windowData_.lastActiveMouseButton == HkMouseButton::Left)
     {
         windowData_.focusedId = HkWindowData::NO_SELECTION_ID;
+        windowData_.focusedSubWindowId = HkWindowData::NO_SELECTION_ID;
         windowData_.mouseOffsetFromFocusedCenter = { 0,0 };
         updateAllSubWindows(HkEvent::FocusScan);
+        std::cout << "focus scan\n";
     }
 }
 
