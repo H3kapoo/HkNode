@@ -26,12 +26,17 @@ public:
     HkWindowManager(const std::string& name, const HkWindowConfig config);
 
     void addSubWindow(const IHkRootNodePtr& subWindowRoot);
+    void makeContextCurrent();
+    void makeContextNotCurrent();
 
     inline GLFWwindow* getWindowHandle() { return windowHandle_; }
     inline uint32_t getWindowId() { return id_; }
     inline std::string getWindowName() { return windowName_; }
     inline bool isMasterWindow() { return isMaster_; }
 
+    //EXPERIMENTAL
+    uint32_t vaoId_;
+    ////////////////
 private:
     /* Events */
     void resizeEventCalled(GLFWwindow* window, int width, int height);

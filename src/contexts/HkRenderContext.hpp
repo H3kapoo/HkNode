@@ -65,6 +65,8 @@ private:
     static bool archCreated_;
     static uint32_t boundVaoId_;
     static uint32_t vaoId_;
+    static uint32_t currentlyBoundWindow;
+
 
     // shader
     // Texture

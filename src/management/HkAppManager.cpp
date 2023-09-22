@@ -11,6 +11,7 @@ const double HkAppManager::MM_CALLBACK_THRESHOLD = 0.05;
 const double HkAppManager::MS_CALLBACK_THRESHOLD = 0.04;
 
 std::vector<HkWindowManagerPtr> HkAppManager::windows_ = {};
+int32_t HkAppManager::resizeEventUnsolvedId_ = -1;
 
 void HkAppManager::windowCloseCallback(GLFWwindow* window)
 {
@@ -43,6 +44,7 @@ void HkAppManager::resizeCallback(GLFWwindow* window, int width, int height)
     {
         if (windows_[i]->getWindowHandle() == window)
         {
+            resizeEventUnsolvedId_ = i;
             windows_[i]->resizeEventCalled(window, width, height);
             break;
         }
@@ -182,14 +184,17 @@ void HkAppManager::runLoop()
                 glfwMakeContextCurrent(windows_[i]->getWindowHandle());
             }
 
-            glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            if (resizeEventUnsolvedId_ == (int32_t)i)
+            {
+                int framebufferWidth, framebufferHeight;
+                glfwGetFramebufferSize(windows_[i]->getWindowHandle(), &framebufferWidth, &framebufferHeight);
+                glViewport(0, 0, framebufferWidth, framebufferHeight);
+                resizeEventUnsolvedId_ = -1;
+            }
 
-            //TODO: Refactor sceneMangement class to use this class now
-            //TODO: GLFWAPI void glfwPostEmptyEvent(void); could be used in the future in case of animations
-            // HkSceneManagement::get().update();
-            //TODO: ^^ we might have to split rendering and updating
-            // HkDrawDebugger::get().drawBuffer();
+            glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT);
+
             windows_[i]->forceUpdate();
 
             glfwSwapBuffers(windows_[i]->getWindowHandle());
@@ -197,13 +202,16 @@ void HkAppManager::runLoop()
             glfwPollEvents();
 
             // Measure speed
-            double currentTime = glfwGetTime();
-            frameCount_++;
-            if (currentTime - previousTime_ >= 1.0)
+            if (i == 0)
             {
-                glfwSetWindowTitle(windows_[i]->getWindowHandle(), std::to_string(frameCount_).c_str());
-                frameCount_ = 0;
-                previousTime_ = currentTime;
+                double currentTime = glfwGetTime();
+                frameCount_++;
+                if (currentTime - previousTime_ >= 1.0)
+                {
+                    glfwSetWindowTitle(windows_[i]->getWindowHandle(), std::to_string(frameCount_).c_str());
+                    frameCount_ = 0;
+                    previousTime_ = currentTime;
+                }
             }
         }
     }

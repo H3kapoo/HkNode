@@ -14,6 +14,7 @@ HkWindowManager::HkWindowManager(const std::string& windowName, const HkWindowCo
 {
     //TODO: Ability to pass options to ctor
     windowHandle_ = glfwCreateWindow(config.width, config.height, windowName.c_str(), NULL, NULL);
+
     if (windowHandle_ == NULL)
     {
         std::cerr << "Failed to create GLFW window" << std::endl;
@@ -55,6 +56,7 @@ void HkWindowManager::updateAllSubWindows(const HkEvent& ev)
         std::cout << "size of subwins: " << rootSubWindows_.size() << "\n";
         for (int32_t i = rootSubWindows_.size() - 1; i >= 0; i--)
         {
+            //TODO: Could we pass a RENDERER object here who has all the bind for the current window?
             rootSubWindows_[i]->rootUpdate(); // TODO: Here it's not mandatory to render. Small optimization
             if (windowData_.focusedId != HkWindowData::NO_SELECTION_ID)
             {
@@ -117,9 +119,12 @@ void HkWindowManager::addSubWindow(const IHkRootNodePtr& subWindowRoot)
     rootSubWindows_.push_back(subWindowRoot);
 }
 
+void HkWindowManager::makeContextCurrent() { glfwMakeContextCurrent(windowHandle_); }
+
+void HkWindowManager::makeContextNotCurrent() { glfwMakeContextCurrent(NULL); }
+
 void HkWindowManager::resizeEventCalled(GLFWwindow*, int width, int height)
 {
-    glViewport(0, 0, width, height);
     windowData_.windowSize = { width, height };
     windowData_.sceneProjMatrix = glm::ortho(0.0f, (float)width, (float)height, 0.0f, 0.0f, 100.0f);
     updateAllSubWindows(HkEvent::WindowResize);

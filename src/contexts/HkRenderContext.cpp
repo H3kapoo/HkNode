@@ -17,9 +17,11 @@ HkRenderArch HkRenderContext::renderArch = {
         }
 };
 
+
 uint32_t HkRenderContext::boundVaoId_ = 0;
 uint32_t HkRenderContext::vaoId_ = 0;
 bool HkRenderContext::archCreated_ = false;
+uint32_t HkRenderContext::currentlyBoundWindow = 0;
 
 /* Sets shader code to be used */
 void HkRenderContext::setShaderSource(const std::string& vertSource, const std::string& fragSource)

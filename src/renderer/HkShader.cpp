@@ -8,6 +8,9 @@ uint32_t HkShader::currentlyActiveShaderId_ = 0;
 
 void HkShader::setShaderSource(const std::string& vertPath, const std::string& fragPath)
 {
+    // shaderId_ = linkShaders(compileShader(vertPath, GL_VERTEX_SHADER),
+    //     compileShader(fragPath, GL_FRAGMENT_SHADER));
+
     const uint32_t storedShaderId = shaderSourceToId_[vertPath + fragPath];
     if (storedShaderId == 0)
     {

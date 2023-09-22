@@ -46,8 +46,9 @@ private:
     //TODO: Passing data between children windows shall be also handled somehow in the future
 
 
-    uint32_t currentlyBoundContextId_{ 0 };
+    uint32_t currentlyBoundContextId_;
 
     static std::vector<HkWindowManagerPtr> windows_;
+    static int32_t resizeEventUnsolvedId_;
 };
 } // hkui
