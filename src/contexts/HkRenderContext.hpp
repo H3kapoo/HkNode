@@ -9,6 +9,7 @@
 
 #include "../contexts/HkStyleContext.hpp"
 #include "../renderer/HkShader.hpp"
+#include "../renderer/HkRenderStore.hpp"
 
 namespace hkui
 {
@@ -30,8 +31,8 @@ class HkRenderContext
 {
 public:
     HkRenderContext() = default;
-    void setShaderSource(const std::string& vertSource, const std::string& fragSource);
-    void render(const glm::mat4& projMat, const glm::mat4& modelMat);
+    void setShaderSource(const std::string& vertSource, const std::string& fragSource, HkRenderStore* renderStore);
+    void render(const glm::mat4& projMat, const glm::mat4& modelMat, HkRenderStore& renderStore);
     void setTextureRefId(const unsigned int textureId);
     void setupArch();
 
@@ -48,7 +49,7 @@ public:
 
 private:
     static HkRenderArch renderArch;
-    uint32_t vaoId; /* Note: only the first element created with this renderArch will have vao variable filled. THe rest of the object will have garbage
+    uint32_t vaoId_; /* Note: only the first element created with this renderArch will have vao variable filled. THe rest of the object will have garbage
                                    Maybe in the future we could abstract this class even more.
                                    Let it slide for now (overflow and garbage val) but I shall come back later for it
     */
@@ -60,16 +61,5 @@ private:
 
     /* Element enabled shader uniforms */
     bool colorUniformEnabled_{ false };
-
-    /* Statics */
-    static bool archCreated_;
-    static uint32_t boundVaoId_;
-    static uint32_t vaoId_;
-    static uint32_t currentlyBoundWindow;
-
-
-    // shader
-    // Texture
-    // Pos
 };
 } // hkui

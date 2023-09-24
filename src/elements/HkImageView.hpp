@@ -17,6 +17,8 @@ public:
     void setSize(const glm::vec2& size);
 
 private:
+    void onFirstHeartbeat() override;
+
     HkTextureContext textureContext_;
 };
 using HkImageViewPtr = std::shared_ptr<HkImageView>;

@@ -10,6 +10,7 @@ class HkKnob : public HkNodeBase
 public:
     HkKnob(const std::string& name, const bool isHorizontal);
 
+    void onFirstHeartbeat() override;
     void onDrag() override;
     void onScroll() override;
     void scrollOngoing();

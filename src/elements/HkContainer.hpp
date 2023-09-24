@@ -20,6 +20,7 @@ public:
     void setSize(const glm::vec2& size);
 
 private:
+    void onFirstHeartbeat() override;
     void onScroll() override;
     void onGeneralMouseScroll() override;
     void onClick() override;

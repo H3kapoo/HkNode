@@ -75,6 +75,7 @@ private:
     virtual void onGeneralMouseMove();
     virtual void onGeneralMouseClick();
     virtual void onGeneralMouseScroll();
+    virtual void onFirstHeartbeat();
 
     virtual void postRenderAdditionalDetails();
 
@@ -90,6 +91,7 @@ private:
     virtual void injectWindowDataPtr(HkWindowData* windowDataPtr);
 
 private:
+    bool hadFirstHeartBeat_{ false };
     HkNodeData node_;
     HkTreeStructure<HkNodeBase, HkNodeType> treeStruct_;
     HkSceneData& sceneDataRef_; /* This is safe as singleton will outlive THIS class anyway*/ // to be deprecated

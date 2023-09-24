@@ -15,6 +15,7 @@ class HkScrollBar : public HkNodeBase
 public:
     HkScrollBar(const std::string& name, const bool isHorizontal);
 
+    void onFirstHeartbeat() override;
     void onScroll() override;
     void onDrag() override;
     void onClick() override;

@@ -1,9 +1,9 @@
 #pragma once
-
-#include "HkEventStructs.hpp"
-
 #include <unordered_map>
 #include <glm/glm.hpp>
+
+#include "HkEventStructs.hpp"
+#include "../renderer/HkRenderStore.hpp"
 
 namespace hkui
 {
@@ -46,6 +46,9 @@ struct HkWindowData
 
     /*Scrolling*/
     uint32_t nearestScrollContainerId_{ 0 }; //G
+
+    /*Render store*/
+    HkRenderStore renderStore;
 
     /*Constants*/
     static constexpr uint32_t NO_SELECTION_ID = 0;  //G

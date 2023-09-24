@@ -9,7 +9,11 @@ HkKnob::HkKnob(const std::string& name, const bool isHorizontal)
     , scrollSensitivity_{ 0.05f }
 {
     node_.styleContext.setColor(glm::vec3(0.5f, 0.7f, 0.9f));
-    node_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
+}
+
+void HkKnob::onFirstHeartbeat()
+{
+    node_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl", &windowDataPtr_->renderStore);
 }
 
 void HkKnob::onDrag()

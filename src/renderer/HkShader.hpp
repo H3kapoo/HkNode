@@ -11,6 +11,8 @@
 #include <sstream>
 #include <unordered_map>
 
+#include "HkRenderStore.hpp"
+
 namespace hkui
 {
 //TODO: Maybe cache 'getUniformLocation'
@@ -22,10 +24,13 @@ public:
     void unbind() const;
 
     /* Setters */
-    void setShaderSource(const std::string& vertPath, const std::string& fragPath);
+    //TODO: there has to be a better method than passing RS here too
+    void setShaderSource(const std::string& vertPath, const std::string& fragPath, HkRenderStore* rs);
+    ///
     void setInt(const char* location, int value);
     void setVec3f(const char* location, glm::vec3 value);
     void setMatrix4(const char* location, const glm::mat4 transform);
+    void setBackfedShaderId(uint32_t shaderId);
 
     /* Getters */
     uint32_t getShaderId() const;
@@ -35,10 +40,11 @@ private:
     int compileShader(const std::string& sourcePath, int32_t shaderType);
 
     uint32_t shaderId_;
+    HkRenderStore* rsPtr;
 
     /* Statics */
-    static std::unordered_map<std::string, int32_t> shaderSourceToId_;
-    static uint32_t currentlyActiveShaderId_;
+    // static std::unordered_map<std::string, int32_t> shaderSourceToId_;
+    // static uint32_t currentlyActiveShaderId_;
 };
 
 } // hkui

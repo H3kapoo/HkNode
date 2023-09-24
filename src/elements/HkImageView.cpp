@@ -5,8 +5,12 @@ namespace hkui
 HkImageView::HkImageView(const std::string& name)
     : HkNodeBase(name, HkNodeType::ImageView)
 {
-    node_.renderContext.setShaderSource("assets/shaders/vTextured.glsl", "assets/shaders/fTextured.glsl"); //TODO: Could be grabbed from style?
     node_.renderContext.setColorUniformEnabled(false);
+}
+
+void HkImageView::onFirstHeartbeat()
+{
+    node_.renderContext.setShaderSource("assets/shaders/vTextured.glsl", "assets/shaders/fTextured.glsl", &windowDataPtr_->renderStore);
 }
 
 void HkImageView::loadImage(const std::string& loadPath)

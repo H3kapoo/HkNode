@@ -9,11 +9,9 @@ HkContainer::HkContainer(const std::string& containerName)
     , scrollbBarsCount_{ 0 }
 {
     node_.styleContext.setColor(glm::vec3(0.5f, 0.5f, 0.5f));
-    node_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
 
     /* NOTE: In the future maybe this dummy can be an actual small UI element, but for now let it be
        just a normal renderable detail */
-    dummyXYIntersectorData_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
     dummyXYIntersectorData_.renderContext.injectStyleContext(&dummyXYIntersectorData_.styleContext);
     dummyXYIntersectorData_.renderContext.setColorUniformEnabled(true);
     dummyXYIntersectorData_.styleContext.setColor(glm::vec3(0.7f, 1.0f, 0.2f));
@@ -24,6 +22,18 @@ HkContainer::HkContainer(const std::string& containerName)
         vScrollBar_.node_.styleContext.setColor(glm::vec3(0.4f, 0.2f, 0.6f));
         hScrollBar_.node_.styleContext.setColor(glm::vec3(0.4f, 0.2f, 0.6f));
     }
+}
+
+void HkContainer::onFirstHeartbeat()
+{
+    node_.renderContext.setShaderSource(
+        "assets/shaders/v1.glsl",
+        "assets/shaders/f1.glsl",
+        &windowDataPtr_->renderStore);
+    dummyXYIntersectorData_.renderContext.setShaderSource(
+        "assets/shaders/v1.glsl",
+        "assets/shaders/f1.glsl",
+        &windowDataPtr_->renderStore);
 }
 
 //TODO: The way we handle scroll inside scroll is now necessarly very intuitive. It needs to ve changed in the future
@@ -117,28 +127,28 @@ void HkContainer::postRenderAdditionalDetails()
        on the container itself and since coordinates for this location are already known, maybe we can do some particular stuff with that info */
        // if (scrollbBarsCount_ == 2)
     {
-        if (treeStruct_.getId() == 4) return;
-        dummyXYIntersectorData_.transformContext.setScale({
-            hScrollBar_.node_.transformContext.getScale().y,
-            hScrollBar_.node_.transformContext.getScale().y });
+        // if (treeStruct_.getId() == 4) return;
+        // dummyXYIntersectorData_.transformContext.setScale({
+        //     hScrollBar_.node_.transformContext.getScale().y,
+        //     hScrollBar_.node_.transformContext.getScale().y });
+
+        // // dummyXYIntersectorData_.transformContext.setPos({
+        // //     hScrollBar_.node_.transformContext.getPos().x + hScrollBar_.node_.transformContext.getScale().x,
+        // //     hScrollBar_.node_.transformContext.getPos().y });
 
         // dummyXYIntersectorData_.transformContext.setPos({
-        //     hScrollBar_.node_.transformContext.getPos().x + hScrollBar_.node_.transformContext.getScale().x,
-        //     hScrollBar_.node_.transformContext.getPos().y });
+        //     node_.transformContext.getPos().x + node_.transformContext.getScale().x - 4,
+        //     node_.transformContext.getPos().y + node_.transformContext.getScale().y - 4 });
 
-        dummyXYIntersectorData_.transformContext.setPos({
-            node_.transformContext.getPos().x + node_.transformContext.getScale().x - 4,
-            node_.transformContext.getPos().y + node_.transformContext.getScale().y - 4 });
+        // dummyXYIntersectorData_.renderContext.render(sceneDataRef_.sceneProjMatrix,
+        //     dummyXYIntersectorData_.transformContext.getModelMatrix());
 
-        dummyXYIntersectorData_.renderContext.render(sceneDataRef_.sceneProjMatrix,
-            dummyXYIntersectorData_.transformContext.getModelMatrix());
+        // dummyXYIntersectorData_.transformContext.setPos({
+        //     node_.transformContext.getPos().x,
+        //     node_.transformContext.getPos().y });
 
-        dummyXYIntersectorData_.transformContext.setPos({
-            node_.transformContext.getPos().x,
-            node_.transformContext.getPos().y });
-
-        dummyXYIntersectorData_.renderContext.render(sceneDataRef_.sceneProjMatrix,
-            dummyXYIntersectorData_.transformContext.getModelMatrix());
+        // dummyXYIntersectorData_.renderContext.render(sceneDataRef_.sceneProjMatrix,
+        //     dummyXYIntersectorData_.transformContext.getModelMatrix());
 
     }
 }

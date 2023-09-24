@@ -6,7 +6,7 @@ namespace hkui
 {
 HkNodeBase::HkNodeBase(const std::string& windowName, const HkNodeType& type)
     : treeStruct_(this, windowName, type)
-    , sceneDataRef_(HkSceneManagement::get().getSceneDataRef())
+    , sceneDataRef_(HkSceneManagement::get().getSceneDataRef()) //TODO: To be removed from all objects
 {
     node_.constraintContext.injectTransformContext(&node_.transformContext);
     node_.constraintContext.injectStyleContext(&node_.styleContext);
@@ -31,7 +31,7 @@ void HkNodeBase::renderMySelf()
     /* Normal rendering */
     if (tc.getVScale().x && tc.getVScale().y)
     {
-        node_.renderContext.render(windowDataPtr_->sceneProjMatrix, tc.getModelMatrix());
+        node_.renderContext.render(windowDataPtr_->sceneProjMatrix, tc.getModelMatrix(), windowDataPtr_->renderStore);
 
         /* Update children. Also don't require bellow children to be rendered if parent can't be rendered itself */
         auto& children = treeStruct_.getChildren();
@@ -116,12 +116,22 @@ void HkNodeBase::updateMySelf(const bool isSubWindowMinimized)
     case HkEvent::DropPath: break;
     }
 
+    /* Heartbeat to initialize stuff like shaders/VAO that cannot be initted on object creation because
+       we might not have yet a valid window/context to do so. From this point we do have also a valid
+       windowDataPtr. */
+    if (!hadFirstHeartBeat_)
+    {
+        onFirstHeartbeat();
+        hadFirstHeartBeat_ = true;
+    }
+
     auto& children = treeStruct_.getChildren();
 
     /* We don't need to update children's transform data in these events*/
     if (windowDataPtr_->currentEvent != HkEvent::FocusScan
         && windowDataPtr_->currentEvent != HkEvent::HoverScan
         && windowDataPtr_->currentEvent != HkEvent::DropPath)
+        // && windowDataPtr_->currentEvent != HkEvent::None)
     {
         /* Resolve child constraints relative to parent */
         resolveChildrenConstraints(children, {});
@@ -263,6 +273,7 @@ void HkNodeBase::onWindowResize() {}
 void HkNodeBase::onGeneralMouseMove() {}
 void HkNodeBase::onGeneralMouseClick() {}
 void HkNodeBase::onGeneralMouseScroll() {}
+void HkNodeBase::onFirstHeartbeat() {}
 
 /* Injects */
 void HkNodeBase::injectWindowDataPtr(HkWindowData* windowDataPtr) { windowDataPtr_ = windowDataPtr; }

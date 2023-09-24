@@ -10,10 +10,14 @@ HkScrollBar::HkScrollBar(const std::string& name, const bool isHorizontal)
     , isActive_{ false }
 {
     node_.styleContext.setColor(glm::vec3(0.95f, 1.0f, 0.95f));
-    node_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
 
     treeStruct_.pushChild(&knob_.treeStruct_);
     setBarScale(20); /* default bar scale depending on orientation */
+}
+
+void HkScrollBar::onFirstHeartbeat()
+{
+    node_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl", &windowDataPtr_->renderStore);
 }
 
 void HkScrollBar::onScroll()

@@ -17,25 +17,33 @@ HkRenderArch HkRenderContext::renderArch = {
         }
 };
 
-
-uint32_t HkRenderContext::boundVaoId_ = 0;
-uint32_t HkRenderContext::vaoId_ = 0;
-bool HkRenderContext::archCreated_ = false;
-uint32_t HkRenderContext::currentlyBoundWindow = 0;
-
 /* Sets shader code to be used */
-void HkRenderContext::setShaderSource(const std::string& vertSource, const std::string& fragSource)
+void HkRenderContext::setShaderSource(const std::string& vertSource, const std::string& fragSource, HkRenderStore* renderStore)
 {
-    shader_.setShaderSource(vertSource, fragSource);
-    if (!archCreated_)
+    shader_.setShaderSource(vertSource, fragSource, renderStore);
+    //TODO: maybe new param like: archName?
+    const std::string archName = "QUAD";
+
+    const uint32_t storedVaoId = renderStore->archNameToVaoIdMap[vertSource + fragSource];
+    if (storedVaoId == 0)
     {
         setupArch();
-        archCreated_ = true;
+        renderStore->archNameToVaoIdMap[vertSource + fragSource] = vaoId_;
+        std::cout << "Generated VAO id: " << vaoId_ << "\n";
     }
+    else
+    {
+        vaoId_ = storedVaoId;
+    }
+
+    // if (!archCreated_)
+    // {
+    //     archCreated_ = true;
+    // }
 }
 
 /* Actually render the mesh */
-void HkRenderContext::render(const glm::mat4& projMat, const glm::mat4& modelMat)
+void HkRenderContext::render(const glm::mat4& projMat, const glm::mat4& modelMat, HkRenderStore& renderStore)
 {
     /* Set always mandatory to have uniforms */
     shader_.setMatrix4("proj", projMat);
@@ -58,11 +66,11 @@ void HkRenderContext::render(const glm::mat4& projMat, const glm::mat4& modelMat
         glBindTexture(GL_TEXTURE_2D, texInfo.texId);
     }
 
-    if (boundVaoId_ == 0)
+    if (renderStore.boundVaoId == 0)
     {
         glBindVertexArray(vaoId_);
         std::cout << "VAO " << vaoId_ << " is now bound\n";
-        boundVaoId_ = vaoId_;
+        renderStore.boundVaoId = vaoId_;
     }
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -117,5 +125,4 @@ void HkRenderContext::injectStyleContext(HkStyleContext* styleContext)
 {
     styleContextInj_ = styleContext;
 }
-
 } // hkui

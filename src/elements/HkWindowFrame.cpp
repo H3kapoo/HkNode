@@ -12,10 +12,11 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
     , cachedScale_{ 680, 480 } //TODO: hack just for now
     , cachedPos_{ 0,0 }
 {
-    node_.renderContext.setShaderSource("assets/shaders/v1.glsl", "assets/shaders/f1.glsl");
+    /* Setup defaults that don't have to do with VAOs/Textures/Shaders themselves*/
     node_.styleContext.setColor(glm::vec3(0.0f, 0.5f, 0.9f));
-
     wfCont_.node_.styleContext.setRowWrapping(true);
+    wfCont_.node_.styleContext.setColor(glm::vec3(0.5f, 0.5f, 0.5f));
+
     treeStruct_.pushChild(&minimizeBtn_.treeStruct_);
     treeStruct_.pushChild(&exitBtn_.treeStruct_);
     treeStruct_.pushChild(&wfCont_.treeStruct_);
@@ -31,9 +32,15 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
         });
 }
 
-void HkWindowFrame::rootUpdate() { updateMySelf(isMinimized_); renderMySelf(); }
-
-HkNodeBase* HkWindowFrame::getUnderlayingNode() { return this; }
+void HkWindowFrame::onFirstHeartbeat()
+{
+    //TODO: We should be able to tell if the user chose on init another shader
+    // than this default one and use the user supplied one. We should keep track
+    // what was the default one and if now is changed on first runtime heartbeat
+    const std::string DEFAULT_VS = "assets/shaders/v1.glsl";
+    const std::string DEFAULT_FS = "assets/shaders/f1.glsl";
+    node_.renderContext.setShaderSource(DEFAULT_VS, DEFAULT_FS, &windowDataPtr_->renderStore);
+}
 
 void HkWindowFrame::onScroll()
 {
@@ -137,6 +144,10 @@ HkStyleContext& HkWindowFrame::getStyle()
 {
     return wfCont_.getStyle();
 }
+
+void HkWindowFrame::rootUpdate() { updateMySelf(isMinimized_); renderMySelf(); }
+
+HkNodeBase* HkWindowFrame::getUnderlayingNode() { return this; }
 
 void HkWindowFrame::injectWindowDataPtr(HkWindowData* windowDataPtr)
 {
