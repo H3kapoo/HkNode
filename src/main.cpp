@@ -12,6 +12,167 @@
 
 using namespace hkui;
 
+// #include <GL/glew.h>
+// #include <GLFW/glfw3.h>
+// #include <iostream>
+
+// #include <GL/glew.h>
+// #include <GLFW/glfw3.h>
+// #include <iostream>
+// #include <GL/glew.h>
+// #include <GLFW/glfw3.h>
+// #include <iostream>
+
+// float vertices[] = {
+//     -0.125f, -0.125f,
+//      0.125f, -0.125f,
+//      0.125f,  0.125f,
+//     -0.125f,  0.125f
+// };
+
+// bool isDragging = false;
+// float objectX = 0.0f;
+// float objectY = 0.0f;
+
+// static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
+//     if (isDragging)
+//     {
+//         int width, height;
+//         glfwGetWindowSize(window, &width, &height);
+
+//         // Convert cursor coordinates to object coordinates
+//         objectX = (xpos / width) * 2.0f - 1.0f;
+//         objectY = -((ypos / height) * 2.0f - 1.0f);
+//     }
+// }
+
+// static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+//     if (button == GLFW_MOUSE_BUTTON_LEFT)
+//     {
+//         if (action == GLFW_PRESS)
+//         {
+//             double xpos, ypos;
+//             glfwGetCursorPos(window, &xpos, &ypos);
+
+//             int width, height;
+//             glfwGetWindowSize(window, &width, &height);
+
+//             // Convert cursor coordinates to object coordinates
+//             xpos = (xpos / width) * 2.0 - 1.0;
+//             ypos = -((ypos / height) * 2.0 - 1.0);
+
+//             // Check if the cursor is within the object's bounds
+//             if (xpos >= (objectX - 0.125f) && xpos <= (objectX + 0.125f) &&
+//                 ypos >= (objectY - 0.125f) && ypos <= (objectY + 0.125f))
+//             {
+//                 isDragging = true;
+//             }
+//         }
+//         else if (action == GLFW_RELEASE)
+//         {
+//             isDragging = false;
+//         }
+//     }
+// }
+
+// int main()
+// {
+//     if (!glfwInit())
+//     {
+//         std::cerr << "Failed to initialize GLFW" << std::endl;
+//         return -1;
+//     }
+
+//     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+//     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+
+//     GLFWwindow* window = glfwCreateWindow(800, 600, "Drag Quad with Mouse", nullptr, nullptr);
+//     if (!window)
+//     {
+//         std::cerr << "Failed to create GLFW window" << std::endl;
+//         glfwTerminate();
+//         return -1;
+//     }
+
+//     glfwMakeContextCurrent(window);
+
+//     if (glewInit() != GLEW_OK)
+//     {
+//         std::cerr << "Failed to initialize GLEW" << std::endl;
+//         glfwTerminate();
+//         return -1;
+//     }
+
+//     glfwSetMouseButtonCallback(window, mouse_button_callback);
+//     glfwSetCursorPosCallback(window, cursor_position_callback);
+
+//     GLuint VAO, VBO;
+//     glGenVertexArrays(1, &VAO);
+//     glGenBuffers(1, &VBO);
+
+//     glBindVertexArray(VAO);
+//     glBindBuffer(GL_ARRAY_BUFFER, VBO);
+//     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+//     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+//     glEnableVertexAttribArray(0);
+
+//     const char* vertexShaderSource = R"(
+//         #version 330 core
+//         layout (location = 0) in vec2 position;
+//         uniform vec2 objectPosition;
+//         void main()
+//         {
+//             gl_Position = vec4(position + objectPosition, 0.0, 1.0);
+//         }
+//     )";
+
+//     const char* fragmentShaderSource = R"(
+//         #version 330 core
+//         out vec4 FragColor;
+//         uniform vec3 color;
+//         void main()
+//         {
+//             FragColor = vec4(color, 1.0);
+//         }
+//     )";
+
+//     GLuint vertexShader, fragmentShader, shaderProgram;
+//     vertexShader = glCreateShader(GL_VERTEX_SHADER);
+//     glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
+//     glCompileShader(vertexShader);
+
+//     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+//     glShaderSource(fragmentShader, 1, &fragmentShaderSource, nullptr);
+//     glCompileShader(fragmentShader);
+
+//     shaderProgram = glCreateProgram();
+//     glAttachShader(shaderProgram, vertexShader);
+//     glAttachShader(shaderProgram, fragmentShader);
+//     glLinkProgram(shaderProgram);
+//     glUseProgram(shaderProgram);
+
+//     GLint objectPositionLocation = glGetUniformLocation(shaderProgram, "objectPosition");
+//     GLint colorLocation = glGetUniformLocation(shaderProgram, "color");
+//     glUniform3f(colorLocation, 1.0f, 0.0f, 0.0f);
+
+//     while (!glfwWindowShouldClose(window))
+//     {
+//         glClear(GL_COLOR_BUFFER_BIT);
+
+//         glUniform2f(objectPositionLocation, objectX, objectY);
+
+//         glBindVertexArray(VAO);
+//         glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+
+//         glfwSwapBuffers(window);
+//         glfwPollEvents();
+//     }
+
+//     glfwTerminate();
+//     return 0;
+// }
+
 int main()
 {
     //TODO: We need the dummy context used for loading glfw to also load all possible VAOs and assets
@@ -22,11 +183,11 @@ int main()
     // we need to make it order agnostic
     HkWindowManagerPtr sceneWindow1 = std::make_shared<HkWindowManager>("MyWindowManager",
         HkWindowManager::HkWindowConfig{ .width = 1920, .height = 1080, .isMaster = true });
-    HkWindowManagerPtr sceneWindow2 = std::make_shared<HkWindowManager>("MyWindowManager2",
-        HkWindowManager::HkWindowConfig{ .width = 800, .height = 600 });
+    // HkWindowManagerPtr sceneWindow2 = std::make_shared<HkWindowManager>("MyWindowManager2",
+    //     HkWindowManager::HkWindowConfig{ .width = 800, .height = 600 });
 
     HkAppManager::get().addWindow(sceneWindow1);
-    HkAppManager::get().addWindow(sceneWindow2);
+    // HkAppManager::get().addWindow(sceneWindow2);
     sceneWindow1->makeContextCurrent();
 
     HkWindowFramePtr windowFrame = std::make_shared<HkWindowFrame>("MyWindowFrame");
@@ -64,11 +225,11 @@ int main()
     // windowFrame->pushChildren(ctrs2);
     // sceneWindow1->makeContextNotCurrent();
 
-    sceneWindow2->makeContextCurrent();
+    // sceneWindow2->makeContextCurrent();
 
     HkWindowFramePtr windowFrame2 = std::make_shared<HkWindowFrame>("MyWindowFrame2");
     windowFrame2->setWindowMode(HkWindowFrameMode::FullScreenFixed);
-    sceneWindow2->addSubWindow(windowFrame2); //NOTE: Needs to be added before adding any children
+    // sceneWindow2->addSubWindow(windowFrame2); //NOTE: Needs to be added before adding any children
 
     windowFrame2->getStyle().setOverflowAllowedXY(true)
         .setDirection(HkDirection::Horizontal)
@@ -92,32 +253,33 @@ int main()
     //     HkWindowManager::HkWindowConfig{ .width = 800, .height = 600 });
     // HkAppManager::get().addWindow(sceneWindow3);
 
-    // HkWindowFramePtr windowFrame3 = std::make_shared<HkWindowFrame>("MyWindowFrame2");
-    // windowFrame3->setWindowMode(HkWindowFrameMode::FullScreenFixed);
+    // sceneWindow3->makeContextCurrent();
+
+    HkWindowFramePtr windowFrame3 = std::make_shared<HkWindowFrame>("MyWindowFrame2");
+    windowFrame3->setWindowMode(HkWindowFrameMode::FullScreenFixed);
     // sceneWindow3->addSubWindow(windowFrame3); //NOTE: Needs to be added before adding any children
 
-    // windowFrame3->getStyle().setOverflowAllowedXY(true)
-    //     .setDirection(HkDirection::Horizontal)
-    //     .setHAlignment(HkHAlignment::Right)
-    //     .setVAlignment(HkVAlignment::Center);
+    windowFrame3->getStyle().setOverflowAllowedXY(true)
+        .setDirection(HkDirection::Horizontal)
+        .setHAlignment(HkHAlignment::Right)
+        .setVAlignment(HkVAlignment::Center);
 
-    // HkContainerPtr ctr5 = std::make_shared<HkContainer>("MyContainer5");
-    // HkContainerPtr ctr6 = std::make_shared<HkContainer>("MyContainer6");
+    HkContainerPtr ctr5 = std::make_shared<HkContainer>("MyContainer5");
+    HkContainerPtr ctr6 = std::make_shared<HkContainer>("MyContainer6");
 
+    ctr5->getStyle().setColor({ 0.0f,0.1f,0.2f });
+    ctr6->getStyle().setColor({ 1.0f,0.4f,0.5f });
 
-    // ctr5->getStyle().setColor({ 0.0f,0.1f,0.2f });
-    // ctr6->getStyle().setColor({ 1.0f,0.4f,0.5f });
+    ctr5->setSize({ 330, 450 });
+    ctr6->setSize({ 400, 450 });
 
-    // ctr5->setSize({ 330, 450 });
-    // ctr6->setSize({ 400, 450 });
+    windowFrame3->getStyle().setOverflowAllowedXY(true)
+        .setDirection(HkDirection::Horizontal)
+        .setHAlignment(HkHAlignment::Right)
+        .setVAlignment(HkVAlignment::Center);
 
-    // windowFrame3->pushChildren({ ctr5, ctr6 });
+    windowFrame3->pushChildren({ ctr5, ctr6 });
 
-
-    // windowFrame3->getStyle().setOverflowAllowedXY(true)
-    //     .setDirection(HkDirection::Horizontal)
-    //     .setHAlignment(HkHAlignment::Right)
-    //     .setVAlignment(HkVAlignment::Center);
 
     // std::vector<HkNodeBasePtr> ctrs2;
     // ctrs2.reserve(5'000);

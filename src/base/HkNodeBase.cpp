@@ -1,12 +1,9 @@
 #include "HkNodeBase.hpp"
 
-#include "../management/HkSceneManagement.hpp" //TODO: THis needs to disappear when no more static scene manager
-
 namespace hkui
 {
 HkNodeBase::HkNodeBase(const std::string& windowName, const HkNodeType& type)
     : treeStruct_(this, windowName, type)
-    , sceneDataRef_(HkSceneManagement::get().getSceneDataRef()) //TODO: To be removed from all objects
 {
     node_.constraintContext.injectTransformContext(&node_.transformContext);
     node_.constraintContext.injectStyleContext(&node_.styleContext);

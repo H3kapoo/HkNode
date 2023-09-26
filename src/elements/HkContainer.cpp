@@ -88,14 +88,14 @@ void HkContainer::onDrag()
     //TODO: Should this really be here?
     //TODO: We cant realy use inside viewable area since it doesnt have a parent..
     /* Ignore mouse drags inside intersector area */
-    if (scrollbBarsCount_ == 2 && dummyXYIntersectorData_.transformContext.isPosInsideOfNode(sceneDataRef_.dragStartMousePosition))
-    {
-    }
-    else
-    {
-        // std::cout << glfwGetTime() << "  " << sceneDataRef_.dragStartMousePosition.x << "  " <<
-            // sceneDataRef_.dragStartMousePosition.y << "dragging ouside of intersector\n";
-    }
+    // if (scrollbBarsCount_ == 2 && dummyXYIntersectorData_.transformContext.isPosInsideOfNode(sceneDataRef_.dragStartMousePosition))
+    // {
+    // }
+    // else
+    // {
+    //     // std::cout << glfwGetTime() << "  " << sceneDataRef_.dragStartMousePosition.x << "  " <<
+    //         // sceneDataRef_.dragStartMousePosition.y << "dragging ouside of intersector\n";
+    // }
 }
 
 void HkContainer::resolveChildrenConstraints(HkTreeStruct& children,

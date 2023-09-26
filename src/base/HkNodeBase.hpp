@@ -94,8 +94,6 @@ private:
     bool hadFirstHeartBeat_{ false };
     HkNodeData node_;
     HkTreeStructure<HkNodeBase, HkNodeType> treeStruct_;
-    HkSceneData& sceneDataRef_; /* This is safe as singleton will outlive THIS class anyway*/ // to be deprecated
-
     HkWindowData* windowDataPtr_; /* This is safe as singleton will outlive THIS class anyway*/ // new
 };
 
