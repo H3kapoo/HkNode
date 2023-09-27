@@ -35,6 +35,7 @@ enum class HkEvent
     MouseEnterExit,
     MouseScroll,
     DropPath,
+    AnimationFrame,
     // Keyboard // TO DO:
 };
 }

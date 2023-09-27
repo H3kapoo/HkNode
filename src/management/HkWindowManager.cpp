@@ -41,7 +41,10 @@ HkWindowManager::HkWindowManager(const std::string& windowName, const HkWindowCo
 
 void HkWindowManager::forceUpdate()
 {
-    updateAllSubWindows(HkEvent::None);
+    // updateAllSubWindows(HkEvent::None);
+
+    /* We could treat this force update as a request for an animation frame*/
+    updateAllSubWindows(HkEvent::AnimationFrame);
 }
 
 void HkWindowManager::updateAllSubWindows(const HkEvent& ev)
@@ -51,9 +54,15 @@ void HkWindowManager::updateAllSubWindows(const HkEvent& ev)
     found a fist match, we bail out. In case we don't find any suitable subWindow, we return from function,
     there's nothing left to be done.*/
     windowData_.currentEvent = ev;
+    if (windowData_.previousTime == 0.0f)
+    {
+        windowData_.previousTime = glfwGetTime();
+        std::cout << "enterd here\n";
+    }
+
     if (windowData_.currentEvent == HkEvent::FocusScan)
     {
-        std::cout << "size of subwins: " << rootSubWindows_.size() << "\n";
+        std::cout << "Number of subwindows: " << rootSubWindows_.size() << "\n";
         for (int32_t i = rootSubWindows_.size() - 1; i >= 0; i--)
         {
             //TODO: Could we pass a RENDERER object here who has all the bind for the current window?
@@ -94,6 +103,10 @@ void HkWindowManager::updateAllSubWindows(const HkEvent& ev)
         }
     }
 
+    double currTime = glfwGetTime();
+    windowData_.deltaTime = currTime - windowData_.previousTime;
+    windowData_.previousTime = currTime;
+    //TODO: If theres no animation left to be done, reset prevTime back to zero
     windowData_.currentEvent = HkEvent::None; /* Reset current event */
 }
 

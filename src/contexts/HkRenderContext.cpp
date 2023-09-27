@@ -23,7 +23,6 @@ void HkRenderContext::setShaderSource(const std::string& vertSource, const std::
     shader_.setShaderSource(vertSource, fragSource, renderStore);
     //TODO: maybe new param like: archName?
     const std::string archName = "QUAD";
-
     const uint32_t storedVaoId = renderStore->archNameToVaoIdMap[vertSource + fragSource];
     if (storedVaoId == 0)
     {
@@ -35,11 +34,6 @@ void HkRenderContext::setShaderSource(const std::string& vertSource, const std::
     {
         vaoId_ = storedVaoId;
     }
-
-    // if (!archCreated_)
-    // {
-    //     archCreated_ = true;
-    // }
 }
 
 /* Actually render the mesh */

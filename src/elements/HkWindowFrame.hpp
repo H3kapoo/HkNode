@@ -30,6 +30,7 @@ public:
 
     /* HkNodeBase */
     void onFirstHeartbeat() override;
+    void onAnimationFrameRequested() override;
     void onScroll() override;
     void onDrag() override;
     void onWindowResize() override;
@@ -63,6 +64,13 @@ private:
     glm::ivec2 cachedScale_;
     glm::ivec2 cachedPos_;
     bool isMinimized_{ false };
+    int32_t dummy{ 0 };
+    bool isAnimOngoing{ false };
+    bool restarted{ false };
+    float t{ 0.0f };
+    glm::vec2 startPos, endPos;
+    float speed{ 40.0f };
+    bool dummyVal{false};
 };
 using HkWindowFramePtr = std::shared_ptr<HkWindowFrame>;
 using HkWindowFrameCPtr = const std::shared_ptr<HkWindowFrame>;

@@ -1,4 +1,5 @@
 #include "HkWindowFrame.hpp"
+#include "../APIGate/GlfwGlewGate.hpp"
 
 namespace hkui
 {
@@ -30,6 +31,12 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
         {
             stillAlive_ = false;
         });
+
+    // exitBtn_.setOnClickListener([this]()
+    //     {
+    //         dummyVal = !dummyVal;
+    //         std::cout << "changed mode\n";
+    //     });
 }
 
 void HkWindowFrame::onFirstHeartbeat()
@@ -42,6 +49,30 @@ void HkWindowFrame::onFirstHeartbeat()
     node_.renderContext.setShaderSource(DEFAULT_VS, DEFAULT_FS, &windowDataPtr_->renderStore);
 }
 
+void HkWindowFrame::onAnimationFrameRequested()
+{
+    if (!isAnimOngoing) return;
+
+    if (restarted)
+    {
+        t = 0.0f;
+        restarted = false;
+    }
+
+    t += windowDataPtr_->deltaTime * speed;
+    if (t > 1.0f)
+    {
+        t = 1.0f;
+        isAnimOngoing = false;
+    }
+
+    glm::vec2 interpPos = (1.0f - t) * startPos + t * endPos;
+    node_.transformContext.setPos(interpPos);
+
+    std::cout << "interp: " << t << "  delta time: " << windowDataPtr_->deltaTime << "\n";
+    glfwPostEmptyEvent(); //TODO: This should be posted just once per frame
+}
+
 void HkWindowFrame::onScroll()
 {
     // std::cout << glfwGetTime() << " scroll value: " << windowDataPtr_->scrollPosY << '\n';
@@ -51,7 +82,18 @@ void HkWindowFrame::onScroll()
 void HkWindowFrame::onDrag()
 {
     if (mode_ != HkWindowFrameMode::Grabbable) return;
-    node_.transformContext.setPos(windowDataPtr_->mouseOffsetFromFocusedCenter + windowDataPtr_->mousePos);
+    if (dummyVal)
+    {
+        isAnimOngoing = false;
+        node_.transformContext.setPos(windowDataPtr_->mouseOffsetFromFocusedCenter + windowDataPtr_->mousePos);
+    }
+    else
+    {
+        startPos = node_.transformContext.getPos();
+        endPos = windowDataPtr_->mouseOffsetFromFocusedCenter + windowDataPtr_->mousePos;
+        isAnimOngoing = true;
+        restarted = true;
+    }
 }
 
 void HkWindowFrame::onWindowResize()

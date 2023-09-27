@@ -102,6 +102,7 @@ void HkNodeBase::updateMySelf(const bool isSubWindowMinimized)
     switch (windowDataPtr_->currentEvent)
     {
     case HkEvent::None: break;
+    case HkEvent::AnimationFrame: onAnimationFrameRequested(); break;
     case HkEvent::HoverScan: resolveHover(); break;
     case HkEvent::FocusScan: resolveFocus(); break;
     case HkEvent::GeneralUpdate: onGeneralUpdate(); break;
@@ -261,6 +262,7 @@ void HkNodeBase::resolveMouseMovementEvent()
 
 /* Events to be consumed by derived if needed */
 void HkNodeBase::postRenderAdditionalDetails() {}
+void HkNodeBase::onAnimationFrameRequested() {}
 void HkNodeBase::onDrag() {}
 void HkNodeBase::onClick() {}
 void HkNodeBase::onRelease() {}

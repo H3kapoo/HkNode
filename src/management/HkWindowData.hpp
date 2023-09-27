@@ -10,6 +10,7 @@ namespace hkui
 //TODO: Default init each variable to avoid garbage
 struct HkWindowData
 {
+    /* Events */
     HkEvent currentEvent; //G
     glm::ivec2 windowSize; //L
     glm::ivec2 mousePos; //G
@@ -49,6 +50,11 @@ struct HkWindowData
 
     /*Render store*/
     HkRenderStore renderStore;
+
+    /*Animation*/
+    uint32_t objectsNeedingAnimFrame{ 0 };
+    double deltaTime{ 0.0f };
+    double previousTime{ 0.0f };
 
     /*Constants*/
     static constexpr uint32_t NO_SELECTION_ID = 0;  //G

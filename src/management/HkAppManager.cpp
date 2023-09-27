@@ -172,7 +172,7 @@ void HkAppManager::runLoop()
     //TODO: FPS counter is not gonna work for multiple windows in thif format
     previousTime_ = glfwGetTime();
 
-    //TODO: Shall be changed to (if master window still alive)
+    /* If master window is closed, all its children will be closed too */
     while (!windows_.empty())
     {
         for (uint32_t i = 0; i < windows_.size(); i++)
@@ -184,6 +184,7 @@ void HkAppManager::runLoop()
                 glfwMakeContextCurrent(windows_[i]->getWindowHandle());
             }
 
+            /* Needed to only resize the window that needs to be resized and not all of them*/
             if (resizeEventUnsolvedId_ == (int32_t)i)
             {
                 int framebufferWidth, framebufferHeight;
@@ -198,8 +199,8 @@ void HkAppManager::runLoop()
             windows_[i]->forceUpdate();
 
             glfwSwapBuffers(windows_[i]->getWindowHandle());
-            // glfwWaitEvents();
-            glfwPollEvents();
+            glfwWaitEvents(); // can be used with multiple windows. GLFW got that backed up
+            // glfwPollEvents();
 
             // Measure speed
             if (i == 0)

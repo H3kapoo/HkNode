@@ -67,6 +67,7 @@ private:
 
     /* Events */
     virtual void onDrag();
+    virtual void onAnimationFrameRequested();
     virtual void onClick();
     virtual void onRelease();
     virtual void onScroll();
