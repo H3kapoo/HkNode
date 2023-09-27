@@ -69,8 +69,8 @@ private:
     bool restarted{ false };
     float t{ 0.0f };
     glm::vec2 startPos, endPos;
-    float speed{ 40.0f };
-    bool dummyVal{false};
+    float speed{ 30.0f };
+    bool dummyVal{ false };
 };
 using HkWindowFramePtr = std::shared_ptr<HkWindowFrame>;
 using HkWindowFrameCPtr = const std::shared_ptr<HkWindowFrame>;

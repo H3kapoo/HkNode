@@ -27,16 +27,16 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
             isMinimized_ = !isMinimized_;
         });
 
-    exitBtn_.setOnClickListener([this]()
-        {
-            stillAlive_ = false;
-        });
-
     // exitBtn_.setOnClickListener([this]()
     //     {
-    //         dummyVal = !dummyVal;
-    //         std::cout << "changed mode\n";
+    //         stillAlive_ = false;
     //     });
+
+    exitBtn_.setOnClickListener([this]()
+        {
+            dummyVal = !dummyVal;
+            std::cout << "changed mode\n";
+        });
 }
 
 void HkWindowFrame::onFirstHeartbeat()
@@ -59,6 +59,7 @@ void HkWindowFrame::onAnimationFrameRequested()
         restarted = false;
     }
 
+    // t += 0.4f;
     t += windowDataPtr_->deltaTime * speed;
     if (t > 1.0f)
     {

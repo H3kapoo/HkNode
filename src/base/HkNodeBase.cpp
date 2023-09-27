@@ -16,12 +16,15 @@ void HkNodeBase::renderMySelf()
     auto& tc = node_.transformContext;
 
     /* We only render the visible area of the UI element as calculated in the update pass*/
-    glEnable(GL_SCISSOR_TEST);
-    glScissor(
-        tc.getVPos().x - 1,
-        windowDataPtr_->windowSize.y - tc.getVPos().y - tc.getVScale().y + 1,
-        tc.getVScale().x,
-        tc.getVScale().y);
+    if (treeStruct_.getType() != HkNodeType::RootWindowFrame)
+    {
+        glEnable(GL_SCISSOR_TEST);
+        glScissor(
+            tc.getVPos().x - 1,
+            windowDataPtr_->windowSize.y - tc.getVPos().y - tc.getVScale().y + 1,
+            tc.getVScale().x,
+            tc.getVScale().y);
+    }
 
     //TODO: tc.isAnyDifference() is correct here but main() loop doesnt know not to clear screen on each pass anymore
     // A flag maybe is needed? Conditional clear?
@@ -59,7 +62,6 @@ void HkNodeBase::renderMySelf()
 */
 void HkNodeBase::updateMySelf(const bool isSubWindowMinimized)
 {
-    // return;
     const auto& parentTreeStruct = treeStruct_.getParent();
     auto& tc = node_.transformContext;
 
