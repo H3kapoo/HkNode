@@ -64,13 +64,14 @@ private:
     glm::ivec2 cachedScale_;
     glm::ivec2 cachedPos_;
     bool isMinimized_{ false };
-    int32_t dummy{ 0 };
     bool isAnimOngoing{ false };
     bool restarted{ false };
     float t{ 0.0f };
     glm::vec2 startPos, endPos;
-    float speed{ 30.0f };
     bool dummyVal{ false };
+
+    double startTime{ 0.0f };
+    double animDuration{ 0.25f };
 };
 using HkWindowFramePtr = std::shared_ptr<HkWindowFrame>;
 using HkWindowFrameCPtr = const std::shared_ptr<HkWindowFrame>;

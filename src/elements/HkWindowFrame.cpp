@@ -51,26 +51,42 @@ void HkWindowFrame::onFirstHeartbeat()
 
 void HkWindowFrame::onAnimationFrameRequested()
 {
+    // if anim frame is requested but we call it too fast compared to set fixedTS value,
+    // we skip this animation frame and request another one
+    // Assumption is that after fixedTS time we are doing this, a frame will be actually
+    // updated, resetting the accumulated time back to 0 and so on
+
     if (!isAnimOngoing) return;
 
     if (restarted)
     {
         t = 0.0f;
         restarted = false;
+        startTime = glfwGetTime();
     }
 
-    // t += 0.4f;
-    t += windowDataPtr_->deltaTime * speed;
+    double currentTime = glfwGetTime();
+    double elapsedTime = currentTime - startTime;
+    t = elapsedTime / animDuration;
+
+    // t += windowDataPtr_->deltaTime * speed;
     if (t > 1.0f)
     {
         t = 1.0f;
         isAnimOngoing = false;
     }
 
-    glm::vec2 interpPos = (1.0f - t) * startPos + t * endPos;
+    const auto easeInOutCubic = [](double x) -> double {
+        const double c1 = 1.70158;
+        const double c3 = c1 + 1.0;
+        return 1.0 + c3 * std::pow(x - 1.0, 3.0) + c1 * std::pow(x - 1.0, 2.0);};
+
+    glm::vec2 interpPos = startPos + (endPos - startPos) * (float)easeInOutCubic(t);
+
+    // glm::vec2 interpPos = (1.0f - t) * startPos + t * endPos;
     node_.transformContext.setPos(interpPos);
 
-    std::cout << "interp: " << t << "  delta time: " << windowDataPtr_->deltaTime << "\n";
+    // std::cout << "interp: " << t << "  delta time: " << windowDataPtr_->deltaTime << "\n";
     glfwPostEmptyEvent(); //TODO: This should be posted just once per frame
 }
 
