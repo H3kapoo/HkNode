@@ -26,14 +26,14 @@ HkContainer::HkContainer(const std::string& containerName)
 
 void HkContainer::onFirstHeartbeat()
 {
-    node_.renderContext.setShaderSource(
-        "assets/shaders/v1.glsl",
-        "assets/shaders/f1.glsl",
-        &windowDataPtr_->renderStore);
-    dummyXYIntersectorData_.renderContext.setShaderSource(
-        "assets/shaders/v1.glsl",
-        "assets/shaders/f1.glsl",
-        &windowDataPtr_->renderStore);
+    const std::string DEFAULT_VS = "assets/shaders/v1.glsl";
+    const std::string DEFAULT_FS = "assets/shaders/f1.glsl";
+    const std::string DEFAULT_TYPE = "QUAD";
+    node_.renderContext.renderConfig_.shaderId = windowDataPtr_->renderer.addShaderSourceToCache(DEFAULT_VS, DEFAULT_FS);
+    node_.renderContext.renderConfig_.vaoId = windowDataPtr_->renderer.addVertexArrayDataToCache("QUAD");
+
+    dummyXYIntersectorData_.renderContext.renderConfig_.shaderId = windowDataPtr_->renderer.addShaderSourceToCache(DEFAULT_VS, DEFAULT_FS);
+    dummyXYIntersectorData_.renderContext.renderConfig_.vaoId = windowDataPtr_->renderer.addVertexArrayDataToCache("QUAD");
 }
 
 //TODO: The way we handle scroll inside scroll is now necessarly very intuitive. It needs to ve changed in the future

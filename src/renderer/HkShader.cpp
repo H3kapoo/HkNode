@@ -3,26 +3,24 @@
 namespace hkui
 {
 
-void HkShader::setShaderSource(const std::string& vertPath, const std::string& fragPath, HkRenderStore* rs)
+int32_t HkShader::loadShaderFromSource(const std::string& vertPath, const std::string& fragPath)
 {
-    rsPtr = rs;
+    // const uint32_t storedShaderId = rsPtr->pathToShaderIdMap[vertPath + fragPath];
+    // if (storedShaderId == 0)
+    // {
+    return linkShaders(compileShader(vertPath, GL_VERTEX_SHADER),
+        compileShader(fragPath, GL_FRAGMENT_SHADER));
 
-    const uint32_t storedShaderId = rsPtr->pathToShaderIdMap[vertPath + fragPath];
-    if (storedShaderId == 0)
-    {
-        const int generatedShaderId = linkShaders(compileShader(vertPath, GL_VERTEX_SHADER),
-            compileShader(fragPath, GL_FRAGMENT_SHADER));
-
-        if (generatedShaderId != -1)
-        {
-            rsPtr->pathToShaderIdMap[vertPath + fragPath] = generatedShaderId;
-        }
-        std::cout << "Generated shader id: " << generatedShaderId << "\n";
-    }
-    else
-    {
-        shaderId_ = storedShaderId;
-    }
+    //     if (generatedShaderId != -1)
+    //     {
+    //         rsPtr->pathToShaderIdMap[vertPath + fragPath] = generatedShaderId;
+    //     }
+    //     std::cout << "Generated shader id: " << generatedShaderId << "\n";
+    // }
+    // else
+    // {
+    //     shaderId_ = storedShaderId;
+    // }
 }
 
 void HkShader::setInt(const char* location, int value)
@@ -63,12 +61,15 @@ void HkShader::setMatrix4(const char* location, const glm::mat4 transform)
 
 void HkShader::bind() const
 {
-    // if (currentlyActiveShaderId_ == shaderId_) return;
-    // currentlyActiveShaderId_ = shaderId_;
-    if (rsPtr->boundShaderId == shaderId_) return;
-    rsPtr->boundShaderId = shaderId_;
+    // if (rsPtr->boundShaderId == shaderId_) return;
+    // rsPtr->boundShaderId = shaderId_;
     glUseProgram(shaderId_);
-    std::cout << "Shader " << shaderId_ << " is now bound\n";
+    // std::cout << "Shader " << shaderId_ << " is now bound\n";
+}
+
+void HkShader::bindId(const uint32_t id)
+{
+    shaderId_ = id;
 }
 
 void HkShader::unbind() const { glUseProgram(0); }

@@ -24,13 +24,12 @@ public:
     void unbind() const;
 
     /* Setters */
-    //TODO: there has to be a better method than passing RS here too
-    void setShaderSource(const std::string& vertPath, const std::string& fragPath, HkRenderStore* rs);
-    ///
+    int32_t loadShaderFromSource(const std::string& vertPath, const std::string& fragPath);
     void setInt(const char* location, int value);
     void setVec3f(const char* location, glm::vec3 value);
     void setMatrix4(const char* location, const glm::mat4 transform);
     void setBackfedShaderId(uint32_t shaderId);
+    void bindId(const uint32_t id);
 
     /* Getters */
     uint32_t getShaderId() const;

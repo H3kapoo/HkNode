@@ -7,8 +7,7 @@ HkNodeBase::HkNodeBase(const std::string& windowName, const HkNodeType& type)
 {
     node_.constraintContext.injectTransformContext(&node_.transformContext);
     node_.constraintContext.injectStyleContext(&node_.styleContext);
-    node_.renderContext.injectStyleContext(&node_.styleContext);
-    node_.renderContext.setColorUniformEnabled(true);
+    node_.renderContext.renderConfig_.colorUniformEn = true;
 }
 
 void HkNodeBase::renderMySelf()
@@ -31,7 +30,14 @@ void HkNodeBase::renderMySelf()
     /* Normal rendering */
     if (tc.getVScale().x && tc.getVScale().y)
     {
-        node_.renderContext.render(windowDataPtr_->sceneProjMatrix, tc.getModelMatrix(), windowDataPtr_->renderStore);
+        /*Experimental: What if we move all actual rendering inside the window scope? Since renderStore its already there
+        this would make sense. This leaves us with the renderContext only containing a blueprint of what the actual
+        renderer needs to set up, a config.*/
+
+        node_.renderContext.renderConfig_.windowProjMatrix = windowDataPtr_->sceneProjMatrix;
+        windowDataPtr_->renderer.render(node_.renderContext.getConfig(), node_.styleContext, tc.getModelMatrix());
+
+        // node_.renderContext.render(windowDataPtr_->sceneProjMatrix, tc.getModelMatrix(), windowDataPtr_->renderStore);
 
         /* Update children. Also don't require bellow children to be rendered if parent can't be rendered itself */
         auto& children = treeStruct_.getChildren();

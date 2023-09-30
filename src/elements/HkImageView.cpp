@@ -5,12 +5,16 @@ namespace hkui
 HkImageView::HkImageView(const std::string& name)
     : HkNodeBase(name, HkNodeType::ImageView)
 {
-    node_.renderContext.setColorUniformEnabled(false);
+    node_.renderContext.renderConfig_.colorUniformEn = false;
 }
 
 void HkImageView::onFirstHeartbeat()
 {
-    node_.renderContext.setShaderSource("assets/shaders/vTextured.glsl", "assets/shaders/fTextured.glsl", &windowDataPtr_->renderStore);
+    const std::string DEFAULT_VS = "assets/shaders/vTextured.glsl";
+    const std::string DEFAULT_FS = "assets/shaders/fTextured.glsl";
+    const std::string DEFAULT_TYPE = "QUAD";
+    node_.renderContext.renderConfig_.shaderId = windowDataPtr_->renderer.addShaderSourceToCache(DEFAULT_VS, DEFAULT_FS);
+    node_.renderContext.renderConfig_.vaoId = windowDataPtr_->renderer.addVertexArrayDataToCache("QUAD");
 }
 
 void HkImageView::loadImage(const std::string& loadPath)

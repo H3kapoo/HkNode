@@ -10,15 +10,10 @@
 #include "../contexts/HkStyleContext.hpp"
 #include "../renderer/HkShader.hpp"
 #include "../renderer/HkRenderStore.hpp"
+#include "../renderer/HkRenderer.hpp"
 
 namespace hkui
 {
-/* Used to define render architecture, like quads, circles, triangles, etc */
-struct HkRenderArch
-{
-    std::vector<float> vertices;
-    std::vector<uint32_t> indices;
-};
 
 struct HkTextureInfo
 {
@@ -31,29 +26,24 @@ class HkRenderContext
 {
 public:
     HkRenderContext() = default;
-    void setShaderSource(const std::string& vertSource, const std::string& fragSource, HkRenderStore* renderStore);
-    void render(const glm::mat4& projMat, const glm::mat4& modelMat, HkRenderStore& renderStore);
     void setTextureRefId(const unsigned int textureId);
-    void setupArch();
+    // void setupArch();
 
     /* Setters */
+    void setConfig(const HkRenderConfig renderConfig);
+
     void addTexture(const HkTextureInfo& texInfo);
 
     void setColorUniformEnabled(const bool value);
 
     /* Getters */
-    HkShader& getShader(); /* Non const, use it as a gateway */
+    inline const HkRenderConfig& getConfig() const { return renderConfig_; }
 
     /* Injects */
     void injectStyleContext(HkStyleContext* styleContext);
 
+    HkRenderConfig renderConfig_;
 private:
-    static HkRenderArch renderArch;
-    uint32_t vaoId_; /* Note: only the first element created with this renderArch will have vao variable filled. THe rest of the object will have garbage
-                                   Maybe in the future we could abstract this class even more.
-                                   Let it slide for now (overflow and garbage val) but I shall come back later for it
-    */
-    HkShader shader_;
     std::vector<HkTextureInfo> texInfos_;
 
     /* Injects */

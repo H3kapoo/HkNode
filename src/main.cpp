@@ -36,7 +36,7 @@ int main()
     windowFrame->getStyle().setOverflowAllowedXY(true)
         .setDirection(HkDirection::Horizontal)
         .setHAlignment(HkHAlignment::Left)
-        .setVAlignment(HkVAlignment::Center);
+        .setVAlignment(HkVAlignment::Top);
 
     windowFrame->setPos({ 1280 * 0.25, 720 * 0.25 });
     windowFrame->setSize({ 1280 * 0.4, 720 * 0.7 });
@@ -50,16 +50,22 @@ int main()
     ctr->setSize({ 200, 300 });
     ctr4->setSize({ 100, 150 });
 
-    std::vector<HkNodeBasePtr> ctrs2;
-    ctrs2.reserve(5'000);
-    for (int i = 0;i < 5'000;i++) // with O2 works ok 01.09.2023
-    {
-        const auto& ct = std::make_shared<HkContainer>("MyContauner");
-        ct->getStyle().setColor(i % 2 == 0 ? glm::vec3{ 0.75f, 0.75f, 0.75f } : glm::vec3{ 1.0f, 1.0f, 1.0f });
-        ct->setSize({ 20, 20 });
-        ctrs2.push_back(std::move(ct));
-    }
+    // std::vector<HkNodeBasePtr> ctrs2;
+    // ctrs2.reserve(5'000);
+    // for (int i = 0;i < 5'000;i++) // with O2 works ok 01.09.2023
+    // {
+    //     const auto& ct = std::make_shared<HkContainer>("MyContauner");
+    //     ct->getStyle().setColor(i % 2 == 0 ? glm::vec3{ 0.75f, 0.75f, 0.75f } : glm::vec3{ 1.0f, 1.0f, 1.0f });
+    //     ct->setSize({ 20, 20 });
+    //     ctrs2.push_back(std::move(ct));
+    // }
+    // HkImageViewPtr imgView = std::make_shared<HkImageView>("MyImgView");
+    // imgView->loadImage("/home/hekapoo/container.jpg");
+    // imgView->loadImage("/home/hekapoo/Downloads/fbi_wp.jpg");
+    // imgView->setSize({ 1920,1080 });
+    // windowFrame->getStyle().setOverflowAllowedXY(false);
 
+    // windowFrame->pushChildren({ imgView });
     windowFrame->pushChildren({ ctr, ctr4 });
     // windowFrame->pushChildren(ctrs2);
     // sceneWindow1->makeContextNotCurrent();

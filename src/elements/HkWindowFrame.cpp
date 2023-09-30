@@ -46,7 +46,9 @@ void HkWindowFrame::onFirstHeartbeat()
     // what was the default one and if now is changed on first runtime heartbeat
     const std::string DEFAULT_VS = "assets/shaders/v1.glsl";
     const std::string DEFAULT_FS = "assets/shaders/f1.glsl";
-    node_.renderContext.setShaderSource(DEFAULT_VS, DEFAULT_FS, &windowDataPtr_->renderStore);
+    const std::string DEFAULT_TYPE = "QUAD";
+    node_.renderContext.renderConfig_.shaderId = windowDataPtr_->renderer.addShaderSourceToCache(DEFAULT_VS, DEFAULT_FS);
+    node_.renderContext.renderConfig_.vaoId = windowDataPtr_->renderer.addVertexArrayDataToCache("QUAD");
 }
 
 void HkWindowFrame::onAnimationFrameRequested()

@@ -3,7 +3,7 @@
 #include <glm/glm.hpp>
 
 #include "HkEventStructs.hpp"
-#include "../renderer/HkRenderStore.hpp"
+#include "../renderer/HkRenderer.hpp"
 
 namespace hkui
 {
@@ -48,8 +48,8 @@ struct HkWindowData
     /*Scrolling*/
     uint32_t nearestScrollContainerId_{ 0 }; //G
 
-    /*Render store*/
-    HkRenderStore renderStore;
+    /*Renderer*/
+    HkRenderer renderer;
 
     /*Animation*/
     uint32_t objectsNeedingAnimFrame{ 0 };
