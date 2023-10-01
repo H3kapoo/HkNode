@@ -35,6 +35,14 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
     exitBtn_.setOnClickListener([this]()
         {
             dummyVal = !dummyVal;
+            if (dummyVal) // fooling around, rm later
+            {
+                node_.styleContext.setColor({ 1.0f,0.0f,0.0f });
+            }
+            else
+            {
+                node_.styleContext.setColor({ 0.0f,0.0f,1.0f });
+            }
             std::cout << "changed mode\n";
         });
 }
@@ -46,9 +54,9 @@ void HkWindowFrame::onFirstHeartbeat()
     // what was the default one and if now is changed on first runtime heartbeat
     const std::string DEFAULT_VS = "assets/shaders/v1.glsl";
     const std::string DEFAULT_FS = "assets/shaders/f1.glsl";
-    const std::string DEFAULT_TYPE = "QUAD";
-    node_.renderContext.renderConfig_.shaderId = windowDataPtr_->renderer.addShaderSourceToCache(DEFAULT_VS, DEFAULT_FS);
-    node_.renderContext.renderConfig_.vaoId = windowDataPtr_->renderer.addVertexArrayDataToCache("QUAD");
+    const HkVertexArrayType DEFAULT_TYPE = HkVertexArrayType::QUAD;
+    node_.renderContext.shaderId = windowDataPtr_->renderer.addShaderSourceToCache(DEFAULT_VS, DEFAULT_FS);
+    node_.renderContext.vaoId = windowDataPtr_->renderer.addVertexArrayDataToCache(DEFAULT_TYPE);
 }
 
 void HkWindowFrame::onAnimationFrameRequested()
@@ -71,7 +79,6 @@ void HkWindowFrame::onAnimationFrameRequested()
     double elapsedTime = currentTime - startTime;
     t = elapsedTime / animDuration;
 
-    // t += windowDataPtr_->deltaTime * speed;
     if (t > 1.0f)
     {
         t = 1.0f;
@@ -84,12 +91,8 @@ void HkWindowFrame::onAnimationFrameRequested()
         return 1.0 + c3 * std::pow(x - 1.0, 3.0) + c1 * std::pow(x - 1.0, 2.0);};
 
     glm::vec2 interpPos = startPos + (endPos - startPos) * (float)easeInOutCubic(t);
-
-    // glm::vec2 interpPos = (1.0f - t) * startPos + t * endPos;
     node_.transformContext.setPos(interpPos);
-
-    // std::cout << "interp: " << t << "  delta time: " << windowDataPtr_->deltaTime << "\n";
-    glfwPostEmptyEvent(); //TODO: This should be posted just once per frame
+    glfwPostEmptyEvent(); //TODO: This should be posted ONLY once per frame
 }
 
 void HkWindowFrame::onScroll()

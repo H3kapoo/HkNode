@@ -199,6 +199,16 @@ void HkAppManager::runLoop()
             windows_[i]->forceUpdate();
 
             glfwSwapBuffers(windows_[i]->getWindowHandle());
+            //TODO: waitEvents has a known bug on multiple windows such that the animations will not finish
+            // and remain midair. Its possible that this happens because on window context swapping, empty
+            // events are no longer redirected to the correct currently animating window.
+            // One solution would be to, at runtime, in case animation is running, use only PollEvents dynamically
+            // so that to unblock the next frame of animation. This will introduce a performance penalty on multiple
+            // windows but I can't see another way untill windows will have a thread each.
+            // Fortunatelly however, many animations should take an insignificant amount of time so maybe the penalty 
+            // is not that big. Except for something like a videoPlayer that runs constantly.
+            // Another idea would be if win1 runs a video for example, we switch to pollEvents, but in win2,3,etc
+            // we post en empty event such that nothing happens there, just exits autmatically and buffer remains the same.
             glfwWaitEvents(); // can be used with multiple windows. GLFW got that backed up
             // glfwPollEvents();
 

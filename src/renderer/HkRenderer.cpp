@@ -3,6 +3,8 @@
 
 namespace hkui
 {
+/* For now its only one and hardcoded. In the future we may all support for other
+   vao configs */
 HkRenderArch HkRenderer::renderArch_ = {
     .vertices = {
         // POS 3F         TEX 2F
@@ -38,15 +40,16 @@ int32_t HkRenderer::addShaderSourceToCache(const std::string& vertSource, const 
     return storedShaderId;
 }
 
-int32_t HkRenderer::addVertexArrayDataToCache(const std::string& archName) //TODO: Shall be enum
+/* Same thing but for vaos */
+int32_t HkRenderer::addVertexArrayDataToCache(const HkVertexArrayType archType)
 {
     // const std::string archName = "QUAD";
-    const uint32_t storedVaoId = archNameToVaoIdMap_[archName];
+    const uint32_t storedVaoId = archNameToVaoIdMap_[archType];
     if (storedVaoId == 0)
     {
         //TODO: Switch case here for the different arch types in the future
         const uint32_t vaoId = setupQuadArch();
-        archNameToVaoIdMap_[archName] = vaoId;
+        archNameToVaoIdMap_[archType] = vaoId;
         std::cout << "Generated VAO id: " << vaoId << "\n";
         return vaoId;
     }
@@ -54,7 +57,7 @@ int32_t HkRenderer::addVertexArrayDataToCache(const std::string& archName) //TOD
 }
 
 /* Actually render the mesh */
-void HkRenderer::render(const HkRenderConfig& renderConfig, const HkStyleContext& styleConfig, const glm::mat4& modelMat)
+void HkRenderer::render(const HkRenderContext& renderConfig, const HkStyleContext& styleConfig, const glm::mat4& modelMat)
 {
     /* Set always mandatory to have uniforms */
     if (boundShaderId_ != renderConfig.shaderId)
@@ -72,14 +75,14 @@ void HkRenderer::render(const HkRenderConfig& renderConfig, const HkStyleContext
 
     //TODO: At some point batching will be needed to avoid context switching
     /* Dont try to bind texture if theres none to bind. Bind is expensive */
-    // for (const auto& texInfo : renderConfig.texIds)
-    // {
-    //     /* Shader needs to know the name of the uniform and the texture unit assigned for that uniform,
-    //        More over, it needs that texture into to be bound.*/
-    //     glActiveTexture(texInfo.texUnit);
-    //     shader_.setInt(texInfo.texName, texInfo.texUnit - GL_TEXTURE0);
-    //     glBindTexture(GL_TEXTURE_2D, texInfo.texId);
-    // }
+    for (const auto& texInfo : renderConfig.texInfos)
+    {
+        /* Shader needs to know the name of the uniform and the texture unit assigned for that uniform,
+           More over, it needs that texture into to be bound.*/
+        glActiveTexture(texInfo.texUnit);
+        shader_.setInt(texInfo.texName, texInfo.texUnit - GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texInfo.texId);
+    }
 
     if (boundVaoId_ != renderConfig.vaoId)
     {
@@ -93,6 +96,7 @@ void HkRenderer::render(const HkRenderConfig& renderConfig, const HkStyleContext
     //TODO: Maybe unbinding is not really needed, just like with VAO
     // glBindTexture(GL_TEXTURE_2D, 0);
 }
+
 /* Setup buffers with the currently set architecture */
 int32_t HkRenderer::setupQuadArch()
 {

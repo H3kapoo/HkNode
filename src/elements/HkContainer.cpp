@@ -12,9 +12,8 @@ HkContainer::HkContainer(const std::string& containerName)
 
     /* NOTE: In the future maybe this dummy can be an actual small UI element, but for now let it be
        just a normal renderable detail */
-    dummyXYIntersectorData_.renderContext.injectStyleContext(&dummyXYIntersectorData_.styleContext);
-    dummyXYIntersectorData_.renderContext.setColorUniformEnabled(true);
     dummyXYIntersectorData_.styleContext.setColor(glm::vec3(0.7f, 1.0f, 0.2f));
+    dummyXYIntersectorData_.renderContext.colorUniformEn = true;
 
     //TODO: Dummy just to test nested scrollbars
     if (treeStruct_.getName() == "MyContainer2")
@@ -28,12 +27,12 @@ void HkContainer::onFirstHeartbeat()
 {
     const std::string DEFAULT_VS = "assets/shaders/v1.glsl";
     const std::string DEFAULT_FS = "assets/shaders/f1.glsl";
-    const std::string DEFAULT_TYPE = "QUAD";
-    node_.renderContext.renderConfig_.shaderId = windowDataPtr_->renderer.addShaderSourceToCache(DEFAULT_VS, DEFAULT_FS);
-    node_.renderContext.renderConfig_.vaoId = windowDataPtr_->renderer.addVertexArrayDataToCache("QUAD");
+    const HkVertexArrayType DEFAULT_TYPE = HkVertexArrayType::QUAD;
+    node_.renderContext.shaderId = windowDataPtr_->renderer.addShaderSourceToCache(DEFAULT_VS, DEFAULT_FS);
+    node_.renderContext.vaoId = windowDataPtr_->renderer.addVertexArrayDataToCache(DEFAULT_TYPE);
 
-    dummyXYIntersectorData_.renderContext.renderConfig_.shaderId = windowDataPtr_->renderer.addShaderSourceToCache(DEFAULT_VS, DEFAULT_FS);
-    dummyXYIntersectorData_.renderContext.renderConfig_.vaoId = windowDataPtr_->renderer.addVertexArrayDataToCache("QUAD");
+    dummyXYIntersectorData_.renderContext.shaderId = windowDataPtr_->renderer.addShaderSourceToCache(DEFAULT_VS, DEFAULT_FS);
+    dummyXYIntersectorData_.renderContext.vaoId = windowDataPtr_->renderer.addVertexArrayDataToCache(DEFAULT_TYPE);
 }
 
 //TODO: The way we handle scroll inside scroll is now necessarly very intuitive. It needs to ve changed in the future

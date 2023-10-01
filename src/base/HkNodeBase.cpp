@@ -7,7 +7,7 @@ HkNodeBase::HkNodeBase(const std::string& windowName, const HkNodeType& type)
 {
     node_.constraintContext.injectTransformContext(&node_.transformContext);
     node_.constraintContext.injectStyleContext(&node_.styleContext);
-    node_.renderContext.renderConfig_.colorUniformEn = true;
+    node_.renderContext.colorUniformEn = true;
 }
 
 void HkNodeBase::renderMySelf()
@@ -34,8 +34,8 @@ void HkNodeBase::renderMySelf()
         this would make sense. This leaves us with the renderContext only containing a blueprint of what the actual
         renderer needs to set up, a config.*/
 
-        node_.renderContext.renderConfig_.windowProjMatrix = windowDataPtr_->sceneProjMatrix;
-        windowDataPtr_->renderer.render(node_.renderContext.getConfig(), node_.styleContext, tc.getModelMatrix());
+        node_.renderContext.windowProjMatrix = windowDataPtr_->sceneProjMatrix;
+        windowDataPtr_->renderer.render(node_.renderContext, node_.styleContext, tc.getModelMatrix());
 
         // node_.renderContext.render(windowDataPtr_->sceneProjMatrix, tc.getModelMatrix(), windowDataPtr_->renderStore);
 

@@ -15,9 +15,9 @@ void HkKnob::onFirstHeartbeat()
 {
     const std::string DEFAULT_VS = "assets/shaders/v1.glsl";
     const std::string DEFAULT_FS = "assets/shaders/f1.glsl";
-    const std::string DEFAULT_TYPE = "QUAD";
-    node_.renderContext.renderConfig_.shaderId = windowDataPtr_->renderer.addShaderSourceToCache(DEFAULT_VS, DEFAULT_FS);
-    node_.renderContext.renderConfig_.vaoId = windowDataPtr_->renderer.addVertexArrayDataToCache("QUAD");
+    const HkVertexArrayType DEFAULT_TYPE = HkVertexArrayType::QUAD;
+    node_.renderContext.shaderId = windowDataPtr_->renderer.addShaderSourceToCache(DEFAULT_VS, DEFAULT_FS);
+    node_.renderContext.vaoId = windowDataPtr_->renderer.addVertexArrayDataToCache(DEFAULT_TYPE);
 }
 
 void HkKnob::onDrag()

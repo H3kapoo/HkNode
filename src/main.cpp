@@ -22,6 +22,7 @@ int main()
     // we need to make it order agnostic
     HkWindowManagerPtr sceneWindow1 = std::make_shared<HkWindowManager>("MyWindowManager",
         HkWindowManager::HkWindowConfig{ .width = 1920, .height = 1080, .isMaster = true });
+    //TODO: There is a bug with 2 windows while animating the windowFrame movement
     // HkWindowManagerPtr sceneWindow2 = std::make_shared<HkWindowManager>("MyWindowManager2",
     //     HkWindowManager::HkWindowConfig{ .width = 800, .height = 600 });
 
@@ -60,12 +61,13 @@ int main()
     //     ctrs2.push_back(std::move(ct));
     // }
     // HkImageViewPtr imgView = std::make_shared<HkImageView>("MyImgView");
+    // HkImageViewPtr imgView2 = std::make_shared<HkImageView>("MyImgView2");
     // imgView->loadImage("/home/hekapoo/container.jpg");
-    // imgView->loadImage("/home/hekapoo/Downloads/fbi_wp.jpg");
+    // imgView2->loadImage("/home/hekapoo/Downloads/fbi_wp.jpg");
     // imgView->setSize({ 1920,1080 });
     // windowFrame->getStyle().setOverflowAllowedXY(false);
 
-    // windowFrame->pushChildren({ imgView });
+    // windowFrame->pushChildren({ imgView, imgView2 });
     windowFrame->pushChildren({ ctr, ctr4 });
     // windowFrame->pushChildren(ctrs2);
     // sceneWindow1->makeContextNotCurrent();
