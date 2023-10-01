@@ -209,8 +209,8 @@ void HkAppManager::runLoop()
             // is not that big. Except for something like a videoPlayer that runs constantly.
             // Another idea would be if win1 runs a video for example, we switch to pollEvents, but in win2,3,etc
             // we post en empty event such that nothing happens there, just exits autmatically and buffer remains the same.
-            // glfwWaitEvents(); // can be used with multiple windows. GLFW got that backed up
-            glfwPollEvents();
+            glfwWaitEvents(); // can be used with multiple windows. GLFW got that backed up
+            // glfwPollEvents();
 
             // Measure speed
             if (i == 0)

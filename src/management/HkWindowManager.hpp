@@ -6,7 +6,6 @@
 
 #include "../APIGate/GlfwGlewGate.hpp"
 #include "../base/IHkRootNode.hpp"
-#include "../renderer/HkTexture.hpp"
 #include "HkWindowData.hpp"
 
 namespace hkui
@@ -63,7 +62,6 @@ private:
     /*Background related*/
     bool shouldRenderBackground_{ false };
     std::string pathToBgImg_;
-    HkTexture bgTexture_;
     HkNodeData bgNodeData_;
 
     //TODO: Window specific params

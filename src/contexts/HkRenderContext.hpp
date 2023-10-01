@@ -6,19 +6,14 @@
 #include <memory>
 #include <vector>
 
+#include "../renderer/HkTextureLoader.hpp"
+
 namespace hkui
 {
 
 enum class HkVertexArrayType
 {
     QUAD,
-};
-
-struct HkTextureInfo
-{
-    const char* texName;
-    uint32_t texUnit{ 0 };
-    uint32_t texId{ 0 };
 };
 
 class HkRenderContext

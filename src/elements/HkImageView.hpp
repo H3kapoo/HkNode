@@ -4,7 +4,7 @@
 #include <string>
 
 #include "../base/HkNodeBase.hpp"
-#include "../renderer/HkTexture.hpp"
+// #include "../renderer/HkTextureLoader.hpp"
 
 namespace hkui
 {
@@ -19,7 +19,8 @@ public:
 private:
     void onFirstHeartbeat() override;
 
-    HkTexture texture_;
+    bool earlyImgRequest_{ false };
+    std::string earlyImgPath_;
 };
 using HkImageViewPtr = std::shared_ptr<HkImageView>;
 using HkImageViewCPtr = const std::shared_ptr<HkImageView>;

@@ -40,10 +40,29 @@ int32_t HkRenderer::addShaderSourceToCache(const std::string& vertSource, const 
     return storedShaderId;
 }
 
+HkTextureInfo HkRenderer::addTextureSourceToCache(const std::string& textureSource)
+{
+    const HkTextureInfo storedTexInfo = pathToTextureInfoMap_[textureSource];
+    if (storedTexInfo.texId == 0)
+    {
+        const HkTextureInfo texInfo = HkTextureLoader::loadTexture(textureSource);
+        if (texInfo.texId != 0)
+        {
+            pathToTextureInfoMap_[textureSource] = texInfo;
+            std::cout << "Generated texture id: " << texInfo.texId << "\n";
+            return texInfo;
+        }
+        else
+        {
+            std::cout << "Failed to generate texture id for: " << textureSource << "\n";
+        }
+    }
+    return storedTexInfo;
+}
+
 /* Same thing but for vaos */
 int32_t HkRenderer::addVertexArrayDataToCache(const HkVertexArrayType archType)
 {
-    // const std::string archName = "QUAD";
     const uint32_t storedVaoId = archNameToVaoIdMap_[archType];
     if (storedVaoId == 0)
     {

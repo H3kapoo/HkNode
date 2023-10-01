@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../management/HkWindowData.hpp" // new
+#include "../management/HkWindowData.hpp"
 #include "../base/HkNodeData.hpp"
 #include "../base/HkTreeStructure.hpp"
 
