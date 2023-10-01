@@ -39,6 +39,7 @@ HkWindowManager::HkWindowManager(const std::string& windowName, const HkWindowCo
     isMaster_ = config.isMaster;
 }
 
+//TODO: Rename appropriately in the future
 void HkWindowManager::forceUpdate()
 {
     // updateAllSubWindows(HkEvent::None);
@@ -49,6 +50,9 @@ void HkWindowManager::forceUpdate()
 
 void HkWindowManager::updateAllSubWindows(const HkEvent& ev)
 {
+    /* Firstly load the background image if needed */
+    renderBackgroundImage();
+
     /* Focus scan event is special here. We need to find the first subWindow that the mouse click and do so from front
     most subWindow to back most one (reverse iteration, last element in vector is always the frontmost window). Once we
     found a fist match, we bail out. In case we don't find any suitable subWindow, we return from function,
@@ -135,6 +139,48 @@ void HkWindowManager::addSubWindow(const IHkRootNodePtr& subWindowRoot)
 void HkWindowManager::makeContextCurrent() { glfwMakeContextCurrent(windowHandle_); }
 
 void HkWindowManager::makeContextNotCurrent() { glfwMakeContextCurrent(NULL); }
+
+void HkWindowManager::setBackgroundImage(const std::string& pathToImg)
+{
+    //TODO: this has to do with shaders and opengl, this function shall pe called on first heartbeat
+    if (pathToBgImg_ != pathToImg)
+    {
+        std::cout << "New background image identified. Will load.\n";
+        if (!bgTexture_.loadTexture(pathToImg))
+        {
+            std::cerr << "Failed to load background image: " << pathToImg << "\n";
+            return;
+        }
+
+        /* Set TC */
+        bgNodeData_.transformContext.setPos({ 0,0 });
+        bgNodeData_.transformContext.setScale(windowData_.windowSize);
+
+        /* Set RC */
+        const std::string DEFAULT_VS = "assets/shaders/vTextured.glsl";
+        const std::string DEFAULT_FS = "assets/shaders/fTextured.glsl";
+        const HkVertexArrayType DEFAULT_TYPE = HkVertexArrayType::QUAD;
+        bgNodeData_.renderContext.texInfos.push_back({ "texture1", GL_TEXTURE0, bgTexture_.getTextureId() });
+        bgNodeData_.renderContext.shaderId = windowData_.renderer.addShaderSourceToCache(DEFAULT_VS, DEFAULT_FS);
+        bgNodeData_.renderContext.vaoId = windowData_.renderer.addVertexArrayDataToCache(DEFAULT_TYPE);
+
+        pathToBgImg_ = pathToImg;
+        shouldRenderBackground_ = true;
+    }
+    else
+    {
+        std::cout << "Same background image. Will reuse.\n";
+        shouldRenderBackground_ = false;
+    }
+}
+
+void HkWindowManager::renderBackgroundImage()
+{
+    if (!shouldRenderBackground_) return;
+    bgNodeData_.renderContext.windowProjMatrix = windowData_.sceneProjMatrix;
+    // bgNodeData_.transformContext.setScale(windowData_.windowSize);
+    windowData_.renderer.render(bgNodeData_.renderContext, bgNodeData_.styleContext, bgNodeData_.transformContext.getModelMatrix());
+}
 
 void HkWindowManager::resizeEventCalled(GLFWwindow*, int width, int height)
 {

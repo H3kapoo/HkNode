@@ -60,17 +60,19 @@ int main()
     //     ct->setSize({ 20, 20 });
     //     ctrs2.push_back(std::move(ct));
     // }
-    // HkImageViewPtr imgView = std::make_shared<HkImageView>("MyImgView");
-    // HkImageViewPtr imgView2 = std::make_shared<HkImageView>("MyImgView2");
-    // imgView->loadImage("/home/hekapoo/container.jpg");
-    // imgView2->loadImage("/home/hekapoo/Downloads/fbi_wp.jpg");
+    HkImageViewPtr imgView = std::make_shared<HkImageView>("MyImgView");
+    HkImageViewPtr imgView2 = std::make_shared<HkImageView>("MyImgView2");
+    imgView->loadImage("/home/hekapoo/container.jpg");
+    imgView2->loadImage("/home/hekapoo/Downloads/fbi_wp.jpg");
     // imgView->setSize({ 1920,1080 });
     // windowFrame->getStyle().setOverflowAllowedXY(false);
 
-    // windowFrame->pushChildren({ imgView, imgView2 });
+    windowFrame->pushChildren({ imgView, imgView2 });
     windowFrame->pushChildren({ ctr, ctr4 });
     // windowFrame->pushChildren(ctrs2);
     // sceneWindow1->makeContextNotCurrent();
+
+    // sceneWindow1->setBackgroundImage("/home/hekapoo/Downloads/fbi_wp.jpg");
 
     // sceneWindow2->makeContextCurrent();
 
