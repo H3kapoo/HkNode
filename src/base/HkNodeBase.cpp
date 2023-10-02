@@ -131,6 +131,13 @@ void HkNodeBase::updateMySelf(const bool isSubWindowMinimized)
         hadFirstHeartBeat_ = true;
     }
 
+    if (node_.styleContext.isDirty)
+    {
+        resolveDirtyAttributes();
+        node_.styleContext.dirtyAttribs.clear();
+        node_.styleContext.isDirty = false;
+    }
+
     auto& children = treeStruct_.getChildren();
 
     /* We don't need to update children's transform data in these events*/
@@ -265,6 +272,41 @@ void HkNodeBase::resolveMouseMovementEvent()
     {
         node_.eventsContext.invokeMouseEvent(windowDataPtr_->mousePos.x, windowDataPtr_->mousePos.x,
             HkMouseAction::Move, HkMouseButton::None);
+    }
+}
+
+/* Resolve runtime changed attributes */
+void HkNodeBase::resolveDirtyAttributes()
+{
+    //TODO: This could be used in constraint context as well to not render when not needed
+    for (const auto& chAttrib : node_.styleContext.dirtyAttribs)
+    {
+        switch (chAttrib)
+        {
+        case HkStyleDirtyAttribs::BG:
+            /* Change shader to the textured one if we have background set */
+            const auto& bgImagePath = node_.styleContext.getBackgroundImage();
+            if (bgImagePath.size() > 0)
+            {
+                std::string DEFAULT_VS = "assets/shaders/vTextured.glsl"; //TODO: could be fetched from style in the future
+                std::string DEFAULT_FS = "assets/shaders/fTextured.glsl";
+                node_.renderContext.shaderId = windowDataPtr_->renderer.addShaderSourceToCache(DEFAULT_VS, DEFAULT_FS);
+                auto texInfo = windowDataPtr_->renderer.addTextureSourceToCache(bgImagePath);
+                texInfo.texName = "texture1";
+                texInfo.texUnit = GL_TEXTURE0;
+                node_.renderContext.texInfos.push_back(texInfo);
+                node_.renderContext.colorUniformEn = false;
+            }
+            else
+            {
+                std::string DEFAULT_VS = "assets/shaders/v1.glsl";
+                std::string DEFAULT_FS = "assets/shaders/f1.glsl";
+                node_.renderContext.shaderId = windowDataPtr_->renderer.addShaderSourceToCache(DEFAULT_VS, DEFAULT_FS);
+                node_.renderContext.texInfos.clear();
+                node_.renderContext.colorUniformEn = true;
+            }
+            break;
+        }
     }
 }
 

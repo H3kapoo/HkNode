@@ -50,7 +50,16 @@ int main()
 
     ctr->setSize({ 200, 300 });
     ctr4->setSize({ 100, 150 });
+    windowFrame->getStyle().setBackgroundImage("/home/hekapoo/container.jpg");
 
+    bool x = false;
+    windowFrame->getEvents().setOnClickListener(
+        [&windowFrame, &x]()
+        {
+            x ? windowFrame->getStyle().setBackgroundImage("/home/hekapoo/container.jpg") : windowFrame->getStyle().setBackgroundImage("");
+            x = !x;
+            std::cout << "pe aici\n";
+        });
     // std::vector<HkNodeBasePtr> ctrs2;
     // ctrs2.reserve(5'000);
     // for (int i = 0;i < 5'000;i++) // with O2 works ok 01.09.2023
@@ -60,19 +69,19 @@ int main()
     //     ct->setSize({ 20, 20 });
     //     ctrs2.push_back(std::move(ct));
     // }
-    HkImageViewPtr imgView = std::make_shared<HkImageView>("MyImgView");
-    HkImageViewPtr imgView2 = std::make_shared<HkImageView>("MyImgView2");
-    HkImageViewPtr imgView3 = std::make_shared<HkImageView>("MyImgView3");
-    HkImageViewPtr imgView4 = std::make_shared<HkImageView>("MyImgView4");
-    imgView->loadImage("/home/hekapoo/container.jpg");
-    imgView2->loadImage("/home/hekapoo/container.jpg");
-    imgView3->loadImage("/home/hekapoo/container.jpg");
-    imgView4->loadImage("/home/hekapoo/Downloads/fbi_wp.jpg");
+    // HkImageViewPtr imgView = std::make_shared<HkImageView>("MyImgView");
+    // HkImageViewPtr imgView2 = std::make_shared<HkImageView>("MyImgView2");
+    // HkImageViewPtr imgView3 = std::make_shared<HkImageView>("MyImgView3");
+    // HkImageViewPtr imgView4 = std::make_shared<HkImageView>("MyImgView4");
+    // imgView->loadImage("/home/hekapoo/container.jpg");
+    // imgView2->loadImage("/home/hekapoo/container.jpg");
+    // imgView3->loadImage("/home/hekapoo/container.jpg");
+    // imgView4->loadImage("/home/hekapoo/Downloads/fbi_wp.jpg");
     // imgView->setSize({ 1920,1080 });
     // windowFrame->getStyle().setOverflowAllowedXY(false);
 
-    windowFrame->pushChildren({ imgView, imgView2, imgView3, imgView4 });
-    // windowFrame->pushChildren({ ctr, ctr4 });
+    // windowFrame->pushChildren({ imgView, imgView2, imgView3, imgView4 });
+    windowFrame->pushChildren({ ctr, ctr4 });
     // windowFrame->pushChildren(ctrs2);
     // sceneWindow1->makeContextNotCurrent();
 

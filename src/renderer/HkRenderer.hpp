@@ -10,6 +10,11 @@
 
 namespace hkui
 {
+enum class HkVertexArrayType
+{
+    QUAD,
+};
+
 struct HkRenderArch
 {
     std::vector<float> vertices;

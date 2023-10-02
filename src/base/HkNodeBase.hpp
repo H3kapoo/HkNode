@@ -86,6 +86,7 @@ private:
     void resolveMouseClickEvent();
     void resolveMouseScrollEvent();
     void resolveMouseMovementEvent();
+    void resolveDirtyAttributes();
 
     /* Injects */
     virtual void injectWindowDataPtr(HkWindowData* windowDataPtr);

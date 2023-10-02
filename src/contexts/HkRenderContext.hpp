@@ -11,11 +11,6 @@
 namespace hkui
 {
 
-enum class HkVertexArrayType
-{
-    QUAD,
-};
-
 class HkRenderContext
 {
 public:

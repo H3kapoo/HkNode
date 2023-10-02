@@ -121,4 +121,12 @@ HkStyleContext& HkStyleContext::setHAlignment(HkHAlignment value)
     horizontalAlignment_ = value;
     return *this;
 }
+
+HkStyleContext& HkStyleContext::setBackgroundImage(const std::string& value)
+{
+    isDirty = true;
+    dirtyAttribs.insert(HkStyleDirtyAttribs::BG);
+    bgImagePath_ = value;
+    return *this;
+}
 } // hkui

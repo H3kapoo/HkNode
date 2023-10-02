@@ -1,7 +1,7 @@
 #pragma once
 
-#include <vector>
-
+#include <unordered_set>
+#include <string>
 #include <glm/glm.hpp>
 
 namespace hkui
@@ -26,8 +26,15 @@ enum class HkHAlignment
     Right
 };
 
+enum class HkStyleDirtyAttribs
+{
+    BG,
+};
+
 class HkStyleContext
 {
+    /* Necessary in order for base to know if to issue a dirty call to the concrete element*/
+    friend class HkNodeBase;
 
 public:
     HkStyleContext() = default;
@@ -52,6 +59,7 @@ public:
     HkStyleContext& setDirection(HkDirection value);
     HkStyleContext& setVAlignment(HkVAlignment value);
     HkStyleContext& setHAlignment(HkHAlignment value);
+    HkStyleContext& setBackgroundImage(const std::string& value);
 
 
     /* Inline Getters, impl here, yes */
@@ -67,8 +75,13 @@ public:
     inline HkDirection getDirection() const { return direction_; }
     inline HkVAlignment getVAlignment() const { return verticalAlignment_; }
     inline HkHAlignment getHAlignment() const { return horizontalAlignment_; }
+    inline std::string getBackgroundImage() const { return bgImagePath_; };
 
 private:
+    /* Dirty flag */
+    bool isDirty{ false };
+    std::unordered_set<HkStyleDirtyAttribs> dirtyAttribs;
+
     /* Attribs */
     glm::vec3 color;
     bool rowWrap{ false };
@@ -79,5 +92,6 @@ private:
     HkDirection direction_{ HkDirection::Horizontal };
     HkVAlignment verticalAlignment_{ HkVAlignment::Top };
     HkHAlignment horizontalAlignment_{ HkHAlignment::Left }; //TODO: Bottom + RIght => permanent scrollbars??
+    std::string bgImagePath_;
 };
 } // hkui
