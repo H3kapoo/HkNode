@@ -8,7 +8,6 @@
 #include "elements/HkWindowFrame.hpp"
 #include "elements/HkContainer.hpp"
 #include "elements/HkButton.hpp"
-#include "elements/HkImageView.hpp"
 
 using namespace hkui;
 
@@ -50,16 +49,16 @@ int main()
 
     ctr->setSize({ 200, 300 });
     ctr4->setSize({ 100, 150 });
-    windowFrame->getStyle().setBackgroundImage("/home/hekapoo/container.jpg");
+    // windowFrame->getStyle().setBackgroundImage("/home/hekapoo/container.jpg");
 
-    bool x = false;
-    windowFrame->getEvents().setOnClickListener(
-        [&windowFrame, &x]()
-        {
-            x ? windowFrame->getStyle().setBackgroundImage("/home/hekapoo/container.jpg") : windowFrame->getStyle().setBackgroundImage("");
-            x = !x;
-            std::cout << "pe aici\n";
-        });
+    // bool x = false;
+    // windowFrame->getEvents().setOnClickListener(
+    //     [&windowFrame, &x]()
+    //     {
+    //         x ? windowFrame->getStyle().setBackgroundImage("/home/hekapoo/container.jpg") : windowFrame->getStyle().setBackgroundImage("");
+    //         x = !x;
+    //         std::cout << "pe aici\n";
+    //     });
     // std::vector<HkNodeBasePtr> ctrs2;
     // ctrs2.reserve(5'000);
     // for (int i = 0;i < 5'000;i++) // with O2 works ok 01.09.2023
