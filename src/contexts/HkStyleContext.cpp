@@ -104,7 +104,7 @@ HkStyleContext& HkStyleContext::setOverflowAllowedXY(const bool value)
     return *this;
 }
 
-HkStyleContext& HkStyleContext::setDirection(HkDirection value)
+HkStyleContext& HkStyleContext::setLayout(HkLayout value)
 {
     direction_ = value;
     return *this;
@@ -127,6 +127,30 @@ HkStyleContext& HkStyleContext::setBackgroundImage(const std::string& value)
     isDirty = true;
     dirtyAttribs.insert(HkStyleDirtyAttribs::BG);
     bgImagePath_ = value;
+    return *this;
+}
+
+HkStyleContext& HkStyleContext::setGridConfig(HkGridConfig value)
+{
+    isDirty = true;
+    // dirtyAttribs.insert(HkStyleDirtyAttribs::BG); //TODO: Adapt
+    gridConfig = value;
+    return *this;
+}
+
+HkStyleContext& HkStyleContext::setGridRow(const uint32_t value)
+{
+    isDirty = true;
+    // dirtyAttribs.insert(HkStyleDirtyAttribs::BG); //TODO: Adapt
+    gridRow = value;
+    return *this;
+}
+
+HkStyleContext& HkStyleContext::setGridCol(const uint32_t value)
+{
+    isDirty = true;
+    // dirtyAttribs.insert(HkStyleDirtyAttribs::BG); //TODO: Adapt
+    gridCol = value;
     return *this;
 }
 } // hkui

@@ -2,14 +2,16 @@
 
 #include <unordered_set>
 #include <string>
+#include <vector>
 #include <glm/glm.hpp>
 
 namespace hkui
 {
-enum class HkDirection
+enum class HkLayout
 {
     Horizontal,
-    Vertical
+    Vertical,
+    Grid
 };
 
 enum class HkVAlignment
@@ -29,6 +31,21 @@ enum class HkHAlignment
 enum class HkStyleDirtyAttribs
 {
     BG,
+};
+
+/* Vector of floats representing the percentage of the space the row/col should occupy
+   Eg: {1.0, 1.0, 1.0} => all 3 rows will occpy space equally
+                       => adds up to 1.0/3.0f => 0.33f => equal part
+   Eg: {1.0, 0.5, 0.25} => adds up to 1/1.75f  = 0.57 => equalPart
+                           1st row will get: 1.0 * 0.57 of available space => 0.58
+                           2st row will get: 0.5 * 0.57 of available space => 0.29
+                           3st row will get: 0.25 * 0.57 of available space => 0.145
+                           = should add up to original 1.0f (obviously here's just an eg)
+*/
+struct HkGridConfig
+{
+    std::vector<float> cols{ 1.0f };
+    std::vector<float> rows{ 1.0f };
 };
 
 class HkStyleContext
@@ -56,9 +73,12 @@ public:
     HkStyleContext& setOverflowAllowedX(const bool value);
     HkStyleContext& setOverflowAllowedY(const bool value);
     HkStyleContext& setOverflowAllowedXY(const bool value);
-    HkStyleContext& setDirection(HkDirection value);
+    HkStyleContext& setLayout(HkLayout value);
     HkStyleContext& setVAlignment(HkVAlignment value);
     HkStyleContext& setHAlignment(HkHAlignment value);
+    HkStyleContext& setGridConfig(const HkGridConfig value);
+    HkStyleContext& setGridRow(const uint32_t value);
+    HkStyleContext& setGridCol(const uint32_t value);
     HkStyleContext& setBackgroundImage(const std::string& value);
 
 
@@ -72,9 +92,12 @@ public:
     inline uint32_t getBottomMargin() const { return marginBY; }
     inline bool isOverflowAllowedX() const { return overflowAllowedX; }
     inline bool isOverflowAllowedY() const { return overflowAllowedY; }
-    inline HkDirection getDirection() const { return direction_; }
+    inline HkLayout getLayout() const { return direction_; }
     inline HkVAlignment getVAlignment() const { return verticalAlignment_; }
     inline HkHAlignment getHAlignment() const { return horizontalAlignment_; }
+    inline const HkGridConfig& getGridConfig() const { return gridConfig; };
+    inline uint32_t getGridRow() const { return gridRow; };
+    inline uint32_t getGridCol() const { return gridCol; };
     inline std::string getBackgroundImage() const { return bgImagePath_; };
 
 private:
@@ -89,9 +112,11 @@ private:
     uint32_t marginLX{ 0 }, marginRX{ 0 };
     uint32_t marginTY{ 0 }, marginBY{ 0 };
     bool overflowAllowedX{ false }, overflowAllowedY{ false };
-    HkDirection direction_{ HkDirection::Horizontal };
+    HkLayout direction_{ HkLayout::Horizontal };
     HkVAlignment verticalAlignment_{ HkVAlignment::Top };
     HkHAlignment horizontalAlignment_{ HkHAlignment::Left }; //TODO: Bottom + RIght => permanent scrollbars??
+    uint32_t gridRow{ 1 }, gridCol{ 1 };
+    HkGridConfig gridConfig;
     std::string bgImagePath_;
 };
 } // hkui

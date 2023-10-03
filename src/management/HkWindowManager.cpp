@@ -140,7 +140,7 @@ void HkWindowManager::makeContextCurrent() { glfwMakeContextCurrent(windowHandle
 
 void HkWindowManager::makeContextNotCurrent() { glfwMakeContextCurrent(NULL); }
 
-void HkWindowManager::setBackgroundImage(const std::string& pathToImg)
+void HkWindowManager::setBackgroundImage(const std::string&)
 {
     //TODO: this has to do with shaders and opengl, this function shall pe called on first heartbeat
     // if (pathToBgImg_ != pathToImg)

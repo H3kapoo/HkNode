@@ -17,12 +17,92 @@ void HkConstraintContext::resolveConstraints(HkTreeStruct& children,
         return;
     computeScrollBarCount();
 
-    if (styleContextInj_->getDirection() == HkDirection::Horizontal)
+    if (styleContextInj_->getLayout() == HkLayout::Horizontal)
         resolveHorizontalContainer(children, sbSizes);
-    else
+    else if (styleContextInj_->getLayout() == HkLayout::Vertical)
         resolveVerticalContainer(children, sbSizes);
+    else if (styleContextInj_->getLayout() == HkLayout::Grid)
+        resolveGridContainer(children, sbSizes);
 
-    resolveAxisOverflow(children, sbSizes);
+    // resolveAxisOverflow(children, sbSizes);
+}
+
+void HkConstraintContext::resolveGridContainer(HkTreeStruct& children,
+    const HkScrollbarsSize)
+{
+    /* Floats are needed here because of GridConfig containing fractional parts itself.
+       Without floats we losing precision in placing elements */
+    float startPosX = 0, startPosY = 0;
+    float firstStartPosX = 0;
+
+    const uint32_t childrenCount = children.size() - sbCount_;
+    const auto gridConfig = styleContextInj_->getGridConfig();
+    const float colEqualPart = 1.0f / std::accumulate(gridConfig.cols.begin(), gridConfig.cols.end(), 0.0f);
+    const uint32_t gridConfigColsSize = gridConfig.cols.size();
+    const uint32_t gridConfigRowssSize = gridConfig.rows.size();
+
+
+    for (uint32_t i = 0; i < childrenCount; i++)
+    {
+        auto& child = children[i]->getPayload()->node_;
+        auto& childTc = child.transformContext;
+        auto& childSc = child.styleContext;
+
+        float advanceFraction = 0.0f;
+        float nextAdvanceFraction = 0.0f;
+
+        /* Return on possibly invalid index access*/
+        if (childSc.getGridCol() > gridConfigColsSize)
+        {
+            std::cerr << "Invalid grid col: " << childSc.getGridCol() << " > " << gridConfigColsSize << '\n';
+            return;
+        }
+
+        if (i < childrenCount - 1)
+        {
+            auto& nextChild = children[i + 1]->getPayload()->node_;
+            auto& nextChildTc = nextChild.transformContext;
+            auto& nextChildSc = nextChild.styleContext;
+
+            /* Return on possibly invalid index access*/
+            if (nextChildSc.getGridCol() > gridConfigColsSize)
+            {
+                std::cerr << "Invalid grid col: " << nextChildSc.getGridCol() << " > " << gridConfigColsSize << '\n';
+                return;
+            }
+
+            for (uint32_t j = 0;j < nextChildSc.getGridCol() - 1; j++)
+            {
+                nextAdvanceFraction += (gridConfig.cols[j] * colEqualPart);
+            }
+        }
+        else
+        {
+            nextAdvanceFraction = 1.0f;
+        }
+
+        /* Deduce, fractionally, how much we should advance to place the element*/
+        for (uint32_t j = 0;j < childSc.getGridCol() - 1; j++)
+        {
+            advanceFraction += (gridConfig.cols[j] * colEqualPart);
+        }
+
+        switch (childSc.getHAlignment())
+        {
+        case HkHAlignment::Left:
+            // startPosX = (advanceFraction) * (float)thisTc_->getScale().x;
+            // childTc.setPos({ startPosX , startPosY });
+            // break;
+        case HkHAlignment::Center:
+            startPosX = ((advanceFraction + nextAdvanceFraction) / 2.0f) * (float)thisTc_->getScale().x;
+            childTc.setPos({ startPosX - childTc.getScale().x / 2 , startPosY });
+            break;
+        case HkHAlignment::Right:
+            // startPosX = (nextAdvanceFraction) * (float)thisTc_->getScale().x;
+            // childTc.setPos({ startPosX - childTc.getScale().x , startPosY });
+            break;
+        }
+    }
 }
 
 void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children,
@@ -152,7 +232,7 @@ void HkConstraintContext::resolveVerticalContainer(HkTreeStruct& children,
         startPosY = nextYAdvance;
     }
 
-    /*Back Propagate child alignment for the last row..or the only one row is no overflow occured with rowWrapping */
+    /*Back Propagate child alignment for the last row..or the only one row if no overflow occured with rowWrapping */
     backPropagateColChange(children, nextColFirstId, children.size() - sbCount_ - 1, longestXOnCol);
 
     /* Above calculations have been with respect to 0,0 ,so now we need to offset the generated "container"
@@ -171,7 +251,7 @@ void HkConstraintContext::backPropagateRowChange(HkTreeStruct& children,
         auto& childBpTc = children[j]->getPayload()->node_.transformContext; //TODO: Minimize this call
         auto& childBpSc = children[j]->getPayload()->node_.styleContext;
 
-        switch (childBpSc.getVAlignment()) // here's wrong, it should be child's HA
+        switch (childBpSc.getVAlignment())
         {
         case HkVAlignment::Top:
             /*Valid, but do nothing */

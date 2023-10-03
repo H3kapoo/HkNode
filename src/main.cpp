@@ -30,25 +30,46 @@ int main()
     sceneWindow1->makeContextCurrent();
 
     HkWindowFramePtr windowFrame = std::make_shared<HkWindowFrame>("MyWindowFrame");
-    windowFrame->setWindowMode(HkWindowFrameMode::Grabbable);
+    windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
     sceneWindow1->addSubWindow(windowFrame); //NOTE: Needs to be added before adding any children
 
     windowFrame->getStyle().setOverflowAllowedXY(true)
-        .setDirection(HkDirection::Horizontal)
-        .setHAlignment(HkHAlignment::Left)
-        .setVAlignment(HkVAlignment::Top);
+        .setLayout(HkLayout::Grid)
+        .setGridConfig(HkGridConfig{ .cols{2.0f, 2.0f, 1.0f}, .rows{1.0f} });
+    // .setHAlignment(HkHAlignment::Left)
+// .setVAlignment(HkVAlignment::Top);
 
     windowFrame->setPos({ 1280 * 0.25, 720 * 0.25 });
-    windowFrame->setSize({ 1280 * 0.4, 720 * 0.7 });
+    windowFrame->setSize({ 1280 , 720 });
 
     HkContainerPtr ctr = std::make_shared<HkContainer>("MyContainer");
     HkContainerPtr ctr4 = std::make_shared<HkContainer>("MyContainer4");
+    HkContainerPtr ctr5 = std::make_shared<HkContainer>("MyContainer5");
+    HkContainerPtr ctr6 = std::make_shared<HkContainer>("MyContainer6");
 
-    ctr->getStyle().setColor({ 1.3f,0.3f,0.7f });
-    ctr4->getStyle().setColor({ 0.7f,0.8f,0.9f });
+    ctr->getStyle().setColor({ 1.0f,1.0f,1.0f })
+        .setGridCol(1)
+        .setHAlignment(HkHAlignment::Left);
+    ctr4->getStyle().setColor({ 1.0f,0.0f,0.0f })
+        .setGridCol(2)
+        // .setGridCol(3)
+        .setHAlignment(HkHAlignment::Left);
+    ctr5->getStyle().setColor({ 0.0f,1.0f,0.0f })
+        .setGridCol(3)
+        // .setGridCol(2)
+        .setHAlignment(HkHAlignment::Left);
+    // ctr6->getStyle().setColor({ 0.0f,0.0f,1.0f })
+    //     .setGridCol(1)
+    //     .setHAlignment(HkHAlignment::Left);
 
-    ctr->setSize({ 200, 300 });
-    ctr4->setSize({ 100, 150 });
+    ctr->setSize({ 100, 600 });
+    ctr4->setSize({ 100, 600 });
+    ctr5->setSize({ 100, 600 });
+    ctr6->setSize({ 100, 600 });
+    // ctr->setSize({ 200, 300 });
+    // ctr4->setSize({ 100, 150 });
+    // ctr5->setSize({ 100, 150 });
+    // ctr6->setSize({ 100, 150 });
     // windowFrame->getStyle().setBackgroundImage("/home/hekapoo/container.jpg");
 
     // bool x = false;
@@ -80,7 +101,7 @@ int main()
     // windowFrame->getStyle().setOverflowAllowedXY(false);
 
     // windowFrame->pushChildren({ imgView, imgView2, imgView3, imgView4 });
-    windowFrame->pushChildren({ ctr, ctr4 });
+    windowFrame->pushChildren({ ctr, ctr4, ctr5 });
     // windowFrame->pushChildren(ctrs2);
     // sceneWindow1->makeContextNotCurrent();
 
@@ -94,7 +115,7 @@ int main()
     // sceneWindow2->addSubWindow(windowFrame2); //NOTE: Needs to be added before adding any children
 
     windowFrame2->getStyle().setOverflowAllowedXY(true)
-        .setDirection(HkDirection::Horizontal)
+        .setLayout(HkLayout::Horizontal)
         .setHAlignment(HkHAlignment::Left)
         .setVAlignment(HkVAlignment::Center);
 
@@ -127,42 +148,42 @@ int main()
 
     // sceneWindow3->makeContextCurrent();
 
-    HkWindowFramePtr windowFrame3 = std::make_shared<HkWindowFrame>("MyWindowFrame2");
-    windowFrame3->setWindowMode(HkWindowFrameMode::Grabbable);
-    // sceneWindow3->addSubWindow(windowFrame3); //NOTE: Needs to be added before adding any children
-    // sceneWindow1->addSubWindow(windowFrame3); //NOTE: Needs to be added before adding any children
+    // HkWindowFramePtr windowFrame3 = std::make_shared<HkWindowFrame>("MyWindowFrame2");
+    // windowFrame3->setWindowMode(HkWindowFrameMode::Grabbable);
+    // // sceneWindow3->addSubWindow(windowFrame3); //NOTE: Needs to be added before adding any children
+    // // sceneWindow1->addSubWindow(windowFrame3); //NOTE: Needs to be added before adding any children
 
-    windowFrame3->getStyle().setOverflowAllowedXY(true)
-        .setDirection(HkDirection::Horizontal)
-        .setHAlignment(HkHAlignment::Right)
-        .setVAlignment(HkVAlignment::Center);
+    // windowFrame3->getStyle().setOverflowAllowedXY(true)
+    //     .setLayout(HkLayout::Horizontal)
+    //     .setHAlignment(HkHAlignment::Right)
+    //     .setVAlignment(HkVAlignment::Center);
 
-    HkContainerPtr ctr5 = std::make_shared<HkContainer>("MyContainer5");
-    HkContainerPtr ctr6 = std::make_shared<HkContainer>("MyContainer6");
+    // ctr5 = std::make_shared<HkContainer>("MyContainer5");
+    // ctr6 = std::make_shared<HkContainer>("MyContainer6");
 
-    ctr5->getStyle().setColor({ 0.0f,0.1f,0.2f });
-    ctr6->getStyle().setColor({ 1.0f,0.4f,0.5f });
+    // ctr5->getStyle().setColor({ 0.0f,0.1f,0.2f });
+    // ctr6->getStyle().setColor({ 1.0f,0.4f,0.5f });
 
-    ctr5->setSize({ 330, 450 });
-    ctr6->setSize({ 400, 450 });
+    // ctr5->setSize({ 330, 450 });
+    // ctr6->setSize({ 400, 450 });
 
-    std::vector<HkNodeBasePtr> ctrs4;
-    ctrs4.reserve(5'000);
-    for (int i = 0;i < 5'000;i++) // with O2 works ok 01.09.2023
-    {
-        const auto& ct = std::make_shared<HkContainer>("MyContauner");
-        ct->getStyle().setColor(i % 2 == 0 ? glm::vec3{ 0.75f, 0.75f, 0.75f } : glm::vec3{ 1.0f, 1.0f, 1.0f });
-        ct->setSize({ 20, 20 });
-        ctrs4.push_back(std::move(ct));
-    }
+    // std::vector<HkNodeBasePtr> ctrs4;
+    // ctrs4.reserve(5'000);
+    // for (int i = 0;i < 5'000;i++) // with O2 works ok 01.09.2023
+    // {
+    //     const auto& ct = std::make_shared<HkContainer>("MyContauner");
+    //     ct->getStyle().setColor(i % 2 == 0 ? glm::vec3{ 0.75f, 0.75f, 0.75f } : glm::vec3{ 1.0f, 1.0f, 1.0f });
+    //     ct->setSize({ 20, 20 });
+    //     ctrs4.push_back(std::move(ct));
+    // }
 
-    windowFrame3->getStyle().setOverflowAllowedXY(true)
-        .setDirection(HkDirection::Horizontal)
-        .setHAlignment(HkHAlignment::Left)
-        .setVAlignment(HkVAlignment::Center);
+    // windowFrame3->getStyle().setOverflowAllowedXY(true)
+    //     .setLayout(HkLayout::Horizontal)
+    //     .setHAlignment(HkHAlignment::Left)
+    //     .setVAlignment(HkVAlignment::Center);
 
-    // windowFrame3->pushChildren({ ctr5, ctr6 });
-    windowFrame3->pushChildren(ctrs4);
+    // // windowFrame3->pushChildren({ ctr5, ctr6 });
+    // windowFrame3->pushChildren(ctrs4);
 
 
     // std::vector<HkNodeBasePtr> ctrs2;
