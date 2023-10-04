@@ -122,6 +122,13 @@ HkStyleContext& HkStyleContext::setHAlignment(HkHAlignment value)
     return *this;
 }
 
+HkStyleContext& HkStyleContext::setVHAlignment(HkVAlignment valueV, HkHAlignment valueH)
+{
+    setHAlignment(valueH);
+    setVAlignment(valueV);
+    return *this;
+}
+
 HkStyleContext& HkStyleContext::setBackgroundImage(const std::string& value)
 {
     isDirty = true;
@@ -135,6 +142,13 @@ HkStyleContext& HkStyleContext::setGridConfig(HkGridConfig value)
     isDirty = true;
     // dirtyAttribs.insert(HkStyleDirtyAttribs::BG); //TODO: Adapt
     gridConfig = value;
+    return *this;
+}
+
+HkStyleContext& HkStyleContext::setGridRowCol(const uint32_t valueRow, const uint32_t valueCol)
+{
+    setGridRow(valueRow);
+    setGridCol(valueCol);
     return *this;
 }
 

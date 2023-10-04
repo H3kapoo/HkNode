@@ -1,8 +1,6 @@
+#include <cstdlib>
+
 #include "APIGate/GlfwGlewGate.hpp"
-
-/*Only for debugging*/
-// #include "utils/HkDrawDebugger.hpp"
-
 #include "management/HkAppManager.hpp"
 #include "management/HkSceneManagement.hpp"
 #include "elements/HkWindowFrame.hpp"
@@ -35,7 +33,7 @@ int main()
 
     windowFrame->getStyle().setOverflowAllowedXY(true)
         .setLayout(HkLayout::Grid)
-        .setGridConfig(HkGridConfig{ .cols{1.0f, 1.0f, 1.0f, 2.0f}, .rows{1.0f} });
+        .setGridConfig(HkGridConfig{ .cols{1.0f, 1.0f}, .rows{1.0f, 1.0f} });
     // .setHAlignment(HkHAlignment::Left)
 // .setVAlignment(HkVAlignment::Top);
 
@@ -48,24 +46,22 @@ int main()
     HkContainerPtr ctr6 = std::make_shared<HkContainer>("MyContainer6");
 
     ctr->getStyle().setColor({ 1.0f,1.0f,1.0f })
-        .setGridCol(4)
-        .setHAlignment(HkHAlignment::Right);
+        .setGridRowCol(1, 1)
+        .setVHAlignment(HkVAlignment::Center, HkHAlignment::Left);
     ctr4->getStyle().setColor({ 1.0f,0.0f,0.0f })
-        // .setGridCol(2)
-        .setGridCol(2)
-        .setHAlignment(HkHAlignment::Right);
+        .setGridRowCol(1, 2)
+        .setVHAlignment(HkVAlignment::Center, HkHAlignment::Left);
     ctr5->getStyle().setColor({ 0.0f,1.0f,0.0f })
-        // .setGridCol(3)
-        .setGridCol(3)
-        .setHAlignment(HkHAlignment::Right);
+        .setGridRowCol(2, 1)
+        .setVHAlignment(HkVAlignment::Bottom, HkHAlignment::Left);
     ctr6->getStyle().setColor({ 0.0f,0.0f,1.0f })
-        .setGridCol(1)
-        .setHAlignment(HkHAlignment::Right);
+        .setGridRowCol(2, 2)
+        .setVHAlignment(HkVAlignment::Center, HkHAlignment::Left);
 
-    ctr->setSize({ 100, 600 });
-    ctr4->setSize({ 100, 600 });
-    ctr5->setSize({ 100, 600 });
-    ctr6->setSize({ 100, 600 });
+    ctr->setSize({ 100, 100 });
+    ctr4->setSize({ 100, 100 });
+    ctr5->setSize({ 100, 100 });
+    ctr6->setSize({ 500, 100 });
     // ctr->setSize({ 200, 300 });
     // ctr4->setSize({ 100, 150 });
     // ctr5->setSize({ 100, 150 });
@@ -80,15 +76,41 @@ int main()
     //         x = !x;
     //         std::cout << "pe aici\n";
     //     });
+
+    // // Providing a seed value
+    // srand((unsigned)time(NULL));
+
     // std::vector<HkNodeBasePtr> ctrs2;
-    // ctrs2.reserve(5'000);
-    // for (int i = 0;i < 5'000;i++) // with O2 works ok 01.09.2023
+    // ctrs2.reserve(1000);
+    // for (int i = 0;i < 50; i++) // with O2 works ok 01.09.2023
     // {
-    //     const auto& ct = std::make_shared<HkContainer>("MyContauner");
-    //     ct->getStyle().setColor(i % 2 == 0 ? glm::vec3{ 0.75f, 0.75f, 0.75f } : glm::vec3{ 1.0f, 1.0f, 1.0f });
-    //     ct->setSize({ 20, 20 });
-    //     ctrs2.push_back(std::move(ct));
+    //     for (int j = 0;j < 50; j++)
+    //     {
+
+    //         double r = (rand() % 255) / 255.0f;
+    //         double g = (rand() % 255) / 255.0f;
+    //         double b = (rand() % 255) / 255.0f;
+
+    //         const auto& ct = std::make_shared<HkContainer>("MyContauner");
+    //         ct->getStyle()
+    //             .setColor((i + j) % 2 == 0 ? glm::vec3{ r,g,b } : glm::vec3{ r,g,b })
+    //             .setGridRowCol(i + 1, j + 1)
+    //             .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center);
+
+    //         ct->setSize({ 6, 6 });
+    //         ctrs2.push_back(std::move(ct));
+    //     }
     // }
+
+    // std::vector<float> rows, cols;
+    // rows.assign(50, 1.0f);
+    // cols.assign(50, 1.0f);
+    // windowFrame->getStyle()
+    //     .setGridConfig(
+    //         HkGridConfig{
+    //             .cols{cols},
+    //             .rows{rows}
+    //         });
     // HkImageViewPtr imgView = std::make_shared<HkImageView>("MyImgView");
     // HkImageViewPtr imgView2 = std::make_shared<HkImageView>("MyImgView2");
     // HkImageViewPtr imgView3 = std::make_shared<HkImageView>("MyImgView3");

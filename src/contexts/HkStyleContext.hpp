@@ -76,7 +76,9 @@ public:
     HkStyleContext& setLayout(HkLayout value);
     HkStyleContext& setVAlignment(HkVAlignment value);
     HkStyleContext& setHAlignment(HkHAlignment value);
+    HkStyleContext& setVHAlignment(HkVAlignment valueV, HkHAlignment valueH);
     HkStyleContext& setGridConfig(const HkGridConfig value);
+    HkStyleContext& setGridRowCol(const uint32_t valueRow, const uint32_t valueCol);
     HkStyleContext& setGridRow(const uint32_t value);
     HkStyleContext& setGridCol(const uint32_t value);
     HkStyleContext& setBackgroundImage(const std::string& value);

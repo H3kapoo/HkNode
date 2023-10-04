@@ -33,13 +33,13 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children,
     /* Floats are needed here because of GridConfig containing fractional parts itself.
        Without floats we losing precision in placing elements */
     float startPosX = 0, startPosY = 0;
-    float firstStartPosX = 0;
 
     const uint32_t childrenCount = children.size() - sbCount_;
     const auto gridConfig = styleContextInj_->getGridConfig();
     const float colEqualPart = 1.0f / std::accumulate(gridConfig.cols.begin(), gridConfig.cols.end(), 0.0f);
+    const float rowEqualPart = 1.0f / std::accumulate(gridConfig.rows.begin(), gridConfig.rows.end(), 0.0f);
     const uint32_t gridConfigColsSize = gridConfig.cols.size();
-    const uint32_t gridConfigRowssSize = gridConfig.rows.size();
+    const uint32_t gridConfigRowsSize = gridConfig.rows.size();
 
 
     for (uint32_t i = 0; i < childrenCount; i++)
@@ -49,41 +49,75 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children,
         auto& childSc = child.styleContext;
 
         /* Return on possibly invalid index access*/
-        if (childSc.getGridCol() > gridConfigColsSize)
+        if (childSc.getGridCol() > gridConfigColsSize || childSc.getGridCol() < 1 ||
+            childSc.getGridRow() > gridConfigRowsSize || childSc.getGridRow() < 1)
         {
             return;
         }
 
         /* Deduce, fractionally, how much we should advance to place the element*/
-        float advanceFraction = 0.0f;
-        for (uint32_t j = 0;j < childSc.getGridCol() - 1; j++)
+        float xAdvanceFraction = 0.0f;
+        for (uint32_t j = 0; j < childSc.getGridCol() - 1; j++)
         {
-            advanceFraction += (gridConfig.cols[j] * colEqualPart);
+            xAdvanceFraction += (gridConfig.cols[j] * colEqualPart);
         }
 
+        float yAdvanceFraction = 0.0f;
+        for (uint32_t j = 0; j < childSc.getGridRow() - 1; j++)
+        {
+            yAdvanceFraction += (gridConfig.rows[j] * rowEqualPart);
+        }
+
+
+        /* By default, elements will be left aligned. When Center/Right alignment is chosen, we need to
+           advance fractionally a little bit more to the right in order to put elements at the right place.
+           This additional advance is half for Center and full for Right*/
         switch (childSc.getHAlignment())
         {
         case HkHAlignment::Left:
         {
-            const float posX = advanceFraction * (float)thisTc_->getScale().x;
-            childTc.setPos({ posX - childTc.getScale().x * 0.5f, startPosY });
+            startPosX = xAdvanceFraction * (float)thisTc_->getScale().x;
         }
         break;
         case HkHAlignment::Center:
         {
-            const float advanceToCenter = (gridConfig.cols[childSc.getGridCol() - 1] * colEqualPart) * 0.5f;
-            const float posX = (advanceFraction + advanceToCenter) * (float)thisTc_->getScale().x;
-            childTc.setPos({ posX - childTc.getScale().x * 0.5f, startPosY });
+            const float xAdvanceToCenter = (gridConfig.cols[childSc.getGridCol() - 1] * colEqualPart) * 0.5f;
+            startPosX = (xAdvanceFraction + xAdvanceToCenter) * (float)thisTc_->getScale().x - childTc.getScale().x * 0.5f;
         }
         break;
         case HkHAlignment::Right:
         {
-            const float advanceToRight = (gridConfig.cols[childSc.getGridCol() - 1] * colEqualPart);
-            const float posX = (advanceFraction + advanceToRight) * (float)thisTc_->getScale().x;
-            childTc.setPos({ posX - childTc.getScale().x, startPosY });
+            const float xAdvanceToRight = (gridConfig.cols[childSc.getGridCol() - 1] * colEqualPart);
+            startPosX = (xAdvanceFraction + xAdvanceToRight) * (float)thisTc_->getScale().x - childTc.getScale().x;
         }
         break;
         }
+
+        /* By default, elements will be top aligned. When Center/Bottom alignment is chosen, we need to
+           advance fractionally a little bit more to the bottom in order to put elements at the right place.
+           This additional advance is half for Center and full for Bottom*/
+        switch (childSc.getVAlignment())
+        {
+        case HkVAlignment::Top:
+        {
+            startPosY = yAdvanceFraction * (float)thisTc_->getScale().y;
+        }
+        break;
+        case HkVAlignment::Center:
+        {
+            const float yAdvanceToCenter = (gridConfig.rows[childSc.getGridRow() - 1] * rowEqualPart) * 0.5f;
+            startPosY = (yAdvanceFraction + yAdvanceToCenter) * (float)thisTc_->getScale().y - childTc.getScale().y * 0.5f;
+        }
+        break;
+        case HkVAlignment::Bottom:
+        {
+            const float yAdvanceToRight = (gridConfig.rows[childSc.getGridRow() - 1] * rowEqualPart);
+            startPosY = (yAdvanceFraction + yAdvanceToRight) * (float)thisTc_->getScale().y - childTc.getScale().y;
+        }
+        break;
+        }
+
+        childTc.setPos({ startPosX, startPosY });
     }
 }
 
