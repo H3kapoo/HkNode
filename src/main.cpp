@@ -28,7 +28,7 @@ int main()
     sceneWindow1->makeContextCurrent();
 
     HkWindowFramePtr windowFrame = std::make_shared<HkWindowFrame>("MyWindowFrame");
-    windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
+    windowFrame->setWindowMode(HkWindowFrameMode::Grabbable);
     sceneWindow1->addSubWindow(windowFrame); //NOTE: Needs to be added before adding any children
 
     windowFrame->getStyle().setOverflowAllowedXY(true)
@@ -47,21 +47,21 @@ int main()
 
     ctr->getStyle().setColor({ 1.0f,1.0f,1.0f })
         .setGridRowCol(1, 1)
-        .setVHAlignment(HkVAlignment::Center, HkHAlignment::Left);
+        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left);
     ctr4->getStyle().setColor({ 1.0f,0.0f,0.0f })
         .setGridRowCol(1, 2)
-        .setVHAlignment(HkVAlignment::Center, HkHAlignment::Left);
+        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left);
     ctr5->getStyle().setColor({ 0.0f,1.0f,0.0f })
         .setGridRowCol(2, 1)
-        .setVHAlignment(HkVAlignment::Bottom, HkHAlignment::Left);
+        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left);
     ctr6->getStyle().setColor({ 0.0f,0.0f,1.0f })
         .setGridRowCol(2, 2)
-        .setVHAlignment(HkVAlignment::Center, HkHAlignment::Left);
+        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left);
 
     ctr->setSize({ 100, 100 });
     ctr4->setSize({ 100, 100 });
-    ctr5->setSize({ 100, 100 });
-    ctr6->setSize({ 500, 100 });
+    ctr5->setSize({ 100, 600 });
+    ctr6->setSize({ 1000, 100 });
     // ctr->setSize({ 200, 300 });
     // ctr4->setSize({ 100, 150 });
     // ctr5->setSize({ 100, 150 });

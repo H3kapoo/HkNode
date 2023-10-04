@@ -49,14 +49,14 @@ void HkNodeBase::renderMySelf()
 
     /* Use this to render additional non interactive things if needed */
     /* Note: rescissoring to original parent is needed unfortunatelly */
-    // glEnable(GL_SCISSOR_TEST);
-    // glScissor(
-    //     tc.getVPos().x - 1,
-    //     windowDataPtr_->windowHeight - tc.getVPos().y - tc.getVScale().y + 1,
-    //     tc.getVScale().x,
-    //     tc.getVScale().y);
+    glEnable(GL_SCISSOR_TEST);
+    glScissor(
+        tc.getVPos().x - 1,
+        windowDataPtr_->windowSize.y - tc.getVPos().y - tc.getVScale().y + 1,
+        tc.getVScale().x,
+        tc.getVScale().y);
 
-    // postRenderAdditionalDetails();
+    postRenderAdditionalDetails();
 
     /* Disable scissors after rendering UI */
     glDisable(GL_SCISSOR_TEST);

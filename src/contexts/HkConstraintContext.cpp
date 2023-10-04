@@ -24,7 +24,7 @@ void HkConstraintContext::resolveConstraints(HkTreeStruct& children,
     else if (styleContextInj_->getLayout() == HkLayout::Grid)
         resolveGridContainer(children, sbSizes);
 
-    // resolveAxisOverflow(children, sbSizes);
+    resolveAxisOverflow(children, sbSizes);
 }
 
 void HkConstraintContext::resolveGridContainer(HkTreeStruct& children,
@@ -117,7 +117,7 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children,
         break;
         }
 
-        childTc.setPos({ startPosX, startPosY });
+        childTc.setPos({ startPosX + thisTc_->getPos().x, startPosY + thisTc_->getPos().y });
     }
 }
 

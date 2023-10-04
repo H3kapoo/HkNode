@@ -125,31 +125,30 @@ void HkContainer::postRenderAdditionalDetails()
        container should know when both SBs are active and what to do with them. Also clicking on the dummy object basically means clicking
        on the container itself and since coordinates for this location are already known, maybe we can do some particular stuff with that info */
        // if (scrollbBarsCount_ == 2)
-    {
-        // if (treeStruct_.getId() == 4) return;
-        // dummyXYIntersectorData_.transformContext.setScale({
-        //     hScrollBar_.node_.transformContext.getScale().y,
-        //     hScrollBar_.node_.transformContext.getScale().y });
+    if (treeStruct_.getId() == 4) return;
+    dummyXYIntersectorData_.renderContext.windowProjMatrix = windowDataPtr_->sceneProjMatrix;
+    dummyXYIntersectorData_.transformContext.setScale({ 20,20 });
 
-        // // dummyXYIntersectorData_.transformContext.setPos({
-        // //     hScrollBar_.node_.transformContext.getPos().x + hScrollBar_.node_.transformContext.getScale().x,
-        // //     hScrollBar_.node_.transformContext.getPos().y });
+    // dummyXYIntersectorData_.transformContext.setPos({
+    //     hScrollBar_.node_.transformContext.getPos().x + hScrollBar_.node_.transformContext.getScale().x,
+    //     hScrollBar_.node_.transformContext.getPos().y });
 
-        // dummyXYIntersectorData_.transformContext.setPos({
-        //     node_.transformContext.getPos().x + node_.transformContext.getScale().x - 4,
-        //     node_.transformContext.getPos().y + node_.transformContext.getScale().y - 4 });
+    dummyXYIntersectorData_.transformContext.setPos({
+        node_.transformContext.getPos().x + node_.transformContext.getScale().x - 20,
+        node_.transformContext.getPos().y + node_.transformContext.getScale().y - 20 });
 
-        // dummyXYIntersectorData_.renderContext.render(sceneDataRef_.sceneProjMatrix,
-        //     dummyXYIntersectorData_.transformContext.getModelMatrix());
+    windowDataPtr_->renderer.render(dummyXYIntersectorData_.renderContext,
+        dummyXYIntersectorData_.styleContext,
+        dummyXYIntersectorData_.transformContext.getModelMatrix());
 
-        // dummyXYIntersectorData_.transformContext.setPos({
-        //     node_.transformContext.getPos().x,
-        //     node_.transformContext.getPos().y });
+    dummyXYIntersectorData_.transformContext.setPos({
+        node_.transformContext.getPos().x,
+        node_.transformContext.getPos().y });
 
-        // dummyXYIntersectorData_.renderContext.render(sceneDataRef_.sceneProjMatrix,
-        //     dummyXYIntersectorData_.transformContext.getModelMatrix());
+    windowDataPtr_->renderer.render(dummyXYIntersectorData_.renderContext,
+        dummyXYIntersectorData_.styleContext,
+        dummyXYIntersectorData_.transformContext.getModelMatrix());
 
-    }
 }
 
 /* This determines if the container will have a scrollbar showing or not */
