@@ -35,7 +35,7 @@ int main()
 
     windowFrame->getStyle().setOverflowAllowedXY(true)
         .setLayout(HkLayout::Grid)
-        .setGridConfig(HkGridConfig{ .cols{2.0f, 2.0f, 1.0f}, .rows{1.0f} });
+        .setGridConfig(HkGridConfig{ .cols{1.0f, 1.0f, 1.0f, 2.0f}, .rows{1.0f} });
     // .setHAlignment(HkHAlignment::Left)
 // .setVAlignment(HkVAlignment::Top);
 
@@ -48,19 +48,19 @@ int main()
     HkContainerPtr ctr6 = std::make_shared<HkContainer>("MyContainer6");
 
     ctr->getStyle().setColor({ 1.0f,1.0f,1.0f })
-        .setGridCol(1)
-        .setHAlignment(HkHAlignment::Left);
+        .setGridCol(4)
+        .setHAlignment(HkHAlignment::Right);
     ctr4->getStyle().setColor({ 1.0f,0.0f,0.0f })
-        .setGridCol(2)
-        // .setGridCol(3)
-        .setHAlignment(HkHAlignment::Left);
-    ctr5->getStyle().setColor({ 0.0f,1.0f,0.0f })
-        .setGridCol(3)
         // .setGridCol(2)
-        .setHAlignment(HkHAlignment::Left);
-    // ctr6->getStyle().setColor({ 0.0f,0.0f,1.0f })
-    //     .setGridCol(1)
-    //     .setHAlignment(HkHAlignment::Left);
+        .setGridCol(2)
+        .setHAlignment(HkHAlignment::Right);
+    ctr5->getStyle().setColor({ 0.0f,1.0f,0.0f })
+        // .setGridCol(3)
+        .setGridCol(3)
+        .setHAlignment(HkHAlignment::Right);
+    ctr6->getStyle().setColor({ 0.0f,0.0f,1.0f })
+        .setGridCol(1)
+        .setHAlignment(HkHAlignment::Right);
 
     ctr->setSize({ 100, 600 });
     ctr4->setSize({ 100, 600 });
@@ -101,7 +101,7 @@ int main()
     // windowFrame->getStyle().setOverflowAllowedXY(false);
 
     // windowFrame->pushChildren({ imgView, imgView2, imgView3, imgView4 });
-    windowFrame->pushChildren({ ctr, ctr4, ctr5 });
+    windowFrame->pushChildren({ ctr, ctr4, ctr5, ctr6 });
     // windowFrame->pushChildren(ctrs2);
     // sceneWindow1->makeContextNotCurrent();
 

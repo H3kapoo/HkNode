@@ -48,40 +48,14 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children,
         auto& childTc = child.transformContext;
         auto& childSc = child.styleContext;
 
-        float advanceFraction = 0.0f;
-        float nextAdvanceFraction = 0.0f;
-
         /* Return on possibly invalid index access*/
         if (childSc.getGridCol() > gridConfigColsSize)
         {
-            std::cerr << "Invalid grid col: " << childSc.getGridCol() << " > " << gridConfigColsSize << '\n';
             return;
         }
 
-        if (i < childrenCount - 1)
-        {
-            auto& nextChild = children[i + 1]->getPayload()->node_;
-            auto& nextChildTc = nextChild.transformContext;
-            auto& nextChildSc = nextChild.styleContext;
-
-            /* Return on possibly invalid index access*/
-            if (nextChildSc.getGridCol() > gridConfigColsSize)
-            {
-                std::cerr << "Invalid grid col: " << nextChildSc.getGridCol() << " > " << gridConfigColsSize << '\n';
-                return;
-            }
-
-            for (uint32_t j = 0;j < nextChildSc.getGridCol() - 1; j++)
-            {
-                nextAdvanceFraction += (gridConfig.cols[j] * colEqualPart);
-            }
-        }
-        else
-        {
-            nextAdvanceFraction = 1.0f;
-        }
-
         /* Deduce, fractionally, how much we should advance to place the element*/
+        float advanceFraction = 0.0f;
         for (uint32_t j = 0;j < childSc.getGridCol() - 1; j++)
         {
             advanceFraction += (gridConfig.cols[j] * colEqualPart);
@@ -90,17 +64,25 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children,
         switch (childSc.getHAlignment())
         {
         case HkHAlignment::Left:
-            // startPosX = (advanceFraction) * (float)thisTc_->getScale().x;
-            // childTc.setPos({ startPosX , startPosY });
-            // break;
+        {
+            const float posX = advanceFraction * (float)thisTc_->getScale().x;
+            childTc.setPos({ posX - childTc.getScale().x * 0.5f, startPosY });
+        }
+        break;
         case HkHAlignment::Center:
-            startPosX = ((advanceFraction + nextAdvanceFraction) / 2.0f) * (float)thisTc_->getScale().x;
-            childTc.setPos({ startPosX - childTc.getScale().x / 2 , startPosY });
-            break;
+        {
+            const float advanceToCenter = (gridConfig.cols[childSc.getGridCol() - 1] * colEqualPart) * 0.5f;
+            const float posX = (advanceFraction + advanceToCenter) * (float)thisTc_->getScale().x;
+            childTc.setPos({ posX - childTc.getScale().x * 0.5f, startPosY });
+        }
+        break;
         case HkHAlignment::Right:
-            // startPosX = (nextAdvanceFraction) * (float)thisTc_->getScale().x;
-            // childTc.setPos({ startPosX - childTc.getScale().x , startPosY });
-            break;
+        {
+            const float advanceToRight = (gridConfig.cols[childSc.getGridCol() - 1] * colEqualPart);
+            const float posX = (advanceFraction + advanceToRight) * (float)thisTc_->getScale().x;
+            childTc.setPos({ posX - childTc.getScale().x, startPosY });
+        }
+        break;
         }
     }
 }
