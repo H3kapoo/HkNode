@@ -33,6 +33,7 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children,
     /* Floats are needed here because of GridConfig containing fractional parts itself.
        Without floats we losing precision in placing elements */
     float startPosX = 0, startPosY = 0;
+    float xSize = 0, ySize = 0;
 
     const uint32_t childrenCount = children.size() - sbCount_;
     const auto gridConfig = styleContextInj_->getGridConfig();
@@ -42,6 +43,7 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children,
     const uint32_t gridConfigRowsSize = gridConfig.rows.size();
 
 
+    // std::cout << "-----\n";
     for (uint32_t i = 0; i < childrenCount; i++)
     {
         auto& child = children[i]->getPayload()->node_;
@@ -125,7 +127,42 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children,
         break;
         }
 
-        childTc.setPos({ startPosX + thisTc_->getPos().x,startPosY + thisTc_->getPos().y });
+        childTc.setPos({ startPosX + (float)thisTc_->getPos().x ,startPosY + (float)thisTc_->getPos().y });
+
+        /* Scale elements according to their config*/
+        const auto hSizeConfig = childSc.getHSizeConfig();
+        const auto vSizeConfig = childSc.getHSizeConfig();
+        switch (hSizeConfig.type)
+        {
+        case HkSizeType::Absolute:
+            xSize = hSizeConfig.value;
+            break;
+        case HkSizeType::Percentage:
+            xSize = hSizeConfig.value * (float)thisTc_->getScale().x;
+            break;
+        case HkSizeType::FitParent:
+            /* Fall through, unsupported mode by grid*/
+        case HkSizeType::FitCell:
+            xSize = (gridConfig.cols[childSc.getGridCol() - 1] * colEqualPart) * (float)thisTc_->getScale().x;
+            break;
+        }
+
+        switch (vSizeConfig.type)
+        {
+        case HkSizeType::Absolute:
+            ySize = hSizeConfig.value;
+            break;
+        case HkSizeType::Percentage:
+            ySize = hSizeConfig.value * (float)thisTc_->getScale().y;
+            break;
+        case HkSizeType::FitParent:
+            /* Fall through, unsupported mode by grid*/
+        case HkSizeType::FitCell:
+            ySize = (gridConfig.rows[childSc.getGridRow() - 1] * rowEqualPart) * (float)thisTc_->getScale().y;
+            break;
+        }
+
+        childTc.setScale({ ceil(xSize), ceil(ySize) });
     }
 }
 
@@ -568,7 +605,8 @@ void HkConstraintContext::windowFrameContainerConstraint(HkTransformContext& wfC
     /* Necessary so we still "render" the frame in renderMySelf scissor pass */
     thisTc_->setScale({ -1,-1 });
 
-    wfCtr.setScale(windowSize + 1); //TODO: hacK: looks like wfCtr gets a windowSize thats lacking exactly 1px behind (looks like GPU dependent)
+    // wfCtr.setScale(windowSize + 1); //TODO: hacK: looks like wfCtr gets a windowSize thats lacking exactly 1px behind (looks like GPU dependent)
+    wfCtr.setScale(windowSize); //TODO: hacK: looks like wfCtr gets a windowSize thats lacking exactly 1px behind (looks like GPU dependent)
     wfCtr.setPos({ 0,0 });
 }
 

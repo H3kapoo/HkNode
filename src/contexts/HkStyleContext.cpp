@@ -129,14 +129,6 @@ HkStyleContext& HkStyleContext::setVHAlignment(HkVAlignment valueV, HkHAlignment
     return *this;
 }
 
-HkStyleContext& HkStyleContext::setBackgroundImage(const std::string& value)
-{
-    isDirty = true;
-    dirtyAttribs.insert(HkStyleDirtyAttribs::BG);
-    bgImagePath_ = value;
-    return *this;
-}
-
 HkStyleContext& HkStyleContext::setGridConfig(HkGridConfig value)
 {
     isDirty = true;
@@ -165,6 +157,37 @@ HkStyleContext& HkStyleContext::setGridCol(const uint32_t value)
     isDirty = true;
     // dirtyAttribs.insert(HkStyleDirtyAttribs::BG); //TODO: Adapt
     gridCol = value;
+    return *this;
+}
+
+HkStyleContext& HkStyleContext::setBackgroundImage(const std::string& value)
+{
+    isDirty = true;
+    dirtyAttribs.insert(HkStyleDirtyAttribs::BG);
+    bgImagePath_ = value;
+    return *this;
+}
+
+HkStyleContext& HkStyleContext::setVSizeConfig(const HkSizeConfig& value)
+{
+    isDirty = true;
+    // dirtyAttribs.insert(HkStyleDirtyAttribs::BG);
+    vSizeConfig = value;
+    return *this;
+}
+
+HkStyleContext& HkStyleContext::setHSizeConfig(const HkSizeConfig& value)
+{
+    isDirty = true;
+    // dirtyAttribs.insert(HkStyleDirtyAttribs::BG);
+    hSizeConfig = value;
+    return *this;
+}
+
+HkStyleContext& HkStyleContext::setVHSizeConfig(const HkSizeConfig& valueV, const HkSizeConfig& valueH)
+{
+    setVSizeConfig(valueV);
+    setVSizeConfig(valueH);
     return *this;
 }
 } // hkui

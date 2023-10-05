@@ -3,8 +3,8 @@
 layout (location = 0) in vec3 aPos;
 
 uniform vec3 color;
-uniform mat4 model;
-uniform mat4 proj;
+uniform highp mat4 model;
+uniform highp mat4 proj;
 
 out vec3 colorOut;
 void main()

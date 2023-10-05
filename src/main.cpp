@@ -31,7 +31,7 @@ int main()
     windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
     sceneWindow1->addSubWindow(windowFrame); //NOTE: Needs to be added before adding any children
 
-    windowFrame->getStyle().setOverflowAllowedXY(true)
+    windowFrame->getStyle().setOverflowAllowedXY(false)
         .setLayout(HkLayout::Grid)
         .setGridConfig(HkGridConfig{ .cols{1.0f, 1.0f}, .rows{1.0f, 1.0f} });
     // .setHAlignment(HkHAlignment::Left)
@@ -48,9 +48,9 @@ int main()
     ctr->getStyle().setColor({ 1.0f,1.0f,1.0f })
         .setGridRowCol(1, 1)
         .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center)
-        .setAllMargins(20)
-        .setLeftMargin(20);
-    // .setRightMargin(20);
+        .setAllMargins(0);
+    // .setLeftMargin(0);
+// .setRightMargin(20);
     ctr4->getStyle().setColor({ 1.0f,0.0f,0.0f })
         .setGridRowCol(1, 2)
         .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center);
@@ -65,31 +65,22 @@ int main()
     ctr4->setSize({ 100, 100 });
     ctr5->setSize({ 100, 100 });
     ctr6->setSize({ 100, 100 });
-    // ctr->getStyle().setHSize(
-    //     HkSizeConfig{
-    //         .type = HkSizeType::Percentage
-    //         .value = 50,
-    //         .min = 10,
-    //         .max = 100
-    //     });
+    ctr->getStyle().setHSizeConfig(
+        HkSizeConfig{
+            .type = HkSizeType::Percentage,
+            .value = 0.25f,
+            .min = 10,
+            .max = 100
+        });
 
-    // ctr->getStyle().setHSize(
-    //     HkSizeConfig{
-    //         .type = HkSizeType::Absolute
-    //         .value = 500
-    //     });
+    ctr4->getStyle().setHSizeConfig({ .value = 100, });
+    ctr4->getStyle().setHSizeConfig({
+        .type = HkSizeType::FitCell,
+        // .value = 100,
+        // .min = 10,
+        // .max = 100
+        });
 
-    // ctr->getStyle().setHSize(
-    //     HkSizeConfig{
-    //         .type = HkSizeType::FitParent
-    //         .min = 10,
-    //         .max = 100
-    //     });
-
-    // ctr->getStyle().setHSize(
-    //     HkSizeConfig{
-    //         .type = HkSizeType::FitCell // grid layout only
-    //     });
     // ctr->setSize({ 200, 300 });
     // ctr4->setSize({ 100, 150 });
     // ctr5->setSize({ 100, 150 });
@@ -108,11 +99,12 @@ int main()
     // // Providing a seed value
     // srand((unsigned)time(NULL));
 
+    // int scale = 10;
     // std::vector<HkNodeBasePtr> ctrs2;
-    // ctrs2.reserve(1000);
-    // for (int i = 0;i < 50; i++) // with O2 works ok 01.09.2023
+    // ctrs2.reserve(scale * scale);
+    // for (int i = 0;i < scale; i++) // with O2 works ok 01.09.2023
     // {
-    //     for (int j = 0;j < 50; j++)
+    //     for (int j = 0;j < scale; j++)
     //     {
 
     //         double r = (rand() % 255) / 255.0f;
@@ -131,8 +123,8 @@ int main()
     // }
 
     // std::vector<float> rows, cols;
-    // rows.assign(50, 1.0f);
-    // cols.assign(50, 1.0f);
+    // rows.assign(scale, 1.0f);
+    // cols.assign(scale, 1.0f);
     // windowFrame->getStyle()
     //     .setGridConfig(
     //         HkGridConfig{

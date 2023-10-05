@@ -48,6 +48,22 @@ struct HkGridConfig
     std::vector<float> rows{ 1.0f };
 };
 
+enum class HkSizeType
+{
+    Absolute,
+    FitParent,
+    FitCell,
+    Percentage
+};
+
+struct HkSizeConfig
+{
+    HkSizeType type{ HkSizeType::Absolute };
+    float value{ 100 };
+    float min{ 1 };
+    float max{ 1000 };
+};
+
 class HkStyleContext
 {
     /* Necessary in order for base to know if to issue a dirty call to the concrete element*/
@@ -81,6 +97,9 @@ public:
     HkStyleContext& setGridRowCol(const uint32_t valueRow, const uint32_t valueCol);
     HkStyleContext& setGridRow(const uint32_t value);
     HkStyleContext& setGridCol(const uint32_t value);
+    HkStyleContext& setVSizeConfig(const HkSizeConfig& value);
+    HkStyleContext& setHSizeConfig(const HkSizeConfig& value);
+    HkStyleContext& setVHSizeConfig(const HkSizeConfig& valueV, const HkSizeConfig& valueH);
     HkStyleContext& setBackgroundImage(const std::string& value);
 
 
@@ -100,6 +119,8 @@ public:
     inline const HkGridConfig& getGridConfig() const { return gridConfig; };
     inline uint32_t getGridRow() const { return gridRow; };
     inline uint32_t getGridCol() const { return gridCol; };
+    inline HkSizeConfig getVSizeConfig() const { return vSizeConfig; };
+    inline HkSizeConfig getHSizeConfig() const { return hSizeConfig; };
     inline std::string getBackgroundImage() const { return bgImagePath_; };
 
 private:
@@ -119,6 +140,7 @@ private:
     HkHAlignment horizontalAlignment_{ HkHAlignment::Left }; //TODO: Bottom + RIght => permanent scrollbars??
     uint32_t gridRow{ 1 }, gridCol{ 1 };
     HkGridConfig gridConfig;
+    HkSizeConfig vSizeConfig, hSizeConfig;
     std::string bgImagePath_;
 };
 } // hkui
