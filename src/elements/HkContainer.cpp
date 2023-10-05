@@ -224,9 +224,4 @@ void HkContainer::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)
         }
     }
 }
-
-void HkContainer::setSize(const glm::vec2& size)
-{
-    node_.transformContext.setScale(size);
-}
 } // hkui

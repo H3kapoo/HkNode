@@ -131,7 +131,7 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children,
 
         /* Scale elements according to their config*/
         const auto hSizeConfig = childSc.getHSizeConfig();
-        const auto vSizeConfig = childSc.getHSizeConfig();
+        const auto vSizeConfig = childSc.getVSizeConfig();
         switch (hSizeConfig.type)
         {
         case HkSizeType::Absolute:
@@ -150,10 +150,10 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children,
         switch (vSizeConfig.type)
         {
         case HkSizeType::Absolute:
-            ySize = hSizeConfig.value;
+            ySize = vSizeConfig.value;
             break;
         case HkSizeType::Percentage:
-            ySize = hSizeConfig.value * (float)thisTc_->getScale().y;
+            ySize = vSizeConfig.value * (float)thisTc_->getScale().y;
             break;
         case HkSizeType::FitParent:
             /* Fall through, unsupported mode by grid*/

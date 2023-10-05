@@ -14,11 +14,6 @@ public:
     HkContainer(const std::string& containerName);
     void pushChildren(const std::vector<HkNodeBasePtr>& newChildren);
 
-    /* Setters */
-    void setOnClickListener(std::function<void()> callback);
-
-    void setSize(const glm::vec2& size);
-
 private:
     void onFirstHeartbeat() override;
     void onScroll() override;

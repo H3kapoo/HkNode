@@ -187,7 +187,7 @@ HkStyleContext& HkStyleContext::setHSizeConfig(const HkSizeConfig& value)
 HkStyleContext& HkStyleContext::setVHSizeConfig(const HkSizeConfig& valueV, const HkSizeConfig& valueH)
 {
     setVSizeConfig(valueV);
-    setVSizeConfig(valueH);
+    setHSizeConfig(valueH);
     return *this;
 }
 } // hkui

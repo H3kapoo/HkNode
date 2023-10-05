@@ -47,39 +47,38 @@ int main()
 
     ctr->getStyle().setColor({ 1.0f,1.0f,1.0f })
         .setGridRowCol(1, 1)
-        .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center)
-        .setAllMargins(0);
-    // .setLeftMargin(0);
-// .setRightMargin(20);
+        .setVHAlignment(HkVAlignment::Center, HkHAlignment::Right)
+        .setVHSizeConfig({ .value = 100 }, { .value = 100 })
+        .setMargins(20, 0, 0, 0);
     ctr4->getStyle().setColor({ 1.0f,0.0f,0.0f })
         .setGridRowCol(1, 2)
-        .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center);
+        .setVHSizeConfig({ .value = 100 }, { .value = 200 })
+        .setMargins(20, 0, 0, 0)
+        .setVHAlignment(HkVAlignment::Center, HkHAlignment::Left);
     ctr5->getStyle().setColor({ 0.0f,1.0f,0.0f })
         .setGridRowCol(2, 1)
+        .setVHSizeConfig({ .value = 200 }, { .value = 150 })
         .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center);
     ctr6->getStyle().setColor({ 0.0f,0.0f,1.0f })
         .setGridRowCol(2, 2)
+        .setVHSizeConfig({ .value = 100 }, { .value = 100 })
         .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center);
 
-    ctr->setSize({ 100, 100 });
-    ctr4->setSize({ 100, 100 });
-    ctr5->setSize({ 100, 100 });
-    ctr6->setSize({ 100, 100 });
-    ctr->getStyle().setHSizeConfig(
-        HkSizeConfig{
-            .type = HkSizeType::Percentage,
-            .value = 0.25f,
-            .min = 10,
-            .max = 100
-        });
+    // ctr->getStyle().setHSizeConfig(
+    //     HkSizeConfig{
+    //         .type = HkSizeType::Percentage,
+    //         .value = 0.25f,
+    //         .min = 10,
+    //         .max = 100
+    //     });
 
-    ctr4->getStyle().setHSizeConfig({ .value = 100, });
-    ctr4->getStyle().setHSizeConfig({
-        .type = HkSizeType::FitCell,
-        // .value = 100,
-        // .min = 10,
-        // .max = 100
-        });
+    // ctr4->getStyle().setHSizeConfig({ .value = 100, });
+    // ctr4->getStyle().setHSizeConfig({
+    //     .type = HkSizeType::FitCell,
+    //     // .value = 100,
+    //     // .min = 10,
+    //     // .max = 100
+    //     });
 
     // ctr->setSize({ 200, 300 });
     // ctr4->setSize({ 100, 150 });
@@ -168,8 +167,8 @@ int main()
     ctr2->getStyle().setColor({ 1.0f,0.4f,0.5f });
     ctr3->getStyle().setColor({ 0.4f,0.5f,0.6f });
 
-    ctr2->setSize({ 300, 350 });
-    ctr3->setSize({ 400, 450 });
+    // ctr2->setSize({ 300, 350 });
+    // ctr3->setSize({ 400, 450 });
 
     std::vector<HkNodeBasePtr> ctrs3;
     ctrs3.reserve(5'000);
@@ -177,7 +176,7 @@ int main()
     {
         const auto& ct = std::make_shared<HkContainer>("MyContauner");
         ct->getStyle().setColor(i % 2 == 0 ? glm::vec3{ 0.75f, 0.75f, 0.75f } : glm::vec3{ 1.0f, 1.0f, 1.0f });
-        ct->setSize({ 20, 20 });
+        // ct->setSize({ 20, 20 });
         ctrs3.push_back(std::move(ct));
     }
 
