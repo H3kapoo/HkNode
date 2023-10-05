@@ -51,6 +51,7 @@ struct HkGridConfig
 enum class HkSizeType
 {
     Absolute,
+    Balanced,
     FitParent,
     FitCell,
     Percentage

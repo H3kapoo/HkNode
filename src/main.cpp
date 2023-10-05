@@ -31,10 +31,11 @@ int main()
     windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
     sceneWindow1->addSubWindow(windowFrame); //NOTE: Needs to be added before adding any children
 
-    windowFrame->getStyle().setOverflowAllowedXY(false)
-        .setLayout(HkLayout::Grid)
-        .setGridConfig(HkGridConfig{ .cols{1.0f, 1.0f}, .rows{1.0f, 1.0f} });
-    // .setHAlignment(HkHAlignment::Left)
+    windowFrame->getStyle().setOverflowAllowedXY(true)
+        .setLayout(HkLayout::Horizontal)
+        .setRowWrapping(true);
+    // .setGridConfig(HkGridConfig{ .cols{1.0f, 1.0f}, .rows{1.0f, 1.0f} });
+// .setHAlignment(HkHAlignment::Left)
 // .setVAlignment(HkVAlignment::Top);
 
     windowFrame->setPos({ 1280 * 0.25, 720 * 0.25 });
@@ -46,45 +47,43 @@ int main()
     HkContainerPtr ctr6 = std::make_shared<HkContainer>("MyContainer6");
 
     ctr->getStyle().setColor({ 1.0f,1.0f,1.0f })
-        .setGridRowCol(1, 1)
-        .setVHAlignment(HkVAlignment::Center, HkHAlignment::Right)
-        .setVHSizeConfig({ .value = 100 }, { .value = 100 })
-        .setMargins(20, 0, 0, 0);
+        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+        .setVHSizeConfig({ .type = HkSizeType::Balanced , .value = 0.25f }, { .type = HkSizeType::Balanced , .value = 0.20f })
+        // .setVHSizeConfig({ .value = 100 }, { .value = 100 })
+        .setMargins(0, 0, 0, 0);
     ctr4->getStyle().setColor({ 1.0f,0.0f,0.0f })
-        .setGridRowCol(1, 2)
-        .setVHSizeConfig({ .value = 100 }, { .value = 200 })
-        .setMargins(20, 0, 0, 0)
-        .setVHAlignment(HkVAlignment::Center, HkHAlignment::Left);
+        .setVHSizeConfig({ .type = HkSizeType::Balanced , .value = 0.25f }, { .type = HkSizeType::Balanced , .value = 0.20f })
+        // .setVHSizeConfig({ .value = 100 }, { .value = 100 })
+        .setMargins(0, 0, 0, 0)
+        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left);
     ctr5->getStyle().setColor({ 0.0f,1.0f,0.0f })
-        .setGridRowCol(2, 1)
-        .setVHSizeConfig({ .value = 200 }, { .value = 150 })
-        .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center);
+        .setVHSizeConfig({ .type = HkSizeType::Percentage , .value = 0.75f }, { .type = HkSizeType::Percentage , .value = 0.5f })
+        // .setVHSizeConfig({ .value = 100 }, { .value = 100 })
+        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left);
     ctr6->getStyle().setColor({ 0.0f,0.0f,1.0f })
-        .setGridRowCol(2, 2)
-        .setVHSizeConfig({ .value = 100 }, { .value = 100 })
-        .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center);
+        .setVHSizeConfig({ .type = HkSizeType::Percentage , .value = 0.75f }, { .type = HkSizeType::Percentage , .value = 0.5f })
+        // .setVHSizeConfig({ .value = 100 }, { .value = 100 })
+        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left);
 
-    // ctr->getStyle().setHSizeConfig(
-    //     HkSizeConfig{
-    //         .type = HkSizeType::Percentage,
-    //         .value = 0.25f,
-    //         .min = 10,
-    //         .max = 100
-    //     });
+    // ctr->getStyle().setColor({ 1.0f,1.0f,1.0f })
+    //     .setGridRowCol(1, 1)
+    //     .setVHAlignment(HkVAlignment::Center, HkHAlignment::Right)
+    //     .setVHSizeConfig({ .value = 100 }, { .value = 100 })
+    //     .setMargins(20, 0, 0, 0);
+    // ctr4->getStyle().setColor({ 1.0f,0.0f,0.0f })
+    //     .setGridRowCol(1, 2)
+    //     .setVHSizeConfig({ .value = 100 }, { .value = 200 })
+    //     .setMargins(20, 0, 0, 0)
+    //     .setVHAlignment(HkVAlignment::Center, HkHAlignment::Left);
+    // ctr5->getStyle().setColor({ 0.0f,1.0f,0.0f })
+    //     .setGridRowCol(2, 1)
+    //     .setVHSizeConfig({ .value = 200 }, { .value = 150 })
+    //     .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center);
+    // ctr6->getStyle().setColor({ 0.0f,0.0f,1.0f })
+    //     .setGridRowCol(2, 2)
+    //     .setVHSizeConfig({ .value = 100 }, { .value = 100 })
+    //     .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center);
 
-    // ctr4->getStyle().setHSizeConfig({ .value = 100, });
-    // ctr4->getStyle().setHSizeConfig({
-    //     .type = HkSizeType::FitCell,
-    //     // .value = 100,
-    //     // .min = 10,
-    //     // .max = 100
-    //     });
-
-    // ctr->setSize({ 200, 300 });
-    // ctr4->setSize({ 100, 150 });
-    // ctr5->setSize({ 100, 150 });
-    // ctr6->setSize({ 100, 150 });
-    // windowFrame->getStyle().setBackgroundImage("/home/hekapoo/container.jpg");
 
     // bool x = false;
     // windowFrame->getEvents().setOnClickListener(

@@ -17,12 +17,20 @@ void HkConstraintContext::resolveConstraints(HkTreeStruct& children,
         return;
     computeScrollBarCount();
 
-    if (styleContextInj_->getLayout() == HkLayout::Horizontal)
+    const auto layout = styleContextInj_->getLayout();
+
+    switch (layout)
+    {
+    case HkLayout::Horizontal:
         resolveHorizontalContainer(children, sbSizes);
-    else if (styleContextInj_->getLayout() == HkLayout::Vertical)
+        break;
+    case HkLayout::Vertical:
         resolveVerticalContainer(children, sbSizes);
-    else if (styleContextInj_->getLayout() == HkLayout::Grid)
+        break;
+    case HkLayout::Grid:
         resolveGridContainer(children, sbSizes);
+        break;
+    }
 
     resolveAxisOverflow(children, sbSizes);
 }
@@ -42,8 +50,6 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children,
     const uint32_t gridConfigColsSize = gridConfig.cols.size();
     const uint32_t gridConfigRowsSize = gridConfig.rows.size();
 
-
-    // std::cout << "-----\n";
     for (uint32_t i = 0; i < childrenCount; i++)
     {
         auto& child = children[i]->getPayload()->node_;
@@ -88,16 +94,13 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children,
         break;
         case HkHAlignment::Center:
         {
-            // const rightOffset = 
             const float xAdvanceToCenter = (gridConfig.cols[childSc.getGridCol() - 1] * colEqualPart) * 0.5f;
-            // startPosX += (xAdvanceFraction + xAdvanceToCenter) * (float)thisTc_->getScale().x - childTc.getScale().x * 0.5f;
             startPosX += (xAdvanceFraction + xAdvanceToCenter) * (float)thisTc_->getScale().x - allXScale * 0.5f;
         }
         break;
         case HkHAlignment::Right:
         {
             const float xAdvanceToRight = (gridConfig.cols[childSc.getGridCol() - 1] * colEqualPart);
-            // startPosX += (xAdvanceFraction + xAdvanceToRight) * (float)thisTc_->getScale().x - childTc.getScale().x - childSc.getRightMargin();
             startPosX += (xAdvanceFraction + xAdvanceToRight) * (float)thisTc_->getScale().x - allXScale;
         }
         break;
@@ -141,6 +144,7 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children,
             xSize = hSizeConfig.value * (float)thisTc_->getScale().x;
             break;
         case HkSizeType::FitParent:
+        case HkSizeType::Balanced:
             /* Fall through, unsupported mode by grid*/
         case HkSizeType::FitCell:
             xSize = (gridConfig.cols[childSc.getGridCol() - 1] * colEqualPart) * (float)thisTc_->getScale().x;
@@ -156,6 +160,7 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children,
             ySize = vSizeConfig.value * (float)thisTc_->getScale().y;
             break;
         case HkSizeType::FitParent:
+        case HkSizeType::Balanced:
             /* Fall through, unsupported mode by grid*/
         case HkSizeType::FitCell:
             ySize = (gridConfig.rows[childSc.getGridRow() - 1] * rowEqualPart) * (float)thisTc_->getScale().y;
@@ -175,11 +180,21 @@ void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children,
     uint32_t lastRowEndId = 0;
     int32_t nextXAdvance = 0;
     int32_t maybeHighest = 0;
-    for (uint32_t i = 0; i < children.size() - sbCount_; i++)
+    uint32_t childCount = children.size() - sbCount_;
+    for (uint32_t i = 0; i < childCount; i++)
     {
         auto& child = children[i]->getPayload()->node_;
         auto& childTc = child.transformContext;
         auto& childSc = child.styleContext;
+
+        /* Scale elements according to their config*/
+        childTc.setScale(
+            {
+                floor(computeHorizontalScale(childSc.getHSizeConfig(), childCount)),
+                floor(computeVerticalScale(childSc.getVSizeConfig(), childCount))
+            });
+
+        // childTc.setScale({ floor(xSize), floor(ySize) });
 
         /* How much we need to advance to place next child */
         nextXAdvance = startPosX + childSc.getLeftMargin() + childSc.getRightMargin() + childTc.getScale().x;
@@ -243,12 +258,19 @@ void HkConstraintContext::resolveVerticalContainer(HkTreeStruct& children,
     uint32_t lastColEndId = 0;
     int32_t nextYAdvance = 0;
     int32_t maybeLongest = 0;
-    for (uint32_t i = 0; i < children.size() - sbCount_; i++)
+    uint32_t childCount = children.size() - sbCount_;
+    for (uint32_t i = 0; i < childCount; i++)
     {
         auto& child = children[i]->getPayload()->node_;
         auto& childTc = child.transformContext;
         auto& childSc = child.styleContext;
 
+        /* Scale elements according to their config*/
+        childTc.setScale(
+            {
+                floor(computeHorizontalScale(childSc.getHSizeConfig(), childCount)),
+                floor(computeVerticalScale(childSc.getVSizeConfig(), childCount))
+            });
         /* How much we need to advance to place next child */
         nextYAdvance = startPosY + childSc.getBottomMargin() + childSc.getTopMargin() + childTc.getScale().y; //TODO: Minimize this call
         if (styleContextInj_->isColWrappingEnabled())
@@ -465,6 +487,44 @@ void HkConstraintContext::computeChildrenOverflowBasedOnMinMax(const MinMaxPos& 
             isOverflowY_ = true;
         }
     }
+}
+
+float HkConstraintContext::computeHorizontalScale(const HkSizeConfig& config, const uint32_t childCount)
+{
+    switch (config.type)
+    {
+    case HkSizeType::Absolute:
+        return config.value;
+    case HkSizeType::Percentage:
+        return config.value * (float)thisTc_->getScale().x;
+    case HkSizeType::FitParent:
+        return thisTc_->getScale().x;
+    case HkSizeType::Balanced:
+        return (float)thisTc_->getScale().x / childCount;
+    case HkSizeType::FitCell:
+        /* Fall through, unsupported mode by grid*/
+        break;
+    }
+    return 1.0f;
+}
+
+float HkConstraintContext::computeVerticalScale(const HkSizeConfig& config, const uint32_t childCount)
+{
+    switch (config.type)
+    {
+    case HkSizeType::Absolute:
+        return config.value;
+    case HkSizeType::Percentage:
+        return config.value * (float)thisTc_->getScale().y;
+    case HkSizeType::FitParent:
+        return thisTc_->getScale().y;
+    case HkSizeType::Balanced:
+        return (float)thisTc_->getScale().y / childCount;
+    case HkSizeType::FitCell:
+        /* Fall through, unsupported mode by grid*/
+        break;
+    }
+    return 1.0f;
 }
 
 void HkConstraintContext::resolveAxisOverflow(const HkTreeStruct& children,
