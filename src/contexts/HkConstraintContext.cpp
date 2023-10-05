@@ -68,6 +68,11 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children,
             yAdvanceFraction += (gridConfig.rows[j] * rowEqualPart);
         }
 
+        /* Take margins into consideration in calculations */
+        startPosX = childSc.getLeftMargin();
+        startPosY = childSc.getTopMargin();
+        uint32_t allXScale = childTc.getScale().x + childSc.getLeftMargin() + childSc.getRightMargin();
+        uint32_t allYScale = childTc.getScale().y + childSc.getTopMargin() + childSc.getBottomMargin();
 
         /* By default, elements will be left aligned. When Center/Right alignment is chosen, we need to
            advance fractionally a little bit more to the right in order to put elements at the right place.
@@ -76,19 +81,22 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children,
         {
         case HkHAlignment::Left:
         {
-            startPosX = xAdvanceFraction * (float)thisTc_->getScale().x;
+            startPosX += xAdvanceFraction * (float)thisTc_->getScale().x;
         }
         break;
         case HkHAlignment::Center:
         {
+            // const rightOffset = 
             const float xAdvanceToCenter = (gridConfig.cols[childSc.getGridCol() - 1] * colEqualPart) * 0.5f;
-            startPosX = (xAdvanceFraction + xAdvanceToCenter) * (float)thisTc_->getScale().x - childTc.getScale().x * 0.5f;
+            // startPosX += (xAdvanceFraction + xAdvanceToCenter) * (float)thisTc_->getScale().x - childTc.getScale().x * 0.5f;
+            startPosX += (xAdvanceFraction + xAdvanceToCenter) * (float)thisTc_->getScale().x - allXScale * 0.5f;
         }
         break;
         case HkHAlignment::Right:
         {
             const float xAdvanceToRight = (gridConfig.cols[childSc.getGridCol() - 1] * colEqualPart);
-            startPosX = (xAdvanceFraction + xAdvanceToRight) * (float)thisTc_->getScale().x - childTc.getScale().x;
+            // startPosX += (xAdvanceFraction + xAdvanceToRight) * (float)thisTc_->getScale().x - childTc.getScale().x - childSc.getRightMargin();
+            startPosX += (xAdvanceFraction + xAdvanceToRight) * (float)thisTc_->getScale().x - allXScale;
         }
         break;
         }
@@ -100,24 +108,24 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children,
         {
         case HkVAlignment::Top:
         {
-            startPosY = yAdvanceFraction * (float)thisTc_->getScale().y;
+            startPosY += yAdvanceFraction * (float)thisTc_->getScale().y;
         }
         break;
         case HkVAlignment::Center:
         {
             const float yAdvanceToCenter = (gridConfig.rows[childSc.getGridRow() - 1] * rowEqualPart) * 0.5f;
-            startPosY = (yAdvanceFraction + yAdvanceToCenter) * (float)thisTc_->getScale().y - childTc.getScale().y * 0.5f;
+            startPosY += (yAdvanceFraction + yAdvanceToCenter) * (float)thisTc_->getScale().y - allYScale * 0.5f;
         }
         break;
         case HkVAlignment::Bottom:
         {
             const float yAdvanceToRight = (gridConfig.rows[childSc.getGridRow() - 1] * rowEqualPart);
-            startPosY = (yAdvanceFraction + yAdvanceToRight) * (float)thisTc_->getScale().y - childTc.getScale().y;
+            startPosY += (yAdvanceFraction + yAdvanceToRight) * (float)thisTc_->getScale().y - allYScale;
         }
         break;
         }
 
-        childTc.setPos({ startPosX + thisTc_->getPos().x, startPosY + thisTc_->getPos().y });
+        childTc.setPos({ startPosX + thisTc_->getPos().x,startPosY + thisTc_->getPos().y });
     }
 }
 

@@ -28,7 +28,7 @@ int main()
     sceneWindow1->makeContextCurrent();
 
     HkWindowFramePtr windowFrame = std::make_shared<HkWindowFrame>("MyWindowFrame");
-    windowFrame->setWindowMode(HkWindowFrameMode::Grabbable);
+    windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
     sceneWindow1->addSubWindow(windowFrame); //NOTE: Needs to be added before adding any children
 
     windowFrame->getStyle().setOverflowAllowedXY(true)
@@ -47,21 +47,49 @@ int main()
 
     ctr->getStyle().setColor({ 1.0f,1.0f,1.0f })
         .setGridRowCol(1, 1)
-        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left);
+        .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center)
+        .setAllMargins(20)
+        .setLeftMargin(20);
+    // .setRightMargin(20);
     ctr4->getStyle().setColor({ 1.0f,0.0f,0.0f })
         .setGridRowCol(1, 2)
-        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left);
+        .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center);
     ctr5->getStyle().setColor({ 0.0f,1.0f,0.0f })
         .setGridRowCol(2, 1)
-        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left);
+        .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center);
     ctr6->getStyle().setColor({ 0.0f,0.0f,1.0f })
         .setGridRowCol(2, 2)
-        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left);
+        .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center);
 
     ctr->setSize({ 100, 100 });
     ctr4->setSize({ 100, 100 });
-    ctr5->setSize({ 100, 600 });
-    ctr6->setSize({ 1000, 100 });
+    ctr5->setSize({ 100, 100 });
+    ctr6->setSize({ 100, 100 });
+    // ctr->getStyle().setHSize(
+    //     HkSizeConfig{
+    //         .type = HkSizeType::Percentage
+    //         .value = 50,
+    //         .min = 10,
+    //         .max = 100
+    //     });
+
+    // ctr->getStyle().setHSize(
+    //     HkSizeConfig{
+    //         .type = HkSizeType::Absolute
+    //         .value = 500
+    //     });
+
+    // ctr->getStyle().setHSize(
+    //     HkSizeConfig{
+    //         .type = HkSizeType::FitParent
+    //         .min = 10,
+    //         .max = 100
+    //     });
+
+    // ctr->getStyle().setHSize(
+    //     HkSizeConfig{
+    //         .type = HkSizeType::FitCell // grid layout only
+    //     });
     // ctr->setSize({ 200, 300 });
     // ctr4->setSize({ 100, 150 });
     // ctr5->setSize({ 100, 150 });
