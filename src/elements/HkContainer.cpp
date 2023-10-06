@@ -33,6 +33,12 @@ void HkContainer::onFirstHeartbeat()
 
     dummyXYIntersectorData_.renderContext.shaderId = windowDataPtr_->renderer.addShaderSourceToCache(DEFAULT_VS, DEFAULT_FS);
     dummyXYIntersectorData_.renderContext.vaoId = windowDataPtr_->renderer.addVertexArrayDataToCache(DEFAULT_TYPE);
+
+    for (const auto& child : treeStruct_.getChildren())
+    {
+        /* Inject ref to windowData to each children so they all have a common source of truth*/
+        child->getPayload()->injectWindowDataPtr(windowDataPtr_);
+    }
 }
 
 //TODO: The way we handle scroll inside scroll is now necessarly very intuitive. It needs to ve changed in the future

@@ -190,11 +190,9 @@ void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children,
         /* Scale elements according to their config*/
         childTc.setScale(
             {
-                floor(computeHorizontalScale(childSc.getHSizeConfig(), childCount)),
-                floor(computeVerticalScale(childSc.getVSizeConfig(), childCount))
+                ceil(computeHorizontalScale(childSc.getHSizeConfig(), childCount)),
+                ceil(computeVerticalScale(childSc.getVSizeConfig(), childCount))
             });
-
-        // childTc.setScale({ floor(xSize), floor(ySize) });
 
         /* How much we need to advance to place next child */
         nextXAdvance = startPosX + childSc.getLeftMargin() + childSc.getRightMargin() + childTc.getScale().x;
@@ -268,8 +266,8 @@ void HkConstraintContext::resolveVerticalContainer(HkTreeStruct& children,
         /* Scale elements according to their config*/
         childTc.setScale(
             {
-                floor(computeHorizontalScale(childSc.getHSizeConfig(), childCount)),
-                floor(computeVerticalScale(childSc.getVSizeConfig(), childCount))
+                ceil(computeHorizontalScale(childSc.getHSizeConfig(), childCount)),
+                ceil(computeVerticalScale(childSc.getVSizeConfig(), childCount))
             });
         /* How much we need to advance to place next child */
         nextYAdvance = startPosY + childSc.getBottomMargin() + childSc.getTopMargin() + childTc.getScale().y; //TODO: Minimize this call
