@@ -1,5 +1,7 @@
 #include "HkConstraintContext.hpp"
 
+#include <algorithm>
+
 #include "../base/HkNodeBase.hpp"
 #include "../utils/HkDrawDebugger.hpp"
 
@@ -167,6 +169,8 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children,
             break;
         }
 
+        xSize = std::clamp(xSize, hSizeConfig.min, hSizeConfig.max);
+        ySize = std::clamp(ySize, vSizeConfig.min, vSizeConfig.max);
         childTc.setScale({ ceil(xSize), ceil(ySize) });
     }
 }
@@ -466,8 +470,8 @@ void HkConstraintContext::computeChildrenOverflowBasedOnMinMax(const MinMaxPos& 
        by how much each axis overflow and at most by the scrollbar size */
     if (styleContextInj_->isOverflowAllowedX() && styleContextInj_->isOverflowAllowedY() && addedOverflowX > 0 && addedOverflowY > 0)
     {
-        overflowXYSize_.x += addedOverflowX > sbSizes.vsbSize ? sbSizes.vsbSize : addedOverflowX; //scrollBarMargins.hsbMargin;
-        overflowXYSize_.y += addedOverflowY > sbSizes.hsbSize ? sbSizes.hsbSize : addedOverflowY; //scrollBarMargins.hsbMargin;
+        overflowXYSize_.x += addedOverflowX > sbSizes.vsbSize ? sbSizes.vsbSize : addedOverflowX;
+        overflowXYSize_.y += addedOverflowY > sbSizes.hsbSize ? sbSizes.hsbSize : addedOverflowY;
         isOverflowX_ = true;
         isOverflowY_ = true;
     }
@@ -476,12 +480,12 @@ void HkConstraintContext::computeChildrenOverflowBasedOnMinMax(const MinMaxPos& 
         /* Treat cases where there's only one sb who can maybe overflow */
         if (styleContextInj_->isOverflowAllowedX() && isOverflowY_ && addedOverflowX > 0)
         {
-            overflowXYSize_.x += addedOverflowX > sbSizes.vsbSize ? sbSizes.vsbSize : addedOverflowX; //scrollBarMargins.hsbMargin;
+            overflowXYSize_.x += addedOverflowX > sbSizes.vsbSize ? sbSizes.vsbSize : addedOverflowX;
             isOverflowX_ = true;
         }
         if (styleContextInj_->isOverflowAllowedY() && isOverflowX_ && addedOverflowY > 0)
         {
-            overflowXYSize_.y += addedOverflowY > sbSizes.hsbSize ? sbSizes.hsbSize : addedOverflowY; //scrollBarMargins.hsbMargin;
+            overflowXYSize_.y += addedOverflowY > sbSizes.hsbSize ? sbSizes.hsbSize : addedOverflowY;
             isOverflowY_ = true;
         }
     }
@@ -489,40 +493,52 @@ void HkConstraintContext::computeChildrenOverflowBasedOnMinMax(const MinMaxPos& 
 
 float HkConstraintContext::computeHorizontalScale(const HkSizeConfig& config, const uint32_t childCount)
 {
+    float size = 1.0f;
     switch (config.type)
     {
     case HkSizeType::Absolute:
-        return config.value;
+        size = config.value;
+        break;
     case HkSizeType::Percentage:
-        return config.value * (float)thisTc_->getScale().x;
+        size = config.value * (float)thisTc_->getScale().x;
+        break;
     case HkSizeType::FitParent:
-        return thisTc_->getScale().x;
+        size = thisTc_->getScale().x;
+        break;
     case HkSizeType::Balanced:
-        return (float)thisTc_->getScale().x / childCount;
+        size = (float)thisTc_->getScale().x / childCount;
+        break;
     case HkSizeType::FitCell:
         /* Fall through, unsupported mode by grid*/
         break;
     }
-    return 1.0f;
+
+    return std::clamp(size, config.min, config.max);
 }
 
 float HkConstraintContext::computeVerticalScale(const HkSizeConfig& config, const uint32_t childCount)
 {
+    float size = 1.0f;
     switch (config.type)
     {
     case HkSizeType::Absolute:
-        return config.value;
+        size = config.value;
+        break;
     case HkSizeType::Percentage:
-        return config.value * (float)thisTc_->getScale().y;
+        size = config.value * (float)thisTc_->getScale().y;
+        break;
     case HkSizeType::FitParent:
-        return thisTc_->getScale().y;
+        size = thisTc_->getScale().y;
+        break;
     case HkSizeType::Balanced:
-        return (float)thisTc_->getScale().y / childCount;
+        size = (float)thisTc_->getScale().y / childCount;
+        break;
     case HkSizeType::FitCell:
         /* Fall through, unsupported mode by grid*/
         break;
     }
-    return 1.0f;
+
+    return std::clamp(size, config.min, config.max);
 }
 
 void HkConstraintContext::resolveAxisOverflow(const HkTreeStruct& children,

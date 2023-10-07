@@ -18,7 +18,7 @@ int main()
     //TODO: Make it the responsability of the window to generate VAO and shader?
     // we need to make it order agnostic
     HkWindowManagerPtr sceneWindow1 = std::make_shared<HkWindowManager>("MyWindowManager",
-        HkWindowManager::HkWindowConfig{ .width = 1920, .height = 1080, .isMaster = true });
+        HkWindowManager::HkWindowConfig{ .width = 1280, .height = 720, .isMaster = true });
     //TODO: There is a bug with 2 windows while animating the windowFrame movement
     // HkWindowManagerPtr sceneWindow2 = std::make_shared<HkWindowManager>("MyWindowManager2",
     //     HkWindowManager::HkWindowConfig{ .width = 800, .height = 600 });
@@ -32,9 +32,9 @@ int main()
     sceneWindow1->addSubWindow(windowFrame); //NOTE: Needs to be added before adding any children
 
     windowFrame->getStyle().setOverflowAllowedXY(false)
-        .setLayout(HkLayout::Horizontal)
+        .setLayout(HkLayout::Grid)
         .setRowWrapping(false)
-        // .setGridConfig(HkGridConfig{ .cols{1.0f, 1.0f}, .rows{1.0f, 1.0f} });
+        .setGridConfig(HkGridConfig{ .cols{1.0f, 1.0f}, .rows{1.0f, 1.0f} })
         .setHAlignment(HkHAlignment::Left)
         .setVAlignment(HkVAlignment::Center);
 
@@ -49,83 +49,78 @@ int main()
     HkContainerPtr ctr8 = std::make_shared<HkContainer>("MyContainer8");
 
     ctr->getStyle().setColor({ 1.0f,1.0f,1.0f })
+        .setGridRowCol(1, 1)
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         .setVHSizeConfig(
-            { .type = HkSizeType::FitParent },
-            { .type = HkSizeType::Percentage , .value = 0.20f })
+            { .type = HkSizeType::FitCell , .max = 300 },
+            { .type = HkSizeType::Percentage, .value = 0.2f, .max = 200 })
         .setMargins(0, 0, 0, 0);
 
     ctr4->getStyle().setColor({ 1.0f,0.0f,0.0f })
-        .setLayout(HkLayout::Vertical)
+        .setGridRowCol(1, 2)
+        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         .setVHSizeConfig(
-            { .type = HkSizeType::FitParent },
-            { .type = HkSizeType::Percentage , .value = 0.60f })
-        .setMargins(0, 0, 0, 0)
-        .setVHAlignment(HkVAlignment::Bottom, HkHAlignment::Left);
-
-    ctr7->getStyle().setColor({ 0.0f,1.0f,1.0f })
-        .setVHSizeConfig(
-            { .type = HkSizeType::FitParent },
-            { .type = HkSizeType::Percentage, .value = 0.20f })
-        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left);
+            { .type = HkSizeType::FitCell },
+            { .type = HkSizeType::FitCell })
+        .setMargins(0, 0, 0, 0);
 
     ctr5->getStyle().setColor({ 0.3f,0.5f,0.0f })
+        .setGridRowCol(2, 1)
+        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         .setVHSizeConfig(
-            { .type = HkSizeType::Percentage , .value = 0.75f },
-            { .type = HkSizeType::FitParent })
-        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left);
+            { .type = HkSizeType::FitCell },
+            { .type = HkSizeType::FitCell })
+        .setMargins(0, 0, 0, 0);
 
-    ctr8->getStyle().setColor({ 0.5f,0.5f,1.0f })
+    ctr6->getStyle().setColor({ 0.0f,0.0f,1.0f })
+        .setGridRowCol(2, 2)
+        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         .setVHSizeConfig(
-            { .type = HkSizeType::Percentage , .value = 0.25f },
-            { .type = HkSizeType::FitParent })
-        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left);
+            { .type = HkSizeType::FitCell },
+            { .type = HkSizeType::FitCell })
+        .setMargins(0, 0, 0, 0);
 
-    ctr4->pushChildren({ ctr5, ctr8 });
-    // ctr6->getStyle().setColor({ 0.0f,0.0f,1.0f })
-    //     .setVHSizeConfig(
-    //         { .type = HkSizeType::Percentage , .value = 0.25f },
-    //         { .type = HkSizeType::Percentage , .value = 0.20f })
-        // .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left);
+    // ctr4->pushChildren({ ctr5, ctr8 });
 
-    windowFrame->pushChildren({ ctr, ctr4, ctr7 });
+
+    windowFrame->pushChildren({ ctr, ctr4, ctr5, ctr6 });
 
     // // Providing a seed value
-    srand((unsigned)time(NULL));
+    // srand((unsigned)time(NULL));
 
-    int scale = 10;
-    std::vector<HkNodeBasePtr> ctrs2;
-    ctrs2.reserve(scale * scale);
-    for (int i = 0;i < scale; i++) // with O2 works ok 01.09.2023
-    {
-        for (int j = 0;j < scale; j++)
-        {
-            double r = (rand() % 255) / 255.0f;
-            double g = (rand() % 255) / 255.0f;
-            double b = (rand() % 255) / 255.0f;
+    // int scale = 10;
+    // std::vector<HkNodeBasePtr> ctrs2;
+    // ctrs2.reserve(scale * scale);
+    // for (int i = 0;i < scale; i++) // with O2 works ok 01.09.2023
+    // {
+    //     for (int j = 0;j < scale; j++)
+    //     {
+    //         double r = (rand() % 255) / 255.0f;
+    //         double g = (rand() % 255) / 255.0f;
+    //         double b = (rand() % 255) / 255.0f;
 
-            const auto& ct = std::make_shared<HkContainer>("MyContauner");
-            ct->getStyle()
-                .setColor((i + j) % 2 == 0 ? glm::vec3{ r,g,b } : glm::vec3{ r,g,b })
-                .setGridRowCol(i + 1, j + 1)
-                .setVHSizeConfig({ .value = 10 }, { .value = 10 })
-                .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center);
+    //         const auto& ct = std::make_shared<HkContainer>("MyContauner");
+    //         ct->getStyle()
+    //             .setColor((i + j) % 2 == 0 ? glm::vec3{ r,g,b } : glm::vec3{ r,g,b })
+    //             .setGridRowCol(i + 1, j + 1)
+    //             .setVHSizeConfig({ .value = 10 }, { .value = 10 })
+    //             .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center);
 
-            ctrs2.push_back(std::move(ct));
-        }
-    }
+    //         ctrs2.push_back(std::move(ct));
+    //     }
+    // }
 
-    std::vector<float> rows, cols;
-    rows.assign(scale, 1.0f);
-    cols.assign(scale, 1.0f);
-    ctr5->getStyle()
-        .setLayout(HkLayout::Grid)
-        .setGridConfig(
-            HkGridConfig{
-                .cols{cols},
-                .rows{rows}
-            });
-    ctr5->pushChildren(ctrs2);
+    // std::vector<float> rows, cols;
+    // rows.assign(scale, 1.0f);
+    // cols.assign(scale, 1.0f);
+    // ctr5->getStyle()
+    //     .setLayout(HkLayout::Grid)
+    //     .setGridConfig(
+    //         HkGridConfig{
+    //             .cols{cols},
+    //             .rows{rows}
+    //         });
+    // ctr5->pushChildren(ctrs2);
     // HkImageViewPtr imgView = std::make_shared<HkImageView>("MyImgView");
     // HkImageViewPtr imgView2 = std::make_shared<HkImageView>("MyImgView2");
     // HkImageViewPtr imgView3 = std::make_shared<HkImageView>("MyImgView3");
