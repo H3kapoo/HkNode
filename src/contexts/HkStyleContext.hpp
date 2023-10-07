@@ -54,7 +54,8 @@ enum class HkSizeType
     Balanced,
     FitParent,
     FitCell,
-    Percentage
+    PercParent,
+    PercCell
 };
 
 struct HkSizeConfig
@@ -62,7 +63,7 @@ struct HkSizeConfig
     HkSizeType type{ HkSizeType::Absolute };
     float value{ 100 };
     float min{ 1 };
-    float max{ 1000 };
+    float max{ 4000 };
 };
 
 class HkStyleContext

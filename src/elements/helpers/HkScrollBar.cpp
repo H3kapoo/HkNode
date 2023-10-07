@@ -15,15 +15,6 @@ HkScrollBar::HkScrollBar(const std::string& name, const bool isHorizontal)
     setBarScale(20); /* default bar scale depending on orientation */
 }
 
-void HkScrollBar::onFirstHeartbeat()
-{
-    const std::string DEFAULT_VS = "assets/shaders/v1.glsl";
-    const std::string DEFAULT_FS = "assets/shaders/f1.glsl";
-    const HkVertexArrayType DEFAULT_TYPE = HkVertexArrayType::QUAD;
-    node_.renderContext.shaderId = windowDataPtr_->renderer.addShaderSourceToCache(DEFAULT_VS, DEFAULT_FS);
-    node_.renderContext.vaoId = windowDataPtr_->renderer.addVertexArrayDataToCache(DEFAULT_TYPE);
-}
-
 void HkScrollBar::onScroll()
 {
     knob_.scrollOngoing();

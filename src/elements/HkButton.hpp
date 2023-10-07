@@ -16,7 +16,6 @@ public:
     void setOnClickListener(std::function<void()> callback);
 
 private:
-    void onFirstHeartbeat() override;
     void onClick() override;
 
     std::function<void()> onClickCallback_{ nullptr };

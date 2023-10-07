@@ -19,6 +19,9 @@ int main()
     // we need to make it order agnostic
     HkWindowManagerPtr sceneWindow1 = std::make_shared<HkWindowManager>("MyWindowManager",
         HkWindowManager::HkWindowConfig{ .width = 1280, .height = 720, .isMaster = true });
+    // sceneWindow1->setBackgroundImage("/home/hekapoo/container.jpg");
+    // sceneWindow1->setBackgroundImage("/home/hekapoo/Downloads/fbi_wp.jpg");
+    // sceneWindow1->setBackgroundImage("/home/hekapoo/container.jpg");
     //TODO: There is a bug with 2 windows while animating the windowFrame movement
     // HkWindowManagerPtr sceneWindow2 = std::make_shared<HkWindowManager>("MyWindowManager2",
     //     HkWindowManager::HkWindowConfig{ .width = 800, .height = 600 });
@@ -31,8 +34,8 @@ int main()
     windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
     sceneWindow1->addSubWindow(windowFrame); //NOTE: Needs to be added before adding any children
 
-    windowFrame->getStyle().setOverflowAllowedXY(false)
-        .setLayout(HkLayout::Grid)
+    windowFrame->getStyle().setOverflowAllowedXY(true)
+        .setLayout(HkLayout::Horizontal)
         .setRowWrapping(false)
         .setGridConfig(HkGridConfig{ .cols{1.0f, 1.0f}, .rows{1.0f, 1.0f} })
         .setHAlignment(HkHAlignment::Left)
@@ -52,37 +55,41 @@ int main()
         .setGridRowCol(1, 1)
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         .setVHSizeConfig(
-            { .type = HkSizeType::FitCell , .max = 300 },
-            { .type = HkSizeType::Percentage, .value = 0.2f, .max = 200 })
+            { .value = 100 },
+            { .value = 100 })
         .setMargins(0, 0, 0, 0);
 
     ctr4->getStyle().setColor({ 1.0f,0.0f,0.0f })
         .setGridRowCol(1, 2)
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         .setVHSizeConfig(
-            { .type = HkSizeType::FitCell },
-            { .type = HkSizeType::FitCell })
+            { .value = 100 },
+            { .value = 100 })
         .setMargins(0, 0, 0, 0);
 
     ctr5->getStyle().setColor({ 0.3f,0.5f,0.0f })
         .setGridRowCol(2, 1)
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         .setVHSizeConfig(
-            { .type = HkSizeType::FitCell },
-            { .type = HkSizeType::FitCell })
+            { .value = 100 },
+            { .value = 100 })
         .setMargins(0, 0, 0, 0);
 
     ctr6->getStyle().setColor({ 0.0f,0.0f,1.0f })
         .setGridRowCol(2, 2)
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         .setVHSizeConfig(
-            { .type = HkSizeType::FitCell },
-            { .type = HkSizeType::FitCell })
+            { .value = 100 },
+            { .value = 100 })
+        // .setBackgroundImage("/home/hekapoo/container.jpg")
         .setMargins(0, 0, 0, 0);
 
     // ctr4->pushChildren({ ctr5, ctr8 });
-
-
+    bool x = false;
+    ctr->getEvents().setOnClickListener([&ctr4, &x]() {
+        ctr4->getStyle().setColor(x ? glm::vec3{ 0.3f, 0.5f, 0.0f } : glm::vec3{ 0.3f, 0.5f, 1.0f });
+        x = !x;
+        });
     windowFrame->pushChildren({ ctr, ctr4, ctr5, ctr6 });
 
     // // Providing a seed value
@@ -103,7 +110,7 @@ int main()
     //         ct->getStyle()
     //             .setColor((i + j) % 2 == 0 ? glm::vec3{ r,g,b } : glm::vec3{ r,g,b })
     //             .setGridRowCol(i + 1, j + 1)
-    //             .setVHSizeConfig({ .value = 10 }, { .value = 10 })
+    //             .setVHSizeConfig({ .value=100}, { .value=100})
     //             .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center);
 
     //         ctrs2.push_back(std::move(ct));
@@ -113,14 +120,14 @@ int main()
     // std::vector<float> rows, cols;
     // rows.assign(scale, 1.0f);
     // cols.assign(scale, 1.0f);
-    // ctr5->getStyle()
+    // windowFrame->getStyle()
     //     .setLayout(HkLayout::Grid)
     //     .setGridConfig(
     //         HkGridConfig{
     //             .cols{cols},
     //             .rows{rows}
     //         });
-    // ctr5->pushChildren(ctrs2);
+    // windowFrame->pushChildren(ctrs2);
     // HkImageViewPtr imgView = std::make_shared<HkImageView>("MyImgView");
     // HkImageViewPtr imgView2 = std::make_shared<HkImageView>("MyImgView2");
     // HkImageViewPtr imgView3 = std::make_shared<HkImageView>("MyImgView3");

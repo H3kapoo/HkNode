@@ -11,14 +11,14 @@ HkKnob::HkKnob(const std::string& name, const bool isHorizontal)
     node_.styleContext.setColor(glm::vec3(0.5f, 0.7f, 0.9f));
 }
 
-void HkKnob::onFirstHeartbeat()
-{
-    const std::string DEFAULT_VS = "assets/shaders/v1.glsl";
-    const std::string DEFAULT_FS = "assets/shaders/f1.glsl";
-    const HkVertexArrayType DEFAULT_TYPE = HkVertexArrayType::QUAD;
-    node_.renderContext.shaderId = windowDataPtr_->renderer.addShaderSourceToCache(DEFAULT_VS, DEFAULT_FS);
-    node_.renderContext.vaoId = windowDataPtr_->renderer.addVertexArrayDataToCache(DEFAULT_TYPE);
-}
+// void HkKnob::onFirstHeartbeat()
+// {
+//     const std::string DEFAULT_VS = "assets/shaders/v1.glsl";
+//     const std::string DEFAULT_FS = "assets/shaders/f1.glsl";
+//     const HkVertexArrayType DEFAULT_TYPE = HkVertexArrayType::QUAD;
+//     node_.renderContext.shaderId = windowDataPtr_->renderer.addShaderSourceToCache(DEFAULT_VS, DEFAULT_FS);
+//     node_.renderContext.vaoId = windowDataPtr_->renderer.addVertexArrayDataToCache(DEFAULT_TYPE);
+// }
 
 void HkKnob::onDrag()
 {

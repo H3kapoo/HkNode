@@ -142,14 +142,18 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children,
         case HkSizeType::Absolute:
             xSize = hSizeConfig.value;
             break;
-        case HkSizeType::Percentage:
-            xSize = hSizeConfig.value * (float)thisTc_->getScale().x;
+        case HkSizeType::PercCell:
+            xSize = (gridConfig.cols[childSc.getGridCol() - 1] * colEqualPart) * (float)thisTc_->getScale().x;
+            xSize *= hSizeConfig.value;
             break;
+        case HkSizeType::FitCell:
+            xSize = (gridConfig.cols[childSc.getGridCol() - 1] * colEqualPart) * (float)thisTc_->getScale().x;
+            break;
+        case HkSizeType::PercParent:
         case HkSizeType::FitParent:
         case HkSizeType::Balanced:
             /* Fall through, unsupported mode by grid*/
-        case HkSizeType::FitCell:
-            xSize = (gridConfig.cols[childSc.getGridCol() - 1] * colEqualPart) * (float)thisTc_->getScale().x;
+            xSize = 20;
             break;
         }
 
@@ -158,14 +162,18 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children,
         case HkSizeType::Absolute:
             ySize = vSizeConfig.value;
             break;
-        case HkSizeType::Percentage:
-            ySize = vSizeConfig.value * (float)thisTc_->getScale().y;
+        case HkSizeType::PercCell:
+            ySize = (gridConfig.rows[childSc.getGridRow() - 1] * rowEqualPart) * (float)thisTc_->getScale().y;
+            ySize *= vSizeConfig.value;
             break;
+        case HkSizeType::FitCell:
+            ySize = (gridConfig.rows[childSc.getGridRow() - 1] * rowEqualPart) * (float)thisTc_->getScale().y;
+            break;
+        case HkSizeType::PercParent:
         case HkSizeType::FitParent:
         case HkSizeType::Balanced:
             /* Fall through, unsupported mode by grid*/
-        case HkSizeType::FitCell:
-            ySize = (gridConfig.rows[childSc.getGridRow() - 1] * rowEqualPart) * (float)thisTc_->getScale().y;
+            ySize = 20;
             break;
         }
 
@@ -499,7 +507,7 @@ float HkConstraintContext::computeHorizontalScale(const HkSizeConfig& config, co
     case HkSizeType::Absolute:
         size = config.value;
         break;
-    case HkSizeType::Percentage:
+    case HkSizeType::PercParent:
         size = config.value * (float)thisTc_->getScale().x;
         break;
     case HkSizeType::FitParent:
@@ -509,6 +517,7 @@ float HkConstraintContext::computeHorizontalScale(const HkSizeConfig& config, co
         size = (float)thisTc_->getScale().x / childCount;
         break;
     case HkSizeType::FitCell:
+    case HkSizeType::PercCell:
         /* Fall through, unsupported mode by grid*/
         break;
     }
@@ -524,7 +533,7 @@ float HkConstraintContext::computeVerticalScale(const HkSizeConfig& config, cons
     case HkSizeType::Absolute:
         size = config.value;
         break;
-    case HkSizeType::Percentage:
+    case HkSizeType::PercParent:
         size = config.value * (float)thisTc_->getScale().y;
         break;
     case HkSizeType::FitParent:
@@ -534,6 +543,7 @@ float HkConstraintContext::computeVerticalScale(const HkSizeConfig& config, cons
         size = (float)thisTc_->getScale().y / childCount;
         break;
     case HkSizeType::FitCell:
+    case HkSizeType::PercCell:
         /* Fall through, unsupported mode by grid*/
         break;
     }
@@ -679,8 +689,9 @@ void HkConstraintContext::windowFrameContainerConstraint(HkTransformContext& wfC
     /* Necessary so we still "render" the frame in renderMySelf scissor pass */
     thisTc_->setScale({ -1,-1 });
 
-    // wfCtr.setScale(windowSize + 1); //TODO: hacK: looks like wfCtr gets a windowSize thats lacking exactly 1px behind (looks like GPU dependent)
-    wfCtr.setScale(windowSize); //TODO: hacK: looks like wfCtr gets a windowSize thats lacking exactly 1px behind (looks like GPU dependent)
+
+    wfCtr.setScale(windowSize + 1); //TODO: hacK: looks like wfCtr gets a windowSize thats lacking exactly 1px behind (looks like GPU dependent)
+    // wfCtr.setScale(windowSize); //TODO: hacK: looks like wfCtr gets a windowSize thats lacking exactly 1px behind (looks like GPU dependent)
     wfCtr.setPos({ 0,0 });
 }
 

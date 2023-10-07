@@ -29,7 +29,6 @@ public:
 
 
     /* HkNodeBase */
-    void onFirstHeartbeat() override;
     void onAnimationFrameRequested() override;
     void onScroll() override;
     void onDrag() override;

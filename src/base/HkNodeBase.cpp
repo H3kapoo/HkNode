@@ -310,6 +310,15 @@ void HkNodeBase::resolveDirtyAttributes()
     }
 }
 
+void HkNodeBase::onFirstHeartbeat()
+{
+    std::string DEFAULT_VS = "assets/shaders/v1.glsl";
+    std::string DEFAULT_FS = "assets/shaders/f1.glsl";
+    const HkVertexArrayType DEFAULT_TYPE = HkVertexArrayType::QUAD;
+    node_.renderContext.shaderId = windowDataPtr_->renderer.addShaderSourceToCache(DEFAULT_VS, DEFAULT_FS);
+    node_.renderContext.vaoId = windowDataPtr_->renderer.addVertexArrayDataToCache(DEFAULT_TYPE);
+}
+
 /* Events to be consumed by derived if needed */
 void HkNodeBase::postRenderAdditionalDetails() {}
 void HkNodeBase::onAnimationFrameRequested() {}
@@ -322,7 +331,7 @@ void HkNodeBase::onWindowResize() {}
 void HkNodeBase::onGeneralMouseMove() {}
 void HkNodeBase::onGeneralMouseClick() {}
 void HkNodeBase::onGeneralMouseScroll() {}
-void HkNodeBase::onFirstHeartbeat() {}
+
 
 /* Injects */
 void HkNodeBase::injectWindowDataPtr(HkWindowData* windowDataPtr) { windowDataPtr_ = windowDataPtr; }

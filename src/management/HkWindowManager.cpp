@@ -140,45 +140,41 @@ void HkWindowManager::makeContextCurrent() { glfwMakeContextCurrent(windowHandle
 
 void HkWindowManager::makeContextNotCurrent() { glfwMakeContextCurrent(NULL); }
 
-void HkWindowManager::setBackgroundImage(const std::string&)
+void HkWindowManager::setBackgroundImage(const std::string& pathToImg)
 {
     //TODO: this has to do with shaders and opengl, this function shall pe called on first heartbeat
-    // if (pathToBgImg_ != pathToImg)
-    // {
-    //     std::cout << "New background image identified. Will load.\n";
-    //     if (!bgTexture_.loadTexture(pathToImg))
-    //     {
-    //         std::cerr << "Failed to load background image: " << pathToImg << "\n";
-    //         return;
-    //     }
+    if (pathToBgImg_ != pathToImg)
+    {
+        std::cout << "New background image identified. Will load.\n";
+        auto texInfo = windowData_.renderer.addTextureSourceToCache(pathToImg);
 
-    //     /* Set TC */
-    //     bgNodeData_.transformContext.setPos({ 0,0 });
-    //     bgNodeData_.transformContext.setScale(windowData_.windowSize);
+        /* Set TC */
+        bgNodeData_.transformContext.setPos({ 0,0 });
+        bgNodeData_.transformContext.setScale(windowData_.windowSize);
 
-    //     /* Set RC */
-    //     const std::string DEFAULT_VS = "assets/shaders/vTextured.glsl";
-    //     const std::string DEFAULT_FS = "assets/shaders/fTextured.glsl";
-    //     const HkVertexArrayType DEFAULT_TYPE = HkVertexArrayType::QUAD;
-    //     bgNodeData_.renderContext.texInfos.push_back({ "texture1", GL_TEXTURE0, bgTexture_.getTextureId() });
-    //     bgNodeData_.renderContext.shaderId = windowData_.renderer.addShaderSourceToCache(DEFAULT_VS, DEFAULT_FS);
-    //     bgNodeData_.renderContext.vaoId = windowData_.renderer.addVertexArrayDataToCache(DEFAULT_TYPE);
+        /* Set RC */
+        const std::string DEFAULT_VS = "assets/shaders/vTextured.glsl";
+        const std::string DEFAULT_FS = "assets/shaders/fTextured.glsl";
+        const HkVertexArrayType DEFAULT_TYPE = HkVertexArrayType::QUAD;
+        bgNodeData_.renderContext.texInfos.push_back({ "texture1", GL_TEXTURE0, texInfo.texId });
+        bgNodeData_.renderContext.shaderId = windowData_.renderer.addShaderSourceToCache(DEFAULT_VS, DEFAULT_FS);
+        bgNodeData_.renderContext.vaoId = windowData_.renderer.addVertexArrayDataToCache(DEFAULT_TYPE);
 
-    //     pathToBgImg_ = pathToImg;
-    //     shouldRenderBackground_ = true;
-    // }
-    // else
-    // {
-    //     std::cout << "Same background image. Will reuse.\n";
-    //     shouldRenderBackground_ = false;
-    // }
+        pathToBgImg_ = pathToImg;
+        shouldRenderBackground_ = true;
+    }
+    else
+    {
+        std::cout << "Same background image. Will reuse.\n";
+        shouldRenderBackground_ = false;
+    }
 }
 
 void HkWindowManager::renderBackgroundImage()
 {
     if (!shouldRenderBackground_) return;
     bgNodeData_.renderContext.windowProjMatrix = windowData_.sceneProjMatrix;
-    // bgNodeData_.transformContext.setScale(windowData_.windowSize);
+    bgNodeData_.transformContext.setScale(windowData_.windowSize + 1); //TODO: Bug similar to hkConstraint
     windowData_.renderer.render(bgNodeData_.renderContext, bgNodeData_.styleContext, bgNodeData_.transformContext.getModelMatrix());
 }
 

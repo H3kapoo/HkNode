@@ -16,7 +16,8 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
     /* Setup defaults that don't have to do with VAOs/Textures/Shaders themselves*/
     node_.styleContext.setColor(glm::vec3(0.0f, 0.5f, 0.9f));
     wfCont_.node_.styleContext.setRowWrapping(true);
-    wfCont_.node_.styleContext.setColor(glm::vec3(0.5f, 0.5f, 0.5f));
+    wfCont_.node_.styleContext.setColor(glm::vec3(0.0f, 0.5f, 0.5f));
+
 
     treeStruct_.pushChild(&minimizeBtn_.treeStruct_);
     treeStruct_.pushChild(&exitBtn_.treeStruct_);
@@ -45,18 +46,6 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
             }
             std::cout << "changed mode\n";
         });
-}
-
-void HkWindowFrame::onFirstHeartbeat()
-{
-    //TODO: We should be able to tell if the user chose on init another shader
-    // than this default one and use the user supplied one. We should keep track
-    // what was the default one and if now is changed on first runtime heartbeat
-    const std::string DEFAULT_VS = "assets/shaders/v1.glsl";
-    const std::string DEFAULT_FS = "assets/shaders/f1.glsl";
-    const HkVertexArrayType DEFAULT_TYPE = HkVertexArrayType::QUAD;
-    node_.renderContext.shaderId = windowDataPtr_->renderer.addShaderSourceToCache(DEFAULT_VS, DEFAULT_FS);
-    node_.renderContext.vaoId = windowDataPtr_->renderer.addVertexArrayDataToCache(DEFAULT_TYPE);
 }
 
 void HkWindowFrame::onAnimationFrameRequested()
