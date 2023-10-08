@@ -440,8 +440,6 @@ void HkConstraintContext::computeChildrenOverflowBasedOnMinMax(const MinMaxPos& 
     overflowXYSize_.x = 0;
     overflowXYSize_.y = 0;
 
-    const int32_t addedOverflowX = minMax.maxX - (thisTc_->getPos().x + thisTc_->getScale().x - sbSizes.vsbSize);
-    const int32_t addedOverflowY = minMax.maxY - (thisTc_->getPos().y + thisTc_->getScale().y - sbSizes.hsbSize);
     /* Calculate X overflow */
     if (styleContextInj_->isOverflowAllowedX())
     {
@@ -455,6 +453,19 @@ void HkConstraintContext::computeChildrenOverflowBasedOnMinMax(const MinMaxPos& 
         {
             isOverflowX_ = true;
             overflowXYSize_.x += thisTc_->getPos().x - minMax.minX;
+        }
+
+        /* Try to see if Y axis also needs to overflow to fit everything nicely*/
+        if (isOverflowX_ && styleContextInj_->isOverflowAllowedY())
+        {
+            if (minMax.maxY + sbSizes.hsbSize > thisTc_->getPos().y + thisTc_->getScale().y)
+            {
+                isOverflowY_ = true;
+                overflowXYSize_.y = sbSizes.hsbSize + minMax.maxY - (thisTc_->getPos().y + thisTc_->getScale().y);
+                overflowXYSize_.x += sbSizes.vsbSize;
+            }
+            /* If there's been a calculation on Y already, exit prematurely*/
+            return;
         }
     }
 
@@ -472,29 +483,18 @@ void HkConstraintContext::computeChildrenOverflowBasedOnMinMax(const MinMaxPos& 
             isOverflowY_ = true;
             overflowXYSize_.y += thisTc_->getPos().y - minMax.minY;
         }
-    }
 
-    /* Treat case when we have overflow on both X and Y. In that case, we need to increase overflow size
-       by how much each axis overflow and at most by the scrollbar size */
-    if (styleContextInj_->isOverflowAllowedX() && styleContextInj_->isOverflowAllowedY() && addedOverflowX > 0 && addedOverflowY > 0)
-    {
-        overflowXYSize_.x += addedOverflowX > sbSizes.vsbSize ? sbSizes.vsbSize : addedOverflowX;
-        overflowXYSize_.y += addedOverflowY > sbSizes.hsbSize ? sbSizes.hsbSize : addedOverflowY;
-        isOverflowX_ = true;
-        isOverflowY_ = true;
-    }
-    else
-    {
-        /* Treat cases where there's only one sb who can maybe overflow */
-        if (styleContextInj_->isOverflowAllowedX() && isOverflowY_ && addedOverflowX > 0)
+        /* Try to see if X axis also needs to overflow to fit everything nicely*/
+        if (isOverflowY_ && styleContextInj_->isOverflowAllowedX())
         {
-            overflowXYSize_.x += addedOverflowX > sbSizes.vsbSize ? sbSizes.vsbSize : addedOverflowX;
-            isOverflowX_ = true;
-        }
-        if (styleContextInj_->isOverflowAllowedY() && isOverflowX_ && addedOverflowY > 0)
-        {
-            overflowXYSize_.y += addedOverflowY > sbSizes.hsbSize ? sbSizes.hsbSize : addedOverflowY;
-            isOverflowY_ = true;
+            if (minMax.maxX + sbSizes.vsbSize > thisTc_->getPos().x + thisTc_->getScale().x)
+            {
+                isOverflowX_ = true;
+                overflowXYSize_.x = sbSizes.vsbSize + minMax.maxX - (thisTc_->getPos().x + thisTc_->getScale().x);
+                overflowXYSize_.y += sbSizes.hsbSize;
+            }
+            /* If there's been a calculation on Y already, exit prematurely*/
+            return;
         }
     }
 }
@@ -631,7 +631,7 @@ void HkConstraintContext::constrainSBKnob(bool isFromHorizontalSB, int overflowS
 }
 
 /* Keeps scrollbar object at the bottom or at the right of the container. */
-void HkConstraintContext::scrollBarConstrain(HkTransformContext& scrollBarTc) const
+void HkConstraintContext::scrollBarConstrain(HkTransformContext& scrollBarTc, const uint32_t otherSbMargin) const
 {
     ScrollbarMargin margins;
     const auto sbScale = scrollBarTc.getScale();
@@ -642,13 +642,13 @@ void HkConstraintContext::scrollBarConstrain(HkTransformContext& scrollBarTc) co
     {
         /* We should take into account if vertical bar is present so that bottom right 'intersection'
            between bars is filled or not. Same thing shoukd apply for vertical calcs bellow */
-        const auto verticalBarAwareMargin = isOverflowY_ ? barScale : 0;
+        const auto verticalBarAwareMargin = isOverflowY_ ? otherSbMargin : 0;
         scrollBarTc.setScale({ thisTc_->getScale().x - verticalBarAwareMargin, barScale });
         scrollBarTc.setPos({ thisTc_->getPos().x, thisTc_->getPos().y + thisTc_->getScale().y - barScale });
     }
     else if (margins.vsbMargin && isOverflowY_)
     {
-        const auto horizontalBarAwareMargin = isOverflowX_ ? barScale : 0;
+        const auto horizontalBarAwareMargin = isOverflowX_ ? otherSbMargin : 0;
         scrollBarTc.setScale({ barScale, thisTc_->getScale().y - horizontalBarAwareMargin });
         scrollBarTc.setPos({ thisTc_->getPos().x + thisTc_->getScale().x - barScale, thisTc_->getPos().y });
     }

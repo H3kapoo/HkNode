@@ -39,7 +39,7 @@ int main()
         .setRowWrapping(false)
         .setGridConfig(HkGridConfig{ .cols{1.0f, 1.0f}, .rows{1.0f, 1.0f} })
         .setHAlignment(HkHAlignment::Left)
-        .setVAlignment(HkVAlignment::Center);
+        .setVAlignment(HkVAlignment::Top);
 
     windowFrame->setPos({ 1280 * 0.25, 720 * 0.25 });
     windowFrame->setSize({ 1280 , 720 });
@@ -51,38 +51,40 @@ int main()
     HkContainerPtr ctr7 = std::make_shared<HkContainer>("MyContainer7");
     HkContainerPtr ctr8 = std::make_shared<HkContainer>("MyContainer8");
 
-    ctr->getStyle().setColor({ 1.0f,1.0f,1.0f })
-        .setGridRowCol(1, 1)
+    ctr->getStyle().setColor({ 1.0f,0.0f,1.0f })
+        // .setGridRowCol(1, 1)
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         .setVHSizeConfig(
-            { .value = 100 },
-            { .value = 100 })
+            { .value = 721 },
+            // { .type = HkSizeType::FitParent },
+            // { .type = HkSizeType::FitParent })
+            { .value = 1281 })
         .setMargins(0, 0, 0, 0);
 
-    ctr4->getStyle().setColor({ 1.0f,0.0f,0.0f })
-        .setGridRowCol(1, 2)
-        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-        .setVHSizeConfig(
-            { .value = 100 },
-            { .value = 100 })
-        .setMargins(0, 0, 0, 0);
+    // ctr4->getStyle().setColor({ 1.0f,0.0f,0.0f })
+    //     .setGridRowCol(1, 2)
+    //     .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+    //     .setVHSizeConfig(
+    //         { .value = 100 },
+    //         { .value = 100 })
+    //     .setMargins(0, 0, 0, 0);
 
-    ctr5->getStyle().setColor({ 0.3f,0.5f,0.0f })
-        .setGridRowCol(2, 1)
-        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-        .setVHSizeConfig(
-            { .value = 100 },
-            { .value = 100 })
-        .setMargins(0, 0, 0, 0);
+    // ctr5->getStyle().setColor({ 0.3f,0.5f,0.0f })
+    //     .setGridRowCol(2, 1)
+    //     .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+    //     .setVHSizeConfig(
+    //         { .value = 100 },
+    //         { .value = 100 })
+    //     .setMargins(0, 0, 0, 0);
 
-    ctr6->getStyle().setColor({ 0.0f,0.0f,1.0f })
-        .setGridRowCol(2, 2)
-        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-        .setVHSizeConfig(
-            { .value = 100 },
-            { .value = 100 })
-        // .setBackgroundImage("/home/hekapoo/container.jpg")
-        .setMargins(0, 0, 0, 0);
+    // ctr6->getStyle().setColor({ 0.0f,0.0f,1.0f })
+    //     .setGridRowCol(2, 2)
+    //     .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+    //     .setVHSizeConfig(
+    //         { .value = 100 },
+    //         { .value = 100 })
+    //     // .setBackgroundImage("/home/hekapoo/container.jpg")
+    //     .setMargins(0, 0, 0, 0);
 
     // ctr4->pushChildren({ ctr5, ctr8 });
     bool x = false;
@@ -90,7 +92,8 @@ int main()
         ctr4->getStyle().setColor(x ? glm::vec3{ 0.3f, 0.5f, 0.0f } : glm::vec3{ 0.3f, 0.5f, 1.0f });
         x = !x;
         });
-    windowFrame->pushChildren({ ctr, ctr4, ctr5, ctr6 });
+    // windowFrame->pushChildren({ ctr, ctr4, ctr5, ctr6 });
+    windowFrame->pushChildren({ ctr });
 
     // // Providing a seed value
     // srand((unsigned)time(NULL));

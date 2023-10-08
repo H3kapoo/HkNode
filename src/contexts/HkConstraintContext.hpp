@@ -81,7 +81,7 @@ public:
     MinMaxPos getMinAndMaxPositions(const HkTreeStruct& children) const;
 
     /* Scrollbar related */
-    void scrollBarConstrain(HkTransformContext& scrollBarTc) const;
+    void scrollBarConstrain(HkTransformContext& scrollBarTc, const uint32_t otherSbMargin) const;
     void constrainSBKnob(bool isFromHorizontalSB, int overflowSize, float currKnobValue,
         HkTransformContext& knobTc) const;
 
