@@ -54,19 +54,18 @@ int main()
 
     ctr->getStyle().setColor({ 1.0f,0.0f,1.0f })
         // .setGridRowCol(1, 1)
-        .setOverflowAllowedXY(true)
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         .setVHSizeConfig(
-            { .type = HkSizeType::PercParent, .value = 0.4f },
-            { .type = HkSizeType::PercParent, .value = 0.4f })
+            { .value = 200 },
+            { .value = 300 })
         .setMargins(0, 0, 00, 0);
 
     ctr4->getStyle().setColor({ 1.0f,0.0f,0.0f })
         .setGridRowCol(1, 2)
         .setVHAlignment(HkVAlignment::Bottom, HkHAlignment::Left)
         .setVHSizeConfig(
-            { .value = 100 },
-            { .value = 100 })
+            { .value = 200 },
+            { .value = 300 })
         .setMargins(0, 0, 0, 0);
 
     ctr5->getStyle().setColor({ 0.3f,0.5f,0.0f })
@@ -74,7 +73,7 @@ int main()
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         .setVHSizeConfig(
             { .value = 300 },
-            { .value = 100 })
+            { .value = 300 })
         .setMargins(0, 0, 0, 0);
 
     ctr6->getStyle().setColor({ 0.0f,0.0f,1.0f })
@@ -82,7 +81,7 @@ int main()
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         .setVHSizeConfig(
             { .value = 100 },
-            { .value = 100 })
+            { .value = 300 })
         .setMargins(0, 0, 0, 0);
 
     // ctr->pushChildren({ ctr4, ctr5, ctr6 });

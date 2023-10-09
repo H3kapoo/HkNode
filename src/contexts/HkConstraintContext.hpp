@@ -61,9 +61,9 @@ public:
 
 
     void resolveConstraints(HkTreeStruct& children, const HkScrollbarsSize sbSizes);
-    void resolveHorizontalContainer(HkTreeStruct& children, const HkScrollbarsSize sbSizes);
-    void resolveVerticalContainer(HkTreeStruct& children, const HkScrollbarsSize sbSizes);
-    void resolveGridContainer(HkTreeStruct& children, const HkScrollbarsSize sbSizes);
+    void resolveHorizontalContainer(HkTreeStruct& children);
+    void resolveVerticalContainer(HkTreeStruct& children);
+    void resolveGridContainer(HkTreeStruct& children);
     void resolveAxisOverflow(const HkTreeStruct& children, const HkScrollbarsSize sbSizes);
 
     void backPropagateRowChange(HkTreeStruct& children, const uint32_t nextRowFirstId,

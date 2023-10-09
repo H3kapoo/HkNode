@@ -24,21 +24,20 @@ void HkConstraintContext::resolveConstraints(HkTreeStruct& children,
     switch (layout)
     {
     case HkLayout::Horizontal:
-        resolveHorizontalContainer(children, sbSizes);
+        resolveHorizontalContainer(children);
         break;
     case HkLayout::Vertical:
-        resolveVerticalContainer(children, sbSizes);
+        resolveVerticalContainer(children);
         break;
     case HkLayout::Grid:
-        resolveGridContainer(children, sbSizes);
+        resolveGridContainer(children);
         break;
     }
 
     resolveAxisOverflow(children, sbSizes);
 }
 
-void HkConstraintContext::resolveGridContainer(HkTreeStruct& children,
-    const HkScrollbarsSize)
+void HkConstraintContext::resolveGridContainer(HkTreeStruct& children)
 {
     /* Floats are needed here because of GridConfig containing fractional parts itself.
        Without floats we losing precision in placing elements */
@@ -185,8 +184,7 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children,
     }
 }
 
-void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children,
-    const HkScrollbarsSize) //TODO: Take into account sbSize in the future
+void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children)
 {
     int32_t startPosX = 0, startPosY = 0;
     int32_t highestYOnRow = 0;
@@ -260,8 +258,7 @@ void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children,
     applyFinalOffsets(children);
 }
 
-void HkConstraintContext::resolveVerticalContainer(HkTreeStruct& children,
-    const HkScrollbarsSize) //TODO: Take into account sbSize in the future
+void HkConstraintContext::resolveVerticalContainer(HkTreeStruct& children)
 {
     //TODO: move into hpp so we dont redeclare them each frame
     int32_t startPosX = 0, startPosY = 0;
