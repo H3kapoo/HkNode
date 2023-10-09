@@ -198,6 +198,11 @@ HkStyleContext& HkWindowFrame::getStyle()
     return wfCont_.getStyle();
 }
 
+const HkTransformContext& HkWindowFrame::getTransform() const
+{
+    return wfCont_.getTransform();
+}
+
 void HkWindowFrame::rootUpdate() { updateMySelf(isMinimized_); renderMySelf(); }
 
 HkNodeBase* HkWindowFrame::getUnderlayingNode() { return this; }

@@ -175,7 +175,13 @@ void HkTransformContext::computeModelMatrix()
     modelMat = glm::translate(modelMat, glm::vec3(-0.5f, -0.5f, 0));
     modelMat = glm::scale(modelMat, glm::vec3(scale, 1.0f));
     modelMat = glm::translate(modelMat, glm::vec3(0.5f, 0.5f, 0));
-    //TODO: Maybe off by one pixel visual bug is caused by offseting with 0.5f, maybe try offrtging by 1.0f
+
+    /* Fix for off-by-one pixel rendering error. This is caused because we do calculations with respect to
+       top left corner of 1x1 square*/
+    modelMat[3][0] = ceil(modelMat[3][0]);
+    modelMat[3][1] = ceil(modelMat[3][1]);
+    if ((int)modelMat[0][0] % 2 == 1) { modelMat[3][0] += 1; }
+    if ((int)modelMat[1][1] % 2 == 1) { modelMat[3][1] += 1; }
 
     prevPos = pos;
     prevScale = scale;

@@ -19,8 +19,8 @@ void HkNodeBase::renderMySelf()
     {
         glEnable(GL_SCISSOR_TEST);
         glScissor(
-            tc.getVPos().x - 1,
-            windowDataPtr_->windowSize.y - tc.getVPos().y - tc.getVScale().y + 1,
+            tc.getVPos().x,
+            windowDataPtr_->windowSize.y - tc.getVPos().y - tc.getVScale().y,
             tc.getVScale().x,
             tc.getVScale().y);
     }
@@ -51,8 +51,8 @@ void HkNodeBase::renderMySelf()
     /* Note: rescissoring to original parent is needed unfortunatelly */
     glEnable(GL_SCISSOR_TEST);
     glScissor(
-        tc.getVPos().x - 1,
-        windowDataPtr_->windowSize.y - tc.getVPos().y - tc.getVScale().y + 1,
+        tc.getVPos().x,
+        windowDataPtr_->windowSize.y - tc.getVPos().y - tc.getVScale().y,
         tc.getVScale().x,
         tc.getVScale().y);
 
@@ -151,7 +151,7 @@ void HkNodeBase::updateMySelf(const bool isSubWindowMinimized)
     }
 
     /* Update children */
-    for (uint32_t i = 0;i < children.size(); i++)
+    for (uint32_t i = 0; i < children.size(); i++)
     {
         children[i]->getPayload()->updateMySelf(isSubWindowMinimized);
     }
@@ -340,6 +340,8 @@ void HkNodeBase::injectWindowDataPtr(HkWindowData* windowDataPtr) { windowDataPt
 HkStyleContext& HkNodeBase::getStyle() { return node_.styleContext; }
 
 HkEventsContext& HkNodeBase::getEvents() { return node_.eventsContext; }
+
+const HkTransformContext& HkNodeBase::getTransform() const { return node_.transformContext; }
 
 HkNodeInfo HkNodeBase::getNodeInfo()
 {

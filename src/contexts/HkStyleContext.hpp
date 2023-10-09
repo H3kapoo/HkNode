@@ -28,6 +28,8 @@ enum class HkHAlignment
     Right
 };
 
+/* All things that are directly sent to the shader like positions/color, do
+   not need dirty attribs as they will be querryed each frame */
 enum class HkStyleDirtyAttribs
 {
     BG,
@@ -76,6 +78,7 @@ public:
 
     /* Setters */
     HkStyleContext& setColor(const glm::vec3& value);
+    // Transform related
     HkStyleContext& setRowWrapping(const bool value);
     HkStyleContext& setColWrapping(const bool value);
     HkStyleContext& setLeftMargin(const uint32_t value);
@@ -102,6 +105,7 @@ public:
     HkStyleContext& setVSizeConfig(const HkSizeConfig& value);
     HkStyleContext& setHSizeConfig(const HkSizeConfig& value);
     HkStyleContext& setVHSizeConfig(const HkSizeConfig& valueV, const HkSizeConfig& valueH);
+    // Background related
     HkStyleContext& setBackgroundImage(const std::string& value);
 
 

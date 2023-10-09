@@ -41,8 +41,9 @@ int main()
         .setHAlignment(HkHAlignment::Left)
         .setVAlignment(HkVAlignment::Top);
 
-    windowFrame->setPos({ 1280 * 0.25, 720 * 0.25 });
-    windowFrame->setSize({ 1280 , 720 });
+    // windowFrame->setPos({ 1280 * 0.25, 720 * 0.25 });
+    // windowFrame->setSize({ 1280 , 720 });
+
 
     HkContainerPtr ctr = std::make_shared<HkContainer>("MyContainer");
     HkContainerPtr ctr4 = std::make_shared<HkContainer>("MyContainer4");
@@ -53,52 +54,50 @@ int main()
 
     ctr->getStyle().setColor({ 1.0f,0.0f,1.0f })
         // .setGridRowCol(1, 1)
+        .setOverflowAllowedXY(true)
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         .setVHSizeConfig(
-            { .value = 721 },
-            // { .type = HkSizeType::FitParent },
-            // { .type = HkSizeType::FitParent })
-            { .value = 1281 })
+            { .type = HkSizeType::PercParent, .value = 0.4f },
+            { .type = HkSizeType::PercParent, .value = 0.4f })
+        .setMargins(0, 0, 00, 0);
+
+    ctr4->getStyle().setColor({ 1.0f,0.0f,0.0f })
+        .setGridRowCol(1, 2)
+        .setVHAlignment(HkVAlignment::Bottom, HkHAlignment::Left)
+        .setVHSizeConfig(
+            { .value = 100 },
+            { .value = 100 })
         .setMargins(0, 0, 0, 0);
 
-    // ctr4->getStyle().setColor({ 1.0f,0.0f,0.0f })
-    //     .setGridRowCol(1, 2)
-    //     .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-    //     .setVHSizeConfig(
-    //         { .value = 100 },
-    //         { .value = 100 })
-    //     .setMargins(0, 0, 0, 0);
+    ctr5->getStyle().setColor({ 0.3f,0.5f,0.0f })
+        .setGridRowCol(2, 1)
+        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+        .setVHSizeConfig(
+            { .value = 300 },
+            { .value = 100 })
+        .setMargins(0, 0, 0, 0);
 
-    // ctr5->getStyle().setColor({ 0.3f,0.5f,0.0f })
-    //     .setGridRowCol(2, 1)
-    //     .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-    //     .setVHSizeConfig(
-    //         { .value = 100 },
-    //         { .value = 100 })
-    //     .setMargins(0, 0, 0, 0);
+    ctr6->getStyle().setColor({ 0.0f,0.0f,1.0f })
+        .setGridRowCol(2, 2)
+        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+        .setVHSizeConfig(
+            { .value = 100 },
+            { .value = 100 })
+        .setMargins(0, 0, 0, 0);
 
-    // ctr6->getStyle().setColor({ 0.0f,0.0f,1.0f })
-    //     .setGridRowCol(2, 2)
-    //     .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-    //     .setVHSizeConfig(
-    //         { .value = 100 },
-    //         { .value = 100 })
-    //     // .setBackgroundImage("/home/hekapoo/container.jpg")
-    //     .setMargins(0, 0, 0, 0);
-
-    // ctr4->pushChildren({ ctr5, ctr8 });
+    // ctr->pushChildren({ ctr4, ctr5, ctr6 });
     bool x = false;
     ctr->getEvents().setOnClickListener([&ctr4, &x]() {
         ctr4->getStyle().setColor(x ? glm::vec3{ 0.3f, 0.5f, 0.0f } : glm::vec3{ 0.3f, 0.5f, 1.0f });
         x = !x;
         });
-    // windowFrame->pushChildren({ ctr, ctr4, ctr5, ctr6 });
-    windowFrame->pushChildren({ ctr });
+    windowFrame->pushChildren({ ctr, ctr4, ctr5, ctr6 });
+    // windowFrame->pushChildren({ ctr });
 
     // // Providing a seed value
     // srand((unsigned)time(NULL));
 
-    // int scale = 10;
+    // int scale = 4;
     // std::vector<HkNodeBasePtr> ctrs2;
     // ctrs2.reserve(scale * scale);
     // for (int i = 0;i < scale; i++) // with O2 works ok 01.09.2023
@@ -113,8 +112,9 @@ int main()
     //         ct->getStyle()
     //             .setColor((i + j) % 2 == 0 ? glm::vec3{ r,g,b } : glm::vec3{ r,g,b })
     //             .setGridRowCol(i + 1, j + 1)
-    //             .setVHSizeConfig({ .value=100}, { .value=100})
-    //             .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center);
+    //             .setVHSizeConfig({ .value = 100 }, { .value = 100 })
+    //             // .setVHSizeConfig({ .type = HkSizeType::FitCell }, { .type = HkSizeType::FitCell })
+    //             .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left);
 
     //         ctrs2.push_back(std::move(ct));
     //     }

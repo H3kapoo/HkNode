@@ -179,6 +179,8 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children,
 
         xSize = std::clamp(xSize, hSizeConfig.min, hSizeConfig.max);
         ySize = std::clamp(ySize, vSizeConfig.min, vSizeConfig.max);
+
+        /*Ceil is needed so we don't get off by one pixel artifacts*/
         childTc.setScale({ ceil(xSize), ceil(ySize) });
     }
 }
@@ -690,8 +692,8 @@ void HkConstraintContext::windowFrameContainerConstraint(HkTransformContext& wfC
     thisTc_->setScale({ -1,-1 });
 
 
-    wfCtr.setScale(windowSize + 1); //TODO: hacK: looks like wfCtr gets a windowSize thats lacking exactly 1px behind (looks like GPU dependent)
-    // wfCtr.setScale(windowSize); //TODO: hacK: looks like wfCtr gets a windowSize thats lacking exactly 1px behind (looks like GPU dependent)
+    // wfCtr.setScale(windowSize + 1); //TODO: hacK: looks like wfCtr gets a windowSize thats lacking exactly 1px behind (looks like GPU dependent)
+    wfCtr.setScale(windowSize); //TODO: hacK: looks like wfCtr gets a windowSize thats lacking exactly 1px behind (looks like GPU dependent)
     wfCtr.setPos({ 0,0 });
 }
 
@@ -699,5 +701,4 @@ void HkConstraintContext::injectStyleContext(HkStyleContext* styleContext)
 {
     styleContextInj_ = styleContext;
 }
-
 } // hkui

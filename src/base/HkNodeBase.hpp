@@ -51,6 +51,7 @@ public:
     /* Getters */
     virtual HkStyleContext& getStyle();
     virtual HkEventsContext& getEvents();
+    virtual const HkTransformContext& getTransform() const;
     virtual HkNodeInfo getNodeInfo();
 
     virtual ~HkNodeBase() = default;

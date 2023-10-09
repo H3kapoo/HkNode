@@ -23,23 +23,8 @@ class HkWindowFrame : public HkNodeBase, public IHkRootNode
 public:
     HkWindowFrame(const std::string& windowName);
 
-    /* IHRootNode */
-    void rootUpdate() override;
-    HkNodeBase* getUnderlayingNode() override;
-
-
-    /* HkNodeBase */
-    void onAnimationFrameRequested() override;
-    void onScroll() override;
-    void onDrag() override;
-    void onWindowResize() override;
-    void resolveChildrenConstraints(HkTreeStruct&,
-        const HkScrollbarsSize&) override;
-
     void pushChildren(const std::vector<HkNodeBasePtr>& newChildren);
     void printTree();
-
-    HkStyleContext& getStyle() override;
 
     /* Setters */
     void setColor(const glm::vec3& color);
@@ -49,11 +34,25 @@ public:
 
     /* Getters */
     bool isAlive() const override;
+    HkStyleContext& getStyle() override;
+    const HkTransformContext& getTransform() const override;
+
+private:
+    /* IHRootNode */
+    void rootUpdate() override;
+    HkNodeBase* getUnderlayingNode() override;
+
+    /* HkNodeBase */
+    void onAnimationFrameRequested() override;
+    void onScroll() override;
+    void onDrag() override;
+    void onWindowResize() override;
+    void resolveChildrenConstraints(HkTreeStruct&,
+        const HkScrollbarsSize&) override;
 
     /* Injects */
     void injectWindowDataPtr(HkWindowData* windowDataPtr) override;
 
-private:
     HkButton minimizeBtn_;
     HkButton exitBtn_;
     HkContainer wfCont_;
