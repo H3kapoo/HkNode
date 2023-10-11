@@ -430,6 +430,7 @@ void HkConstraintContext::computeScrollBarCount()
     sbCount_ += (styleContextInj_->isOverflowAllowedY() && overflowXYSize_.y) ? 1 : 0;
 }
 
+/* This is only called on a container that has the possibility to have children*/
 void HkConstraintContext::computeChildrenOverflowBasedOnMinMax(const MinMaxPos& minMax,
     const HkScrollbarsSize sbSizes)
 {
@@ -457,6 +458,7 @@ void HkConstraintContext::computeChildrenOverflowBasedOnMinMax(const MinMaxPos& 
         /* Try to see if Y axis also needs to overflow to fit everything nicely*/
         if (isOverflowX_ && styleContextInj_->isOverflowAllowedY())
         {
+
             if (minMax.maxY + sbSizes.hsbSize > thisTc_->getPos().y + thisTc_->getScale().y)
             {
                 isOverflowY_ = true;
@@ -496,6 +498,7 @@ void HkConstraintContext::computeChildrenOverflowBasedOnMinMax(const MinMaxPos& 
             return;
         }
     }
+
 }
 
 float HkConstraintContext::computeHorizontalScale(const HkSizeConfig& config, const uint32_t childCount)

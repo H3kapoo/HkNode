@@ -5,8 +5,6 @@
 
 #include "../../base/HkNodeBase.hpp"
 
-#include "HkKnob.hpp"
-
 namespace hkui
 {
 
@@ -31,11 +29,22 @@ public:
     float getScrollValue() const;
     bool isScrollBarActive() const;
 
-    HkKnob knob_;
 private:
-    float overflowSize_;
-    bool isHorizontal_;
-    bool isActive_;
+    /* HkNodeBase */
+    void onFirstHeartbeat() override;
+    void postRenderAdditionalDetails() override;
+
+    void computeKnobValue(const glm::ivec2 offsetFromCenter);
+    void setKnobValue(float value);
+
+    HkNodeData knob_;
+    uint32_t barSize_{ 20 };
+    float scrollSensitivity_{ 0.05f };
+    float knobValue_{ 0 }; // 0 to 1 range
+
+    float overflowSize_{ 0 };
+    bool isHorizontal_{ false };
+    bool isActive_{ false };
 };
 using HkScrollBarPtr = std::shared_ptr<HkScrollBar>;
 using HkScrollBarCPtr = const std::shared_ptr<HkScrollBar>;

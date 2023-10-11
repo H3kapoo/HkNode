@@ -59,7 +59,6 @@ public:
         , overflowXYSize_{ 0,0 }, offsetPercentage_{ 0,0 }, sbCount_{ 0 }
     {}
 
-
     void resolveConstraints(HkTreeStruct& children, const HkScrollbarsSize sbSizes);
     void resolveHorizontalContainer(HkTreeStruct& children);
     void resolveVerticalContainer(HkTreeStruct& children);
