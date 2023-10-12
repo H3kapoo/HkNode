@@ -18,7 +18,7 @@ int main()
     //TODO: Make it the responsability of the window to generate VAO and shader?
     // we need to make it order agnostic
     HkWindowManagerPtr sceneWindow1 = std::make_shared<HkWindowManager>("MyWindowManager",
-        HkWindowManager::HkWindowConfig{ .width = 1280, .height = 720, .isMaster = true });
+        HkWindowManager::HkWindowConfig{ .width = 800, .height = 720, .isMaster = true });
     // sceneWindow1->setBackgroundImage("/home/hekapoo/container.jpg");
     // sceneWindow1->setBackgroundImage("/home/hekapoo/Downloads/fbi_wp.jpg");
     // sceneWindow1->setBackgroundImage("/home/hekapoo/container.jpg");
@@ -72,7 +72,7 @@ int main()
         .setGridRowCol(2, 1)
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         .setVHSizeConfig(
-            { .value = 300 },
+            { .value = 500 },
             { .value = 300 })
         .setMargins(0, 0, 0, 0);
 

@@ -18,7 +18,6 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
     wfCont_.node_.styleContext.setRowWrapping(true);
     wfCont_.node_.styleContext.setColor(glm::vec3(0.0f, 0.5f, 0.5f));
 
-
     treeStruct_.pushChild(&minimizeBtn_.treeStruct_);
     treeStruct_.pushChild(&exitBtn_.treeStruct_);
     treeStruct_.pushChild(&wfCont_.treeStruct_);
@@ -28,23 +27,9 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
             isMinimized_ = !isMinimized_;
         });
 
-    // exitBtn_.setOnClickListener([this]()
-    //     {
-    //         stillAlive_ = false;
-    //     });
-
     exitBtn_.setOnClickListener([this]()
         {
-            dummyVal = !dummyVal;
-            if (dummyVal) // fooling around, rm later
-            {
-                node_.styleContext.setColor({ 1.0f,0.0f,0.0f });
-            }
-            else
-            {
-                node_.styleContext.setColor({ 0.0f,0.0f,1.0f });
-            }
-            std::cout << "changed mode\n";
+            stillAlive_ = false;
         });
 }
 
@@ -93,18 +78,10 @@ void HkWindowFrame::onScroll()
 void HkWindowFrame::onDrag()
 {
     if (mode_ != HkWindowFrameMode::Grabbable) return;
-    if (dummyVal)
-    {
-        isAnimOngoing = false;
-        node_.transformContext.setPos(windowDataPtr_->mouseOffsetFromFocusedCenter + windowDataPtr_->mousePos);
-    }
-    else
-    {
-        startPos = node_.transformContext.getPos();
-        endPos = windowDataPtr_->mouseOffsetFromFocusedCenter + windowDataPtr_->mousePos;
-        isAnimOngoing = true;
-        restarted = true;
-    }
+    startPos = node_.transformContext.getPos();
+    endPos = windowDataPtr_->mouseOffsetFromFocusedCenter + windowDataPtr_->mousePos;
+    isAnimOngoing = true;
+    restarted = true;
 }
 
 void HkWindowFrame::onWindowResize()

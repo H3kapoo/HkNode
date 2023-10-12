@@ -1,4 +1,5 @@
 #include "HkScrollBar.hpp"
+#include "../../APIGate/GlfwGlewGate.hpp"
 
 namespace hkui
 {
@@ -45,6 +46,10 @@ void HkScrollBar::postRenderAdditionalDetails()
 
 void HkScrollBar::onScroll()
 {
+    isAnimOngoing = true;
+    restarted = true;
+    startPos = knobValue_;
+    endPos = knobValue_ - windowDataPtr_->scrollPosY * scrollSensitivity_;
     setKnobValue(knobValue_ - windowDataPtr_->scrollPosY * scrollSensitivity_);
 }
 
@@ -52,16 +57,54 @@ void HkScrollBar::onDrag()
 {
     /* Parameters represent offsets from drag or click area so that mouse doesnt snap to center
        of object and instead keeps a natural distance from its center */
-    computeKnobValue(windowDataPtr_->mouseOffsetFromFocusedCenter);
+    isAnimOngoing = true;
+    restarted = true;
+    startPos = knobValue_;
+    computeKnobValue((-(knob_.transformContext.getScale()) / 2) + dragOffset_);
+    endPos = knobValue_;
 }
 
 void HkScrollBar::onClick()
 {
-    computeKnobValue(
-        {
-            -knob_.transformContext.getScale().x * 0.5f,
-            -knob_.transformContext.getScale().y * 0.5f
-        });
+    /* Offset from click to center of knob*/
+    dragOffset_ = (knob_.transformContext.getPos() + knob_.transformContext.getScale() / 2)
+        - windowDataPtr_->mousePos;
+    /* Only reposition knob if we click outside of it*/
+    if (!knob_.transformContext.isPosInsideOfNode(windowDataPtr_->mousePos))
+    {
+        computeKnobValue((-(knob_.transformContext.getScale()) / 2));
+    }
+}
+
+void HkScrollBar::onAnimationFrameRequested()
+{
+    if (!isAnimOngoing) return;
+
+    if (restarted)
+    {
+        t = 0.0f;
+        restarted = false;
+        startTime = glfwGetTime();
+    }
+
+    double currentTime = glfwGetTime();
+    double elapsedTime = currentTime - startTime;
+    t = elapsedTime / animDuration;
+
+    if (t > 1.0f)
+    {
+        t = 1.0f;
+        isAnimOngoing = false;
+    }
+
+    const auto easeInOutCubic = [](double x) -> double {
+        const double c1 = 1.70158;
+        const double c3 = c1 + 1.0;
+        return 1.0 + c3 * std::pow(x - 1.0, 3.0) + c1 * std::pow(x - 1.0, 2.0);};
+
+    float interpPos = startPos + (endPos - startPos) * (float)easeInOutCubic(t);
+    setKnobValue(interpPos);
+    glfwPostEmptyEvent(); //TODO: This should be posted ONLY once per frame
 }
 
 void HkScrollBar::resolveChildrenConstraints(HkTreeStruct&, const HkScrollbarsSize&)
@@ -72,7 +115,7 @@ void HkScrollBar::resolveChildrenConstraints(HkTreeStruct&, const HkScrollbarsSi
 
 void HkScrollBar::setScrollValue(float value)
 {
-    (void)value;
+    setKnobValue(value);
 }
 
 /* Scale here refers to when a container has an overflow, how big of a margin this scrollbar will have. */
@@ -90,7 +133,7 @@ void HkScrollBar::setBarScale(uint32_t scale)
 }
 
 /* Based on where the mouse is at drag/click/scroll time, compute 0 to 1 range mapped
-   from scrollbar min pos to scrollbar max pos */
+   from scrollbar min pos to scrollbar max pos taking into accound the knob size*/
 void HkScrollBar::computeKnobValue(const glm::ivec2 offsetFromCenter)
 {
     if (isHorizontal_)

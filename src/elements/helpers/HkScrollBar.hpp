@@ -32,6 +32,7 @@ public:
 private:
     /* HkNodeBase */
     void onFirstHeartbeat() override;
+    void onAnimationFrameRequested() override;
     void postRenderAdditionalDetails() override;
 
     void computeKnobValue(const glm::ivec2 offsetFromCenter);
@@ -41,6 +42,15 @@ private:
     uint32_t barSize_{ 20 };
     float scrollSensitivity_{ 0.05f };
     float knobValue_{ 0 }; // 0 to 1 range
+    glm::ivec2 dragOffset_{ 0,0 };
+
+    bool isAnimOngoing{ false };
+    bool restarted{ false };
+    float t{ 0.0f };
+    float startPos, endPos;
+
+    double startTime{ 0.0f };
+    double animDuration{ 0.15f };
 
     float overflowSize_{ 0 };
     bool isHorizontal_{ false };
