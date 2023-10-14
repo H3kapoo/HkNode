@@ -60,7 +60,7 @@ void HkContainer::onGeneralMouseScroll()
     }
 }
 
-void HkContainer::onGeneralMouseClick()
+void HkContainer::onGeneralMouseClickOrRelease()
 {
     //TODO: Later bring back highlighting if needed
     // node_.renderContext.getShader().setInt("focused", 0);
@@ -84,6 +84,13 @@ void HkContainer::onGeneralMouseMove()
 void HkContainer::onClick()
 {
     // node_.renderContext.getShader().setInt("focused", 1);
+    std::cout << "clicked container\n";
+}
+
+void HkContainer::onRelease()
+{
+    // node_.renderContext.getShader().setInt("focused", 1);
+    std::cout << "released container\n";
 }
 
 void HkContainer::onDrag()

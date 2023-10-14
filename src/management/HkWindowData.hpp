@@ -4,18 +4,22 @@
 
 #include "HkEventStructs.hpp"
 #include "../renderer/HkRenderer.hpp"
+#include "../APIGate/GlfwGlewGate.hpp"
 
 namespace hkui
 {
 //TODO: Default init each variable to avoid garbage
 struct HkWindowData
 {
+    /* Window obj itself */
+    GLFWwindow* windowHandle{ NULL };
+
     /* Events */
     HkEvent currentEvent; //G
     glm::ivec2 windowSize; //L
     glm::ivec2 mousePos; //G
     glm::ivec2 lastMousePos; //G
-    bool isMouseClicked; //G
+    bool isMouseClicked{ false }; //G
     HkMouseButton lastActiveMouseButton; //G
     bool mouseEntered, mouseExited; //L
     double scrollPosY; //L

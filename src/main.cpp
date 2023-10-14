@@ -18,7 +18,7 @@ int main()
     //TODO: Make it the responsability of the window to generate VAO and shader?
     // we need to make it order agnostic
     HkWindowManagerPtr sceneWindow1 = std::make_shared<HkWindowManager>("MyWindowManager",
-        HkWindowManager::HkWindowConfig{ .width = 800, .height = 720, .isMaster = true });
+        HkWindowManager::HkWindowConfig{ .width = 1280, .height = 720, .isMaster = true });
     // sceneWindow1->setBackgroundImage("/home/hekapoo/container.jpg");
     // sceneWindow1->setBackgroundImage("/home/hekapoo/Downloads/fbi_wp.jpg");
     // sceneWindow1->setBackgroundImage("/home/hekapoo/container.jpg");
@@ -31,7 +31,7 @@ int main()
     sceneWindow1->makeContextCurrent();
 
     HkWindowFramePtr windowFrame = std::make_shared<HkWindowFrame>("MyWindowFrame");
-    windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
+    windowFrame->setWindowMode(HkWindowFrameMode::Grabbable);
     sceneWindow1->addSubWindow(windowFrame); //NOTE: Needs to be added before adding any children
 
     windowFrame->getStyle().setOverflowAllowedXY(true)
@@ -152,7 +152,7 @@ int main()
 
     HkWindowFramePtr windowFrame2 = std::make_shared<HkWindowFrame>("MyWindowFrame2");
     windowFrame2->setWindowMode(HkWindowFrameMode::Grabbable);
-    // sceneWindow1->addSubWindow(windowFrame2); //NOTE: Needs to be added before adding any children
+    sceneWindow1->addSubWindow(windowFrame2); //NOTE: Needs to be added before adding any children
     // sceneWindow2->addSubWindow(windowFrame2); //NOTE: Needs to be added before adding any children
 
     windowFrame2->getStyle().setOverflowAllowedXY(true)
@@ -171,8 +171,8 @@ int main()
     // ctr3->setSize({ 400, 450 });
 
     std::vector<HkNodeBasePtr> ctrs3;
-    ctrs3.reserve(5'000);
-    for (int i = 0;i < 5'000;i++) // with O2 works ok 01.09.2023
+    ctrs3.reserve(500);
+    for (int i = 0;i < 500;i++) // with O2 works ok 01.09.2023
     {
         const auto& ct = std::make_shared<HkContainer>("MyContauner");
         ct->getStyle().setColor(i % 2 == 0 ? glm::vec3{ 0.75f, 0.75f, 0.75f } : glm::vec3{ 1.0f, 1.0f, 1.0f });
@@ -189,18 +189,18 @@ int main()
 
     // sceneWindow3->makeContextCurrent();
 
-    // HkWindowFramePtr windowFrame3 = std::make_shared<HkWindowFrame>("MyWindowFrame2");
-    // windowFrame3->setWindowMode(HkWindowFrameMode::Grabbable);
+    HkWindowFramePtr windowFrame3 = std::make_shared<HkWindowFrame>("MyWindowFrame2");
+    windowFrame3->setWindowMode(HkWindowFrameMode::Grabbable);
     // // sceneWindow3->addSubWindow(windowFrame3); //NOTE: Needs to be added before adding any children
-    // // sceneWindow1->addSubWindow(windowFrame3); //NOTE: Needs to be added before adding any children
+    sceneWindow1->addSubWindow(windowFrame3); //NOTE: Needs to be added before adding any children
 
-    // windowFrame3->getStyle().setOverflowAllowedXY(true)
-    //     .setLayout(HkLayout::Horizontal)
-    //     .setHAlignment(HkHAlignment::Right)
-    //     .setVAlignment(HkVAlignment::Center);
+    windowFrame3->getStyle().setOverflowAllowedXY(true)
+        .setLayout(HkLayout::Horizontal)
+        .setHAlignment(HkHAlignment::Right)
+        .setVAlignment(HkVAlignment::Center);
 
-    // ctr5 = std::make_shared<HkContainer>("MyContainer5");
-    // ctr6 = std::make_shared<HkContainer>("MyContainer6");
+    HkContainerPtr ctr15 = std::make_shared<HkContainer>("MyContainer15");
+    HkContainerPtr ctr16 = std::make_shared<HkContainer>("MyContainer16");
 
     // ctr5->getStyle().setColor({ 0.0f,0.1f,0.2f });
     // ctr6->getStyle().setColor({ 1.0f,0.4f,0.5f });
@@ -223,7 +223,7 @@ int main()
     //     .setHAlignment(HkHAlignment::Left)
     //     .setVAlignment(HkVAlignment::Center);
 
-    // // windowFrame3->pushChildren({ ctr5, ctr6 });
+    windowFrame3->pushChildren({ ctr15, ctr16 });
     // windowFrame3->pushChildren(ctrs4);
 
 

@@ -31,6 +31,7 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
         {
             stillAlive_ = false;
         });
+
 }
 
 void HkWindowFrame::onAnimationFrameRequested()
@@ -39,7 +40,6 @@ void HkWindowFrame::onAnimationFrameRequested()
     // we skip this animation frame and request another one
     // Assumption is that after fixedTS time we are doing this, a frame will be actually
     // updated, resetting the accumulated time back to 0 and so on
-
     if (!isAnimOngoing) return;
 
     if (restarted)
@@ -82,27 +82,322 @@ void HkWindowFrame::onDrag()
     endPos = windowDataPtr_->mouseOffsetFromFocusedCenter + windowDataPtr_->mousePos;
     isAnimOngoing = true;
     restarted = true;
+
+    // node_.transformContext.setPos(endPos);
+
 }
 
-void HkWindowFrame::onWindowResize()
+void HkWindowFrame::onGeneralMouseClickOrRelease()
+{}
+
+void HkWindowFrame::onGeneralMouseMove()
 {
-    // setPos({ 0,0 });
-    // setSize({ windowDataPtr_->windowWidth, windowDataPtr_->windowHeight - 30 });
-    //TODO: Refactor if needed after topLeft coordinate change
-    /* Techically root windows shall not resize with WINDOW itself, only children should resize with their parents */
-    //TODO: Future: Refactor transforms so that they have pivot at top left corner instead of center
-    // auto factor = 0.5f;
-    // auto factor2 = 0.25f;
-    // //Just for now
-    // auto width_factor = std::round(windowDataPtr_->windowWidth * factor / 2) * 2;
-    // auto height_factor2 = std::round(windowDataPtr_->windowHeight * factor2 / 2) * 2;
-    // auto height_factor = std::round(windowDataPtr_->windowHeight * factor / 2) * 2;
+    if (!windowDataPtr_->isMouseClicked)
+    {
+        const auto mousePos = windowDataPtr_->mousePos;
+        const auto nodeEndPos = node_.transformContext.getPos().x + node_.transformContext.getScale().x;
+        const auto nodeEndPosY = wfCont_.node_.transformContext.getPos().y + wfCont_.node_.transformContext.getScale().y;
 
-    // node_.transformContext.setScale({ windowDataPtr_->windowWidth * factor, 30 });
-    // node_.transformContext.setPos({ windowDataPtr_->windowWidth * factor, windowDataPtr_->windowHeight * factor });
-    // wfCont_.node_.transformContext.setScale({ windowDataPtr_->windowWidth * factor, wfCont_.node_.transformContext.scale.y });
+        const bool TZone = (mousePos.y > node_.transformContext.getPos().y - grabOffset)
+            && (mousePos.y < node_.transformContext.getPos().y);
+        const bool BZone = (mousePos.y < nodeEndPosY + grabOffset)
+            && (mousePos.y > nodeEndPosY);
+        const bool LZone = (mousePos.x > node_.transformContext.getPos().x - grabOffset)
+            && (mousePos.x < node_.transformContext.getPos().x);
+        const bool RZone = (mousePos.x > nodeEndPos) && (mousePos.x < nodeEndPos + grabOffset);
 
+        const bool VBound = mousePos.y > node_.transformContext.getPos().y &&
+            mousePos.y < nodeEndPosY;
+        const bool HBound = mousePos.x > node_.transformContext.getPos().x &&
+            mousePos.x < nodeEndPos;
+
+        // pinch right
+        if (RZone && VBound)
+        {
+            /* This shall be moved out of here to first heart beat maybe*/
+            if (!cursorH)
+            {
+                cursorH = glfwCreateStandardCursor(GLFW_HRESIZE_CURSOR);
+            }
+            std::cout << "right edge click\n";
+            lockedInXR = true;
+        }
+        else
+        {
+            lockedInXR = false;
+        }
+
+        // pinch left
+        if (LZone && VBound)
+        {
+            /* This shall be moved out of here to first heart beat maybe*/
+            if (!cursorH)
+            {
+                cursorH = glfwCreateStandardCursor(GLFW_HRESIZE_CURSOR);
+            }
+            std::cout << "left edge click\n";
+            lockedInXL = true;
+        }
+        else
+        {
+            lockedInXL = false;
+        }
+
+        // pinch top
+        if (TZone && HBound)
+        {
+            if (!cursorV)
+            {
+                cursorV = glfwCreateStandardCursor(GLFW_VRESIZE_CURSOR);
+            }
+            std::cout << "top edge click\n";
+            lockedInYT = true;
+        }
+        else
+        {
+            lockedInYT = false;
+        }
+
+        // pinch bottom
+        if (BZone && HBound)
+        {
+            if (!cursorV)
+            {
+                cursorV = glfwCreateStandardCursor(GLFW_VRESIZE_CURSOR);
+            }
+            std::cout << "bottom edge click\n";
+            lockedInYB = true;
+        }
+        else
+        {
+            lockedInYB = false;
+        }
+
+        // diagonal bottom-right pinch
+        if (RZone && BZone)
+        {
+            if (!cursorHV)
+            {
+                cursorHV = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
+            }
+            lockedInXR = true;
+            lockedInYB = true;
+        }
+
+        // diagonal top-right pinch
+        if (RZone && TZone)
+        {
+            if (!cursorHV)
+            {
+                cursorHV = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
+            }
+            lockedInXR = true;
+            lockedInYT = true;
+        }
+
+        // diagonal bottom-left pinch
+        if (LZone && BZone)
+        {
+            if (!cursorHV)
+            {
+                cursorHV = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
+            }
+            lockedInXL = true;
+            lockedInYB = true;
+        }
+
+        // diagonal top-left pinch
+        if (LZone && TZone)
+        {
+            std::cout << "possible top left pinch\n";
+            if (!cursorHV)
+            {
+                cursorHV = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
+            }
+            lockedInXL = true;
+            lockedInYT = true;
+        }
+    }
+
+    if (lockedInXR && lockedInYB)
+    {
+        glfwSetCursor(windowDataPtr_->windowHandle, cursorHV);
+        if (windowDataPtr_->isMouseClicked)
+        {
+            node_.transformContext.addScale(
+                { windowDataPtr_->mousePos.x - windowDataPtr_->lastMousePos.x, 0 });
+            wfCont_.node_.transformContext.addScale(
+                {
+                    0,
+                    (windowDataPtr_->mousePos.y - windowDataPtr_->lastMousePos.y)
+                });
+        }
+        return;
+    }
+
+    if (lockedInXR && lockedInYT)
+    {
+        glfwSetCursor(windowDataPtr_->windowHandle, cursorHV);
+        if (windowDataPtr_->isMouseClicked)
+        {
+            node_.transformContext.addScale(
+                { windowDataPtr_->mousePos.x - windowDataPtr_->lastMousePos.x, 0 });
+            node_.transformContext.addPos(
+                {
+                    0,
+                    windowDataPtr_->mousePos.y - windowDataPtr_->lastMousePos.y
+                });
+
+            wfCont_.node_.transformContext.addScale(
+                {
+                    0,
+                    -(windowDataPtr_->mousePos.y - windowDataPtr_->lastMousePos.y)
+                });
+        }
+        return;
+    }
+
+    if (lockedInXL && lockedInYB)
+    {
+        glfwSetCursor(windowDataPtr_->windowHandle, cursorHV);
+        if (windowDataPtr_->isMouseClicked)
+        {
+            node_.transformContext.addPos(
+                { (windowDataPtr_->mousePos.x - windowDataPtr_->lastMousePos.x), 0 });
+
+            node_.transformContext.addScale(
+                { -(windowDataPtr_->mousePos.x - windowDataPtr_->lastMousePos.x), 0 });
+            wfCont_.node_.transformContext.addScale(
+                {
+                    0,
+                    (windowDataPtr_->mousePos.y - windowDataPtr_->lastMousePos.y)
+                });
+        }
+        return;
+    }
+
+    if (lockedInXL && lockedInYT)
+    {
+        glfwSetCursor(windowDataPtr_->windowHandle, cursorHV);
+        if (windowDataPtr_->isMouseClicked)
+        {
+            node_.transformContext.addPos(
+                { (windowDataPtr_->mousePos.x - windowDataPtr_->lastMousePos.x), 0 });
+
+            node_.transformContext.addScale(
+                { -(windowDataPtr_->mousePos.x - windowDataPtr_->lastMousePos.x), 0 });
+            node_.transformContext.addPos(
+                {
+                    0,
+                    windowDataPtr_->mousePos.y - windowDataPtr_->lastMousePos.y
+                });
+
+            wfCont_.node_.transformContext.addScale(
+                {
+                    0,
+                    -(windowDataPtr_->mousePos.y - windowDataPtr_->lastMousePos.y)
+                });
+        }
+        return;
+    }
+
+    if (lockedInXR)
+    {
+        glfwSetCursor(windowDataPtr_->windowHandle, cursorH);
+        if (windowDataPtr_->isMouseClicked)
+        {
+            node_.transformContext.addScale(
+                { windowDataPtr_->mousePos.x - windowDataPtr_->lastMousePos.x, 0 });
+        }
+    }
+
+    if (lockedInXL)
+    {
+        glfwSetCursor(windowDataPtr_->windowHandle, cursorH);
+        if (windowDataPtr_->isMouseClicked)
+        {
+            node_.transformContext.addPos(
+                { (windowDataPtr_->mousePos.x - windowDataPtr_->lastMousePos.x), 0 });
+
+            node_.transformContext.addScale(
+                { -(windowDataPtr_->mousePos.x - windowDataPtr_->lastMousePos.x), 0 });
+        }
+    }
+
+    if (lockedInYT)
+    {
+        glfwSetCursor(windowDataPtr_->windowHandle, cursorV);
+        if (windowDataPtr_->isMouseClicked)
+        {
+            node_.transformContext.addPos(
+                {
+                    0,
+                    windowDataPtr_->mousePos.y - windowDataPtr_->lastMousePos.y
+                });
+
+            wfCont_.node_.transformContext.addScale(
+                {
+                    0,
+                    -(windowDataPtr_->mousePos.y - windowDataPtr_->lastMousePos.y)
+                });
+        }
+    }
+
+    if (lockedInYB)
+    {
+        glfwSetCursor(windowDataPtr_->windowHandle, cursorV);
+        if (windowDataPtr_->isMouseClicked)
+        {
+            wfCont_.node_.transformContext.addScale(
+                {
+                    0,
+                    (windowDataPtr_->mousePos.y - windowDataPtr_->lastMousePos.y)
+                });
+        }
+    }
+
+    /* If we didn't manage to grab anything, reset cursor */
+    if (lockedInXR == false && lockedInXL == false && lockedInYT == false && lockedInYB == false)
+    {
+        glfwSetCursor(windowDataPtr_->windowHandle, NULL);
+    }
 }
+
+void HkWindowFrame::onClick()
+{
+    clickedPos = windowDataPtr_->mousePos;
+    std::cout << "clicked\n";
+
+    // // pinch right
+    // const auto nodeEndPos = node_.transformContext.getPos().x + node_.transformContext.getScale().x;
+    // if (clickedPos.x > nodeEndPos - 15 && !lockedInXR)
+    // {
+    //     std::cout << "right edge click\n";
+    //     lockedInXR = true;
+    //     return;
+    // }
+
+    // // pinch left
+    // if (clickedPos.x < node_.transformContext.getPos().x + 15 && !lockedInXL)
+    // {
+    //     std::cout << "left edge click\n";
+    //     lockedInXL = true;
+    //     return;
+    // }
+
+    // // pinch top
+    // if (clickedPos.y < node_.transformContext.getPos().y + 15 && !lockedInYT)
+    // {
+    //     std::cout << "top edge click\n";
+    //     lockedInYT = true;
+    //     return;
+    // }
+}
+
+void HkWindowFrame::onRelease()
+{}
+
+void HkWindowFrame::onWindowResize() {}
 
 void HkWindowFrame::resolveChildrenConstraints(HkTreeStruct&,
     const HkScrollbarsSize&)
@@ -113,7 +408,6 @@ void HkWindowFrame::resolveChildrenConstraints(HkTreeStruct&,
         cachedPos_ = wfCont_.node_.transformContext.getPos();
         cachedScale_ = wfCont_.node_.transformContext.getScale();
     }
-
 
     node_.constraintContext.windowFrameContainerConstraint(wfCont_.node_.transformContext,
         exitBtn_.node_.transformContext, minimizeBtn_.node_.transformContext, windowDataPtr_->windowSize,

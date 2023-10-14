@@ -667,13 +667,13 @@ void HkConstraintContext::windowFrameContainerConstraint(HkTransformContext& wfC
 
     exitBtn.setScale({ 20, 20 }); // hardcoded, but technically ok situation
     exitBtn.setPos({
-        thisTc_->getPos().x + thisTc_->getScale().x - 20 - 5,
+        thisTc_->getPos().x + thisTc_->getScale().x - 20 - 10,
         thisTc_->getPos().y + 20 / 2 - 5
         });
 
     minBtn.setScale({ 20, 20 });
     minBtn.setPos({
-        thisTc_->getPos().x + thisTc_->getScale().x - 20 - 35,
+        thisTc_->getPos().x + thisTc_->getScale().x - 20 - 40,
         thisTc_->getPos().y + 20 / 2 - 5
         });
 }

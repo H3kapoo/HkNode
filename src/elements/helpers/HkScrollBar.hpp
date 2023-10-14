@@ -40,9 +40,8 @@ private:
 
     HkNodeData knob_;
     uint32_t barSize_{ 20 };
-    float scrollSensitivity_{ 0.05f };
+    float scrollSensitivity_{ 0.15f };
     float knobValue_{ 0 }; // 0 to 1 range
-    glm::ivec2 dragOffset_{ 0,0 };
 
     bool isAnimOngoing{ false };
     bool restarted{ false };

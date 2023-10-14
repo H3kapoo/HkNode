@@ -19,7 +19,8 @@ private:
     void onScroll() override;
     void onGeneralMouseScroll() override;
     void onClick() override;
-    void onGeneralMouseClick() override;
+    void onRelease() override;
+    void onGeneralMouseClickOrRelease() override;
     void onGeneralMouseMove() override;
     void onDrag() override;
     void resolveChildrenConstraints(HkTreeStruct& children,

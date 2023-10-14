@@ -74,7 +74,7 @@ private:
     virtual void onGeneralUpdate();
     virtual void onWindowResize();
     virtual void onGeneralMouseMove();
-    virtual void onGeneralMouseClick();
+    virtual void onGeneralMouseClickOrRelease();
     virtual void onGeneralMouseScroll();
     virtual void onFirstHeartbeat();
 

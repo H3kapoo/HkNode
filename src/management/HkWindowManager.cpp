@@ -33,6 +33,7 @@ HkWindowManager::HkWindowManager(const std::string& windowName, const HkWindowCo
 
     windowData_.windowSize = { config.width, config.height };
     windowData_.sceneProjMatrix = glm::ortho(0.0f, (float)config.width, (float)config.height, 0.0f, 0.0f, 100.0f);
+    windowData_.windowHandle = windowHandle_;
 
     windowName_ = windowName;
     id_ = idGiver++;

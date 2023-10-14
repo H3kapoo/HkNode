@@ -60,15 +60,12 @@ void HkScrollBar::onDrag()
     isAnimOngoing = true;
     restarted = true;
     startPos = knobValue_;
-    computeKnobValue((-(knob_.transformContext.getScale()) / 2) + dragOffset_);
+    computeKnobValue((-(knob_.transformContext.getScale()) / 2));
     endPos = knobValue_;
 }
 
 void HkScrollBar::onClick()
 {
-    /* Offset from click to center of knob*/
-    dragOffset_ = (knob_.transformContext.getPos() + knob_.transformContext.getScale() / 2)
-        - windowDataPtr_->mousePos;
     /* Only reposition knob if we click outside of it*/
     if (!knob_.transformContext.isPosInsideOfNode(windowDataPtr_->mousePos))
     {

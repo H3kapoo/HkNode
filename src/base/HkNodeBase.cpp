@@ -199,6 +199,10 @@ void HkNodeBase::resolveFocus()
         windowDataPtr_->focusedId = treeStruct_.getId();
         windowDataPtr_->mouseOffsetFromFocusedCenter = node_.transformContext.getPos() - windowDataPtr_->mousePos;
     }
+
+    //TODO: For pinching, maybe its best to do a similar thing that we did with nearest
+    // scrollbar. Try to see if on click-focus we might be also happening to pinch something
+    // IF we next 'drag'
 }
 
 /* Resolve specific and general mouse click evt */
@@ -214,16 +218,16 @@ void HkNodeBase::resolveMouseClickEvent()
             HkMouseAction::Click, windowDataPtr_->lastActiveMouseButton);
     }
     /* Notify release on actually released object only*/
-    else if (!windowDataPtr_->isMouseClicked && windowDataPtr_->hoveredId == treeStruct_.getId())
+    else if (!windowDataPtr_->isMouseClicked && windowDataPtr_->focusedId == treeStruct_.getId())
     {
+        //TODO: Better handling of how clicks/releases are made
         onRelease();
         node_.eventsContext.invokeMouseEvent(windowDataPtr_->mousePos.x, windowDataPtr_->mousePos.x,
             HkMouseAction::Release, windowDataPtr_->lastActiveMouseButton);
     }
 
     /* Then notify the rest */
-    if (windowDataPtr_->isMouseClicked && windowDataPtr_->hoveredId != treeStruct_.getId())
-        onGeneralMouseClick();
+    onGeneralMouseClickOrRelease();
 }
 
 /* Resolve specific and general mouse scroll evt */
@@ -329,7 +333,7 @@ void HkNodeBase::onScroll() {}
 void HkNodeBase::onGeneralUpdate() {}
 void HkNodeBase::onWindowResize() {}
 void HkNodeBase::onGeneralMouseMove() {}
-void HkNodeBase::onGeneralMouseClick() {}
+void HkNodeBase::onGeneralMouseClickOrRelease() {}
 void HkNodeBase::onGeneralMouseScroll() {}
 
 

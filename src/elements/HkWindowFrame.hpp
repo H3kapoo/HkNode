@@ -7,6 +7,7 @@
 #include "../base/HkNodeBase.hpp"
 #include "../base/HkNodeData.hpp"
 #include "../base/HkTreeStructure.hpp"
+#include "../utils/PinchHelper.hpp"
 #include "HkContainer.hpp"
 #include "HkButton.hpp"
 
@@ -46,6 +47,10 @@ private:
     void onAnimationFrameRequested() override;
     void onScroll() override;
     void onDrag() override;
+    void onClick() override;
+    void onRelease() override;
+    void onGeneralMouseMove() override;
+    void onGeneralMouseClickOrRelease() override;
     void onWindowResize() override;
     void resolveChildrenConstraints(HkTreeStruct&,
         const HkScrollbarsSize&) override;
@@ -70,6 +75,19 @@ private:
 
     double startTime{ 0.0f };
     double animDuration{ 0.25f };
+
+    glm::ivec2 clickedPos{ 0,0 };
+    bool lockedInXR{ false };
+    bool validRight{ false };
+    bool lockedInXL{ false };
+    bool lockedInYT{ false };
+    bool lockedInYB{ false };
+    GLFWcursor* cursorH{ NULL };
+    GLFWcursor* cursorV{ NULL };
+    GLFWcursor* cursorHV{ NULL };
+    const int32_t grabOffset = 15;
+    PinchHelper pinchHelper_;
+
 };
 using HkWindowFramePtr = std::shared_ptr<HkWindowFrame>;
 using HkWindowFrameCPtr = const std::shared_ptr<HkWindowFrame>;
