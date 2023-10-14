@@ -55,6 +55,9 @@ private:
     void resolveChildrenConstraints(HkTreeStruct&,
         const HkScrollbarsSize&) override;
 
+    void cursorChange(const int32_t value);
+
+
     /* Injects */
     void injectWindowDataPtr(HkWindowData* windowDataPtr) override;
 
@@ -76,7 +79,6 @@ private:
     double startTime{ 0.0f };
     double animDuration{ 0.25f };
 
-    glm::ivec2 clickedPos{ 0,0 };
     bool lockedInXR{ false };
     bool validRight{ false };
     bool lockedInXL{ false };

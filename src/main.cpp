@@ -192,7 +192,7 @@ int main()
     HkWindowFramePtr windowFrame3 = std::make_shared<HkWindowFrame>("MyWindowFrame2");
     windowFrame3->setWindowMode(HkWindowFrameMode::Grabbable);
     // // sceneWindow3->addSubWindow(windowFrame3); //NOTE: Needs to be added before adding any children
-    sceneWindow1->addSubWindow(windowFrame3); //NOTE: Needs to be added before adding any children
+    // sceneWindow1->addSubWindow(windowFrame3); //NOTE: Needs to be added before adding any children
 
     windowFrame3->getStyle().setOverflowAllowedXY(true)
         .setLayout(HkLayout::Horizontal)

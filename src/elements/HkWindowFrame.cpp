@@ -71,7 +71,6 @@ void HkWindowFrame::onAnimationFrameRequested()
 
 void HkWindowFrame::onScroll()
 {
-    // std::cout << glfwGetTime() << " scroll value: " << windowDataPtr_->scrollPosY << '\n';
     node_.transformContext.addScale({ windowDataPtr_->scrollPosY * 4, 0 });
 }
 
@@ -82,9 +81,6 @@ void HkWindowFrame::onDrag()
     endPos = windowDataPtr_->mouseOffsetFromFocusedCenter + windowDataPtr_->mousePos;
     isAnimOngoing = true;
     restarted = true;
-
-    // node_.transformContext.setPos(endPos);
-
 }
 
 void HkWindowFrame::onGeneralMouseClickOrRelease()
@@ -114,12 +110,6 @@ void HkWindowFrame::onGeneralMouseMove()
         // pinch right
         if (RZone && VBound)
         {
-            /* This shall be moved out of here to first heart beat maybe*/
-            if (!cursorH)
-            {
-                cursorH = glfwCreateStandardCursor(GLFW_HRESIZE_CURSOR);
-            }
-            std::cout << "right edge click\n";
             lockedInXR = true;
         }
         else
@@ -130,12 +120,6 @@ void HkWindowFrame::onGeneralMouseMove()
         // pinch left
         if (LZone && VBound)
         {
-            /* This shall be moved out of here to first heart beat maybe*/
-            if (!cursorH)
-            {
-                cursorH = glfwCreateStandardCursor(GLFW_HRESIZE_CURSOR);
-            }
-            std::cout << "left edge click\n";
             lockedInXL = true;
         }
         else
@@ -146,11 +130,6 @@ void HkWindowFrame::onGeneralMouseMove()
         // pinch top
         if (TZone && HBound)
         {
-            if (!cursorV)
-            {
-                cursorV = glfwCreateStandardCursor(GLFW_VRESIZE_CURSOR);
-            }
-            std::cout << "top edge click\n";
             lockedInYT = true;
         }
         else
@@ -161,11 +140,6 @@ void HkWindowFrame::onGeneralMouseMove()
         // pinch bottom
         if (BZone && HBound)
         {
-            if (!cursorV)
-            {
-                cursorV = glfwCreateStandardCursor(GLFW_VRESIZE_CURSOR);
-            }
-            std::cout << "bottom edge click\n";
             lockedInYB = true;
         }
         else
@@ -176,10 +150,6 @@ void HkWindowFrame::onGeneralMouseMove()
         // diagonal bottom-right pinch
         if (RZone && BZone)
         {
-            if (!cursorHV)
-            {
-                cursorHV = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
-            }
             lockedInXR = true;
             lockedInYB = true;
         }
@@ -187,10 +157,6 @@ void HkWindowFrame::onGeneralMouseMove()
         // diagonal top-right pinch
         if (RZone && TZone)
         {
-            if (!cursorHV)
-            {
-                cursorHV = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
-            }
             lockedInXR = true;
             lockedInYT = true;
         }
@@ -198,10 +164,6 @@ void HkWindowFrame::onGeneralMouseMove()
         // diagonal bottom-left pinch
         if (LZone && BZone)
         {
-            if (!cursorHV)
-            {
-                cursorHV = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
-            }
             lockedInXL = true;
             lockedInYB = true;
         }
@@ -209,11 +171,6 @@ void HkWindowFrame::onGeneralMouseMove()
         // diagonal top-left pinch
         if (LZone && TZone)
         {
-            std::cout << "possible top left pinch\n";
-            if (!cursorHV)
-            {
-                cursorHV = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
-            }
             lockedInXL = true;
             lockedInYT = true;
         }
@@ -221,7 +178,7 @@ void HkWindowFrame::onGeneralMouseMove()
 
     if (lockedInXR && lockedInYB)
     {
-        glfwSetCursor(windowDataPtr_->windowHandle, cursorHV);
+        cursorChange(GLFW_CROSSHAIR_CURSOR);
         if (windowDataPtr_->isMouseClicked)
         {
             node_.transformContext.addScale(
@@ -237,7 +194,7 @@ void HkWindowFrame::onGeneralMouseMove()
 
     if (lockedInXR && lockedInYT)
     {
-        glfwSetCursor(windowDataPtr_->windowHandle, cursorHV);
+        cursorChange(GLFW_CROSSHAIR_CURSOR);
         if (windowDataPtr_->isMouseClicked)
         {
             node_.transformContext.addScale(
@@ -259,7 +216,7 @@ void HkWindowFrame::onGeneralMouseMove()
 
     if (lockedInXL && lockedInYB)
     {
-        glfwSetCursor(windowDataPtr_->windowHandle, cursorHV);
+        cursorChange(GLFW_CROSSHAIR_CURSOR);
         if (windowDataPtr_->isMouseClicked)
         {
             node_.transformContext.addPos(
@@ -278,7 +235,7 @@ void HkWindowFrame::onGeneralMouseMove()
 
     if (lockedInXL && lockedInYT)
     {
-        glfwSetCursor(windowDataPtr_->windowHandle, cursorHV);
+        cursorChange(GLFW_CROSSHAIR_CURSOR);
         if (windowDataPtr_->isMouseClicked)
         {
             node_.transformContext.addPos(
@@ -303,7 +260,7 @@ void HkWindowFrame::onGeneralMouseMove()
 
     if (lockedInXR)
     {
-        glfwSetCursor(windowDataPtr_->windowHandle, cursorH);
+        cursorChange(GLFW_HRESIZE_CURSOR);
         if (windowDataPtr_->isMouseClicked)
         {
             node_.transformContext.addScale(
@@ -313,7 +270,7 @@ void HkWindowFrame::onGeneralMouseMove()
 
     if (lockedInXL)
     {
-        glfwSetCursor(windowDataPtr_->windowHandle, cursorH);
+        cursorChange(GLFW_HRESIZE_CURSOR);
         if (windowDataPtr_->isMouseClicked)
         {
             node_.transformContext.addPos(
@@ -326,7 +283,7 @@ void HkWindowFrame::onGeneralMouseMove()
 
     if (lockedInYT)
     {
-        glfwSetCursor(windowDataPtr_->windowHandle, cursorV);
+        cursorChange(GLFW_VRESIZE_CURSOR);
         if (windowDataPtr_->isMouseClicked)
         {
             node_.transformContext.addPos(
@@ -345,7 +302,7 @@ void HkWindowFrame::onGeneralMouseMove()
 
     if (lockedInYB)
     {
-        glfwSetCursor(windowDataPtr_->windowHandle, cursorV);
+        cursorChange(GLFW_VRESIZE_CURSOR);
         if (windowDataPtr_->isMouseClicked)
         {
             wfCont_.node_.transformContext.addScale(
@@ -359,40 +316,18 @@ void HkWindowFrame::onGeneralMouseMove()
     /* If we didn't manage to grab anything, reset cursor */
     if (lockedInXR == false && lockedInXL == false && lockedInYT == false && lockedInYB == false)
     {
-        glfwSetCursor(windowDataPtr_->windowHandle, NULL);
+        cursorChange(GLFW_ARROW_CURSOR);
     }
 }
 
-void HkWindowFrame::onClick()
+void HkWindowFrame::cursorChange(const int32_t value)
 {
-    clickedPos = windowDataPtr_->mousePos;
-    std::cout << "clicked\n";
-
-    // // pinch right
-    // const auto nodeEndPos = node_.transformContext.getPos().x + node_.transformContext.getScale().x;
-    // if (clickedPos.x > nodeEndPos - 15 && !lockedInXR)
-    // {
-    //     std::cout << "right edge click\n";
-    //     lockedInXR = true;
-    //     return;
-    // }
-
-    // // pinch left
-    // if (clickedPos.x < node_.transformContext.getPos().x + 15 && !lockedInXL)
-    // {
-    //     std::cout << "left edge click\n";
-    //     lockedInXL = true;
-    //     return;
-    // }
-
-    // // pinch top
-    // if (clickedPos.y < node_.transformContext.getPos().y + 15 && !lockedInYT)
-    // {
-    //     std::cout << "top edge click\n";
-    //     lockedInYT = true;
-    //     return;
-    // }
+    windowDataPtr_->suggestedCursor = value;
+    windowDataPtr_->cursorChangeNeeded = true;
 }
+
+void HkWindowFrame::onClick()
+{}
 
 void HkWindowFrame::onRelease()
 {}

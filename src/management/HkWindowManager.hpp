@@ -49,7 +49,10 @@ private:
 
     /* Force update from App manger */
     void forceUpdate();
+
     void updateAllSubWindows(const HkEvent& ev);
+    void updateCursor();
+    void decideCursor();
 
     /* Background related*/
     void renderBackgroundImage();
@@ -64,6 +67,13 @@ private:
     std::string pathToBgImg_;
     HkNodeData bgNodeData_;
 
+    /*Cursor info*/
+    GLFWcursor* hCursor_{ NULL };
+    GLFWcursor* vCursor_{ NULL };
+    GLFWcursor* hvCursor_{ NULL };
+    int32_t decidedCursor_{ GLFW_ARROW_CURSOR };
+    int32_t potentialCursor_{ 0 };
+    bool cursorsInited_{ false };
     //TODO: Window specific params
     std::string windowName_;
     bool isMaster_{ false };

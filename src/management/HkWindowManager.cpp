@@ -25,7 +25,7 @@ HkWindowManager::HkWindowManager(const std::string& windowName, const HkWindowCo
     /* Make any newly created window the currently bound context to make sure
        future glew/glfw API calls succeed */
     glfwMakeContextCurrent(windowHandle_);
-    glfwSwapInterval(0); // zero to disable Vsync
+    // glfwSwapInterval(0); // zero to disable Vsync
 
     windowData_.lastMousePos = windowData_.mousePos = { 0,0 };
     windowData_.focusedId = HkWindowData::NO_SELECTION_ID;
@@ -98,6 +98,8 @@ void HkWindowManager::updateAllSubWindows(const HkEvent& ev)
         {
             /* Update subwindow */
             (*it)->rootUpdate();
+
+            decideCursor();
             ++it;
         }
         else
@@ -108,16 +110,76 @@ void HkWindowManager::updateAllSubWindows(const HkEvent& ev)
         }
     }
 
-    double currTime = glfwGetTime();
-    windowData_.deltaTime = currTime - windowData_.previousTime;
-    windowData_.previousTime = currTime;
+    //EXPERIMENTAL, MAYBE NEEDS REMOVAL
+    // double currTime = glfwGetTime();
+    // windowData_.deltaTime = currTime - windowData_.previousTime;
+    // windowData_.previousTime = currTime;
+    //
     //TODO: If theres no animation left to be done, reset prevTime back to zero
     windowData_.currentEvent = HkEvent::None; /* Reset current event */
+
+    /* Update suggested cursor accordingly. No priority is taken into account for now*/
+    updateCursor();
+}
+
+void HkWindowManager::decideCursor()
+{
+    /* Very important to change cursor only if it might of changed*/
+    if (!windowData_.cursorChangeNeeded == true) return;
+
+    /* First cursor different than the default one will be the new cursor in this case*/
+    if (potentialCursor_ == 0 && windowData_.suggestedCursor != GLFW_ARROW_CURSOR)
+    {
+        potentialCursor_ = windowData_.suggestedCursor;
+    }
+}
+
+void HkWindowManager::updateCursor()
+{
+    /* Very important to change cursor only if it might of changed*/
+    if (!windowData_.cursorChangeNeeded == true) return;
+
+    /* init cursor types */
+    if (!cursorsInited_)
+    {
+        hCursor_ = glfwCreateStandardCursor(GLFW_HRESIZE_CURSOR);
+        vCursor_ = glfwCreateStandardCursor(GLFW_VRESIZE_CURSOR);
+        hvCursor_ = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
+        cursorsInited_ = true;
+    }
+
+    /* If we have a potential new cursor that we know is not the default one,
+    change current cursor o it*/
+    potentialCursor_ != 0 ?
+        decidedCursor_ = potentialCursor_ : decidedCursor_ = GLFW_ARROW_CURSOR;
+
+    switch (decidedCursor_)
+    {
+    case GLFW_ARROW_CURSOR:
+        glfwSetCursor(windowHandle_, NULL);
+        break;
+    case GLFW_HRESIZE_CURSOR:
+        glfwSetCursor(windowHandle_, hCursor_);
+        break;
+    case GLFW_VRESIZE_CURSOR:
+        glfwSetCursor(windowHandle_, vCursor_);
+        break;
+    case GLFW_CROSSHAIR_CURSOR:
+        glfwSetCursor(windowHandle_, hvCursor_);
+        break;
+    }
+
+    /* Reset change needed.. already handled*/
+    windowData_.cursorChangeNeeded = false;
+    potentialCursor_ = 0;
 }
 
 void HkWindowManager::teardown()
 {
     std::cout << "Destroying window: " << windowName_ << "\n";
+    glfwDestroyCursor(hCursor_);
+    glfwDestroyCursor(vCursor_);
+    glfwDestroyCursor(hvCursor_);
     glfwDestroyWindow(windowHandle_);
 }
 
