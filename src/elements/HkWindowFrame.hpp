@@ -44,6 +44,8 @@ private:
     HkNodeBase* getUnderlayingNode() override;
 
     /* HkNodeBase */
+    void onFirstHeartbeat() override;
+    void postRenderAdditionalDetails() override;
     void onAnimationFrameRequested() override;
     void onScroll() override;
     void onDrag() override;
@@ -65,6 +67,8 @@ private:
     HkButton exitBtn_;
     HkContainer wfCont_;
 
+    HkNodeData pincher_;
+
     bool stillAlive_{ true };
     HkWindowFrameMode mode_;
     glm::ivec2 cachedScale_;
@@ -84,10 +88,11 @@ private:
     bool lockedInXL{ false };
     bool lockedInYT{ false };
     bool lockedInYB{ false };
+    // bool lastLockedIn // enum for better performance maybe
     GLFWcursor* cursorH{ NULL };
     GLFWcursor* cursorV{ NULL };
     GLFWcursor* cursorHV{ NULL };
-    const int32_t grabOffset = 15;
+    const int32_t grabOffset = 10;
     PinchHelper pinchHelper_;
 
 };

@@ -49,12 +49,17 @@ void HkNodeBase::renderMySelf()
 
     /* Use this to render additional non interactive things if needed */
     /* Note: rescissoring to original parent is needed unfortunatelly */
-    glEnable(GL_SCISSOR_TEST);
-    glScissor(
-        tc.getVPos().x,
-        windowDataPtr_->windowSize.y - tc.getVPos().y - tc.getVScale().y,
-        tc.getVScale().x,
-        tc.getVScale().y);
+
+    /* Node can have its custom scissors inside the postRenderAdditionalDetails method*/
+    if (!node_.renderContext.customPostScissor)
+    {
+        glEnable(GL_SCISSOR_TEST);
+        glScissor(
+            tc.getVPos().x,
+            windowDataPtr_->windowSize.y - tc.getVPos().y - tc.getVScale().y,
+            tc.getVScale().x,
+            tc.getVScale().y);
+    }
 
     postRenderAdditionalDetails();
 

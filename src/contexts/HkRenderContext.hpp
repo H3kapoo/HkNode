@@ -21,5 +21,6 @@ public:
     std::vector<HkTextureInfo> texInfos;
     glm::mat4 windowProjMatrix;
     bool colorUniformEn{ false };
+    bool customPostScissor{ false };
 };
 } // hkui

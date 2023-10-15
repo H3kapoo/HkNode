@@ -15,8 +15,15 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
 {
     /* Setup defaults that don't have to do with VAOs/Textures/Shaders themselves*/
     node_.styleContext.setColor(glm::vec3(0.0f, 0.5f, 0.9f));
+
+    node_.renderContext.customPostScissor = true;
+
     wfCont_.node_.styleContext.setRowWrapping(true);
     wfCont_.node_.styleContext.setColor(glm::vec3(0.0f, 0.5f, 0.5f));
+
+
+    pincher_.styleContext.setColor(glm::vec3(0.2f, 0.2f, 0.2f));
+    pincher_.renderContext.colorUniformEn = true;
 
     treeStruct_.pushChild(&minimizeBtn_.treeStruct_);
     treeStruct_.pushChild(&exitBtn_.treeStruct_);
@@ -31,7 +38,127 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
         {
             stillAlive_ = false;
         });
+}
 
+void HkWindowFrame::onFirstHeartbeat()
+{
+    std::string DEFAULT_VS = "assets/shaders/v1.glsl";
+    std::string DEFAULT_FS = "assets/shaders/f1.glsl";
+    const HkVertexArrayType DEFAULT_TYPE = HkVertexArrayType::QUAD;
+
+    pincher_.renderContext.shaderId = windowDataPtr_->renderer.addShaderSourceToCache(DEFAULT_VS, DEFAULT_FS);
+    pincher_.renderContext.vaoId = windowDataPtr_->renderer.addVertexArrayDataToCache(DEFAULT_TYPE);
+
+    HkNodeBase::onFirstHeartbeat();
+}
+
+void HkWindowFrame::postRenderAdditionalDetails()
+{
+    const auto& tc = node_.transformContext;
+    const auto& wfContTc = wfCont_. node_.transformContext;
+    const auto combinedY = (tc.getVScale().y + wfContTc.getVScale().y);
+
+    /* To note that we should always render the bars last*/
+    glEnable(GL_SCISSOR_TEST);
+    const int32_t extendT = lockedInYT ? grabOffset : 0;
+    const int32_t extendB = lockedInYB ? grabOffset : 0;
+    if (lockedInXR)
+    {
+        glScissor(
+            tc.getVPos().x,
+            windowDataPtr_->windowSize.y - tc.getVPos().y - combinedY - extendB,
+            tc.getVScale().x + grabOffset,
+            combinedY + 2 * extendT + extendB);
+        pincher_.transformContext.setScale(
+            {
+                grabOffset,
+                wfCont_.node_.transformContext.getScale().y + node_.transformContext.getScale().y
+                    + extendT + extendB
+            });
+        pincher_.transformContext.setPos(
+            {
+                node_.transformContext.getPos().x + node_.transformContext.getScale().x,
+                node_.transformContext.getPos().y - extendT
+            });
+
+        pincher_.renderContext.windowProjMatrix = windowDataPtr_->sceneProjMatrix;
+        windowDataPtr_->renderer.render(pincher_.renderContext,
+            pincher_.styleContext,
+            pincher_.transformContext.getModelMatrix());
+    }
+
+    if (lockedInXL)
+    {
+        glScissor(
+            tc.getVPos().x - grabOffset,
+            windowDataPtr_->windowSize.y - tc.getVPos().y - combinedY - extendB,
+            tc.getVScale().x + grabOffset,
+            combinedY + 2 * extendT + extendB);
+        pincher_.transformContext.setScale(
+            {
+                grabOffset,
+                wfCont_.node_.transformContext.getScale().y + node_.transformContext.getScale().y
+                    + extendT + extendB
+            });
+        pincher_.transformContext.setPos(
+            {
+                node_.transformContext.getPos().x - grabOffset,
+                node_.transformContext.getPos().y - extendT
+            });
+
+        pincher_.renderContext.windowProjMatrix = windowDataPtr_->sceneProjMatrix;
+        windowDataPtr_->renderer.render(pincher_.renderContext,
+            pincher_.styleContext,
+            pincher_.transformContext.getModelMatrix());
+    }
+
+    if (lockedInYT)
+    {
+        glScissor(
+            tc.getVPos().x,
+            windowDataPtr_->windowSize.y - tc.getVPos().y - combinedY,
+            tc.getVScale().x,
+            combinedY + grabOffset);
+        pincher_.transformContext.setScale(
+            {
+                node_.transformContext.getScale().x,
+                grabOffset
+            });
+        pincher_.transformContext.setPos(
+            {
+                node_.transformContext.getPos().x,
+                node_.transformContext.getPos().y - grabOffset
+            });
+
+        pincher_.renderContext.windowProjMatrix = windowDataPtr_->sceneProjMatrix;
+        windowDataPtr_->renderer.render(pincher_.renderContext,
+            pincher_.styleContext,
+            pincher_.transformContext.getModelMatrix());
+    }
+
+    if (lockedInYB)
+    {
+        glScissor(
+            tc.getVPos().x,
+            windowDataPtr_->windowSize.y - tc.getVPos().y - combinedY - grabOffset,
+            tc.getVScale().x,
+            combinedY);
+        pincher_.transformContext.setScale(
+            {
+                node_.transformContext.getScale().x,
+                grabOffset
+            });
+        pincher_.transformContext.setPos(
+            {
+                node_.transformContext.getPos().x,
+                wfCont_.node_.transformContext.getPos().y + wfCont_.node_.transformContext.getScale().y
+            });
+
+        pincher_.renderContext.windowProjMatrix = windowDataPtr_->sceneProjMatrix;
+        windowDataPtr_->renderer.render(pincher_.renderContext,
+            pincher_.styleContext,
+            pincher_.transformContext.getModelMatrix());
+    }
 }
 
 void HkWindowFrame::onAnimationFrameRequested()

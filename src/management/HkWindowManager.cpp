@@ -25,7 +25,7 @@ HkWindowManager::HkWindowManager(const std::string& windowName, const HkWindowCo
     /* Make any newly created window the currently bound context to make sure
        future glew/glfw API calls succeed */
     glfwMakeContextCurrent(windowHandle_);
-    // glfwSwapInterval(0); // zero to disable Vsync
+    glfwSwapInterval(0); // zero to disable Vsync
 
     windowData_.lastMousePos = windowData_.mousePos = { 0,0 };
     windowData_.focusedId = HkWindowData::NO_SELECTION_ID;

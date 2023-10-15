@@ -41,7 +41,7 @@ int main()
         .setHAlignment(HkHAlignment::Left)
         .setVAlignment(HkVAlignment::Top);
 
-    // windowFrame->setPos({ 1280 * 0.25, 720 * 0.25 });
+    windowFrame->setPos({ 1280 * 0.25, 720 * 0.25 });
     // windowFrame->setSize({ 1280 , 720 });
 
 
@@ -152,7 +152,7 @@ int main()
 
     HkWindowFramePtr windowFrame2 = std::make_shared<HkWindowFrame>("MyWindowFrame2");
     windowFrame2->setWindowMode(HkWindowFrameMode::Grabbable);
-    sceneWindow1->addSubWindow(windowFrame2); //NOTE: Needs to be added before adding any children
+    // sceneWindow1->addSubWindow(windowFrame2); //NOTE: Needs to be added before adding any children
     // sceneWindow2->addSubWindow(windowFrame2); //NOTE: Needs to be added before adding any children
 
     windowFrame2->getStyle().setOverflowAllowedXY(true)
