@@ -5,9 +5,8 @@
 
 #include "../base/IHkRootNode.hpp"
 #include "../base/HkNodeBase.hpp"
-#include "../base/HkNodeData.hpp"
 #include "../base/HkTreeStructure.hpp"
-#include "../utils/PinchHelper.hpp"
+#include "../utils/HkPinchHelper.hpp"
 #include "HkContainer.hpp"
 #include "HkButton.hpp"
 
@@ -52,13 +51,11 @@ private:
     void onClick() override;
     void onRelease() override;
     void onGeneralMouseMove() override;
-    void onGeneralMouseClickOrRelease() override;
     void onWindowResize() override;
     void resolveChildrenConstraints(HkTreeStruct&,
         const HkScrollbarsSize&) override;
 
     void cursorChange(const int32_t value);
-
 
     /* Injects */
     void injectWindowDataPtr(HkWindowData* windowDataPtr) override;
@@ -67,7 +64,6 @@ private:
     HkButton exitBtn_;
     HkContainer wfCont_;
 
-    HkNodeData pincher_;
 
     bool stillAlive_{ true };
     HkWindowFrameMode mode_;
@@ -83,17 +79,8 @@ private:
     double startTime{ 0.0f };
     double animDuration{ 0.25f };
 
-    bool lockedInXR{ false };
-    bool validRight{ false };
-    bool lockedInXL{ false };
-    bool lockedInYT{ false };
-    bool lockedInYB{ false };
-    // bool lastLockedIn // enum for better performance maybe
-    GLFWcursor* cursorH{ NULL };
-    GLFWcursor* cursorV{ NULL };
-    GLFWcursor* cursorHV{ NULL };
-    const int32_t grabOffset = 10;
-    PinchHelper pinchHelper_;
+    HkPinchHelper pinchHelper_;
+    glm::ivec2 boundPos_, boundScale_;
 
 };
 using HkWindowFramePtr = std::shared_ptr<HkWindowFrame>;

@@ -2,9 +2,9 @@
 
 #include <functional>
 
-#include "../management/HkSceneManagement.hpp" // TODO: Needed?
 #include "../base/HkNodeBase.hpp"
 #include "helpers/HkScrollBar.hpp"
+#include "../utils/HkPinchHelper.hpp"
 
 namespace hkui
 {
@@ -36,6 +36,9 @@ private:
     HkScrollBar vScrollBar_;
     uint32_t scrollbBarsCount_;
     HkNodeData dummyXYIntersectorData_;
+
+    HkPinchHelper pinchHelper_;
+    glm::ivec2 boundPos_, boundScale_;
 };
 using HkContainerPtr = std::shared_ptr<HkContainer>;
 using HkContainerCPtr = const std::shared_ptr<HkContainer>;

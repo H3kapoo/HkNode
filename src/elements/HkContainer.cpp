@@ -32,6 +32,11 @@ void HkContainer::onFirstHeartbeat()
     dummyXYIntersectorData_.renderContext.shaderId = windowDataPtr_->renderer.addShaderSourceToCache(DEFAULT_VS, DEFAULT_FS);
     dummyXYIntersectorData_.renderContext.vaoId = windowDataPtr_->renderer.addVertexArrayDataToCache(DEFAULT_TYPE);
 
+    /*Init pinching helper*/
+    pinchHelper_.init(*windowDataPtr_);
+    boundPos_ = { node_.transformContext.getPos() };
+    boundScale_ = { node_.transformContext.getScale() };
+
     for (const auto& child : treeStruct_.getChildren())
     {
         /* Inject ref to windowData to each children so they all have a common source of truth*/
@@ -79,6 +84,13 @@ void HkContainer::onGeneralMouseMove()
     //     node_.renderContext.getShader().setInt("hovered", 0);
     //     //     // node_.renderContext.getShader().setVec3f("hovered", glm::vec3(0, 1, 1));
     // }
+
+    pinchHelper_.onMove(*windowDataPtr_, boundPos_, boundScale_);
+    if (pinchHelper_.isSomethingActive())
+    {
+        node_.transformContext.setScale(boundScale_);
+        node_.transformContext.setPos(boundPos_);
+    }
 }
 
 void HkContainer::onClick()
@@ -210,6 +222,13 @@ void HkContainer::postRenderAdditionalDetails()
     windowDataPtr_->renderer.render(dummyXYIntersectorData_.renderContext,
         dummyXYIntersectorData_.styleContext,
         dummyXYIntersectorData_.transformContext.getModelMatrix());
+
+    if (pinchHelper_.isSomethingActive())
+    {
+        /* To note that we should always render the bars last*/
+        glEnable(GL_SCISSOR_TEST);
+        pinchHelper_.onBarRender(*windowDataPtr_, boundPos_, boundScale_);
+    }
 
 }
 

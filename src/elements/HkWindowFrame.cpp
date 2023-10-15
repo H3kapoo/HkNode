@@ -16,14 +16,10 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
     /* Setup defaults that don't have to do with VAOs/Textures/Shaders themselves*/
     node_.styleContext.setColor(glm::vec3(0.0f, 0.5f, 0.9f));
 
-    node_.renderContext.customPostScissor = true;
-
     wfCont_.node_.styleContext.setRowWrapping(true);
     wfCont_.node_.styleContext.setColor(glm::vec3(0.0f, 0.5f, 0.5f));
 
-
-    pincher_.styleContext.setColor(glm::vec3(0.2f, 0.2f, 0.2f));
-    pincher_.renderContext.colorUniformEn = true;
+    pinchHelper_.setGrabSize(15);
 
     treeStruct_.pushChild(&minimizeBtn_.treeStruct_);
     treeStruct_.pushChild(&exitBtn_.treeStruct_);
@@ -42,122 +38,26 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
 
 void HkWindowFrame::onFirstHeartbeat()
 {
-    std::string DEFAULT_VS = "assets/shaders/v1.glsl";
-    std::string DEFAULT_FS = "assets/shaders/f1.glsl";
-    const HkVertexArrayType DEFAULT_TYPE = HkVertexArrayType::QUAD;
-
-    pincher_.renderContext.shaderId = windowDataPtr_->renderer.addShaderSourceToCache(DEFAULT_VS, DEFAULT_FS);
-    pincher_.renderContext.vaoId = windowDataPtr_->renderer.addVertexArrayDataToCache(DEFAULT_TYPE);
+    /*Init pinching helper*/
+    pinchHelper_.init(*windowDataPtr_);
+    boundPos_ = { node_.transformContext.getPos() };
+    boundScale_ = {
+        node_.transformContext.getScale().x,
+        wfCont_.node_.transformContext.getScale().y + node_.transformContext.getScale().y
+    };
 
     HkNodeBase::onFirstHeartbeat();
 }
 
 void HkWindowFrame::postRenderAdditionalDetails()
 {
-    const auto& tc = node_.transformContext;
-    const auto& wfContTc = wfCont_. node_.transformContext;
-    const auto combinedY = (tc.getVScale().y + wfContTc.getVScale().y);
-
-    /* To note that we should always render the bars last*/
-    glEnable(GL_SCISSOR_TEST);
-    const int32_t extendT = lockedInYT ? grabOffset : 0;
-    const int32_t extendB = lockedInYB ? grabOffset : 0;
-    if (lockedInXR)
+    /* Normally we would just pass a reference to pos+scale of TC, but windowFrame is special
+       because it has a top frame and a container object */
+    if (pinchHelper_.isSomethingActive())
     {
-        glScissor(
-            tc.getVPos().x,
-            windowDataPtr_->windowSize.y - tc.getVPos().y - combinedY - extendB,
-            tc.getVScale().x + grabOffset,
-            combinedY + 2 * extendT + extendB);
-        pincher_.transformContext.setScale(
-            {
-                grabOffset,
-                wfCont_.node_.transformContext.getScale().y + node_.transformContext.getScale().y
-                    + extendT + extendB
-            });
-        pincher_.transformContext.setPos(
-            {
-                node_.transformContext.getPos().x + node_.transformContext.getScale().x,
-                node_.transformContext.getPos().y - extendT
-            });
-
-        pincher_.renderContext.windowProjMatrix = windowDataPtr_->sceneProjMatrix;
-        windowDataPtr_->renderer.render(pincher_.renderContext,
-            pincher_.styleContext,
-            pincher_.transformContext.getModelMatrix());
-    }
-
-    if (lockedInXL)
-    {
-        glScissor(
-            tc.getVPos().x - grabOffset,
-            windowDataPtr_->windowSize.y - tc.getVPos().y - combinedY - extendB,
-            tc.getVScale().x + grabOffset,
-            combinedY + 2 * extendT + extendB);
-        pincher_.transformContext.setScale(
-            {
-                grabOffset,
-                wfCont_.node_.transformContext.getScale().y + node_.transformContext.getScale().y
-                    + extendT + extendB
-            });
-        pincher_.transformContext.setPos(
-            {
-                node_.transformContext.getPos().x - grabOffset,
-                node_.transformContext.getPos().y - extendT
-            });
-
-        pincher_.renderContext.windowProjMatrix = windowDataPtr_->sceneProjMatrix;
-        windowDataPtr_->renderer.render(pincher_.renderContext,
-            pincher_.styleContext,
-            pincher_.transformContext.getModelMatrix());
-    }
-
-    if (lockedInYT)
-    {
-        glScissor(
-            tc.getVPos().x,
-            windowDataPtr_->windowSize.y - tc.getVPos().y - combinedY,
-            tc.getVScale().x,
-            combinedY + grabOffset);
-        pincher_.transformContext.setScale(
-            {
-                node_.transformContext.getScale().x,
-                grabOffset
-            });
-        pincher_.transformContext.setPos(
-            {
-                node_.transformContext.getPos().x,
-                node_.transformContext.getPos().y - grabOffset
-            });
-
-        pincher_.renderContext.windowProjMatrix = windowDataPtr_->sceneProjMatrix;
-        windowDataPtr_->renderer.render(pincher_.renderContext,
-            pincher_.styleContext,
-            pincher_.transformContext.getModelMatrix());
-    }
-
-    if (lockedInYB)
-    {
-        glScissor(
-            tc.getVPos().x,
-            windowDataPtr_->windowSize.y - tc.getVPos().y - combinedY - grabOffset,
-            tc.getVScale().x,
-            combinedY);
-        pincher_.transformContext.setScale(
-            {
-                node_.transformContext.getScale().x,
-                grabOffset
-            });
-        pincher_.transformContext.setPos(
-            {
-                node_.transformContext.getPos().x,
-                wfCont_.node_.transformContext.getPos().y + wfCont_.node_.transformContext.getScale().y
-            });
-
-        pincher_.renderContext.windowProjMatrix = windowDataPtr_->sceneProjMatrix;
-        windowDataPtr_->renderer.render(pincher_.renderContext,
-            pincher_.styleContext,
-            pincher_.transformContext.getModelMatrix());
+        /* To note that we should always render the bars last*/
+        glEnable(GL_SCISSOR_TEST);
+        pinchHelper_.onBarRender(*windowDataPtr_, boundPos_, boundScale_);
     }
 }
 
@@ -210,240 +110,14 @@ void HkWindowFrame::onDrag()
     restarted = true;
 }
 
-void HkWindowFrame::onGeneralMouseClickOrRelease()
-{}
-
 void HkWindowFrame::onGeneralMouseMove()
 {
-    if (!windowDataPtr_->isMouseClicked)
+    pinchHelper_.onMove(*windowDataPtr_, boundPos_, boundScale_);
+    if (pinchHelper_.isSomethingActive())
     {
-        const auto mousePos = windowDataPtr_->mousePos;
-        const auto nodeEndPos = node_.transformContext.getPos().x + node_.transformContext.getScale().x;
-        const auto nodeEndPosY = wfCont_.node_.transformContext.getPos().y + wfCont_.node_.transformContext.getScale().y;
-
-        const bool TZone = (mousePos.y > node_.transformContext.getPos().y - grabOffset)
-            && (mousePos.y < node_.transformContext.getPos().y);
-        const bool BZone = (mousePos.y < nodeEndPosY + grabOffset)
-            && (mousePos.y > nodeEndPosY);
-        const bool LZone = (mousePos.x > node_.transformContext.getPos().x - grabOffset)
-            && (mousePos.x < node_.transformContext.getPos().x);
-        const bool RZone = (mousePos.x > nodeEndPos) && (mousePos.x < nodeEndPos + grabOffset);
-
-        const bool VBound = mousePos.y > node_.transformContext.getPos().y &&
-            mousePos.y < nodeEndPosY;
-        const bool HBound = mousePos.x > node_.transformContext.getPos().x &&
-            mousePos.x < nodeEndPos;
-
-        // pinch right
-        if (RZone && VBound)
-        {
-            lockedInXR = true;
-        }
-        else
-        {
-            lockedInXR = false;
-        }
-
-        // pinch left
-        if (LZone && VBound)
-        {
-            lockedInXL = true;
-        }
-        else
-        {
-            lockedInXL = false;
-        }
-
-        // pinch top
-        if (TZone && HBound)
-        {
-            lockedInYT = true;
-        }
-        else
-        {
-            lockedInYT = false;
-        }
-
-        // pinch bottom
-        if (BZone && HBound)
-        {
-            lockedInYB = true;
-        }
-        else
-        {
-            lockedInYB = false;
-        }
-
-        // diagonal bottom-right pinch
-        if (RZone && BZone)
-        {
-            lockedInXR = true;
-            lockedInYB = true;
-        }
-
-        // diagonal top-right pinch
-        if (RZone && TZone)
-        {
-            lockedInXR = true;
-            lockedInYT = true;
-        }
-
-        // diagonal bottom-left pinch
-        if (LZone && BZone)
-        {
-            lockedInXL = true;
-            lockedInYB = true;
-        }
-
-        // diagonal top-left pinch
-        if (LZone && TZone)
-        {
-            lockedInXL = true;
-            lockedInYT = true;
-        }
-    }
-
-    if (lockedInXR && lockedInYB)
-    {
-        cursorChange(GLFW_CROSSHAIR_CURSOR);
-        if (windowDataPtr_->isMouseClicked)
-        {
-            node_.transformContext.addScale(
-                { windowDataPtr_->mousePos.x - windowDataPtr_->lastMousePos.x, 0 });
-            wfCont_.node_.transformContext.addScale(
-                {
-                    0,
-                    (windowDataPtr_->mousePos.y - windowDataPtr_->lastMousePos.y)
-                });
-        }
-        return;
-    }
-
-    if (lockedInXR && lockedInYT)
-    {
-        cursorChange(GLFW_CROSSHAIR_CURSOR);
-        if (windowDataPtr_->isMouseClicked)
-        {
-            node_.transformContext.addScale(
-                { windowDataPtr_->mousePos.x - windowDataPtr_->lastMousePos.x, 0 });
-            node_.transformContext.addPos(
-                {
-                    0,
-                    windowDataPtr_->mousePos.y - windowDataPtr_->lastMousePos.y
-                });
-
-            wfCont_.node_.transformContext.addScale(
-                {
-                    0,
-                    -(windowDataPtr_->mousePos.y - windowDataPtr_->lastMousePos.y)
-                });
-        }
-        return;
-    }
-
-    if (lockedInXL && lockedInYB)
-    {
-        cursorChange(GLFW_CROSSHAIR_CURSOR);
-        if (windowDataPtr_->isMouseClicked)
-        {
-            node_.transformContext.addPos(
-                { (windowDataPtr_->mousePos.x - windowDataPtr_->lastMousePos.x), 0 });
-
-            node_.transformContext.addScale(
-                { -(windowDataPtr_->mousePos.x - windowDataPtr_->lastMousePos.x), 0 });
-            wfCont_.node_.transformContext.addScale(
-                {
-                    0,
-                    (windowDataPtr_->mousePos.y - windowDataPtr_->lastMousePos.y)
-                });
-        }
-        return;
-    }
-
-    if (lockedInXL && lockedInYT)
-    {
-        cursorChange(GLFW_CROSSHAIR_CURSOR);
-        if (windowDataPtr_->isMouseClicked)
-        {
-            node_.transformContext.addPos(
-                { (windowDataPtr_->mousePos.x - windowDataPtr_->lastMousePos.x), 0 });
-
-            node_.transformContext.addScale(
-                { -(windowDataPtr_->mousePos.x - windowDataPtr_->lastMousePos.x), 0 });
-            node_.transformContext.addPos(
-                {
-                    0,
-                    windowDataPtr_->mousePos.y - windowDataPtr_->lastMousePos.y
-                });
-
-            wfCont_.node_.transformContext.addScale(
-                {
-                    0,
-                    -(windowDataPtr_->mousePos.y - windowDataPtr_->lastMousePos.y)
-                });
-        }
-        return;
-    }
-
-    if (lockedInXR)
-    {
-        cursorChange(GLFW_HRESIZE_CURSOR);
-        if (windowDataPtr_->isMouseClicked)
-        {
-            node_.transformContext.addScale(
-                { windowDataPtr_->mousePos.x - windowDataPtr_->lastMousePos.x, 0 });
-        }
-    }
-
-    if (lockedInXL)
-    {
-        cursorChange(GLFW_HRESIZE_CURSOR);
-        if (windowDataPtr_->isMouseClicked)
-        {
-            node_.transformContext.addPos(
-                { (windowDataPtr_->mousePos.x - windowDataPtr_->lastMousePos.x), 0 });
-
-            node_.transformContext.addScale(
-                { -(windowDataPtr_->mousePos.x - windowDataPtr_->lastMousePos.x), 0 });
-        }
-    }
-
-    if (lockedInYT)
-    {
-        cursorChange(GLFW_VRESIZE_CURSOR);
-        if (windowDataPtr_->isMouseClicked)
-        {
-            node_.transformContext.addPos(
-                {
-                    0,
-                    windowDataPtr_->mousePos.y - windowDataPtr_->lastMousePos.y
-                });
-
-            wfCont_.node_.transformContext.addScale(
-                {
-                    0,
-                    -(windowDataPtr_->mousePos.y - windowDataPtr_->lastMousePos.y)
-                });
-        }
-    }
-
-    if (lockedInYB)
-    {
-        cursorChange(GLFW_VRESIZE_CURSOR);
-        if (windowDataPtr_->isMouseClicked)
-        {
-            wfCont_.node_.transformContext.addScale(
-                {
-                    0,
-                    (windowDataPtr_->mousePos.y - windowDataPtr_->lastMousePos.y)
-                });
-        }
-    }
-
-    /* If we didn't manage to grab anything, reset cursor */
-    if (lockedInXR == false && lockedInXL == false && lockedInYT == false && lockedInYB == false)
-    {
-        cursorChange(GLFW_ARROW_CURSOR);
+        node_.transformContext.setScale({ boundScale_.x, 30 });
+        node_.transformContext.setPos(boundPos_);
+        wfCont_.node_.transformContext.setScale({ boundScale_.x, boundScale_.y - 30 });
     }
 }
 
