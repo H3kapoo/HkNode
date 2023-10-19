@@ -57,7 +57,8 @@ enum class HkSizeType
     FitParent,
     FitCell,
     PercParent,
-    PercCell
+    PercCell,
+    Pinch
 };
 
 struct HkSizeConfig

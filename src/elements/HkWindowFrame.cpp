@@ -40,11 +40,7 @@ void HkWindowFrame::onFirstHeartbeat()
 {
     /*Init pinching helper*/
     pinchHelper_.init(*windowDataPtr_);
-    boundPos_ = { node_.transformContext.getPos() };
-    boundScale_ = {
-        node_.transformContext.getScale().x,
-        wfCont_.node_.transformContext.getScale().y + node_.transformContext.getScale().y
-    };
+
 
     HkNodeBase::onFirstHeartbeat();
 }
@@ -112,6 +108,13 @@ void HkWindowFrame::onDrag()
 
 void HkWindowFrame::onGeneralMouseMove()
 {
+    //TODO: do this only if pinching flag is enabled
+    boundPos_ = { node_.transformContext.getPos() };
+    boundScale_ = {
+        node_.transformContext.getScale().x,
+        wfCont_.node_.transformContext.getScale().y + node_.transformContext.getScale().y
+    };
+
     pinchHelper_.onMove(*windowDataPtr_, boundPos_, boundScale_);
     if (pinchHelper_.isSomethingActive())
     {

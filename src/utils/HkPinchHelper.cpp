@@ -3,6 +3,12 @@
 namespace hkui
 {
 
+
+uint32_t HkPinchHelper::LFilled = 0;
+uint32_t HkPinchHelper::RFilled = 0;
+uint32_t HkPinchHelper::TFilled = 0;
+uint32_t HkPinchHelper::BFilled = 0;
+
 void HkPinchHelper::init(HkWindowData& windowData)
 {
     std::string DEFAULT_VS = "assets/shaders/v1.glsl";
@@ -81,28 +87,28 @@ void HkPinchHelper::onMove(HkWindowData& windowData, glm::ivec2& boundPos, glm::
         if (RZone && BZone)
         {
             lockedInXR_ = true;
-            lockedInYB_ = true;
+            // lockedInYB_ = true;
         }
 
         // diagonal top-right pinch
         if (RZone && TZone)
         {
             lockedInXR_ = true;
-            lockedInYT_ = true;
+            // lockedInYT_ = true;
         }
 
         // diagonal bottom-left pinch
         if (LZone && BZone)
         {
             lockedInXL_ = true;
-            lockedInYB_ = true;
+            // lockedInYB_ = true;
         }
 
         // diagonal top-left pinch
         if (LZone && TZone)
         {
             lockedInXL_ = true;
-            lockedInYT_ = true;
+            // lockedInYT_ = true;
         }
     }
 

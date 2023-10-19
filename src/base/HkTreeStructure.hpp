@@ -78,6 +78,7 @@ public:
     std::string getName() { return name_; }
     NodeType getType() { return type_; }
     uint32_t getId() { return id_; }
+    uint32_t getLevel() { return level_; }
     HkTreeStructure* getParent() { return parent_; }
     /* Necessary & so no copying occurs each frame */
     std::vector<HkTreeStructure*>& getChildren() { return children_; }

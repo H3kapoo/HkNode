@@ -7,8 +7,8 @@ namespace hkui
 
 double HkAppManager::lastMoveTime = 0.0;
 double HkAppManager::lastMoveTime2 = 0.0;
-const double HkAppManager::MM_CALLBACK_THRESHOLD = 0.05;
-const double HkAppManager::MS_CALLBACK_THRESHOLD = 0.04;
+const double HkAppManager::MM_CALLBACK_THRESHOLD = 0.05; //TODO: Depending on how many items there are in the scene, this could be dynamic
+const double HkAppManager::MS_CALLBACK_THRESHOLD = 0.04; // Same here
 
 std::vector<HkWindowManagerPtr> HkAppManager::windows_ = {};
 int32_t HkAppManager::resizeEventUnsolvedId_ = -1;

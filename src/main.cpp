@@ -18,7 +18,7 @@ int main()
     //TODO: Make it the responsability of the window to generate VAO and shader?
     // we need to make it order agnostic
     HkWindowManagerPtr sceneWindow1 = std::make_shared<HkWindowManager>("MyWindowManager",
-        HkWindowManager::HkWindowConfig{ .width = 1280, .height = 720, .isMaster = true });
+        HkWindowManager::HkWindowConfig{ .width = 1280 - 300, .height = 720, .isMaster = true });
     // sceneWindow1->setBackgroundImage("/home/hekapoo/container.jpg");
     // sceneWindow1->setBackgroundImage("/home/hekapoo/Downloads/fbi_wp.jpg");
     // sceneWindow1->setBackgroundImage("/home/hekapoo/container.jpg");
@@ -31,11 +31,11 @@ int main()
     sceneWindow1->makeContextCurrent();
 
     HkWindowFramePtr windowFrame = std::make_shared<HkWindowFrame>("MyWindowFrame");
-    windowFrame->setWindowMode(HkWindowFrameMode::Grabbable);
+    windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
     sceneWindow1->addSubWindow(windowFrame); //NOTE: Needs to be added before adding any children
 
-    windowFrame->getStyle().setOverflowAllowedXY(true)
-        .setLayout(HkLayout::Horizontal)
+    windowFrame->getStyle().setOverflowAllowedXY(false)
+        .setLayout(HkLayout::Vertical)
         .setRowWrapping(false)
         .setGridConfig(HkGridConfig{ .cols{1.0f, 1.0f}, .rows{1.0f, 1.0f} })
         .setHAlignment(HkHAlignment::Left)
@@ -52,37 +52,40 @@ int main()
     HkContainerPtr ctr7 = std::make_shared<HkContainer>("MyContainer7");
     HkContainerPtr ctr8 = std::make_shared<HkContainer>("MyContainer8");
 
+    /*
+    Pinch size type?
+    */
     ctr->getStyle().setColor({ 1.0f,0.0f,1.0f })
         // .setGridRowCol(1, 1)
+        .setLayout(HkLayout::Horizontal)
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         .setVHSizeConfig(
-            { .value = 200 },
-            { .value = 300 })
-        .setMargins(0, 0, 00, 0);
+            { .type = HkSizeType::Pinch, .value = 0.5f, .min = 0 },
+            { .type = HkSizeType::PercParent, .value = 1.0f })
+        .setBottomMargin(15);
 
     ctr4->getStyle().setColor({ 1.0f,0.0f,0.0f })
-        .setGridRowCol(1, 2)
-        .setVHAlignment(HkVAlignment::Bottom, HkHAlignment::Left)
+        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         .setVHSizeConfig(
-            { .value = 200 },
-            { .value = 300 })
-        .setMargins(0, 0, 0, 0);
+            { .type = HkSizeType::Pinch, .value = 0.5f, .min = 15 },
+            { .type = HkSizeType::PercParent, .value = 1.0f })
+        .setRightMargin(0);
+
 
     ctr5->getStyle().setColor({ 0.3f,0.5f,0.0f })
-        .setGridRowCol(2, 1)
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         .setVHSizeConfig(
-            { .value = 500 },
-            { .value = 300 })
-        .setMargins(0, 0, 0, 0);
+            { .type = HkSizeType::PercParent, .value = 1.0f },
+            { .type = HkSizeType::Pinch, .value = 0.5f, .min = 0 })
+        .setRightMargin(15);
+    // .setLeftRightMargin(15, 15);
+
 
     ctr6->getStyle().setColor({ 0.0f,0.0f,1.0f })
-        .setGridRowCol(2, 2)
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         .setVHSizeConfig(
-            { .value = 100 },
-            { .value = 300 })
-        .setMargins(0, 0, 0, 0);
+            { .type = HkSizeType::PercParent, .value = 1.0f },
+            { .type = HkSizeType::Pinch, .value = 0.5f, .min = 15 });
 
     // ctr->pushChildren({ ctr4, ctr5, ctr6 });
     bool x = false;
@@ -90,7 +93,9 @@ int main()
         ctr4->getStyle().setColor(x ? glm::vec3{ 0.3f, 0.5f, 0.0f } : glm::vec3{ 0.3f, 0.5f, 1.0f });
         x = !x;
         });
-    windowFrame->pushChildren({ ctr, ctr4, ctr5, ctr6 });
+    // windowFrame->pushChildren({ ctr, ctr4, ctr5, ctr6 });
+    windowFrame->pushChildren({ ctr, ctr4 });
+    ctr->pushChildren({ ctr5, ctr6 });
     // windowFrame->pushChildren({ ctr });
 
     // // Providing a seed value
