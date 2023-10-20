@@ -76,14 +76,7 @@ void HkContainer::onGeneralMouseClickOrRelease()
     //TODO: Later bring back highlighting if needed
     // node_.renderContext.getShader().setInt("focused", 0);
 
-    if (windowDataPtr_->isMouseClicked)
-    {
-        pinchHelper_.resolve();
-    }
-    else
-    {
-        pinchHelper_.clear();
-    }
+    pinchHelper_.onMouseButton(*windowDataPtr_);
 }
 
 void HkContainer::onGeneralMouseMove()
@@ -103,71 +96,9 @@ void HkContainer::onGeneralMouseMove()
 
     boundPos_ = { node_.transformContext.getPos() };
     boundScale_ = { node_.transformContext.getScale() };
-    // pinchHelper_.onMove(*windowDataPtr_, boundPos_, boundScale_);
-    if (windowDataPtr_->isMouseClicked)
-    {
-        bool isValid = false;
-        HkPinchHelper::PinchInfo foundInfo;
-        for (const auto& pi : pinchHelper_.validityGroup_)
-        {
-            if (treeStruct_.getId() == pi.nodeId)
-            {
-                isValid = true;
-                foundInfo = pi;
-                break;
-            }
-        }
-
-        if (!isValid)
-        {
-            return;
-        }
-
-        if (foundInfo.right)
-        {
-            boundScale_.x += windowDataPtr_->mousePos.x - windowDataPtr_->lastMousePos.x;
-        }
-
-        if (foundInfo.left)
-        {
-            boundPos_.x += windowDataPtr_->mousePos.x - windowDataPtr_->lastMousePos.x;
-            boundScale_.x += -(windowDataPtr_->mousePos.x - windowDataPtr_->lastMousePos.x);
-        }
-
-        if (foundInfo.top)
-        {
-            boundPos_.y += windowDataPtr_->mousePos.y - windowDataPtr_->lastMousePos.y;
-            boundScale_.y += -(windowDataPtr_->mousePos.y - windowDataPtr_->lastMousePos.y);
-        }
-
-        if (foundInfo.bottom)
-        {
-            boundScale_.y += (windowDataPtr_->mousePos.y - windowDataPtr_->lastMousePos.y);
-        }
-
-
-
-        const auto pScaleX = treeStruct_.getParent()->getPayload()->node_.transformContext.getScale().x;
-        const auto pScaleY = treeStruct_.getParent()->getPayload()->node_.transformContext.getScale().y;
-        const auto chScale = boundScale_.x;
-        const auto chScaleY = boundScale_.y;
-
-
-        const float perc =
-            ((double)chScale - node_.transformContext.getScale().x) / (double)pScaleX;
-
-        const float percY =
-            ((double)chScaleY - node_.transformContext.getScale().y) / (double)pScaleY;
-
-        node_.transformContext.setPos(boundPos_);
-        auto prev = node_.styleContext.getHSizeConfig();
-        prev.value += perc;
-
-        auto prevY = node_.styleContext.getVSizeConfig();
-        prevY.value += percY;
-        getStyle().setHSizeConfig(prev);
-        getStyle().setVSizeConfig(prevY);
-    }
+    pinchHelper_.onMouseMove(*windowDataPtr_, node_,
+        treeStruct_.getParent()->getPayload()->node_,
+        treeStruct_.getId());
 }
 
 void HkContainer::onClick()
@@ -302,11 +233,11 @@ void HkContainer::postRenderAdditionalDetails()
 
     /* To note that we should always render the bars last*/
     // if (pinchHelper_.isSomethingActive())
-    // {
-    //     // glEnable(GL_SCISSOR_TEST);
-    //     pinchHelper_.onBarRender(*windowDataPtr_, node_.transformContext.getPos(),
-    //         node_.transformContext.getScale());
-    // }
+    {
+        glEnable(GL_SCISSOR_TEST);
+        pinchHelper_.onBarRender(*windowDataPtr_, node_.transformContext.getPos(),
+            node_.transformContext.getScale());
+    }
 }
 
 void HkContainer::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)

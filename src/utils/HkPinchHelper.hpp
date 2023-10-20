@@ -30,8 +30,10 @@ public:
 
     void clear();
     void resolve();
+    void onMouseButton(HkWindowData& windowData);
     void scan(HkWindowData& windowData, glm::ivec2& boundPos, glm::ivec2& boundScale,
         const uint32_t id, const uint32_t level);
+    void onMouseMove(HkWindowData& windowData, HkNodeData& nd, HkNodeData& pnd, const uint32_t id);
     void onMove(HkWindowData& windowData, glm::ivec2& boundPos, glm::ivec2& boundScale);
     void onBarRender(HkWindowData& windowData, const glm::ivec2 boundPos, const glm::ivec2 boundScale);
     bool isSomethingActive();
@@ -58,6 +60,7 @@ private:
     // bool lockedInYB_{ false };
     int32_t grabSize_{ 15 };
     // HkNodeData pincher_;
+    glm::ivec2 boundPos_, boundScale_;
 
     static std::vector<PinchInfo> pinchInfo_;
     static bool resolved_;

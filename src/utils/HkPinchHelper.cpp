@@ -22,8 +22,19 @@ void HkPinchHelper::init(HkWindowData& windowData)
     pincher_.renderContext.colorUniformEn = true;
 }
 
+void HkPinchHelper::onMouseButton(HkWindowData& windowData)
+{
+    /* On click (after focusPass), resolve which pinchInfos need to be used.
+       On release, clear cache */
+    windowData.isMouseClicked ? resolve() : clear();
+}
+
 void HkPinchHelper::clear()
 {
+    /* If we already resolved something, clear on mouse release */
+    if (!resolved_) return;
+
+    /* Restore everything after click release */
     pinchInfo_.clear();
     validityGroup_.clear();
     resolved_ = false;
@@ -31,49 +42,33 @@ void HkPinchHelper::clear()
 
 void HkPinchHelper::resolve()
 {
+    /* If we already resolved the pinchInfos for this click, bail out */
     if (resolved_) return;
     resolved_ = true;
 
-    std::sort(pinchInfo_.begin(), pinchInfo_.end(), [](const PinchInfo& a, const PinchInfo& b)
-        {
-            return a.level < b.level;
-        });
+    /* Sort the scanned pinch zones by ascending level */
+    std::sort(pinchInfo_.begin(), pinchInfo_.end(),
+        [](const PinchInfo& a, const PinchInfo& b) {return a.level < b.level;});
 
-    // just for debug print
-    for (const auto& pi : pinchInfo_)
-    {
-        break;
-        std::cout << pi.nodeId << " "
-            << pi.level << " L:"
-            << pi.left << "  R:"
-            << pi.right << "  T:"
-            << "  " << pi.top << "  B:"
-            << pi.bottom << "\n";
-    }
-
-    /*
-        T+B => R L no matter how many
-        R+L => T B no matter how many
-    */
-    uint32_t currentLevel{ 0 };
+    /* We need two passes to aquire the needed pinch info for pinch to work.
+      First pass aquires the first B+T or R+L combination scanning from the lower levels upwards.
+      The second pass aquires all the opposite pairs (or singles) from the found one, starting at
+      the opposite pair's level +1*/
     bool topNeeded{ true };
     bool botNeeded{ true };
     bool leftNeeded{ true };
     bool rightNeeded{ true };
     bool topBottomAquired{ false };
     bool leftRightAquired{ false };
+    uint32_t currentLevel{ 0 };
+
+    /* First Pass*/
     for (const auto& pi : pinchInfo_)
     {
         if (currentLevel == 0 && (pi.left || pi.right || pi.top || pi.bottom))
-        {
             currentLevel = pi.level;
-        }
-
         if (currentLevel != 0 && currentLevel != pi.level)
-        {
-            std::cout << "Nothing more on level of interest: " << currentLevel << "\n";
             break;
-        }
 
         PinchInfo validInfo;
         bool okToPush{ false };
@@ -117,54 +112,23 @@ void HkPinchHelper::resolve()
         }
     }
 
-    //Toate L and R de la urmatoru nivel doar
-    // and reverse now
-    // std::reverse(pinchInfo_.begin(), pinchInfo_.end());
+    /* Second Pass. Restart level and start at previous level+1 */
     uint32_t prevLevel = currentLevel;
     currentLevel = 0;
     for (const auto& pi : pinchInfo_)
     {
-        if (currentLevel == 0 && pi.level > prevLevel && (pi.left || pi.right || pi.top || pi.bottom))
-        {
+        if (currentLevel == 0 && pi.level > prevLevel
+            && (pi.left || pi.right || pi.top || pi.bottom))
             currentLevel = pi.level;
-        }
-
         if (currentLevel != 0 && currentLevel != pi.level)
-        {
-            std::cout << "Nothing more on level of interest: " << currentLevel << "\n";
             break;
-        }
-
 
         PinchInfo validInfo;
         bool okToPush{ false };
-        if (pi.bottom && !topBottomAquired)
-        {
-            validInfo.bottom = true;
-            okToPush = true;
-            // botNeeded = false;
-        }
-
-        if (pi.top && !topBottomAquired)
-        {
-            validInfo.top = true;
-            okToPush = true;
-            // topNeeded = false;
-        }
-
-        if (pi.left && !leftRightAquired)
-        {
-            validInfo.left = true;
-            okToPush = true;
-            // leftNeeded = false;
-        }
-
-        if (pi.right && !leftRightAquired)
-        {
-            validInfo.right = true;
-            okToPush = true;
-            // rightNeeded = false;
-        }
+        if (pi.bottom && !topBottomAquired) { validInfo.bottom = true;okToPush = true; }
+        if (pi.top && !topBottomAquired) { validInfo.top = true;okToPush = true; }
+        if (pi.left && !leftRightAquired) { validInfo.left = true;okToPush = true; }
+        if (pi.right && !leftRightAquired) { validInfo.right = true;okToPush = true; }
 
         if (okToPush)
         {
@@ -173,33 +137,6 @@ void HkPinchHelper::resolve()
             validityGroup_.push_back(validInfo);
         }
     }
-
-    // // we need to sort it and find the entry that repeats only once and we should remove it
-    // std::sort(validityGroup_.begin(), validityGroup_.end(), [](const PinchInfo& a, const PinchInfo& b)
-    //     {
-    //         return a.level < b.level;
-    //     });
-
-    // uint32_t rmIndex = 0;
-    // for (uint32_t i = 0; i < validityGroup_.size();)
-    // {
-    //     // last element
-    //     if (i == validityGroup_.size() - 1)
-    //         rmIndex = i;
-
-    //     uint32_t j = i;
-    //     while (validityGroup_[i].level == validityGroup_[j].level && j < validityGroup_.size())
-    //     {
-    //         ++j;
-    //     }
-
-    //     if (j - i == 1)
-    //         rmIndex = i;
-    //     else
-    //         i = j;
-    // }
-
-    // std::cout << "Rm index is: " << rmIndex << "\n";
 
     for (const auto& pi : validityGroup_)
     {
@@ -216,6 +153,8 @@ void HkPinchHelper::resolve()
 void HkPinchHelper::scan(HkWindowData& windowData, glm::ivec2& boundPos, glm::ivec2& boundScale,
     const uint32_t id, const uint32_t level)
 {
+    /* Each click has first a focusScan pass. We can use this to scan all objects that support pinching
+      for potential pinch points and add them to a potential final pinch vector*/
     PinchInfo pi;
     const auto mousePos = windowData.mousePos;
     const auto nodeEndPos = boundPos + boundScale;
@@ -254,6 +193,113 @@ void HkPinchHelper::scan(HkWindowData& windowData, glm::ivec2& boundPos, glm::iv
     pi.nodeId = id;
     pi.level = level;
     pinchInfo_.push_back(pi);
+}
+
+void HkPinchHelper::onMouseMove(HkWindowData& windowData, HkNodeData& nd, HkNodeData& pnd, const uint32_t id)
+{
+    /* We are just moving around, scan for grab points in order to display grabBars to user. These will
+       not be used for position calculations*/
+    auto& tc = nd.transformContext;
+    boundPos_ = { tc.getPos() };
+    boundScale_ = { tc.getScale() };
+
+    if (!windowData.isMouseClicked)
+    {
+        const auto mousePos = windowData.mousePos;
+        const auto nodeEndPos = tc.getPos() + tc.getScale();
+
+        const bool TZone = (mousePos.y > tc.getPos().y - grabSize_)
+            && (mousePos.y < tc.getPos().y);
+        const bool BZone = (mousePos.y < nodeEndPos.y + grabSize_)
+            && (mousePos.y > nodeEndPos.y);
+        const bool LZone = (mousePos.x > tc.getPos().x - grabSize_)
+            && (mousePos.x < tc.getPos().x);
+        const bool RZone = (mousePos.x > nodeEndPos.x)
+            && (mousePos.x < nodeEndPos.x + grabSize_);
+        const bool VBound = mousePos.y > tc.getPos().y &&
+            mousePos.y < nodeEndPos.y;
+        const bool HBound = mousePos.x > tc.getPos().x &&
+            mousePos.x < nodeEndPos.x;
+
+        // pinch right
+        if (RZone && VBound) lockedInXR_ = true; else lockedInXR_ = false;
+        // pinch left
+        if (LZone && VBound) lockedInXL_ = true; else lockedInXL_ = false;
+        // pinch top
+        if (TZone && HBound) lockedInYT_ = true; else lockedInYT_ = false;
+        // pinch bottom
+        if (BZone && HBound) lockedInYB_ = true; else lockedInYB_ = false;
+        // diagonal bottom-right pinch
+        if (RZone && BZone) { lockedInXR_ = true; lockedInYB_ = true; }
+        // diagonal top-right pinch
+        if (RZone && TZone) { lockedInXR_ = true;lockedInYT_ = true; }
+        // diagonal bottom-left pinch
+        if (LZone && BZone) { lockedInXL_ = true;lockedInYB_ = true; }
+        // diagonal top-left pinch
+        if (LZone && TZone) { lockedInXL_ = true;lockedInYT_ = true; }
+    }
+    /* If we are holding click and moving, we need to update position/scale of pinched object */
+    else
+    {
+        bool isValid = false;
+        HkPinchHelper::PinchInfo foundInfo;
+        for (const auto& pi : validityGroup_)
+        {
+            if (id == pi.nodeId)
+            {
+                isValid = true;
+                foundInfo = pi;
+                break;
+            }
+        }
+
+        if (!isValid)
+        {
+            return;
+        }
+
+        if (foundInfo.right)
+        {
+            boundScale_.x += windowData.mousePos.x - windowData.lastMousePos.x;
+        }
+
+        if (foundInfo.left)
+        {
+            boundPos_.x += windowData.mousePos.x - windowData.lastMousePos.x;
+            boundScale_.x += -(windowData.mousePos.x - windowData.lastMousePos.x);
+        }
+
+        if (foundInfo.top)
+        {
+            boundPos_.y += windowData.mousePos.y - windowData.lastMousePos.y;
+            boundScale_.y += -(windowData.mousePos.y - windowData.lastMousePos.y);
+        }
+
+        if (foundInfo.bottom)
+        {
+            boundScale_.y += (windowData.mousePos.y - windowData.lastMousePos.y);
+        }
+
+        const auto pScaleX = pnd.transformContext.getScale().x;
+        const auto pScaleY = pnd.transformContext.getScale().y;
+        const auto chScale = boundScale_.x;
+        const auto chScaleY = boundScale_.y;
+
+        const float perc =
+            ((double)chScale - tc.getScale().x) / (double)pScaleX;
+
+        const float percY =
+            ((double)chScaleY - tc.getScale().y) / (double)pScaleY;
+
+        tc.setPos(boundPos_);
+        auto prev = nd.styleContext.getHSizeConfig();
+        prev.value += perc;
+
+        auto prevY = nd.styleContext.getVSizeConfig();
+        prevY.value += percY;
+        nd.styleContext.setHSizeConfig(prev);
+        nd.styleContext.setVSizeConfig(prevY);
+    }
 }
 
 void HkPinchHelper::onMove(HkWindowData& windowData, glm::ivec2& boundPos, glm::ivec2& boundScale)

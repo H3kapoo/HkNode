@@ -165,76 +165,69 @@ int main()
     ctr->pushChildren({ ctr5, ctr6 });
     ctr4->pushChildren({ ctr7, ctr8 });
 
-    // ctr6->pushChildren({ ctr9,ctr10 });
-    // ctr7->pushChildren({ ctr11,ctr12 });
+
+    ctr7->pushChildren({ ctr11,ctr12 });
     ctr8->pushChildren({ ctr13,ctr14 });
+
+    ctr13->pushChildren({ ctr9,ctr10 });
     // windowFrame->pushChildren({ ctr });
 
-/*
-    valid info: 7 2 L:0  R:0  T:  0  B:1
-    valid info: 10 2 L:0  R:0  T:  1  B:0
-    valid info: 31 4 L:1  R:0  T:  0  B:0
-    valid info: 22 3 L:1  R:0  T:  0  B:0
-    valid info: 19 3 L:0  R:1  T:  0  B:0
-    valid info: 16 3 L:1  R:0  T:  0  B:0
-    valid info: 13 3 L:0  R:1  T:  0  B:0
-*/
-// // Providing a seed value
-// srand((unsigned)time(NULL));
+// Providing a seed value
+    srand((unsigned)time(NULL));
 
-// int scale = 4;
-// std::vector<HkNodeBasePtr> ctrs2;
-// ctrs2.reserve(scale * scale);
-// for (int i = 0;i < scale; i++) // with O2 works ok 01.09.2023
-// {
-//     for (int j = 0;j < scale; j++)
-//     {
-//         double r = (rand() % 255) / 255.0f;
-//         double g = (rand() % 255) / 255.0f;
-//         double b = (rand() % 255) / 255.0f;
+    int scale = 4;
+    std::vector<HkNodeBasePtr> ctrs2;
+    ctrs2.reserve(scale * scale);
+    for (int i = 0;i < scale; i++) // with O2 works ok 01.09.2023
+    {
+        for (int j = 0;j < scale; j++)
+        {
+            double r = (rand() % 255) / 255.0f;
+            double g = (rand() % 255) / 255.0f;
+            double b = (rand() % 255) / 255.0f;
 
-//         const auto& ct = std::make_shared<HkContainer>("MyContauner");
-//         ct->getStyle()
-//             .setColor((i + j) % 2 == 0 ? glm::vec3{ r,g,b } : glm::vec3{ r,g,b })
-//             .setGridRowCol(i + 1, j + 1)
-//             .setVHSizeConfig({ .value = 100 }, { .value = 100 })
-//             // .setVHSizeConfig({ .type = HkSizeType::FitCell }, { .type = HkSizeType::FitCell })
-//             .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left);
+            const auto& ct = std::make_shared<HkContainer>("MyContauner");
+            ct->getStyle()
+                .setColor((i + j) % 2 == 0 ? glm::vec3{ r,g,b } : glm::vec3{ r,g,b })
+                .setGridRowCol(i + 1, j + 1)
+                // .setVHSizeConfig({ .value = 50 }, { .value = 50 })
+                .setVHSizeConfig({ .type = HkSizeType::FitCell }, { .type = HkSizeType::FitCell })
+                .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center);
 
-//         ctrs2.push_back(std::move(ct));
-//     }
-// }
+            ctrs2.push_back(std::move(ct));
+        }
+    }
 
-// std::vector<float> rows, cols;
-// rows.assign(scale, 1.0f);
-// cols.assign(scale, 1.0f);
-// windowFrame->getStyle()
-//     .setLayout(HkLayout::Grid)
-//     .setGridConfig(
-//         HkGridConfig{
-//             .cols{cols},
-//             .rows{rows}
-//         });
-// windowFrame->pushChildren(ctrs2);
-// HkImageViewPtr imgView = std::make_shared<HkImageView>("MyImgView");
-// HkImageViewPtr imgView2 = std::make_shared<HkImageView>("MyImgView2");
-// HkImageViewPtr imgView3 = std::make_shared<HkImageView>("MyImgView3");
-// HkImageViewPtr imgView4 = std::make_shared<HkImageView>("MyImgView4");
-// imgView->loadImage("/home/hekapoo/container.jpg");
-// imgView2->loadImage("/home/hekapoo/container.jpg");
-// imgView3->loadImage("/home/hekapoo/container.jpg");
-// imgView4->loadImage("/home/hekapoo/Downloads/fbi_wp.jpg");
-// imgView->setSize({ 1920,1080 });
-// windowFrame->getStyle().setOverflowAllowedXY(false);
+    std::vector<float> rows, cols;
+    rows.assign(scale, 1.0f);
+    cols.assign(scale, 1.0f);
+    ctr5->getStyle()
+        .setLayout(HkLayout::Grid)
+        .setGridConfig(
+            HkGridConfig{
+                .cols{cols},
+                .rows{rows}
+            });
+    ctr5->pushChildren(ctrs2);
+    // HkImageViewPtr imgView = std::make_shared<HkImageView>("MyImgView");
+    // HkImageViewPtr imgView2 = std::make_shared<HkImageView>("MyImgView2");
+    // HkImageViewPtr imgView3 = std::make_shared<HkImageView>("MyImgView3");
+    // HkImageViewPtr imgView4 = std::make_shared<HkImageView>("MyImgView4");
+    // imgView->loadImage("/home/hekapoo/container.jpg");
+    // imgView2->loadImage("/home/hekapoo/container.jpg");
+    // imgView3->loadImage("/home/hekapoo/container.jpg");
+    // imgView4->loadImage("/home/hekapoo/Downloads/fbi_wp.jpg");
+    // imgView->setSize({ 1920,1080 });
+    // windowFrame->getStyle().setOverflowAllowedXY(false);
 
-// windowFrame->pushChildren({ imgView, imgView2, imgView3, imgView4 });
-// windowFrame->pushChildren({ ctr, ctr4, ctr5, ctr6 });
+    // windowFrame->pushChildren({ imgView, imgView2, imgView3, imgView4 });
+    // windowFrame->pushChildren({ ctr, ctr4, ctr5, ctr6 });
 
-// sceneWindow1->makeContextNotCurrent();
+    // sceneWindow1->makeContextNotCurrent();
 
-// sceneWindow1->setBackgroundImage("/home/hekapoo/Downloads/fbi_wp.jpg");
+    // sceneWindow1->setBackgroundImage("/home/hekapoo/Downloads/fbi_wp.jpg");
 
-// sceneWindow2->makeContextCurrent();
+    // sceneWindow2->makeContextCurrent();
 
     HkWindowFramePtr windowFrame2 = std::make_shared<HkWindowFrame>("MyWindowFrame2");
     windowFrame2->setWindowMode(HkWindowFrameMode::Grabbable);
