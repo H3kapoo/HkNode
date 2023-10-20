@@ -17,6 +17,7 @@ public:
 private:
     void onFirstHeartbeat() override;
     void onScroll() override;
+    void onResolveFocusPass() override;
     void onGeneralMouseScroll() override;
     void onClick() override;
     void onRelease() override;
@@ -39,7 +40,6 @@ private:
 
     HkPinchHelper pinchHelper_;
     glm::ivec2 boundPos_, boundScale_;
-    static uint32_t dummyVal;
 };
 using HkContainerPtr = std::shared_ptr<HkContainer>;
 using HkContainerCPtr = const std::shared_ptr<HkContainer>;

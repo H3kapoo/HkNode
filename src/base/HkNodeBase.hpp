@@ -77,6 +77,7 @@ private:
     virtual void onGeneralMouseClickOrRelease();
     virtual void onGeneralMouseScroll();
     virtual void onFirstHeartbeat();
+    virtual void onResolveFocusPass();
 
     virtual void postRenderAdditionalDetails();
 

@@ -2,9 +2,6 @@
 
 namespace hkui
 {
-
-uint32_t HkContainer::dummyVal = 0;
-
 HkContainer::HkContainer(const std::string& containerName)
     : HkNodeBase(containerName, HkNodeType::Container)
     , hScrollBar_("{Internal}-HScrollBarFor " + containerName, true)
@@ -66,28 +63,26 @@ void HkContainer::onGeneralMouseScroll()
     }
 }
 
+void HkContainer::onResolveFocusPass()
+{
+    boundPos_ = { node_.transformContext.getPos() };
+    boundScale_ = { node_.transformContext.getScale() };
+    pinchHelper_.scan(*windowDataPtr_, boundPos_, boundScale_,
+        treeStruct_.getId(), treeStruct_.getLevel());
+}
+
 void HkContainer::onGeneralMouseClickOrRelease()
 {
     //TODO: Later bring back highlighting if needed
     // node_.renderContext.getShader().setInt("focused", 0);
 
-    if (!windowDataPtr_->isMouseClicked)
+    if (windowDataPtr_->isMouseClicked)
     {
-
-        // float prevStyle = getStyle().getHSizeConfig().min;
-
-        // const auto pScaleX = treeStruct_.getParent()->getPayload()->node_.transformContext.getScale().x;
-        // const auto chScale = node_.transformContext.getScale().x;
-        // const float perc = (double)(chScale) / (double)pScaleX;
-        // getStyle().setVHSizeConfig(
-        //     { .value = 300 },
-        //     { .type = HkSizeType::Pinch, .value = perc, .min = prevStyle });
-
-        pinchHelper_.LFilled = 0;
-        pinchHelper_.RFilled = 0;
-        pinchHelper_.TFilled = 0;
-        pinchHelper_.BFilled = 0;
-        dummyVal = 0;
+        pinchHelper_.resolve();
+    }
+    else
+    {
+        pinchHelper_.clear();
     }
 }
 
@@ -105,83 +100,57 @@ void HkContainer::onGeneralMouseMove()
     //     //     // node_.renderContext.getShader().setVec3f("hovered", glm::vec3(0, 1, 1));
     // }
 
+
     boundPos_ = { node_.transformContext.getPos() };
     boundScale_ = { node_.transformContext.getScale() };
-    pinchHelper_.onMove(*windowDataPtr_, boundPos_, boundScale_);
-    if (pinchHelper_.isSomethingActive() && windowDataPtr_->isMouseClicked)
+    // pinchHelper_.onMove(*windowDataPtr_, boundPos_, boundScale_);
+    if (windowDataPtr_->isMouseClicked)
     {
-        /*
-
-        We need to find a way to pinch correctly in case of inner container
-        with wrapping container pinch.
-        Only restricting to containers on same level makes us unable to do 3+ way
-        pinching.
-        One solution is to agregate all the pinch locations on click and resolve
-        the containers that will actually move somehow...
-
-        Faulty case:
-        lvl 2: B + T
-        lvl 3: BR + BL
-        => in this case, lvl3 Bottom shall not be pinched as it is already accounted for
-           by lvl 2 Bottom......what if we restrict to max of one of each pinch direction?
-           somwhow..
-        */
-        // if (dummyVal == 0)
-        // {
-        //     dummyVal = treeStruct_.getLevel();
-        // }
-
-        // if (dummyVal != treeStruct_.getLevel())
-        // {
-        //     std::cout << "dummy val doesnt match: " << dummyVal << " " << treeStruct_.getLevel() << "\n";
-        //     return;
-        // }
-
-        if (pinchHelper_.lockedInXL_ && pinchHelper_.LFilled == 0)
+        bool isValid = false;
+        HkPinchHelper::PinchInfo foundInfo;
+        for (const auto& pi : pinchHelper_.validityGroup_)
         {
-            pinchHelper_.LFilled = treeStruct_.getId();
-        }
-        if (pinchHelper_.lockedInXR_ && pinchHelper_.RFilled == 0)
-        {
-            pinchHelper_.RFilled = treeStruct_.getId();
-        }
-        if (pinchHelper_.lockedInYT_ && pinchHelper_.TFilled == 0)
-        {
-            pinchHelper_.TFilled = treeStruct_.getId();
-        }
-        if (pinchHelper_.lockedInYB_ && pinchHelper_.BFilled == 0)
-        {
-            pinchHelper_.BFilled = treeStruct_.getId();
+            if (treeStruct_.getId() == pi.nodeId)
+            {
+                isValid = true;
+                foundInfo = pi;
+                break;
+            }
         }
 
-        std::cout << pinchHelper_.LFilled << "  " << pinchHelper_.RFilled << "  "
-            << pinchHelper_.TFilled << "  " << pinchHelper_.BFilled << "\n";
-
-        if (pinchHelper_.lockedInXL_ && pinchHelper_.LFilled != treeStruct_.getId())
+        if (!isValid)
         {
             return;
         }
-        if (pinchHelper_.lockedInXR_ && pinchHelper_.RFilled != treeStruct_.getId())
+
+        if (foundInfo.right)
         {
-            return;
+            boundScale_.x += windowDataPtr_->mousePos.x - windowDataPtr_->lastMousePos.x;
         }
-        if (pinchHelper_.lockedInYT_ && pinchHelper_.TFilled != treeStruct_.getId())
+
+        if (foundInfo.left)
         {
-            return;
+            boundPos_.x += windowDataPtr_->mousePos.x - windowDataPtr_->lastMousePos.x;
+            boundScale_.x += -(windowDataPtr_->mousePos.x - windowDataPtr_->lastMousePos.x);
         }
-        if (pinchHelper_.lockedInYB_ && pinchHelper_.BFilled != treeStruct_.getId())
+
+        if (foundInfo.top)
         {
-            return;
+            boundPos_.y += windowDataPtr_->mousePos.y - windowDataPtr_->lastMousePos.y;
+            boundScale_.y += -(windowDataPtr_->mousePos.y - windowDataPtr_->lastMousePos.y);
         }
+
+        if (foundInfo.bottom)
+        {
+            boundScale_.y += (windowDataPtr_->mousePos.y - windowDataPtr_->lastMousePos.y);
+        }
+
+
 
         const auto pScaleX = treeStruct_.getParent()->getPayload()->node_.transformContext.getScale().x;
         const auto pScaleY = treeStruct_.getParent()->getPayload()->node_.transformContext.getScale().y;
         const auto chScale = boundScale_.x;
         const auto chScaleY = boundScale_.y;
-        // const float perc = ((double)chScale + 0.0f) / (double)pScaleX;
-
-        //TODO: Looks like percParent doesnt take into account margins fully
-        // std::cout << "Child: " << treeStruct_.getName() << " -> " << (double)chScale / (double)pScaleX << "\n";
 
 
         const float perc =
@@ -190,15 +159,6 @@ void HkContainer::onGeneralMouseMove()
         const float percY =
             ((double)chScaleY - node_.transformContext.getScale().y) / (double)pScaleY;
 
-        // std::cout << "Pinched lvl: " << dummyVal << "\n";
-
-
-        // getStyle().setVHSizeConfig(
-        //     { .value = 300 },
-        //     { .type = HkSizeType::Pinch, .value = perc, .min = 0 });
-
-
-        // // node_.transformContext.setScale(boundScale_);
         node_.transformContext.setPos(boundPos_);
         auto prev = node_.styleContext.getHSizeConfig();
         prev.value += perc;
@@ -207,12 +167,6 @@ void HkContainer::onGeneralMouseMove()
         prevY.value += percY;
         getStyle().setHSizeConfig(prev);
         getStyle().setVSizeConfig(prevY);
-        // { .value = 300 },
-        // { .type = HkSizeType::PercParent, .value = perc, .min = 0 });
-
-
-    // getStyle().setVHSizeConfig(
-    //     { .value = (float)boundScale_.y }, { .value = (float)boundScale_.x });
     }
 }
 
@@ -346,75 +300,13 @@ void HkContainer::postRenderAdditionalDetails()
         dummyXYIntersectorData_.styleContext,
         dummyXYIntersectorData_.transformContext.getModelMatrix());
 
-    if (pinchHelper_.isSomethingActive())
-    {
-        // glDisable(GL_SCISSOR_TEST);
-        // pinchHelper_.pincher_.renderContext.windowProjMatrix = windowDataPtr_->sceneProjMatrix;
-
-        // pinchHelper_.pincher_.transformContext.setScale(
-        //     {
-        //         15,
-        //         node_.transformContext.getScale().y
-        //     });
-        // pinchHelper_.pincher_.transformContext.setPos(
-        //     {
-        //         node_.transformContext.getPos().x + node_.transformContext.getScale().x,
-        //         node_.transformContext.getPos().y
-        //     });
-
-        // windowDataPtr_->renderer.render(pinchHelper_.pincher_.renderContext,
-        //     pinchHelper_.pincher_.styleContext,
-        //     pinchHelper_.pincher_.transformContext.getModelMatrix());
-
-        // pinchHelper_.transformContext.setScale(
-        //     {
-        //         grabSize_,
-        //         boundScale.y + extendT + extendB
-        //     });
-        // pinchHelper_.transformContext.setPos(
-        //     {
-        //         boundPos.x - grabSize_,
-        //         boundPos.y - extendT
-        //     });
-
-        // windowData.renderer.render(pinchHelper_.renderContext,
-        //     pinchHelper_.styleContext,
-        //     pinchHelper_.transformContext.getModelMatrix());
-
-        // pinchHelper_.transformContext.setScale(
-        //     {
-        //         boundScale.x,
-        //         grabSize_
-        //     });
-        // pinchHelper_.transformContext.setPos(
-        //     {
-        //         boundPos.x,
-        //         boundPos.y - grabSize_
-        //     });
-
-        // windowData.renderer.render(pinchHelper_.renderContext,
-        //     pinchHelper_.styleContext,
-        //     pinchHelper_.transformContext.getModelMatrix());
-
-        // pinchHelper_.transformContext.setScale(
-        //     {
-        //         boundScale.x,
-        //         grabSize_
-        //     });
-        // pinchHelper_.transformContext.setPos(
-        //     {
-        //         boundPos.x,
-        //         boundPos.y + boundScale.y
-        //     });
-
-        // windowData.renderer.render(pinchHelper_.renderContext,
-        //     pinchHelper_.styleContext,
-        //     pinchHelper_.transformContext.getModelMatrix());
     /* To note that we should always render the bars last*/
-        glEnable(GL_SCISSOR_TEST);
-        pinchHelper_.onBarRender(*windowDataPtr_, node_.transformContext.getPos(),
-            node_.transformContext.getScale());
-    }
+    // if (pinchHelper_.isSomethingActive())
+    // {
+    //     // glEnable(GL_SCISSOR_TEST);
+    //     pinchHelper_.onBarRender(*windowDataPtr_, node_.transformContext.getPos(),
+    //         node_.transformContext.getScale());
+    // }
 }
 
 void HkContainer::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)

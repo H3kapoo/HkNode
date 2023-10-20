@@ -50,12 +50,12 @@ void HkNodeBase::renderMySelf()
     /* Use this to render additional non interactive things if needed */
     /* Note: rescissoring to original parent is needed unfortunatelly */
 
-    glEnable(GL_SCISSOR_TEST);
-    glScissor(
-        tc.getVPos().x,
-        windowDataPtr_->windowSize.y - tc.getVPos().y - tc.getVScale().y,
-        tc.getVScale().x,
-        tc.getVScale().y);
+    // glEnable(GL_SCISSOR_TEST);
+    // glScissor(
+    //     tc.getVPos().x,
+    //     windowDataPtr_->windowSize.y - tc.getVPos().y - tc.getVScale().y,
+    //     tc.getVScale().x,
+    //     tc.getVScale().y);
 
     postRenderAdditionalDetails();
 
@@ -204,6 +204,9 @@ void HkNodeBase::resolveFocus()
     //TODO: For pinching, maybe its best to do a similar thing that we did with nearest
     // scrollbar. Try to see if on click-focus we might be also happening to pinch something
     // IF we next 'drag'
+
+    /* On focus we also need to resolve any pinching that might occur */
+    onResolveFocusPass();
 }
 
 /* Resolve specific and general mouse click evt */
@@ -336,6 +339,7 @@ void HkNodeBase::onWindowResize() {}
 void HkNodeBase::onGeneralMouseMove() {}
 void HkNodeBase::onGeneralMouseClickOrRelease() {}
 void HkNodeBase::onGeneralMouseScroll() {}
+void HkNodeBase::onResolveFocusPass() {}
 
 
 /* Injects */
