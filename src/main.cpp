@@ -31,7 +31,7 @@ int main()
     sceneWindow1->makeContextCurrent();
 
     HkWindowFramePtr windowFrame = std::make_shared<HkWindowFrame>("MyWindowFrame");
-    windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
+    windowFrame->setWindowMode(HkWindowFrameMode::Grabbable);
     sceneWindow1->addSubWindow(windowFrame); //NOTE: Needs to be added before adding any children
 
     windowFrame->getStyle().setOverflowAllowedXY(false)
@@ -67,7 +67,7 @@ int main()
         .setLayout(HkLayout::Horizontal)
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         .setVHSizeConfig(
-            { .type = HkSizeType::Pinch, .value = 0.5f, .min = 0 },
+            { .type = HkSizeType::Pinch, .value = 0.25f, .min = 0 },
             { .type = HkSizeType::PercParent, .value = 1.0f })
         .setBottomMargin(15);
 
@@ -75,140 +75,140 @@ int main()
         .setLayout(HkLayout::Horizontal)
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         .setVHSizeConfig(
-            { .type = HkSizeType::Pinch, .value = 0.5f, .min = 15 },
+            { .type = HkSizeType::Pinch, .value = 0.25f, .min = 0 },
             { .type = HkSizeType::PercParent, .value = 1.0f })
-        .setRightMargin(0);
-
+        .setBottomMargin(15);
 
     ctr5->getStyle().setColor({ 0.3f,0.5f,0.0f })
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         .setVHSizeConfig(
-            { .type = HkSizeType::PercParent, .value = 1.0f },
-            { .type = HkSizeType::Pinch, .value = 0.5f, .min = 0 })
-        .setRightMargin(15);
-    // .setLeftRightMargin(15, 15);
-
+            { .type = HkSizeType::Pinch, .value = 0.25f, .min = 0 },
+            { .type = HkSizeType::PercParent, .value = 1.0f })
+        .setBottomMargin(15);
 
     ctr6->getStyle().setColor({ 0.0f,0.0f,1.0f })
         .setLayout(HkLayout::Horizontal)
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         .setVHSizeConfig(
-            { .type = HkSizeType::PercParent, .value = 1.0f },
-            { .type = HkSizeType::Pinch, .value = 0.5f, .min = 15 });
-
-    ctr7->getStyle().setColor({ 0.3f,0.7f,0.0f })
-        .setLayout(HkLayout::Vertical)
-        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-        .setVHSizeConfig(
-            { .type = HkSizeType::PercParent, .value = 1.0f },
-            { .type = HkSizeType::Pinch, .value = 0.5f, .min = 0 })
-        .setRightMargin(15);
-
-
-    ctr8->getStyle().setColor({ 0.0f,0.4f,1.0f })
-        .setLayout(HkLayout::Vertical)
-        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-        .setVHSizeConfig(
-            { .type = HkSizeType::PercParent, .value = 1.0f },
-            { .type = HkSizeType::Pinch, .value = 0.5f, .min = 15 });
-
-    ctr9->getStyle().setColor({ 0.4f,0.7f,0.0f })
-        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-        .setVHSizeConfig(
-            { .type = HkSizeType::PercParent, .value = 1.0f },
-            { .type = HkSizeType::Pinch, .value = 0.5f, .min = 0 })
-        .setRightMargin(15);
-
-
-    ctr10->getStyle().setColor({ 0.0f,0.7f,1.0f })
-        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-        .setVHSizeConfig(
-            { .type = HkSizeType::PercParent, .value = 1.0f },
-            { .type = HkSizeType::Pinch, .value = 0.5f, .min = 15 });
-
-    ctr11->getStyle().setColor({ 0.4f,0.7f,0.0f })
-        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-        .setVHSizeConfig(
-            { .type = HkSizeType::Pinch, .value = 0.5f, .min = 0 },
+            { .type = HkSizeType::Pinch, .value = 0.25f, .min = 45 },
             { .type = HkSizeType::PercParent, .value = 1.0f })
-        .setBottomMargin(15);
+        .setBottomMargin(0);
+
+    {
+
+        ctr7->getStyle().setColor({ 0.3f,0.7f,0.0f })
+            .setLayout(HkLayout::Vertical)
+            .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+            .setVHSizeConfig(
+                { .type = HkSizeType::PercParent, .value = 1.0f },
+                { .type = HkSizeType::Pinch, .value = 0.5f, .min = 0 })
+            .setRightMargin(15);
 
 
-    ctr12->getStyle().setColor({ 0.0f,0.7f,1.0f })
-        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-        .setVHSizeConfig(
-            { .type = HkSizeType::Pinch, .value = 0.5f, .min = 15 },
-            { .type = HkSizeType::PercParent, .value = 1.0f });
+        ctr8->getStyle().setColor({ 0.0f,0.4f,1.0f })
+            .setLayout(HkLayout::Vertical)
+            .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+            .setVHSizeConfig(
+                { .type = HkSizeType::PercParent, .value = 1.0f },
+                { .type = HkSizeType::Pinch, .value = 0.5f, .min = 15 });
 
-    ctr13->getStyle().setColor({ 0.1f,0.7f,0.0f })
-        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-        .setVHSizeConfig(
-            { .type = HkSizeType::Pinch, .value = 0.5f, .min = 0 },
-            { .type = HkSizeType::PercParent, .value = 1.0f })
-        .setBottomMargin(15);
+        ctr9->getStyle().setColor({ 0.4f,0.7f,0.0f })
+            .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+            .setVHSizeConfig(
+                { .type = HkSizeType::PercParent, .value = 1.0f },
+                { .type = HkSizeType::Pinch, .value = 0.5f, .min = 0 })
+            .setRightMargin(15);
 
 
-    ctr14->getStyle().setColor({ 0.5f,0.7f,1.0f })
-        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-        .setVHSizeConfig(
-            { .type = HkSizeType::Pinch, .value = 0.5f, .min = 15 },
-            { .type = HkSizeType::PercParent, .value = 1.0f });
+        ctr10->getStyle().setColor({ 0.0f,0.7f,1.0f })
+            .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+            .setVHSizeConfig(
+                { .type = HkSizeType::PercParent, .value = 1.0f },
+                { .type = HkSizeType::Pinch, .value = 0.5f, .min = 15 });
 
+        ctr11->getStyle().setColor({ 0.4f,0.7f,0.0f })
+            .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+            .setVHSizeConfig(
+                { .type = HkSizeType::Pinch, .value = 0.5f, .min = 0 },
+                { .type = HkSizeType::PercParent, .value = 1.0f })
+            .setBottomMargin(15);
+
+
+        ctr12->getStyle().setColor({ 0.0f,0.7f,1.0f })
+            .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+            .setVHSizeConfig(
+                { .type = HkSizeType::Pinch, .value = 0.5f, .min = 15 },
+                { .type = HkSizeType::PercParent, .value = 1.0f });
+
+        ctr13->getStyle().setColor({ 0.1f,0.7f,0.0f })
+            .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+            .setVHSizeConfig(
+                { .type = HkSizeType::Pinch, .value = 0.5f, .min = 0 },
+                { .type = HkSizeType::PercParent, .value = 1.0f })
+            .setBottomMargin(15);
+
+
+        ctr14->getStyle().setColor({ 0.5f,0.7f,1.0f })
+            .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+            .setVHSizeConfig(
+                { .type = HkSizeType::Pinch, .value = 0.5f, .min = 15 },
+                { .type = HkSizeType::PercParent, .value = 1.0f });
+    }
     // ctr->pushChildren({ ctr4, ctr5, ctr6 });
     bool x = false;
     ctr->getEvents().setOnClickListener([&ctr4, &x]() {
         ctr4->getStyle().setColor(x ? glm::vec3{ 0.3f, 0.5f, 0.0f } : glm::vec3{ 0.3f, 0.5f, 1.0f });
         x = !x;
         });
-    // windowFrame->pushChildren({ ctr, ctr4, ctr5, ctr6 });
-    windowFrame->pushChildren({ ctr, ctr4 });
-    ctr->pushChildren({ ctr5, ctr6 });
-    ctr4->pushChildren({ ctr7, ctr8 });
+    windowFrame->pushChildren({ ctr, ctr4, ctr5, ctr6 });
+    // windowFrame->pushChildren({ ctr, ctr4 });
+    // ctr->pushChildren({ ctr5, ctr6 });
+    // ctr4->pushChildren({ ctr7, ctr8 });
 
 
-    ctr7->pushChildren({ ctr11,ctr12 });
-    ctr8->pushChildren({ ctr13,ctr14 });
+    // ctr7->pushChildren({ ctr11,ctr12 });
+    // ctr8->pushChildren({ ctr13,ctr14 });
 
-    ctr13->pushChildren({ ctr9,ctr10 });
+    // ctr13->pushChildren({ ctr9,ctr10 });
     // windowFrame->pushChildren({ ctr });
 
 // Providing a seed value
-    srand((unsigned)time(NULL));
+    // srand((unsigned)time(NULL));
 
-    int scale = 4;
-    std::vector<HkNodeBasePtr> ctrs2;
-    ctrs2.reserve(scale * scale);
-    for (int i = 0;i < scale; i++) // with O2 works ok 01.09.2023
-    {
-        for (int j = 0;j < scale; j++)
-        {
-            double r = (rand() % 255) / 255.0f;
-            double g = (rand() % 255) / 255.0f;
-            double b = (rand() % 255) / 255.0f;
+    // int scale = 4;
+    // std::vector<HkNodeBasePtr> ctrs2;
+    // ctrs2.reserve(scale * scale);
+    // for (int i = 0;i < scale; i++) // with O2 works ok 01.09.2023
+    // {
+    //     for (int j = 0;j < scale; j++)
+    //     {
+    //         double r = (rand() % 255) / 255.0f;
+    //         double g = (rand() % 255) / 255.0f;
+    //         double b = (rand() % 255) / 255.0f;
 
-            const auto& ct = std::make_shared<HkContainer>("MyContauner");
-            ct->getStyle()
-                .setColor((i + j) % 2 == 0 ? glm::vec3{ r,g,b } : glm::vec3{ r,g,b })
-                .setGridRowCol(i + 1, j + 1)
-                // .setVHSizeConfig({ .value = 50 }, { .value = 50 })
-                .setVHSizeConfig({ .type = HkSizeType::FitCell }, { .type = HkSizeType::FitCell })
-                .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center);
+    //         const auto& ct = std::make_shared<HkContainer>("MyContauner");
+    //         ct->getStyle()
+    //             .setColor((i + j) % 2 == 0 ? glm::vec3{ r,g,b } : glm::vec3{ r,g,b })
+    //             .setGridRowCol(i + 1, j + 1)
+    //             // .setVHSizeConfig({ .value = 50 }, { .value = 50 })
+    //             .setVHSizeConfig({ .type = HkSizeType::FitCell }, { .type = HkSizeType::FitCell })
+    //             .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center);
 
-            ctrs2.push_back(std::move(ct));
-        }
-    }
+    //         ctrs2.push_back(std::move(ct));
+    //     }
+    // }
 
-    std::vector<float> rows, cols;
-    rows.assign(scale, 1.0f);
-    cols.assign(scale, 1.0f);
-    ctr5->getStyle()
-        .setLayout(HkLayout::Grid)
-        .setGridConfig(
-            HkGridConfig{
-                .cols{cols},
-                .rows{rows}
-            });
-    ctr5->pushChildren(ctrs2);
+    // std::vector<float> rows, cols;
+    // rows.assign(scale, 1.0f);
+    // cols.assign(scale, 1.0f);
+    // ctr5->getStyle()
+    //     .setLayout(HkLayout::Grid)
+    //     .setGridConfig(
+    //         HkGridConfig{
+    //             .cols{cols},
+    //             .rows{rows}
+    //         });
+    // ctr5->pushChildren(ctrs2);
     // HkImageViewPtr imgView = std::make_shared<HkImageView>("MyImgView");
     // HkImageViewPtr imgView2 = std::make_shared<HkImageView>("MyImgView2");
     // HkImageViewPtr imgView3 = std::make_shared<HkImageView>("MyImgView3");
@@ -231,7 +231,7 @@ int main()
 
     HkWindowFramePtr windowFrame2 = std::make_shared<HkWindowFrame>("MyWindowFrame2");
     windowFrame2->setWindowMode(HkWindowFrameMode::Grabbable);
-    // sceneWindow1->addSubWindow(windowFrame2); //NOTE: Needs to be added before adding any children
+    sceneWindow1->addSubWindow(windowFrame2); //NOTE: Needs to be added before adding any children
     // sceneWindow2->addSubWindow(windowFrame2); //NOTE: Needs to be added before adding any children
 
     windowFrame2->getStyle().setOverflowAllowedXY(true)

@@ -10,6 +10,8 @@ HkContainer::HkContainer(const std::string& containerName)
 {
     node_.styleContext.setColor(glm::vec3(0.5f, 0.5f, 0.5f));
 
+    pinchHelper_.setGrabSize(15);
+
     /* NOTE: In the future maybe this dummy can be an actual small UI element, but for now let it be
        just a normal renderable detail */
     dummyXYIntersectorData_.styleContext.setColor(glm::vec3(0.7f, 1.0f, 0.2f));
@@ -65,9 +67,7 @@ void HkContainer::onGeneralMouseScroll()
 
 void HkContainer::onResolveFocusPass()
 {
-    boundPos_ = { node_.transformContext.getPos() };
-    boundScale_ = { node_.transformContext.getScale() };
-    pinchHelper_.scan(*windowDataPtr_, boundPos_, boundScale_,
+    pinchHelper_.scan(*windowDataPtr_, node_,
         treeStruct_.getId(), treeStruct_.getLevel());
 }
 
@@ -94,8 +94,6 @@ void HkContainer::onGeneralMouseMove()
     // }
 
 
-    boundPos_ = { node_.transformContext.getPos() };
-    boundScale_ = { node_.transformContext.getScale() };
     pinchHelper_.onMouseMove(*windowDataPtr_, node_,
         treeStruct_.getParent()->getPayload()->node_,
         treeStruct_.getId());
@@ -232,12 +230,8 @@ void HkContainer::postRenderAdditionalDetails()
         dummyXYIntersectorData_.transformContext.getModelMatrix());
 
     /* To note that we should always render the bars last*/
-    // if (pinchHelper_.isSomethingActive())
-    {
-        glEnable(GL_SCISSOR_TEST);
-        pinchHelper_.onBarRender(*windowDataPtr_, node_.transformContext.getPos(),
-            node_.transformContext.getScale());
-    }
+    pinchHelper_.onBarRender(*windowDataPtr_, node_.transformContext.getVPos(),
+        node_.transformContext.getVScale());
 }
 
 void HkContainer::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)

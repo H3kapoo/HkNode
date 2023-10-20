@@ -41,7 +41,6 @@ void HkWindowFrame::onFirstHeartbeat()
     /*Init pinching helper*/
     pinchHelper_.init(*windowDataPtr_);
 
-
     HkNodeBase::onFirstHeartbeat();
 }
 
@@ -49,12 +48,9 @@ void HkWindowFrame::postRenderAdditionalDetails()
 {
     /* Normally we would just pass a reference to pos+scale of TC, but windowFrame is special
        because it has a top frame and a container object */
-    if (pinchHelper_.isSomethingActive())
-    {
-        /* To note that we should always render the bars last*/
-        glEnable(GL_SCISSOR_TEST);
-        pinchHelper_.onBarRender(*windowDataPtr_, boundPos_, boundScale_);
-    }
+
+       /* To note that we should always render the bars last*/
+    pinchHelper_.onBarRender(*windowDataPtr_, boundPos_, boundScale_);
 }
 
 void HkWindowFrame::onAnimationFrameRequested()
@@ -108,15 +104,13 @@ void HkWindowFrame::onDrag()
 
 void HkWindowFrame::onGeneralMouseMove()
 {
-    //TODO: do this only if pinching flag is enabled
     boundPos_ = { node_.transformContext.getPos() };
     boundScale_ = {
         node_.transformContext.getScale().x,
         wfCont_.node_.transformContext.getScale().y + node_.transformContext.getScale().y
     };
 
-    pinchHelper_.onMove(*windowDataPtr_, boundPos_, boundScale_);
-    if (pinchHelper_.isSomethingActive())
+    if (pinchHelper_.onMouseMoveCustom(*windowDataPtr_, boundPos_, boundScale_))
     {
         node_.transformContext.setScale({ boundScale_.x, 30 });
         node_.transformContext.setPos(boundPos_);

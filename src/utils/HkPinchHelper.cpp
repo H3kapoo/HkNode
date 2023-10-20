@@ -22,22 +22,57 @@ void HkPinchHelper::init(HkWindowData& windowData)
     pincher_.renderContext.colorUniformEn = true;
 }
 
+void HkPinchHelper::scan(HkWindowData& windowData, HkNodeData& nd,
+    const uint32_t id, const uint32_t level)
+{
+    /* Each click has first a focusScan pass. We can use this to scan all objects that support pinching
+      for potential pinch points and add them to a potential final pinch vector*/
+    PinchInfo pi;
+    auto& tc = nd.transformContext;
+    const auto mousePos = windowData.mousePos;
+    const auto nodeEndPos = tc.getVPos() + tc.getVScale();
+
+    const bool TZone = (mousePos.y > tc.getVPos().y - grabSize_)
+        && (mousePos.y < tc.getVPos().y);
+    const bool BZone = (mousePos.y < nodeEndPos.y + grabSize_)
+        && (mousePos.y > nodeEndPos.y);
+    const bool LZone = (mousePos.x > tc.getVPos().x - grabSize_)
+        && (mousePos.x < tc.getVPos().x);
+    const bool RZone = (mousePos.x > nodeEndPos.x)
+        && (mousePos.x < nodeEndPos.x + grabSize_);
+    const bool VBound = mousePos.y > tc.getVPos().y &&
+        mousePos.y < nodeEndPos.y;
+    const bool HBound = mousePos.x > tc.getVPos().x &&
+        mousePos.x < nodeEndPos.x;
+
+    // pinch right
+    if (RZone && VBound) pi.right = true;
+    // pinch left
+    if (LZone && VBound) pi.left = true;
+    // pinch top
+    if (TZone && HBound) pi.top = true;
+    // pinch bottom
+    if (BZone && HBound) pi.bottom = true;
+
+    // diagonal bottom-right pinch
+    if (RZone && BZone) { pi.right = true;pi.bottom = true; }
+    // diagonal top-right pinch
+    if (RZone && TZone) { pi.right = true; pi.top = true; }
+    // diagonal bottom-left pinch
+    if (LZone && BZone) { pi.left = true; pi.bottom = true; }
+    // diagonal top-left pinch
+    if (LZone && TZone) { pi.left = true;pi.top = true; }
+
+    pi.nodeId = id;
+    pi.level = level;
+    pinchInfo_.push_back(pi);
+}
+
 void HkPinchHelper::onMouseButton(HkWindowData& windowData)
 {
     /* On click (after focusPass), resolve which pinchInfos need to be used.
        On release, clear cache */
     windowData.isMouseClicked ? resolve() : clear();
-}
-
-void HkPinchHelper::clear()
-{
-    /* If we already resolved something, clear on mouse release */
-    if (!resolved_) return;
-
-    /* Restore everything after click release */
-    pinchInfo_.clear();
-    validityGroup_.clear();
-    resolved_ = false;
 }
 
 void HkPinchHelper::resolve()
@@ -150,75 +185,28 @@ void HkPinchHelper::resolve()
     }
 }
 
-void HkPinchHelper::scan(HkWindowData& windowData, glm::ivec2& boundPos, glm::ivec2& boundScale,
-    const uint32_t id, const uint32_t level)
-{
-    /* Each click has first a focusScan pass. We can use this to scan all objects that support pinching
-      for potential pinch points and add them to a potential final pinch vector*/
-    PinchInfo pi;
-    const auto mousePos = windowData.mousePos;
-    const auto nodeEndPos = boundPos + boundScale;
-
-    const bool TZone = (mousePos.y > boundPos.y - grabSize_)
-        && (mousePos.y < boundPos.y);
-    const bool BZone = (mousePos.y < nodeEndPos.y + grabSize_)
-        && (mousePos.y > nodeEndPos.y);
-    const bool LZone = (mousePos.x > boundPos.x - grabSize_)
-        && (mousePos.x < boundPos.x);
-    const bool RZone = (mousePos.x > nodeEndPos.x)
-        && (mousePos.x < nodeEndPos.x + grabSize_);
-    const bool VBound = mousePos.y > boundPos.y &&
-        mousePos.y < nodeEndPos.y;
-    const bool HBound = mousePos.x > boundPos.x &&
-        mousePos.x < nodeEndPos.x;
-
-    // pinch right
-    if (RZone && VBound) pi.right = true;
-    // pinch left
-    if (LZone && VBound) pi.left = true;
-    // pinch top
-    if (TZone && HBound) pi.top = true;
-    // pinch bottom
-    if (BZone && HBound) pi.bottom = true;
-
-    // diagonal bottom-right pinch
-    if (RZone && BZone) { pi.right = true;pi.bottom = true; }
-    // diagonal top-right pinch
-    if (RZone && TZone) { pi.right = true; pi.top = true; }
-    // diagonal bottom-left pinch
-    if (LZone && BZone) { pi.left = true; pi.bottom = true; }
-    // diagonal top-left pinch
-    if (LZone && TZone) { pi.left = true;pi.top = true; }
-
-    pi.nodeId = id;
-    pi.level = level;
-    pinchInfo_.push_back(pi);
-}
 
 void HkPinchHelper::onMouseMove(HkWindowData& windowData, HkNodeData& nd, HkNodeData& pnd, const uint32_t id)
 {
     /* We are just moving around, scan for grab points in order to display grabBars to user. These will
        not be used for position calculations*/
     auto& tc = nd.transformContext;
-    boundPos_ = { tc.getPos() };
-    boundScale_ = { tc.getScale() };
-
     if (!windowData.isMouseClicked)
     {
         const auto mousePos = windowData.mousePos;
-        const auto nodeEndPos = tc.getPos() + tc.getScale();
+        const auto nodeEndPos = tc.getVPos() + tc.getVScale();
 
-        const bool TZone = (mousePos.y > tc.getPos().y - grabSize_)
-            && (mousePos.y < tc.getPos().y);
+        const bool TZone = (mousePos.y > tc.getVPos().y - grabSize_)
+            && (mousePos.y < tc.getVPos().y);
         const bool BZone = (mousePos.y < nodeEndPos.y + grabSize_)
             && (mousePos.y > nodeEndPos.y);
-        const bool LZone = (mousePos.x > tc.getPos().x - grabSize_)
-            && (mousePos.x < tc.getPos().x);
+        const bool LZone = (mousePos.x > tc.getVPos().x - grabSize_)
+            && (mousePos.x < tc.getVPos().x);
         const bool RZone = (mousePos.x > nodeEndPos.x)
             && (mousePos.x < nodeEndPos.x + grabSize_);
-        const bool VBound = mousePos.y > tc.getPos().y &&
+        const bool VBound = mousePos.y > tc.getVPos().y &&
             mousePos.y < nodeEndPos.y;
-        const bool HBound = mousePos.x > tc.getPos().x &&
+        const bool HBound = mousePos.x > tc.getVPos().x &&
             mousePos.x < nodeEndPos.x;
 
         // pinch right
@@ -232,17 +220,17 @@ void HkPinchHelper::onMouseMove(HkWindowData& windowData, HkNodeData& nd, HkNode
         // diagonal bottom-right pinch
         if (RZone && BZone) { lockedInXR_ = true; lockedInYB_ = true; }
         // diagonal top-right pinch
-        if (RZone && TZone) { lockedInXR_ = true;lockedInYT_ = true; }
+        if (RZone && TZone) { lockedInXR_ = true; lockedInYT_ = true; }
         // diagonal bottom-left pinch
-        if (LZone && BZone) { lockedInXL_ = true;lockedInYB_ = true; }
+        if (LZone && BZone) { lockedInXL_ = true; lockedInYB_ = true; }
         // diagonal top-left pinch
-        if (LZone && TZone) { lockedInXL_ = true;lockedInYT_ = true; }
+        if (LZone && TZone) { lockedInXL_ = true; lockedInYT_ = true; }
     }
     /* If we are holding click and moving, we need to update position/scale of pinched object */
     else
     {
         bool isValid = false;
-        HkPinchHelper::PinchInfo foundInfo;
+        PinchInfo foundInfo;
         for (const auto& pi : validityGroup_)
         {
             if (id == pi.nodeId)
@@ -253,47 +241,42 @@ void HkPinchHelper::onMouseMove(HkWindowData& windowData, HkNodeData& nd, HkNode
             }
         }
 
-        if (!isValid)
-        {
-            return;
-        }
+        if (!isValid) return;
+
+        //TODO: make them local
+        glm::vec2 boundPos = { tc.getPos() };
+        glm::vec2 boundScale = { tc.getScale() };
 
         if (foundInfo.right)
         {
-            boundScale_.x += windowData.mousePos.x - windowData.lastMousePos.x;
+            boundScale.x += windowData.mousePos.x - windowData.lastMousePos.x;
         }
 
         if (foundInfo.left)
         {
-            boundPos_.x += windowData.mousePos.x - windowData.lastMousePos.x;
-            boundScale_.x += -(windowData.mousePos.x - windowData.lastMousePos.x);
+            boundPos.x += windowData.mousePos.x - windowData.lastMousePos.x;
+            boundScale.x += -(windowData.mousePos.x - windowData.lastMousePos.x);
         }
 
         if (foundInfo.top)
         {
-            boundPos_.y += windowData.mousePos.y - windowData.lastMousePos.y;
-            boundScale_.y += -(windowData.mousePos.y - windowData.lastMousePos.y);
+            boundPos.y += windowData.mousePos.y - windowData.lastMousePos.y;
+            boundScale.y += -(windowData.mousePos.y - windowData.lastMousePos.y);
         }
 
         if (foundInfo.bottom)
         {
-            boundScale_.y += (windowData.mousePos.y - windowData.lastMousePos.y);
+            boundScale.y += (windowData.mousePos.y - windowData.lastMousePos.y);
         }
 
         const auto pScaleX = pnd.transformContext.getScale().x;
         const auto pScaleY = pnd.transformContext.getScale().y;
-        const auto chScale = boundScale_.x;
-        const auto chScaleY = boundScale_.y;
+        const float percX = ((float)boundScale.x - tc.getScale().x) / pScaleX;
+        const float percY = ((float)boundScale.y - tc.getScale().y) / pScaleY;
 
-        const float perc =
-            ((double)chScale - tc.getScale().x) / (double)pScaleX;
-
-        const float percY =
-            ((double)chScaleY - tc.getScale().y) / (double)pScaleY;
-
-        tc.setPos(boundPos_);
+        tc.setPos(boundPos);
         auto prev = nd.styleContext.getHSizeConfig();
-        prev.value += perc;
+        prev.value += percX;
 
         auto prevY = nd.styleContext.getVSizeConfig();
         prevY.value += percY;
@@ -302,195 +285,13 @@ void HkPinchHelper::onMouseMove(HkWindowData& windowData, HkNodeData& nd, HkNode
     }
 }
 
-void HkPinchHelper::onMove(HkWindowData& windowData, glm::ivec2& boundPos, glm::ivec2& boundScale)
-{
-    /* We are just moving around, scanning for a potential grab point */
-    if (!windowData.isMouseClicked)
-    {
-        const auto mousePos = windowData.mousePos;
-        const auto nodeEndPos = boundPos + boundScale;
-
-        const bool TZone = (mousePos.y > boundPos.y - grabSize_)
-            && (mousePos.y < boundPos.y);
-        const bool BZone = (mousePos.y < nodeEndPos.y + grabSize_)
-            && (mousePos.y > nodeEndPos.y);
-        const bool LZone = (mousePos.x > boundPos.x - grabSize_)
-            && (mousePos.x < boundPos.x);
-        const bool RZone = (mousePos.x > nodeEndPos.x)
-            && (mousePos.x < nodeEndPos.x + grabSize_);
-        const bool VBound = mousePos.y > boundPos.y &&
-            mousePos.y < nodeEndPos.y;
-        const bool HBound = mousePos.x > boundPos.x &&
-            mousePos.x < nodeEndPos.x;
-
-        // pinch right
-        if (RZone && VBound)
-        {
-            lockedInXR_ = true;
-        }
-        else
-        {
-            lockedInXR_ = false;
-        }
-
-        // pinch left
-        if (LZone && VBound)
-        {
-            lockedInXL_ = true;
-        }
-        else
-        {
-            lockedInXL_ = false;
-        }
-
-        // pinch top
-        if (TZone && HBound)
-        {
-            lockedInYT_ = true;
-        }
-        else
-        {
-            lockedInYT_ = false;
-        }
-
-        // pinch bottom
-        if (BZone && HBound)
-        {
-            lockedInYB_ = true;
-        }
-        else
-        {
-            lockedInYB_ = false;
-        }
-
-        //TODO: in non subWindow mode, both sides need to be active. BUt only in this mode
-        // diagonal bottom-right pinch
-        if (RZone && BZone)
-        {
-            lockedInXR_ = true;
-            lockedInYB_ = true;
-        }
-
-        // diagonal top-right pinch
-        if (RZone && TZone)
-        {
-            lockedInXR_ = true;
-            lockedInYT_ = true;
-        }
-
-        // diagonal bottom-left pinch
-        if (LZone && BZone)
-        {
-            lockedInXL_ = true;
-            lockedInYB_ = true;
-        }
-
-        // diagonal top-left pinch
-        if (LZone && TZone)
-        {
-            lockedInXL_ = true;
-            lockedInYT_ = true;
-        }
-    }
-
-    // if (lockedInXR_ && lockedInYB_)
-    // {
-    //     cursorChange(windowData, GLFW_CROSSHAIR_CURSOR);
-    //     if (windowData.isMouseClicked)
-    //     {
-    //         boundScale.x += windowData.mousePos.x - windowData.lastMousePos.x;
-    //         boundScale.y += windowData.mousePos.y - windowData.lastMousePos.y;
-    //     }
-    //     return;
-    // }
-
-    // if (lockedInXR_ && lockedInYT_)
-    // {
-    //     cursorChange(windowData, GLFW_CROSSHAIR_CURSOR);
-    //     if (windowData.isMouseClicked)
-    //     {
-    //         boundScale.x += windowData.mousePos.x - windowData.lastMousePos.x;
-    //         boundPos.y += windowData.mousePos.y - windowData.lastMousePos.y;
-    //         boundScale.y += -(windowData.mousePos.y - windowData.lastMousePos.y);
-    //     }
-    //     return;
-    // }
-
-    // if (lockedInXL_ && lockedInYB_)
-    // {
-    //     cursorChange(windowData, GLFW_CROSSHAIR_CURSOR);
-    //     if (windowData.isMouseClicked)
-    //     {
-    //         boundPos.x += windowData.mousePos.x - windowData.lastMousePos.x;
-    //         boundScale.x += -(windowData.mousePos.x - windowData.lastMousePos.x);
-    //         boundScale.y += (windowData.mousePos.y - windowData.lastMousePos.y);
-    //     }
-    //     return;
-    // }
-
-    // if (lockedInXL_ && lockedInYT_)
-    // {
-    //     cursorChange(windowData, GLFW_CROSSHAIR_CURSOR);
-    //     if (windowData.isMouseClicked)
-    //     {
-    //         boundPos.x += windowData.mousePos.x - windowData.lastMousePos.x;
-    //         boundScale.x += -(windowData.mousePos.x - windowData.lastMousePos.x);
-    //         boundPos.y += windowData.mousePos.y - windowData.lastMousePos.y;
-    //         boundScale.y += -(windowData.mousePos.y - windowData.lastMousePos.y);
-    //     }
-    //     return;
-    // }
-
-    if (lockedInXR_)
-    {
-        cursorChange(windowData, GLFW_HRESIZE_CURSOR);
-        if (windowData.isMouseClicked)
-        {
-            boundScale.x += windowData.mousePos.x - windowData.lastMousePos.x;
-        }
-    }
-
-    if (lockedInXL_)
-    {
-        cursorChange(windowData, GLFW_HRESIZE_CURSOR);
-        if (windowData.isMouseClicked)
-        {
-            boundPos.x += windowData.mousePos.x - windowData.lastMousePos.x;
-            boundScale.x += -(windowData.mousePos.x - windowData.lastMousePos.x);
-        }
-    }
-
-    if (lockedInYT_)
-    {
-        cursorChange(windowData, GLFW_VRESIZE_CURSOR);
-        if (windowData.isMouseClicked)
-        {
-            boundPos.y += windowData.mousePos.y - windowData.lastMousePos.y;
-            boundScale.y += -(windowData.mousePos.y - windowData.lastMousePos.y);
-        }
-    }
-
-    if (lockedInYB_)
-    {
-        cursorChange(windowData, GLFW_VRESIZE_CURSOR);
-        if (windowData.isMouseClicked)
-        {
-            boundScale.y += (windowData.mousePos.y - windowData.lastMousePos.y);
-        }
-    }
-
-    /* If we didn't manage to grab anything, reset cursor */
-    if (!isSomethingActive())
-    {
-        // std::cout << glfwGetTime() << " fffff\n";
-        cursorChange(windowData, GLFW_ARROW_CURSOR);
-    }
-}
-
 void HkPinchHelper::onBarRender(HkWindowData& windowData, const glm::ivec2 boundPos, const glm::ivec2 boundScale)
 {
     const int32_t extendT = lockedInYT_ ? grabSize_ : 0;
     const int32_t extendB = lockedInYB_ ? grabSize_ : 0;
+
+    if (boundScale.x == 0 || boundScale.y == 0)
+        return;
 
     pincher_.renderContext.windowProjMatrix = windowData.sceneProjMatrix;
 
@@ -587,17 +388,111 @@ void HkPinchHelper::onBarRender(HkWindowData& windowData, const glm::ivec2 bound
     }
 }
 
+void HkPinchHelper::clear()
+{
+    /* If we already resolved something, clear on mouse release */
+    if (!resolved_) return;
+
+    /* Restore everything after click release */
+    pinchInfo_.clear();
+    validityGroup_.clear();
+    resolved_ = false;
+}
+
+bool HkPinchHelper::onMouseMoveCustom(HkWindowData& windowData, glm::ivec2& boundPos, glm::ivec2& boundScale)
+{
+    /* This is made custom for windowFrame as logic there is a bit different and not so complex like
+       for containers*/
+
+       /* We are just moving around, scanning for a potential grab point */
+    if (!windowData.isMouseClicked)
+    {
+        const auto mousePos = windowData.mousePos;
+        const auto nodeEndPos = boundPos + boundScale;
+
+        const bool TZone = (mousePos.y > boundPos.y - grabSize_)
+            && (mousePos.y < boundPos.y);
+        const bool BZone = (mousePos.y < nodeEndPos.y + grabSize_)
+            && (mousePos.y > nodeEndPos.y);
+        const bool LZone = (mousePos.x > boundPos.x - grabSize_)
+            && (mousePos.x < boundPos.x);
+        const bool RZone = (mousePos.x > nodeEndPos.x)
+            && (mousePos.x < nodeEndPos.x + grabSize_);
+        const bool VBound = mousePos.y > boundPos.y &&
+            mousePos.y < nodeEndPos.y;
+        const bool HBound = mousePos.x > boundPos.x &&
+            mousePos.x < nodeEndPos.x;
+
+        // pinch right
+        if (RZone && VBound) lockedInXR_ = true; else lockedInXR_ = false;
+        // pinch left
+        if (LZone && VBound) lockedInXL_ = true; else lockedInXL_ = false;
+        // pinch top
+        if (TZone && HBound) lockedInYT_ = true; else lockedInYT_ = false;
+        // pinch bottom
+        if (BZone && HBound) lockedInYB_ = true; else lockedInYB_ = false;
+        // diagonal bottom-right pinch
+        if (RZone && BZone) { lockedInXR_ = true; lockedInYB_ = true; }
+        // diagonal top-right pinch
+        if (RZone && TZone) { lockedInXR_ = true; lockedInYT_ = true; }
+        // diagonal bottom-left pinch
+        if (LZone && BZone) { lockedInXL_ = true; lockedInYB_ = true; }
+        // diagonal top-left pinch
+        if (LZone && TZone) { lockedInXL_ = true; lockedInYT_ = true; }
+
+        /* Set cursor to whatever we might need */
+        if (lockedInXR_ || lockedInXL_)
+            cursorChange(windowData, GLFW_HRESIZE_CURSOR);
+
+        if (lockedInYT_ || lockedInYB_)
+            cursorChange(windowData, GLFW_VRESIZE_CURSOR);
+
+        if ((lockedInXR_ && lockedInYB_) || (lockedInXR_ && lockedInYT_)
+            || (lockedInXL_ && lockedInYB_) || (lockedInXL_ && lockedInYT_))
+            cursorChange(windowData, GLFW_CROSSHAIR_CURSOR);
+
+        /* If we didn't manage to grab anything, reset cursor */
+        if (!(lockedInXL_ || lockedInXR_ || lockedInYB_ || lockedInYT_))
+            cursorChange(windowData, GLFW_ARROW_CURSOR);
+
+        /* Return false as this is "scan" pass (maybe separate func in the future), not "resolve" one */
+        return false;
+    }
+    /* (resolve pass) Is mouse is clicked and we are dragging, see if there's something changed so
+       we can update */
+    else
+    {
+        if (lockedInXR_)
+        {
+            boundScale.x += windowData.mousePos.x - windowData.lastMousePos.x;
+        }
+
+        if (lockedInXL_)
+        {
+            boundPos.x += windowData.mousePos.x - windowData.lastMousePos.x;
+            boundScale.x += -(windowData.mousePos.x - windowData.lastMousePos.x);
+        }
+
+        if (lockedInYT_)
+        {
+            boundPos.y += windowData.mousePos.y - windowData.lastMousePos.y;
+            boundScale.y += -(windowData.mousePos.y - windowData.lastMousePos.y);
+        }
+
+        if (lockedInYB_)
+        {
+            boundScale.y += (windowData.mousePos.y - windowData.lastMousePos.y);
+        }
+
+        /* Tell windowFrame if something needs update */
+        return lockedInXL_ || lockedInXR_ || lockedInYB_ || lockedInYT_;
+    }
+}
+
 void HkPinchHelper::cursorChange(HkWindowData& windowData, const int32_t value)
 {
     windowData.suggestedCursor = value;
     windowData.cursorChangeNeeded = true;
-}
-
-bool HkPinchHelper::isSomethingActive()
-{
-    if (lockedInXR_ == false && lockedInXL_ == false && lockedInYT_ == false && lockedInYB_ == false)
-        return false;
-    return true;
 }
 
 void HkPinchHelper::setGrabSize(const int32_t size) { grabSize_ = size; }

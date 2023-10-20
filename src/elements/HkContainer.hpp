@@ -39,7 +39,6 @@ private:
     HkNodeData dummyXYIntersectorData_;
 
     HkPinchHelper pinchHelper_;
-    glm::ivec2 boundPos_, boundScale_;
 };
 using HkContainerPtr = std::shared_ptr<HkContainer>;
 using HkContainerCPtr = const std::shared_ptr<HkContainer>;
