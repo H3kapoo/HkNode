@@ -18,6 +18,7 @@ private:
     void onFirstHeartbeat() override;
     void onScroll() override;
     void onResolveFocusPass() override;
+    void onDirtyAttribs(const std::unordered_set<HkStyleDirtyAttribs>& dirtyAttribs) override;
     void onGeneralMouseScroll() override;
     void onClick() override;
     void onRelease() override;
@@ -30,6 +31,7 @@ private:
 
     void constrainScrollbarsIfNeeded();
     void resolveScrollBarChildrenIfNeeded();
+    void configurePinchChildrenIfNeeded();
     //TODO: maybe push those ^^ in constraint mgmt
 
 private:

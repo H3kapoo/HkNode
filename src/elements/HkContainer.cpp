@@ -10,8 +10,6 @@ HkContainer::HkContainer(const std::string& containerName)
 {
     node_.styleContext.setColor(glm::vec3(0.5f, 0.5f, 0.5f));
 
-    pinchHelper_.setGrabSize(15);
-
     /* NOTE: In the future maybe this dummy can be an actual small UI element, but for now let it be
        just a normal renderable detail */
     dummyXYIntersectorData_.styleContext.setColor(glm::vec3(0.7f, 1.0f, 0.2f));
@@ -44,6 +42,41 @@ void HkContainer::onFirstHeartbeat()
     }
 
     HkNodeBase::onFirstHeartbeat();
+}
+
+void HkContainer::onDirtyAttribs(const std::unordered_set<HkStyleDirtyAttribs>& dirtyAttribs)
+{
+    for (const auto& chAttrib : dirtyAttribs)
+    {
+        switch (chAttrib)
+        {
+        case HkStyleDirtyAttribs::BG: break;
+        case HkStyleDirtyAttribs::Pinch:
+            /* We need to reconfigure children on pinch settings changed*/
+            pinchHelper_.setGrabConfig(getStyle().getPinchConfig());
+            configurePinchChildrenIfNeeded();
+            break;
+        }
+    }
+}
+
+void HkContainer::configurePinchChildrenIfNeeded()
+{
+    const auto& layout = getStyle().getLayout();
+    if (layout == HkLayout::HPinch || layout == HkLayout::VPinch)
+    {
+        /* If this is a parent containing pinchable children, we need to recalc things on children insertion */
+
+        std::vector<HkNodeData*> children;
+        const auto& allChildren = treeStruct_.getChildren();
+        for (uint32_t i = 0; i < treeStruct_.getChildren().size() - scrollbBarsCount_; i++)
+        {
+            children.push_back(&allChildren[i]->getPayload()->node_);
+        }
+
+        pinchHelper_.configureChildren(children,
+            getStyle().getLayout() == HkLayout::HPinch);
+    }
 }
 
 //TODO: The way we handle scroll inside scroll is now necessarly very intuitive. It needs to ve changed in the future
@@ -255,5 +288,9 @@ void HkContainer::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)
             child->injectWindowDataPtr(windowDataPtr_);
         }
     }
+
+    /* If this is a parent containing pinchable children, we need to recalc
+       things on children insertion */
+    configurePinchChildrenIfNeeded();
 }
 } // hkui

@@ -50,12 +50,12 @@ void HkNodeBase::renderMySelf()
     /* Use this to render additional non interactive things if needed */
     /* Note: rescissoring to original parent is needed unfortunatelly */
 
-    // glEnable(GL_SCISSOR_TEST);
-    // glScissor(
-    //     tc.getVPos().x,
-    //     windowDataPtr_->windowSize.y - tc.getVPos().y - tc.getVScale().y,
-    //     tc.getVScale().x,
-    //     tc.getVScale().y);
+    glEnable(GL_SCISSOR_TEST);
+    glScissor(
+        tc.getVPos().x,
+        windowDataPtr_->windowSize.y - tc.getVPos().y - tc.getVScale().y,
+        tc.getVScale().x,
+        tc.getVScale().y);
 
     postRenderAdditionalDetails();
 
@@ -292,6 +292,7 @@ void HkNodeBase::resolveDirtyAttributes()
         switch (chAttrib)
         {
         case HkStyleDirtyAttribs::BG:
+        {
             /* Change shader to the textured one if we have background set */
             const auto& bgImagePath = node_.styleContext.getBackgroundImage();
             if (bgImagePath.size() > 0)
@@ -315,7 +316,13 @@ void HkNodeBase::resolveDirtyAttributes()
             }
             break;
         }
+        case HkStyleDirtyAttribs::Pinch:
+            // WIll be resolved by each element individually. Can't really be resolved from here
+            break;
+        }
     }
+    std::cout << "dirty stuff " << treeStruct_.getName() << "\n";
+    onDirtyAttribs(node_.styleContext.dirtyAttribs);
 }
 
 void HkNodeBase::onFirstHeartbeat()
@@ -340,6 +347,7 @@ void HkNodeBase::onGeneralMouseMove() {}
 void HkNodeBase::onGeneralMouseClickOrRelease() {}
 void HkNodeBase::onGeneralMouseScroll() {}
 void HkNodeBase::onResolveFocusPass() {}
+void HkNodeBase::onDirtyAttribs(const std::unordered_set<HkStyleDirtyAttribs>&) {}
 
 
 /* Injects */

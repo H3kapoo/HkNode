@@ -18,7 +18,7 @@ int main()
     //TODO: Make it the responsability of the window to generate VAO and shader?
     // we need to make it order agnostic
     HkWindowManagerPtr sceneWindow1 = std::make_shared<HkWindowManager>("MyWindowManager",
-        HkWindowManager::HkWindowConfig{ .width = 1280 - 300, .height = 720, .isMaster = true });
+        HkWindowManager::HkWindowConfig{ .width = 1920, .height = 1080, .isMaster = true });
     // sceneWindow1->setBackgroundImage("/home/hekapoo/container.jpg");
     // sceneWindow1->setBackgroundImage("/home/hekapoo/Downloads/fbi_wp.jpg");
     // sceneWindow1->setBackgroundImage("/home/hekapoo/container.jpg");
@@ -35,15 +35,14 @@ int main()
     sceneWindow1->addSubWindow(windowFrame); //NOTE: Needs to be added before adding any children
 
     windowFrame->getStyle().setOverflowAllowedXY(false)
-        .setLayout(HkLayout::Vertical)
+        .setLayout(HkLayout::HPinch)
         .setRowWrapping(false)
         .setGridConfig(HkGridConfig{ .cols{1.0f, 1.0f}, .rows{1.0f, 1.0f} })
         .setHAlignment(HkHAlignment::Left)
         .setVAlignment(HkVAlignment::Top);
 
-    windowFrame->setPos({ 1280 * 0.25, 720 * 0.25 });
-    // windowFrame->setSize({ 1280 , 720 });
-
+    // windowFrame->setPos({ 1280, 720 });
+    windowFrame->setSize({ 1280 , 720 });
 
     HkContainerPtr ctr = std::make_shared<HkContainer>("MyContainer");
     HkContainerPtr ctr4 = std::make_shared<HkContainer>("MyContainer4");
@@ -59,115 +58,103 @@ int main()
     HkContainerPtr ctr13 = std::make_shared<HkContainer>("MyContainer13");
     HkContainerPtr ctr14 = std::make_shared<HkContainer>("MyContainer14");
 
-    /*
-    Pinch size type?
-    */
     ctr->getStyle().setColor({ 1.0f,0.0f,1.0f })
-        // .setGridRowCol(1, 1)
-        .setLayout(HkLayout::Horizontal)
-        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-        .setVHSizeConfig(
-            { .type = HkSizeType::Pinch, .value = 0.25f, .min = 0 },
-            { .type = HkSizeType::PercParent, .value = 1.0f })
-        .setBottomMargin(15);
+        .setLayout(HkLayout::VPinch)
+        .setPinchConfig({ .allowLeft = false , .allowRight = true });
+    // .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+    // .setVHSizeConfig(
+    //     { .type = HkSizeType::Pinch, .value = 0.25f, .min = 0 },
+    //     { .type = HkSizeType::PercParent, .value = 1.0f })
+    // .setBottomMargin(15);
 
     ctr4->getStyle().setColor({ 1.0f,0.0f,0.0f })
-        .setLayout(HkLayout::Horizontal)
-        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-        .setVHSizeConfig(
-            { .type = HkSizeType::Pinch, .value = 0.25f, .min = 0 },
-            { .type = HkSizeType::PercParent, .value = 1.0f })
-        .setBottomMargin(15);
+        .setLayout(HkLayout::VPinch)
+        .setPinchConfig({ .allowLeft = true, .allowRight = false });
+    // .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+    // .setVHSizeConfig(
+    //     { .type = HkSizeType::Pinch, .value = 0.25f, .min = 0 },
+    //     { .type = HkSizeType::PercParent, .value = 1.0f })
+    // .setBottomMargin(15);
 
     ctr5->getStyle().setColor({ 0.3f,0.5f,0.0f })
-        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-        .setVHSizeConfig(
-            { .type = HkSizeType::Pinch, .value = 0.25f, .min = 0 },
-            { .type = HkSizeType::PercParent, .value = 1.0f })
-        .setBottomMargin(15);
+        .setLayout(HkLayout::Horizontal)
+        .setPinchConfig({ .allowRight = true, .allowBottom = true });
+    // .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+    // .setVHSizeConfig(
+    //     { .type = HkSizeType::Pinch, .value = 0.25f, .min = 0 },
+    //     { .type = HkSizeType::PercParent, .value = 1.0f })
+    // .setBottomMargin(15);
 
     ctr6->getStyle().setColor({ 0.0f,0.0f,1.0f })
         .setLayout(HkLayout::Horizontal)
-        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-        .setVHSizeConfig(
-            { .type = HkSizeType::Pinch, .value = 0.25f, .min = 45 },
-            { .type = HkSizeType::PercParent, .value = 1.0f })
-        .setBottomMargin(0);
+        .setPinchConfig({ .allowRight = true, .allowTop = true });
+    // .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+    // .setVHSizeConfig(
+    //     { .type = HkSizeType::Pinch, .value = 0.25f, .min = 45 },
+    //     { .type = HkSizeType::PercParent, .value = 1.0f })
+    // .setBottomMargin(0);
 
-    {
-
-        ctr7->getStyle().setColor({ 0.3f,0.7f,0.0f })
-            .setLayout(HkLayout::Vertical)
-            .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-            .setVHSizeConfig(
-                { .type = HkSizeType::PercParent, .value = 1.0f },
-                { .type = HkSizeType::Pinch, .value = 0.5f, .min = 0 })
-            .setRightMargin(15);
+    ctr7->getStyle().setColor({ 0.3f,0.7f,0.0f })
+        .setLayout(HkLayout::Vertical)
+        .setPinchConfig({ .allowLeft = true ,.allowBottom = true });
 
 
-        ctr8->getStyle().setColor({ 0.0f,0.4f,1.0f })
-            .setLayout(HkLayout::Vertical)
-            .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-            .setVHSizeConfig(
-                { .type = HkSizeType::PercParent, .value = 1.0f },
-                { .type = HkSizeType::Pinch, .value = 0.5f, .min = 15 });
+    ctr8->getStyle().setColor({ 0.0f,0.4f,1.0f })
+        .setLayout(HkLayout::HPinch)
+        .setPinchConfig({ .allowLeft = true, .allowTop = true });
 
-        ctr9->getStyle().setColor({ 0.4f,0.7f,0.0f })
-            .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-            .setVHSizeConfig(
-                { .type = HkSizeType::PercParent, .value = 1.0f },
-                { .type = HkSizeType::Pinch, .value = 0.5f, .min = 0 })
-            .setRightMargin(15);
+    // ctr9->getStyle().setColor({ 0.4f,0.7f,0.0f })
+    //     .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+    //     .setVHSizeConfig(
+    //         { .type = HkSizeType::PercParent, .value = 1.0f },
+    //         { .type = HkSizeType::Pinch, .value = 0.5f, .min = 0 })
+    //     .setRightMargin(15);
 
 
-        ctr10->getStyle().setColor({ 0.0f,0.7f,1.0f })
-            .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-            .setVHSizeConfig(
-                { .type = HkSizeType::PercParent, .value = 1.0f },
-                { .type = HkSizeType::Pinch, .value = 0.5f, .min = 15 });
+    // ctr10->getStyle().setColor({ 0.0f,0.7f,1.0f })
+    //     .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+    //     .setVHSizeConfig(
+    //         { .type = HkSizeType::PercParent, .value = 1.0f },
+    //         { .type = HkSizeType::Pinch, .value = 0.5f, .min = 15 });
 
-        ctr11->getStyle().setColor({ 0.4f,0.7f,0.0f })
-            .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-            .setVHSizeConfig(
-                { .type = HkSizeType::Pinch, .value = 0.5f, .min = 0 },
-                { .type = HkSizeType::PercParent, .value = 1.0f })
-            .setBottomMargin(15);
-
-
-        ctr12->getStyle().setColor({ 0.0f,0.7f,1.0f })
-            .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-            .setVHSizeConfig(
-                { .type = HkSizeType::Pinch, .value = 0.5f, .min = 15 },
-                { .type = HkSizeType::PercParent, .value = 1.0f });
-
-        ctr13->getStyle().setColor({ 0.1f,0.7f,0.0f })
-            .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-            .setVHSizeConfig(
-                { .type = HkSizeType::Pinch, .value = 0.5f, .min = 0 },
-                { .type = HkSizeType::PercParent, .value = 1.0f })
-            .setBottomMargin(15);
+    // ctr11->getStyle().setColor({ 0.4f,0.7f,0.0f })
+    //     .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+    //     .setVHSizeConfig(
+    //         { .type = HkSizeType::Pinch, .value = 0.5f, .min = 0 },
+    //         { .type = HkSizeType::PercParent, .value = 1.0f })
+    //     .setBottomMargin(15);
 
 
-        ctr14->getStyle().setColor({ 0.5f,0.7f,1.0f })
-            .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-            .setVHSizeConfig(
-                { .type = HkSizeType::Pinch, .value = 0.5f, .min = 15 },
-                { .type = HkSizeType::PercParent, .value = 1.0f });
-    }
+    // ctr12->getStyle().setColor({ 0.0f,0.7f,1.0f })
+    //     .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+    //     .setVHSizeConfig(
+    //         { .type = HkSizeType::Pinch, .value = 0.5f, .min = 15 },
+    //         { .type = HkSizeType::PercParent, .value = 1.0f });
+
+    ctr13->getStyle().setColor({ 0.1f,0.7f,0.0f })
+        .setLayout(HkLayout::Vertical)
+        .setPinchConfig({ .allowRight = true, .allowTop = true });
+
+
+
+    ctr14->getStyle().setColor({ 0.5f,0.7f,1.0f })
+        .setLayout(HkLayout::Vertical)
+        .setPinchConfig({ .allowLeft = true, .allowTop = true });
+
     // ctr->pushChildren({ ctr4, ctr5, ctr6 });
-    bool x = false;
-    ctr->getEvents().setOnClickListener([&ctr4, &x]() {
-        ctr4->getStyle().setColor(x ? glm::vec3{ 0.3f, 0.5f, 0.0f } : glm::vec3{ 0.3f, 0.5f, 1.0f });
-        x = !x;
-        });
-    windowFrame->pushChildren({ ctr, ctr4, ctr5, ctr6 });
-    // windowFrame->pushChildren({ ctr, ctr4 });
-    // ctr->pushChildren({ ctr5, ctr6 });
-    // ctr4->pushChildren({ ctr7, ctr8 });
+    // bool x = false;
+    // ctr->getEvents().setOnClickListener([&windowFrame, &ctr6, &ctr5]() {
+    //     ctr5->getStyle().setPinchConfig({ .allowLeft = true, .allowRight = true });
+    //     windowFrame->pushChildren({ ctr6 });
+    //     });
+    // windowFrame->pushChildren({ ctr, ctr4, ctr5, ctr6 });
+    windowFrame->pushChildren({ ctr, ctr4 });
+    ctr->pushChildren({ ctr5, ctr6 });
+    ctr4->pushChildren({ ctr7, ctr8 });
 
 
     // ctr7->pushChildren({ ctr11,ctr12 });
-    // ctr8->pushChildren({ ctr13,ctr14 });
+    ctr8->pushChildren({ ctr13,ctr14 });
 
     // ctr13->pushChildren({ ctr9,ctr10 });
     // windowFrame->pushChildren({ ctr });
@@ -231,7 +218,7 @@ int main()
 
     HkWindowFramePtr windowFrame2 = std::make_shared<HkWindowFrame>("MyWindowFrame2");
     windowFrame2->setWindowMode(HkWindowFrameMode::Grabbable);
-    sceneWindow1->addSubWindow(windowFrame2); //NOTE: Needs to be added before adding any children
+    // sceneWindow1->addSubWindow(windowFrame2); //NOTE: Needs to be added before adding any children
     // sceneWindow2->addSubWindow(windowFrame2); //NOTE: Needs to be added before adding any children
 
     windowFrame2->getStyle().setOverflowAllowedXY(true)

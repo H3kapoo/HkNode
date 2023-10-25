@@ -24,9 +24,11 @@ void HkConstraintContext::resolveConstraints(HkTreeStruct& children,
     switch (layout)
     {
     case HkLayout::Horizontal:
+    case HkLayout::HPinch:
         resolveHorizontalContainer(children);
         break;
     case HkLayout::Vertical:
+    case HkLayout::VPinch:
         resolveVerticalContainer(children);
         break;
     case HkLayout::Grid:
@@ -151,7 +153,6 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children)
         case HkSizeType::PercParent:
         case HkSizeType::FitParent:
         case HkSizeType::Balanced:
-        case HkSizeType::Pinch:
             /* Fall through, unsupported mode by grid*/
             xSize = 20;
             break;
@@ -172,7 +173,6 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children)
         case HkSizeType::PercParent:
         case HkSizeType::FitParent:
         case HkSizeType::Balanced:
-        case HkSizeType::Pinch:
             /* Fall through, unsupported mode by grid*/
             ySize = 20;
             break;
@@ -195,23 +195,32 @@ void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children)
     int32_t nextXAdvance = 0;
     int32_t maybeHighest = 0;
     uint32_t childCount = children.size() - sbCount_;
-    float percsAdded = 0.0f;
     for (uint32_t i = 0; i < childCount; i++)
     {
         auto& child = children[i]->getPayload()->node_;
         auto& childTc = child.transformContext;
         auto& childSc = child.styleContext;
 
-        if (childSc.getHSizeConfig().type == HkSizeType::Pinch)
-        {
-            percsAdded += childSc.getHSizeConfig().value;
-        }
         /* Scale elements according to their config*/
-        childTc.setScale(
-            {
-                ceil(computeHorizontalScale(childSc.getHSizeConfig(), childCount)),
-                ceil(computeVerticalScale(childSc.getVSizeConfig(), childCount))
-            });
+        if (styleContextInj_->getLayout() == HkLayout::HPinch)
+        {
+            auto sc = childSc.getHSizeConfig();
+            const float extra = 15.0f * 1.0f / thisTc_->getScale().x;
+            sc.value += (extra / childCount);
+            childTc.setScale(
+                {
+                    ceil(computeHorizontalScale(sc, childCount)) - childSc.getLeftMargin() - childSc.getRightMargin(),
+                    ceil(computeVerticalScale(childSc.getVSizeConfig(), childCount))
+                });
+        }
+        else
+        {
+            childTc.setScale(
+                {
+                    ceil(computeHorizontalScale(childSc.getHSizeConfig(), childCount)),
+                    ceil(computeVerticalScale(childSc.getVSizeConfig(), childCount))
+                });
+        }
 
         /* How much we need to advance to place next child */
         nextXAdvance = startPosX + childSc.getLeftMargin() + childSc.getRightMargin() + childTc.getScale().x;
@@ -265,8 +274,6 @@ void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children)
        This needs to be done here because otherwise we can get wrong min max information and bottom/center alignments
        need this information. It's a trade-off. */
     applyFinalOffsets(children);
-
-    // std::cout << percsAdded << "\n";
 }
 
 void HkConstraintContext::resolveVerticalContainer(HkTreeStruct& children)
@@ -286,11 +293,27 @@ void HkConstraintContext::resolveVerticalContainer(HkTreeStruct& children)
         auto& childSc = child.styleContext;
 
         /* Scale elements according to their config*/
-        childTc.setScale(
-            {
-                ceil(computeHorizontalScale(childSc.getHSizeConfig(), childCount)),
-                ceil(computeVerticalScale(childSc.getVSizeConfig(), childCount))
-            });
+        if (styleContextInj_->getLayout() == HkLayout::VPinch)
+        {
+            auto sc = childSc.getVSizeConfig();
+            const float extra = 15.0f * 1.0f / thisTc_->getScale().y;
+            sc.value += extra / childCount;
+            childTc.setScale(
+                {
+                    ceil(computeHorizontalScale(childSc.getHSizeConfig(), childCount)),
+                    ceil(computeVerticalScale(sc, childCount)
+                        - childSc.getBottomMargin() - childSc.getTopMargin())
+                });
+        }
+        else
+        {
+            childTc.setScale(
+                {
+                    ceil(computeHorizontalScale(childSc.getHSizeConfig(), childCount)),
+                    ceil(computeVerticalScale(childSc.getVSizeConfig(), childCount))
+                });
+        }
+
         /* How much we need to advance to place next child */
         nextYAdvance = startPosY + childSc.getBottomMargin() + childSc.getTopMargin() + childTc.getScale().y; //TODO: Minimize this call
         if (styleContextInj_->isColWrappingEnabled())
@@ -528,9 +551,6 @@ float HkConstraintContext::computeHorizontalScale(const HkSizeConfig& config, co
     case HkSizeType::Balanced:
         size = (float)thisTc_->getScale().x / childCount;
         break;
-    case HkSizeType::Pinch:
-        size = config.value * (float)thisTc_->getScale().x - config.min;
-        break;
     case HkSizeType::FitCell:
     case HkSizeType::PercCell:
         /* Fall through, unsupported mode by horizontal/vertical layout*/
@@ -556,9 +576,6 @@ float HkConstraintContext::computeVerticalScale(const HkSizeConfig& config, cons
         break;
     case HkSizeType::Balanced:
         size = (float)thisTc_->getScale().y / childCount;
-        break;
-    case HkSizeType::Pinch:
-        size = config.value * (float)thisTc_->getScale().y - config.min;
         break;
     case HkSizeType::FitCell:
     case HkSizeType::PercCell:

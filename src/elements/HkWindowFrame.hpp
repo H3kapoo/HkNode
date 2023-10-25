@@ -47,6 +47,7 @@ private:
     void postRenderAdditionalDetails() override;
     void onAnimationFrameRequested() override;
     void onScroll() override;
+    void onResolveFocusPass() override;
     void onDrag() override;
     void onClick() override;
     void onRelease() override;
@@ -56,6 +57,7 @@ private:
         const HkScrollbarsSize&) override;
 
     void cursorChange(const int32_t value);
+
 
     /* Injects */
     void injectWindowDataPtr(HkWindowData* windowDataPtr) override;

@@ -32,7 +32,6 @@ class HkNodeBase
 {
     friend class HkWindowManager;
 
-    friend class HkSceneManagement; //TBD
     friend class HkSceneRenderer;
 
     friend class HkWindowFrame;
@@ -78,6 +77,7 @@ private:
     virtual void onGeneralMouseScroll();
     virtual void onFirstHeartbeat();
     virtual void onResolveFocusPass();
+    virtual void onDirtyAttribs(const std::unordered_set<HkStyleDirtyAttribs>&);
 
     virtual void postRenderAdditionalDetails();
 

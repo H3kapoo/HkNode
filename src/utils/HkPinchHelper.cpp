@@ -1,10 +1,7 @@
 #include "HkPinchHelper.hpp"
 
-// #include <ranges>
 namespace hkui
 {
-
-
 std::vector<HkPinchHelper::PinchInfo> HkPinchHelper::pinchInfo_{ 0 };
 std::vector<HkPinchHelper::PinchInfo> HkPinchHelper::validityGroup_{ 0 };
 bool HkPinchHelper::resolved_{ false };
@@ -20,6 +17,36 @@ void HkPinchHelper::init(HkWindowData& windowData)
 
     pincher_.styleContext.setColor(glm::vec3(0.2f, 0.2f, 0.2f));
     pincher_.renderContext.colorUniformEn = true;
+}
+
+void HkPinchHelper::configureChildren(const std::vector<HkNodeData*>& containerChildren,
+    const bool isParentHorizontalAligned)
+{
+    /* We shall give each children equal space inside pinchable container, set margins and alignment.
+       Once those are set, they shall not be changed by user in any way */
+    const int32_t childrenSize = containerChildren.size();
+    const float equalPart = 1.0f / childrenSize;
+    for (int32_t i = 0; i < childrenSize; i++)
+    {
+        if (isParentHorizontalAligned)
+        {
+            containerChildren[i]->styleContext
+                .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+                .setVHSizeConfig(
+                    { .type = HkSizeType::FitParent },
+                    { .type = HkSizeType::PercParent, .value = equalPart })
+                .setRightMargin(grabSize_);
+        }
+        else
+        {
+            containerChildren[i]->styleContext
+                .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+                .setVHSizeConfig(
+                    { .type = HkSizeType::PercParent, .value = equalPart },
+                    { .type = HkSizeType::FitParent })
+                .setBottomMargin(grabSize_);
+        }
+    }
 }
 
 void HkPinchHelper::scan(HkWindowData& windowData, HkNodeData& nd,
@@ -46,26 +73,74 @@ void HkPinchHelper::scan(HkWindowData& windowData, HkNodeData& nd,
         mousePos.x < nodeEndPos.x;
 
     // pinch right
+    if (RZone && VBound && allowXR_) pi.right = true;
+    // pinch left
+    if (LZone && VBound && allowXL_) pi.left = true;
+    // pinch top
+    if (TZone && HBound && allowYT_) pi.top = true;
+
+    // pinch bottom
+    if (BZone && HBound && allowYB_) pi.bottom = true;
+
+    // diagonal bottom-right pinch
+    if (RZone && BZone && allowXR_ && allowYB_) { pi.right = true; pi.bottom = true; }
+    // diagonal top-right pinch
+    if (RZone && TZone && allowXR_ && allowYT_) { pi.right = true; pi.top = true; }
+    // diagonal bottom-left pinch
+    if (LZone && BZone && allowXL_ && allowYB_) { pi.left = true; pi.bottom = true; }
+    // diagonal top-left pinch
+    if (LZone && TZone && allowXL_ && allowYT_) { pi.left = true; pi.top = true; }
+
+    // Allow check
+    // if (!allowXL_) pi.left = false;
+    // if (!allowXR_) pi.right = false;
+    // if (!allowYT_) pi.top = false;
+    // if (!allowYB_) pi.bottom = false;
+
+    pi.nodeId = id;
+    pi.level = level;
+    pinchInfo_.push_back(pi);
+}
+
+void HkPinchHelper::scanCustom(HkWindowData& windowData, glm::ivec2& boundPos, glm::ivec2& boundScale)
+{
+    PinchInfo pi;
+    const auto mousePos = windowData.mousePos;
+    const auto nodeEndPos = boundPos + boundScale;
+    const bool TZone = (mousePos.y > boundPos.y - grabSize_)
+        && (mousePos.y < boundPos.y);
+    const bool BZone = (mousePos.y < nodeEndPos.y + grabSize_)
+        && (mousePos.y > nodeEndPos.y);
+    const bool LZone = (mousePos.x > boundPos.x - grabSize_)
+        && (mousePos.x < boundPos.x);
+    const bool RZone = (mousePos.x > nodeEndPos.x)
+        && (mousePos.x < nodeEndPos.x + grabSize_);
+    const bool VBound = mousePos.y > boundPos.y &&
+        mousePos.y < nodeEndPos.y;
+    const bool HBound = mousePos.x > boundPos.x &&
+        mousePos.x < nodeEndPos.x;
+
+    // pinch right
     if (RZone && VBound) pi.right = true;
     // pinch left
     if (LZone && VBound) pi.left = true;
     // pinch top
     if (TZone && HBound) pi.top = true;
+
     // pinch bottom
     if (BZone && HBound) pi.bottom = true;
 
     // diagonal bottom-right pinch
-    if (RZone && BZone) { pi.right = true;pi.bottom = true; }
+    if (RZone && BZone) { pi.right = true; pi.bottom = true; }
     // diagonal top-right pinch
     if (RZone && TZone) { pi.right = true; pi.top = true; }
     // diagonal bottom-left pinch
     if (LZone && BZone) { pi.left = true; pi.bottom = true; }
     // diagonal top-left pinch
-    if (LZone && TZone) { pi.left = true;pi.top = true; }
+    if (LZone && TZone) { pi.left = true; pi.top = true; }
 
-    pi.nodeId = id;
-    pi.level = level;
-    pinchInfo_.push_back(pi);
+    if (pi.left || pi.right || pi.top || pi.bottom)
+        windowData.focusedId = 999999;
 }
 
 void HkPinchHelper::onMouseButton(HkWindowData& windowData)
@@ -173,18 +248,17 @@ void HkPinchHelper::resolve()
         }
     }
 
-    for (const auto& pi : validityGroup_)
-    {
-        std::cout << "valid info: ";
-        std::cout << pi.nodeId << " "
-            << pi.level << " L:"
-            << pi.left << "  R:"
-            << pi.right << "  T:"
-            << "  " << pi.top << "  B:"
-            << pi.bottom << "\n";
-    }
+    // for (const auto& pi : validityGroup_)
+    // {
+    //     std::cout << "valid info: ";
+    //     std::cout << pi.nodeId << " "
+    //         << pi.level << " L:"
+    //         << pi.left << "  R:"
+    //         << pi.right << "  T:"
+    //         << "  " << pi.top << "  B:"
+    //         << pi.bottom << "\n";
+    // }
 }
-
 
 void HkPinchHelper::onMouseMove(HkWindowData& windowData, HkNodeData& nd, HkNodeData& pnd, const uint32_t id)
 {
@@ -287,15 +361,15 @@ void HkPinchHelper::onMouseMove(HkWindowData& windowData, HkNodeData& nd, HkNode
 
 void HkPinchHelper::onBarRender(HkWindowData& windowData, const glm::ivec2 boundPos, const glm::ivec2 boundScale)
 {
-    const int32_t extendT = lockedInYT_ ? grabSize_ : 0;
-    const int32_t extendB = lockedInYB_ ? grabSize_ : 0;
+    const int32_t extendT = (lockedInYT_ && allowYT_) ? grabSize_ : 0;
+    const int32_t extendB = (lockedInYB_ && allowYB_) ? grabSize_ : 0;
 
     if (boundScale.x == 0 || boundScale.y == 0)
         return;
 
     pincher_.renderContext.windowProjMatrix = windowData.sceneProjMatrix;
 
-    if (lockedInXR_)
+    if (lockedInXR_ && allowXR_)
     {
         glScissor(
             boundPos.x,
@@ -318,7 +392,7 @@ void HkPinchHelper::onBarRender(HkWindowData& windowData, const glm::ivec2 bound
             pincher_.transformContext.getModelMatrix());
     }
 
-    if (lockedInXL_)
+    if (lockedInXL_ && allowXL_)
     {
         glScissor(
             boundPos.x - grabSize_,
@@ -341,7 +415,7 @@ void HkPinchHelper::onBarRender(HkWindowData& windowData, const glm::ivec2 bound
             pincher_.transformContext.getModelMatrix());
     }
 
-    if (lockedInYT_)
+    if (lockedInYT_ && allowYT_)
     {
         glScissor(
             boundPos.x,
@@ -364,7 +438,7 @@ void HkPinchHelper::onBarRender(HkWindowData& windowData, const glm::ivec2 bound
             pincher_.transformContext.getModelMatrix());
     }
 
-    if (lockedInYB_)
+    if (lockedInYB_ && allowYB_)
     {
         glScissor(
             boundPos.x,
@@ -424,21 +498,21 @@ bool HkPinchHelper::onMouseMoveCustom(HkWindowData& windowData, glm::ivec2& boun
             mousePos.x < nodeEndPos.x;
 
         // pinch right
-        if (RZone && VBound) lockedInXR_ = true; else lockedInXR_ = false;
+        if (RZone && VBound && allowXR_) lockedInXR_ = true; else lockedInXR_ = false;
         // pinch left
-        if (LZone && VBound) lockedInXL_ = true; else lockedInXL_ = false;
+        if (LZone && VBound && allowXL_) lockedInXL_ = true; else lockedInXL_ = false;
         // pinch top
-        if (TZone && HBound) lockedInYT_ = true; else lockedInYT_ = false;
+        if (TZone && HBound && allowYT_) lockedInYT_ = true; else lockedInYT_ = false;
         // pinch bottom
-        if (BZone && HBound) lockedInYB_ = true; else lockedInYB_ = false;
+        if (BZone && HBound && allowYB_) lockedInYB_ = true; else lockedInYB_ = false;
         // diagonal bottom-right pinch
-        if (RZone && BZone) { lockedInXR_ = true; lockedInYB_ = true; }
+        if (RZone && BZone && allowXR_ && allowYB_) { lockedInXR_ = true; lockedInYB_ = true; }
         // diagonal top-right pinch
-        if (RZone && TZone) { lockedInXR_ = true; lockedInYT_ = true; }
+        if (RZone && TZone && allowXR_ && allowYT_) { lockedInXR_ = true; lockedInYT_ = true; }
         // diagonal bottom-left pinch
-        if (LZone && BZone) { lockedInXL_ = true; lockedInYB_ = true; }
+        if (LZone && BZone && allowXL_ && allowYB_) { lockedInXL_ = true; lockedInYB_ = true; }
         // diagonal top-left pinch
-        if (LZone && TZone) { lockedInXL_ = true; lockedInYT_ = true; }
+        if (LZone && TZone && allowXL_ && allowYT_) { lockedInXL_ = true; lockedInYT_ = true; }
 
         /* Set cursor to whatever we might need */
         if (lockedInXR_ || lockedInXL_)
@@ -496,4 +570,12 @@ void HkPinchHelper::cursorChange(HkWindowData& windowData, const int32_t value)
 }
 
 void HkPinchHelper::setGrabSize(const int32_t size) { grabSize_ = size; }
+
+void HkPinchHelper::setGrabConfig(const HkPinchConfig& config)
+{
+    allowXL_ = config.allowLeft;
+    allowXR_ = config.allowRight;
+    allowYT_ = config.allowTop;
+    allowYB_ = config.allowBottom;
+}
 } // hkui

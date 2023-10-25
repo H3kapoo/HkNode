@@ -13,6 +13,7 @@ struct HkWindowData
 {
     /* Window obj itself */
     GLFWwindow* windowHandle{ NULL };
+    uint32_t windowId{ 0 };
 
     /* Events */
     HkEvent currentEvent;

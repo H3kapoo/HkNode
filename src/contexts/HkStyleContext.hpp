@@ -11,7 +11,9 @@ enum class HkLayout
 {
     Horizontal,
     Vertical,
-    Grid
+    Grid,
+    HPinch,
+    VPinch
 };
 
 enum class HkVAlignment
@@ -33,6 +35,7 @@ enum class HkHAlignment
 enum class HkStyleDirtyAttribs
 {
     BG,
+    Pinch
 };
 
 /* Vector of floats representing the percentage of the space the row/col should occupy
@@ -57,8 +60,7 @@ enum class HkSizeType
     FitParent,
     FitCell,
     PercParent,
-    PercCell,
-    Pinch
+    PercCell
 };
 
 struct HkSizeConfig
@@ -67,6 +69,12 @@ struct HkSizeConfig
     float value{ 100 };
     float min{ 1 };
     float max{ 4000 };
+};
+
+struct HkPinchConfig
+{
+    bool allowLeft{ false }, allowRight{ false };
+    bool allowTop{ false }, allowBottom{ false };
 };
 
 class HkStyleContext
@@ -109,6 +117,8 @@ public:
     // Background related
     HkStyleContext& setBackgroundImage(const std::string& value);
 
+    // Pinching related
+    HkStyleContext& setPinchConfig(const HkPinchConfig& value);
 
     /* Inline Getters, impl here, yes */
     inline const glm::vec3& getColor() const { return color; }
@@ -129,6 +139,7 @@ public:
     inline HkSizeConfig getVSizeConfig() const { return vSizeConfig; };
     inline HkSizeConfig getHSizeConfig() const { return hSizeConfig; };
     inline std::string getBackgroundImage() const { return bgImagePath_; };
+    inline HkPinchConfig getPinchConfig() const { return pinchConfig_; };
 
 private:
     /* Dirty flag */
@@ -149,5 +160,6 @@ private:
     HkGridConfig gridConfig;
     HkSizeConfig vSizeConfig, hSizeConfig;
     std::string bgImagePath_;
+    HkPinchConfig pinchConfig_;
 };
 } // hkui

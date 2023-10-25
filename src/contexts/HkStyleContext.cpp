@@ -180,4 +180,12 @@ HkStyleContext& HkStyleContext::setBackgroundImage(const std::string& value)
     bgImagePath_ = value;
     return *this;
 }
+
+HkStyleContext& HkStyleContext::setPinchConfig(const HkPinchConfig& value)
+{
+    isDirty = true;
+    dirtyAttribs.insert(HkStyleDirtyAttribs::Pinch);
+    pinchConfig_ = value;
+    return *this;
+}
 } // hkui

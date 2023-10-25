@@ -38,6 +38,8 @@ HkWindowManager::HkWindowManager(const std::string& windowName, const HkWindowCo
     windowName_ = windowName;
     id_ = idGiver++;
     isMaster_ = config.isMaster;
+
+    windowData_.windowId = id_;
 }
 
 //TODO: Rename appropriately in the future
@@ -86,7 +88,6 @@ void HkWindowManager::updateAllSubWindows(const HkEvent& ev)
                 rootSubWindows_.push_back(rootSubWindows_[windowData_.focusedSubWindowId]);
                 rootSubWindows_.erase(rootSubWindows_.begin() + windowData_.focusedSubWindowId);
                 return;
-
             }
         }
         return;

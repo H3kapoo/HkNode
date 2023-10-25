@@ -40,8 +40,20 @@ void HkWindowFrame::onFirstHeartbeat()
 {
     /*Init pinching helper*/
     pinchHelper_.init(*windowDataPtr_);
+    pinchHelper_.setGrabConfig({ .allowLeft = true, .allowRight = true, .allowTop = true, .allowBottom = true });
 
     HkNodeBase::onFirstHeartbeat();
+}
+
+void HkWindowFrame::onResolveFocusPass()
+{
+    boundPos_ = { node_.transformContext.getPos() };
+    boundScale_ = {
+        node_.transformContext.getScale().x,
+        wfCont_.node_.transformContext.getScale().y + node_.transformContext.getScale().y
+    };
+
+    pinchHelper_.scanCustom(*windowDataPtr_, boundPos_, boundScale_);
 }
 
 void HkWindowFrame::postRenderAdditionalDetails()
@@ -116,12 +128,6 @@ void HkWindowFrame::onGeneralMouseMove()
         node_.transformContext.setPos(boundPos_);
         wfCont_.node_.transformContext.setScale({ boundScale_.x, boundScale_.y - 30 });
     }
-}
-
-void HkWindowFrame::cursorChange(const int32_t value)
-{
-    windowDataPtr_->suggestedCursor = value;
-    windowDataPtr_->cursorChangeNeeded = true;
 }
 
 void HkWindowFrame::onClick()
