@@ -321,7 +321,6 @@ void HkNodeBase::resolveDirtyAttributes()
             break;
         }
     }
-    std::cout << "dirty stuff " << treeStruct_.getName() << "\n";
     onDirtyAttribs(node_.styleContext.dirtyAttribs);
 }
 

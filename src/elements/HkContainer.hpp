@@ -31,7 +31,6 @@ private:
 
     void constrainScrollbarsIfNeeded();
     void resolveScrollBarChildrenIfNeeded();
-    void configurePinchChildrenIfNeeded();
     //TODO: maybe push those ^^ in constraint mgmt
 
 private:

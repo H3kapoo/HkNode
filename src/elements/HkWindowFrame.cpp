@@ -47,13 +47,16 @@ void HkWindowFrame::onFirstHeartbeat()
 
 void HkWindowFrame::onResolveFocusPass()
 {
-    boundPos_ = { node_.transformContext.getPos() };
-    boundScale_ = {
-        node_.transformContext.getScale().x,
-        wfCont_.node_.transformContext.getScale().y + node_.transformContext.getScale().y
-    };
+    if (wfCont_.getStyle().getPinchConfig().enable)
+    {
+        boundPos_ = { node_.transformContext.getPos() };
+        boundScale_ = {
+            node_.transformContext.getScale().x,
+            wfCont_.node_.transformContext.getScale().y + node_.transformContext.getScale().y
+        };
 
-    pinchHelper_.scanCustom(*windowDataPtr_, boundPos_, boundScale_);
+        pinchHelper_.scanCustom(*windowDataPtr_, boundPos_, boundScale_);
+    }
 }
 
 void HkWindowFrame::postRenderAdditionalDetails()
@@ -62,7 +65,10 @@ void HkWindowFrame::postRenderAdditionalDetails()
        because it has a top frame and a container object */
 
        /* To note that we should always render the bars last*/
-    pinchHelper_.onBarRender(*windowDataPtr_, boundPos_, boundScale_);
+    if (wfCont_.getStyle().getPinchConfig().enable)
+    {
+        pinchHelper_.onBarRender(*windowDataPtr_, boundPos_, boundScale_);
+    }
 }
 
 void HkWindowFrame::onAnimationFrameRequested()
@@ -116,17 +122,20 @@ void HkWindowFrame::onDrag()
 
 void HkWindowFrame::onGeneralMouseMove()
 {
-    boundPos_ = { node_.transformContext.getPos() };
-    boundScale_ = {
-        node_.transformContext.getScale().x,
-        wfCont_.node_.transformContext.getScale().y + node_.transformContext.getScale().y
-    };
-
-    if (pinchHelper_.onMouseMoveCustom(*windowDataPtr_, boundPos_, boundScale_))
+    if (wfCont_.getStyle().getPinchConfig().enable)
     {
-        node_.transformContext.setScale({ boundScale_.x, 30 });
-        node_.transformContext.setPos(boundPos_);
-        wfCont_.node_.transformContext.setScale({ boundScale_.x, boundScale_.y - 30 });
+        boundPos_ = { node_.transformContext.getPos() };
+        boundScale_ = {
+            node_.transformContext.getScale().x,
+            wfCont_.node_.transformContext.getScale().y + node_.transformContext.getScale().y
+        };
+
+        if (pinchHelper_.onMouseMoveCustom(*windowDataPtr_, boundPos_, boundScale_))
+        {
+            node_.transformContext.setScale({ boundScale_.x, 30 });
+            node_.transformContext.setPos(boundPos_);
+            wfCont_.node_.transformContext.setScale({ boundScale_.x, boundScale_.y - 30 });
+        }
     }
 }
 

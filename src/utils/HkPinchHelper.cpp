@@ -19,36 +19,6 @@ void HkPinchHelper::init(HkWindowData& windowData)
     pincher_.renderContext.colorUniformEn = true;
 }
 
-void HkPinchHelper::configureChildren(const std::vector<HkNodeData*>& containerChildren,
-    const bool isParentHorizontalAligned)
-{
-    /* We shall give each children equal space inside pinchable container, set margins and alignment.
-       Once those are set, they shall not be changed by user in any way */
-    const int32_t childrenSize = containerChildren.size();
-    const float equalPart = 1.0f / childrenSize;
-    for (int32_t i = 0; i < childrenSize; i++)
-    {
-        if (isParentHorizontalAligned)
-        {
-            containerChildren[i]->styleContext
-                .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-                .setVHSizeConfig(
-                    { .type = HkSizeType::FitParent },
-                    { .type = HkSizeType::PercParent, .value = equalPart })
-                .setRightMargin(grabSize_);
-        }
-        else
-        {
-            containerChildren[i]->styleContext
-                .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-                .setVHSizeConfig(
-                    { .type = HkSizeType::PercParent, .value = equalPart },
-                    { .type = HkSizeType::FitParent })
-                .setBottomMargin(grabSize_);
-        }
-    }
-}
-
 void HkPinchHelper::scan(HkWindowData& windowData, HkNodeData& nd,
     const uint32_t id, const uint32_t level)
 {
@@ -90,12 +60,6 @@ void HkPinchHelper::scan(HkWindowData& windowData, HkNodeData& nd,
     if (LZone && BZone && allowXL_ && allowYB_) { pi.left = true; pi.bottom = true; }
     // diagonal top-left pinch
     if (LZone && TZone && allowXL_ && allowYT_) { pi.left = true; pi.top = true; }
-
-    // Allow check
-    // if (!allowXL_) pi.left = false;
-    // if (!allowXR_) pi.right = false;
-    // if (!allowYT_) pi.top = false;
-    // if (!allowYB_) pi.bottom = false;
 
     pi.nodeId = id;
     pi.level = level;
@@ -284,21 +248,38 @@ void HkPinchHelper::onMouseMove(HkWindowData& windowData, HkNodeData& nd, HkNode
             mousePos.x < nodeEndPos.x;
 
         // pinch right
-        if (RZone && VBound) lockedInXR_ = true; else lockedInXR_ = false;
+        if (RZone && VBound && allowXR_) lockedInXR_ = true; else lockedInXR_ = false;
         // pinch left
-        if (LZone && VBound) lockedInXL_ = true; else lockedInXL_ = false;
+        if (LZone && VBound && allowXL_) lockedInXL_ = true; else lockedInXL_ = false;
         // pinch top
-        if (TZone && HBound) lockedInYT_ = true; else lockedInYT_ = false;
+        if (TZone && HBound && allowYT_) lockedInYT_ = true; else lockedInYT_ = false;
         // pinch bottom
-        if (BZone && HBound) lockedInYB_ = true; else lockedInYB_ = false;
+        if (BZone && HBound && allowYB_) lockedInYB_ = true; else lockedInYB_ = false;
         // diagonal bottom-right pinch
-        if (RZone && BZone) { lockedInXR_ = true; lockedInYB_ = true; }
+        if (RZone && BZone && allowXR_ && allowYB_) { lockedInXR_ = true; lockedInYB_ = true; }
         // diagonal top-right pinch
-        if (RZone && TZone) { lockedInXR_ = true; lockedInYT_ = true; }
+        if (RZone && TZone && allowXR_ && allowYT_) { lockedInXR_ = true; lockedInYT_ = true; }
         // diagonal bottom-left pinch
-        if (LZone && BZone) { lockedInXL_ = true; lockedInYB_ = true; }
+        if (LZone && BZone && allowXL_ && allowYB_) { lockedInXL_ = true; lockedInYB_ = true; }
         // diagonal top-left pinch
-        if (LZone && TZone) { lockedInXL_ = true; lockedInYT_ = true; }
+        if (LZone && TZone && allowXR_ && allowYT_) { lockedInXL_ = true; lockedInYT_ = true; }
+
+        // added
+        /* Set cursor to whatever we might need */
+        if (lockedInXR_ || lockedInXL_)
+            cursorChange(windowData, GLFW_HRESIZE_CURSOR);
+
+        if (lockedInYT_ || lockedInYB_)
+            cursorChange(windowData, GLFW_VRESIZE_CURSOR);
+
+        if ((lockedInXR_ && lockedInYB_) || (lockedInXR_ && lockedInYT_)
+            || (lockedInXL_ && lockedInYB_) || (lockedInXL_ && lockedInYT_))
+            cursorChange(windowData, GLFW_CROSSHAIR_CURSOR);
+
+        /* If we didn't manage to grab anything, reset cursor */
+        if (windowData.suggestedCursor == GLFW_ARROW_CURSOR &&
+            !(lockedInXL_ || lockedInXR_ || lockedInYB_ || lockedInYT_))
+            cursorChange(windowData, GLFW_ARROW_CURSOR);
     }
     /* If we are holding click and moving, we need to update position/scale of pinched object */
     else
@@ -577,5 +558,8 @@ void HkPinchHelper::setGrabConfig(const HkPinchConfig& config)
     allowXR_ = config.allowRight;
     allowYT_ = config.allowTop;
     allowYB_ = config.allowBottom;
+    enabled_ = config.enable;
 }
+
+bool HkPinchHelper::isEnabled() { return enabled_; }
 } // hkui

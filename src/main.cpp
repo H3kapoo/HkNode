@@ -31,17 +31,17 @@ int main()
     sceneWindow1->makeContextCurrent();
 
     HkWindowFramePtr windowFrame = std::make_shared<HkWindowFrame>("MyWindowFrame");
-    windowFrame->setWindowMode(HkWindowFrameMode::Grabbable);
+    windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
     sceneWindow1->addSubWindow(windowFrame); //NOTE: Needs to be added before adding any children
 
     windowFrame->getStyle().setOverflowAllowedXY(false)
-        .setLayout(HkLayout::HPinch)
+        // .setLayout(HkLayout::HPinch)
+        .setLayout(HkLayout::Horizontal)
+        .setPinchConfig({ .enable = true })
         .setRowWrapping(false)
-        .setGridConfig(HkGridConfig{ .cols{1.0f, 1.0f}, .rows{1.0f, 1.0f} })
         .setHAlignment(HkHAlignment::Left)
         .setVAlignment(HkVAlignment::Top);
 
-    // windowFrame->setPos({ 1280, 720 });
     windowFrame->setSize({ 1280 , 720 });
 
     HkContainerPtr ctr = std::make_shared<HkContainer>("MyContainer");
@@ -58,144 +58,159 @@ int main()
     HkContainerPtr ctr13 = std::make_shared<HkContainer>("MyContainer13");
     HkContainerPtr ctr14 = std::make_shared<HkContainer>("MyContainer14");
 
+    // WF children
     ctr->getStyle().setColor({ 1.0f,0.0f,1.0f })
-        .setLayout(HkLayout::VPinch)
-        .setPinchConfig({ .allowLeft = false , .allowRight = true });
-    // .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-    // .setVHSizeConfig(
-    //     { .type = HkSizeType::Pinch, .value = 0.25f, .min = 0 },
-    //     { .type = HkSizeType::PercParent, .value = 1.0f })
-    // .setBottomMargin(15);
+        .setLayout(HkLayout::Horizontal)
+        .setVHSizeConfig(
+            { .type = HkSizeType::FitParent },
+            { .type = HkSizeType::PercParent, .value = 0.25f })
+        .setPinchConfig({ .enable = true , .allowRight = true })
+        .setRightMargin(15);
 
     ctr4->getStyle().setColor({ 1.0f,0.0f,0.0f })
-        .setLayout(HkLayout::VPinch)
-        .setPinchConfig({ .allowLeft = true, .allowRight = false });
-    // .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-    // .setVHSizeConfig(
-    //     { .type = HkSizeType::Pinch, .value = 0.25f, .min = 0 },
-    //     { .type = HkSizeType::PercParent, .value = 1.0f })
-    // .setBottomMargin(15);
+        .setLayout(HkLayout::Vertical)
+        .setVHSizeConfig(
+            { .type = HkSizeType::FitParent }, // maybe set this one autonomously?
+            { .type = HkSizeType::PercParent, .value = 0.5f })
+        .setPinchConfig({ .enable = true, .allowLeft = true, .allowRight = true })
+        .setRightMargin(15);
 
     ctr5->getStyle().setColor({ 0.3f,0.5f,0.0f })
-        .setLayout(HkLayout::Horizontal)
-        .setPinchConfig({ .allowRight = true, .allowBottom = true });
-    // .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-    // .setVHSizeConfig(
-    //     { .type = HkSizeType::Pinch, .value = 0.25f, .min = 0 },
-    //     { .type = HkSizeType::PercParent, .value = 1.0f })
-    // .setBottomMargin(15);
+        .setLayout(HkLayout::Vertical)
+        .setVHSizeConfig(
+            { .type = HkSizeType::FitParent },
+            { .type = HkSizeType::PercParent, .value = 0.2499f })
+        .setPinchConfig({ .enable = true, .allowLeft = true });
+    //
 
+    //ctr4 children
     ctr6->getStyle().setColor({ 0.0f,0.0f,1.0f })
         .setLayout(HkLayout::Horizontal)
-        .setPinchConfig({ .allowRight = true, .allowTop = true });
-    // .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-    // .setVHSizeConfig(
-    //     { .type = HkSizeType::Pinch, .value = 0.25f, .min = 45 },
-    //     { .type = HkSizeType::PercParent, .value = 1.0f })
-    // .setBottomMargin(0);
+        .setVHSizeConfig(
+            { .type = HkSizeType::PercParent, .value = 0.75f },
+            { .type = HkSizeType::FitParent })
+        .setPinchConfig({ .enable = true, .allowLeft = true, .allowRight = true, .allowBottom = true })
+        .setBottomMargin(15);
 
     ctr7->getStyle().setColor({ 0.3f,0.7f,0.0f })
-        .setLayout(HkLayout::Vertical)
-        .setPinchConfig({ .allowLeft = true ,.allowBottom = true });
+        .setLayout(HkLayout::Horizontal)
+        .setOverflowAllowedXY(true)
+        .setRowWrapping(true)
+        .setVHSizeConfig(
+            { .type = HkSizeType::PercParent, .value = 0.25f },
+            { .type = HkSizeType::FitParent })
+        .setPinchConfig({ .enable = true, .allowLeft = true, .allowRight = true, .allowTop = true });
+    //
+
+// .setLayout(HkLayout::Vertical)
+// .setPinchConfig({ .allowLeft = true ,.allowBottom = true });
+
+    ctr8->getStyle().setColor({ 0.5f,0.4f,1.0f })
+        .setVHSizeConfig(
+            { .type = HkSizeType::PercParent, .value = 0.5f },
+            { .type = HkSizeType::FitParent })
+        .setPinchConfig({ .enable = true, .allowBottom = true })
+        .setBottomMargin(15);
+
+    ctr9->getStyle().setColor({ 0.0f,0.4f,1.0f })
+        .setVHSizeConfig(
+            { .type = HkSizeType::PercParent, .value = 0.5f },
+            { .type = HkSizeType::FitParent })
+        .setPinchConfig({ .enable = true, .allowTop = true });
+
+    {
+        // // ctr9->getStyle().setColor({ 0.4f,0.7f,0.0f })
+        // //     .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+        // //     .setVHSizeConfig(
+        // //         { .type = HkSizeType::PercParent, .value = 1.0f },
+        // //         { .type = HkSizeType::Pinch, .value = 0.5f, .min = 0 })
+        // //     .setRightMargin(15);
 
 
-    ctr8->getStyle().setColor({ 0.0f,0.4f,1.0f })
-        .setLayout(HkLayout::HPinch)
-        .setPinchConfig({ .allowLeft = true, .allowTop = true });
+        // // ctr10->getStyle().setColor({ 0.0f,0.7f,1.0f })
+        // //     .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+        // //     .setVHSizeConfig(
+        // //         { .type = HkSizeType::PercParent, .value = 1.0f },
+        // //         { .type = HkSizeType::Pinch, .value = 0.5f, .min = 15 });
 
-    // ctr9->getStyle().setColor({ 0.4f,0.7f,0.0f })
-    //     .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-    //     .setVHSizeConfig(
-    //         { .type = HkSizeType::PercParent, .value = 1.0f },
-    //         { .type = HkSizeType::Pinch, .value = 0.5f, .min = 0 })
-    //     .setRightMargin(15);
-
-
-    // ctr10->getStyle().setColor({ 0.0f,0.7f,1.0f })
-    //     .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-    //     .setVHSizeConfig(
-    //         { .type = HkSizeType::PercParent, .value = 1.0f },
-    //         { .type = HkSizeType::Pinch, .value = 0.5f, .min = 15 });
-
-    // ctr11->getStyle().setColor({ 0.4f,0.7f,0.0f })
-    //     .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-    //     .setVHSizeConfig(
-    //         { .type = HkSizeType::Pinch, .value = 0.5f, .min = 0 },
-    //         { .type = HkSizeType::PercParent, .value = 1.0f })
-    //     .setBottomMargin(15);
+        // // ctr11->getStyle().setColor({ 0.4f,0.7f,0.0f })
+        // //     .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+        // //     .setVHSizeConfig(
+        // //         { .type = HkSizeType::Pinch, .value = 0.5f, .min = 0 },
+        // //         { .type = HkSizeType::PercParent, .value = 1.0f })
+        // //     .setBottomMargin(15);
 
 
-    // ctr12->getStyle().setColor({ 0.0f,0.7f,1.0f })
-    //     .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-    //     .setVHSizeConfig(
-    //         { .type = HkSizeType::Pinch, .value = 0.5f, .min = 15 },
-    //         { .type = HkSizeType::PercParent, .value = 1.0f });
+        // // ctr12->getStyle().setColor({ 0.0f,0.7f,1.0f })
+        // //     .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+        // //     .setVHSizeConfig(
+        // //         { .type = HkSizeType::Pinch, .value = 0.5f, .min = 15 },
+        // //         { .type = HkSizeType::PercParent, .value = 1.0f });
 
-    ctr13->getStyle().setColor({ 0.1f,0.7f,0.0f })
-        .setLayout(HkLayout::Vertical)
-        .setPinchConfig({ .allowRight = true, .allowTop = true });
+        // ctr13->getStyle().setColor({ 0.1f,0.7f,0.0f })
+        //     .setLayout(HkLayout::Vertical)
+        //     .setPinchConfig({ .allowRight = true, .allowTop = true });
+        // ctr14->getStyle().setColor({ 0.5f,0.7f,1.0f })
+        //     .setLayout(HkLayout::Vertical)
+        //     .setPinchConfig({ .allowLeft = true, .allowTop = true });
 
-
-
-    ctr14->getStyle().setColor({ 0.5f,0.7f,1.0f })
-        .setLayout(HkLayout::Vertical)
-        .setPinchConfig({ .allowLeft = true, .allowTop = true });
-
-    // ctr->pushChildren({ ctr4, ctr5, ctr6 });
-    // bool x = false;
-    // ctr->getEvents().setOnClickListener([&windowFrame, &ctr6, &ctr5]() {
-    //     ctr5->getStyle().setPinchConfig({ .allowLeft = true, .allowRight = true });
-    //     windowFrame->pushChildren({ ctr6 });
-    //     });
+        // ctr->pushChildren({ ctr4, ctr5, ctr6 });
+        // bool x = false;
+        // ctr->getEvents().setOnClickListener([&windowFrame, &ctr6, &ctr5]() {
+        //     ctr5->getStyle().setPinchConfig({ .allowLeft = true, .allowRight = true });
+        //     windowFrame->pushChildren({ ctr6 });
+        //     });
+    }
     // windowFrame->pushChildren({ ctr, ctr4, ctr5, ctr6 });
-    windowFrame->pushChildren({ ctr, ctr4 });
-    ctr->pushChildren({ ctr5, ctr6 });
-    ctr4->pushChildren({ ctr7, ctr8 });
+    windowFrame->pushChildren({ ctr, ctr4, ctr5 });
+    // ctr->pushChildren({ ctr5, ctr6 });
+    // ctr5->pushChildren({ ctr7 });
+    ctr4->pushChildren({ ctr6, ctr7 });
+    ctr5->pushChildren({ ctr8, ctr9 });
 
-
-    // ctr7->pushChildren({ ctr11,ctr12 });
-    ctr8->pushChildren({ ctr13,ctr14 });
+    // // ctr7->pushChildren({ ctr11,ctr12 });
+    // ctr8->pushChildren({ ctr13,ctr14 });
 
     // ctr13->pushChildren({ ctr9,ctr10 });
     // windowFrame->pushChildren({ ctr });
 
 // Providing a seed value
-    // srand((unsigned)time(NULL));
+    srand((unsigned)time(NULL));
 
-    // int scale = 4;
-    // std::vector<HkNodeBasePtr> ctrs2;
-    // ctrs2.reserve(scale * scale);
-    // for (int i = 0;i < scale; i++) // with O2 works ok 01.09.2023
-    // {
-    //     for (int j = 0;j < scale; j++)
-    //     {
-    //         double r = (rand() % 255) / 255.0f;
-    //         double g = (rand() % 255) / 255.0f;
-    //         double b = (rand() % 255) / 255.0f;
+    int scale = 4;
+    std::vector<HkNodeBasePtr> ctrs2;
+    ctrs2.reserve(scale * scale);
+    for (int i = 0;i < scale; i++) // with O2 works ok 01.09.2023
+    {
+        for (int j = 0;j < scale; j++)
+        {
+            double r = (rand() % 255) / 255.0f;
+            double g = (rand() % 255) / 255.0f;
+            double b = (rand() % 255) / 255.0f;
 
-    //         const auto& ct = std::make_shared<HkContainer>("MyContauner");
-    //         ct->getStyle()
-    //             .setColor((i + j) % 2 == 0 ? glm::vec3{ r,g,b } : glm::vec3{ r,g,b })
-    //             .setGridRowCol(i + 1, j + 1)
-    //             // .setVHSizeConfig({ .value = 50 }, { .value = 50 })
-    //             .setVHSizeConfig({ .type = HkSizeType::FitCell }, { .type = HkSizeType::FitCell })
-    //             .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center);
+            const auto& ct = std::make_shared<HkContainer>("MyContauner");
+            ct->getStyle()
+                .setColor((i + j) % 2 == 0 ? glm::vec3{ r,g,b } : glm::vec3{ r,g,b })
+                // .setGridRowCol(i + 1, j + 1)
+                .setVHSizeConfig({ .value = 50 }, { .value = 100 })
+                // .setVHSizeConfig({ .type = HkSizeType::FitCell }, { .type = HkSizeType::FitCell })
+                .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center);
 
-    //         ctrs2.push_back(std::move(ct));
-    //     }
-    // }
+            ctrs2.push_back(std::move(ct));
+        }
+    }
 
     // std::vector<float> rows, cols;
     // rows.assign(scale, 1.0f);
     // cols.assign(scale, 1.0f);
-    // ctr5->getStyle()
+    // ctr7->getStyle()
     //     .setLayout(HkLayout::Grid)
     //     .setGridConfig(
     //         HkGridConfig{
     //             .cols{cols},
     //             .rows{rows}
     //         });
-    // ctr5->pushChildren(ctrs2);
+    ctr7->pushChildren(ctrs2);
     // HkImageViewPtr imgView = std::make_shared<HkImageView>("MyImgView");
     // HkImageViewPtr imgView2 = std::make_shared<HkImageView>("MyImgView2");
     // HkImageViewPtr imgView3 = std::make_shared<HkImageView>("MyImgView3");
@@ -223,6 +238,7 @@ int main()
 
     windowFrame2->getStyle().setOverflowAllowedXY(true)
         .setLayout(HkLayout::Horizontal)
+        .setPinchConfig({ .enable = true })
         .setHAlignment(HkHAlignment::Left)
         .setVAlignment(HkVAlignment::Center);
 

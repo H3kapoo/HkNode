@@ -52,30 +52,9 @@ void HkContainer::onDirtyAttribs(const std::unordered_set<HkStyleDirtyAttribs>& 
         {
         case HkStyleDirtyAttribs::BG: break;
         case HkStyleDirtyAttribs::Pinch:
-            /* We need to reconfigure children on pinch settings changed*/
             pinchHelper_.setGrabConfig(getStyle().getPinchConfig());
-            configurePinchChildrenIfNeeded();
             break;
         }
-    }
-}
-
-void HkContainer::configurePinchChildrenIfNeeded()
-{
-    const auto& layout = getStyle().getLayout();
-    if (layout == HkLayout::HPinch || layout == HkLayout::VPinch)
-    {
-        /* If this is a parent containing pinchable children, we need to recalc things on children insertion */
-
-        std::vector<HkNodeData*> children;
-        const auto& allChildren = treeStruct_.getChildren();
-        for (uint32_t i = 0; i < treeStruct_.getChildren().size() - scrollbBarsCount_; i++)
-        {
-            children.push_back(&allChildren[i]->getPayload()->node_);
-        }
-
-        pinchHelper_.configureChildren(children,
-            getStyle().getLayout() == HkLayout::HPinch);
     }
 }
 
@@ -126,10 +105,13 @@ void HkContainer::onGeneralMouseMove()
     //     //     // node_.renderContext.getShader().setVec3f("hovered", glm::vec3(0, 1, 1));
     // }
 
-
-    pinchHelper_.onMouseMove(*windowDataPtr_, node_,
-        treeStruct_.getParent()->getPayload()->node_,
-        treeStruct_.getId());
+    /* Acts as checking if pinching is active*/
+    if (pinchHelper_.isEnabled())
+    {
+        pinchHelper_.onMouseMove(*windowDataPtr_, node_,
+            treeStruct_.getParent()->getPayload()->node_,
+            treeStruct_.getId());
+    }
 }
 
 void HkContainer::onClick()
@@ -263,8 +245,11 @@ void HkContainer::postRenderAdditionalDetails()
         dummyXYIntersectorData_.transformContext.getModelMatrix());
 
     /* To note that we should always render the bars last*/
-    pinchHelper_.onBarRender(*windowDataPtr_, node_.transformContext.getVPos(),
-        node_.transformContext.getVScale());
+    if (pinchHelper_.isEnabled())
+    {
+        pinchHelper_.onBarRender(*windowDataPtr_, node_.transformContext.getVPos(),
+            node_.transformContext.getVScale());
+    }
 }
 
 void HkContainer::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)
@@ -288,9 +273,5 @@ void HkContainer::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)
             child->injectWindowDataPtr(windowDataPtr_);
         }
     }
-
-    /* If this is a parent containing pinchable children, we need to recalc
-       things on children insertion */
-    configurePinchChildrenIfNeeded();
 }
 } // hkui

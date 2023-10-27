@@ -202,10 +202,10 @@ void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children)
         auto& childSc = child.styleContext;
 
         /* Scale elements according to their config*/
-        if (styleContextInj_->getLayout() == HkLayout::HPinch)
+        if (childSc.getPinchConfig().enable)
         {
             auto sc = childSc.getHSizeConfig();
-            const float extra = 15.0f * 1.0f / thisTc_->getScale().x;
+            const float extra = 0.0f * 1.0f / thisTc_->getScale().x;
             sc.value += (extra / childCount);
             childTc.setScale(
                 {
@@ -293,10 +293,10 @@ void HkConstraintContext::resolveVerticalContainer(HkTreeStruct& children)
         auto& childSc = child.styleContext;
 
         /* Scale elements according to their config*/
-        if (styleContextInj_->getLayout() == HkLayout::VPinch)
+        if (childSc.getPinchConfig().enable)
         {
             auto sc = childSc.getVSizeConfig();
-            const float extra = 15.0f * 1.0f / thisTc_->getScale().y;
+            const float extra = 0.0f * 1.0f / thisTc_->getScale().y;
             sc.value += extra / childCount;
             childTc.setScale(
                 {
@@ -367,7 +367,6 @@ void HkConstraintContext::resolveVerticalContainer(HkTreeStruct& children)
        need this information. It's a trade-off. */
     applyFinalOffsets(children);
 }
-
 
 void HkConstraintContext::backPropagateRowChange(HkTreeStruct& children,
     const uint32_t nextRowFirstId, const uint32_t lastRowEndId, const uint32_t highestYOnRow) const

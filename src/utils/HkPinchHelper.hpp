@@ -27,8 +27,6 @@ public:
     void init(HkWindowData& windowData);
 
     /* Functions, in rough order of their calling*/
-    void configureChildren(const std::vector<HkNodeData*>& containerChildren,
-        const bool isParentHorizontalAligned);
     void scan(HkWindowData& windowData, HkNodeData& nd, const uint32_t id, const uint32_t level);
     void onMouseButton(HkWindowData& windowData);
     void resolve();
@@ -44,6 +42,9 @@ public:
     void setGrabSize(const int32_t size);
     void setGrabConfig(const HkPinchConfig& config);
 
+    /* Getters */
+    bool isEnabled();
+
 private:
     void cursorChange(HkWindowData& windowData, const int32_t value);
 
@@ -55,6 +56,7 @@ private:
     // bool allowYB_{ true }, allowYT_{ true };
     bool allowXL_{ false }, allowXR_{ false };
     bool allowYB_{ false }, allowYT_{ false };
+    bool enabled_{ false };
     int32_t grabSize_{ 15 };
     HkNodeData pincher_;
 

@@ -73,6 +73,7 @@ struct HkSizeConfig
 
 struct HkPinchConfig
 {
+    bool enable{ false };
     bool allowLeft{ false }, allowRight{ false };
     bool allowTop{ false }, allowBottom{ false };
 };
