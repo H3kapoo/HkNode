@@ -121,7 +121,6 @@ void HkWindowManager::updateAllSubWindows(const HkEvent& ev)
 
     /* Update suggested cursor accordingly. No priority is taken into account for now*/
     updateCursor();
-    windowData_.suggestedCursor = GLFW_ARROW_CURSOR;
 }
 
 void HkWindowManager::decideCursor()

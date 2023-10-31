@@ -111,6 +111,13 @@ void HkContainer::onGeneralMouseMove()
         pinchHelper_.onMouseMove(*windowDataPtr_, node_,
             treeStruct_.getParent()->getPayload()->node_,
             treeStruct_.getId());
+
+        // std::vector<HkNodeBase*> children;
+        // for (const auto& ch : treeStruct_.getChildren())
+        // {
+        //     children.push_back(ch->getPayload());
+        // }
+        // pinchHelper_.enableOrDisableGrabPoints(*windowDataPtr_, children);
     }
 }
 

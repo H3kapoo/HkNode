@@ -1,5 +1,7 @@
 #include "HkPinchHelper.hpp"
 
+#include "../base/HkNodeBase.hpp"
+
 namespace hkui
 {
 std::vector<HkPinchHelper::PinchInfo> HkPinchHelper::pinchInfo_{ 0 };
@@ -17,6 +19,22 @@ void HkPinchHelper::init(HkWindowData& windowData)
 
     pincher_.styleContext.setColor(glm::vec3(0.2f, 0.2f, 0.2f));
     pincher_.renderContext.colorUniformEn = true;
+}
+
+void HkPinchHelper::enableOrDisableGrabPoints(HkWindowData& windowData, std::vector<HkNodeBase*> children)
+{
+    for (const auto& ch : children)
+    {
+        const auto& sc = ch->getStyle().getHSizeConfig();
+        const auto& tc = ch->getTransform().getScale();
+        if (sc.max <= tc.x + 15) // grabSize
+        {
+            std::cout << "Child has same size as max size " << sc.max << "\n";
+            // we should FREEZE RIGHT and LEFT of this child and LEFT of next child + RIGHT of previous child?
+            // and by freeze I mean something that will not change percentage values, but will still allow grab points to be valid
+            // vertical containers cannot be min maxed horizontally, this shall be handled by parent container
+        }
+    }
 }
 
 void HkPinchHelper::scan(HkWindowData& windowData, HkNodeData& nd,
@@ -262,24 +280,19 @@ void HkPinchHelper::onMouseMove(HkWindowData& windowData, HkNodeData& nd, HkNode
         // diagonal bottom-left pinch
         if (LZone && BZone && allowXL_ && allowYB_) { lockedInXL_ = true; lockedInYB_ = true; }
         // diagonal top-left pinch
-        if (LZone && TZone && allowXR_ && allowYT_) { lockedInXL_ = true; lockedInYT_ = true; }
+        if (LZone && TZone && allowXL_ && allowYT_) { lockedInXL_ = true; lockedInYT_ = true; }
 
         // added
         /* Set cursor to whatever we might need */
-        if (lockedInXR_ || lockedInXL_)
+        if ((lockedInXR_ || lockedInXL_) && windowData.suggestedCursor != GLFW_CROSSHAIR_CURSOR)
             cursorChange(windowData, GLFW_HRESIZE_CURSOR);
 
-        if (lockedInYT_ || lockedInYB_)
+        if ((lockedInYT_ || lockedInYB_) && windowData.suggestedCursor != GLFW_CROSSHAIR_CURSOR)
             cursorChange(windowData, GLFW_VRESIZE_CURSOR);
 
         if ((lockedInXR_ && lockedInYB_) || (lockedInXR_ && lockedInYT_)
             || (lockedInXL_ && lockedInYB_) || (lockedInXL_ && lockedInYT_))
             cursorChange(windowData, GLFW_CROSSHAIR_CURSOR);
-
-        /* If we didn't manage to grab anything, reset cursor */
-        if (windowData.suggestedCursor == GLFW_ARROW_CURSOR &&
-            !(lockedInXL_ || lockedInXR_ || lockedInYB_ || lockedInYT_))
-            cursorChange(windowData, GLFW_ARROW_CURSOR);
     }
     /* If we are holding click and moving, we need to update position/scale of pinched object */
     else
@@ -302,41 +315,52 @@ void HkPinchHelper::onMouseMove(HkWindowData& windowData, HkNodeData& nd, HkNode
         glm::vec2 boundPos = { tc.getPos() };
         glm::vec2 boundScale = { tc.getScale() };
 
+        auto prevX = nd.styleContext.getHSizeConfig();
+        auto prevY = nd.styleContext.getVSizeConfig();
+        const auto pScaleX = pnd.transformContext.getScale().x;
+        const auto pScaleY = pnd.transformContext.getScale().y;
+
         if (foundInfo.right)
         {
-            boundScale.x += windowData.mousePos.x - windowData.lastMousePos.x;
+            prevX.offset = ((windowData.mousePos.x - windowData.lastMousePos.x) / (float)pScaleX);
         }
 
-        if (foundInfo.left)
-        {
-            boundPos.x += windowData.mousePos.x - windowData.lastMousePos.x;
-            boundScale.x += -(windowData.mousePos.x - windowData.lastMousePos.x);
-        }
+        // if (foundInfo.left)
+        // {
+        //     // prevX.offset += -(windowData.mousePos.x - windowData.lastMousePos.x) / (float)pScaleX;
+        //     // prevX.value += -(windowData.mousePos.x - windowData.lastMousePos.x) / (float)pScaleX;
+        // }
 
-        if (foundInfo.top)
-        {
-            boundPos.y += windowData.mousePos.y - windowData.lastMousePos.y;
-            boundScale.y += -(windowData.mousePos.y - windowData.lastMousePos.y);
-        }
+        nd.styleContext.setHSizeConfig(prevX);
+
+        // if (foundInfo.top)
+        // {
+        //     boundPos.y += windowData.mousePos.y - windowData.lastMousePos.y;
+        //     boundScale.y += -(windowData.mousePos.y - windowData.lastMousePos.y);
+        // }
 
         if (foundInfo.bottom)
         {
-            boundScale.y += (windowData.mousePos.y - windowData.lastMousePos.y);
+            prevY.offset = ((windowData.mousePos.y - windowData.lastMousePos.y) / (float)pScaleY);
+
+            // boundScale.y += (windowData.mousePos.y - windowData.lastMousePos.y);
         }
-
-        const auto pScaleX = pnd.transformContext.getScale().x;
-        const auto pScaleY = pnd.transformContext.getScale().y;
-        const float percX = ((float)boundScale.x - tc.getScale().x) / pScaleX;
-        const float percY = ((float)boundScale.y - tc.getScale().y) / pScaleY;
-
-        tc.setPos(boundPos);
-        auto prev = nd.styleContext.getHSizeConfig();
-        prev.value += percX;
-
-        auto prevY = nd.styleContext.getVSizeConfig();
-        prevY.value += percY;
-        nd.styleContext.setHSizeConfig(prev);
         nd.styleContext.setVSizeConfig(prevY);
+
+
+
+        // const auto pScaleY = pnd.transformContext.getScale().y;
+        // const float percX = ((float)boundScale.x - tc.getScale().x) / pScaleX;
+        // const float percY = ((float)boundScale.y - tc.getScale().y) / pScaleY;
+
+        // tc.setPos(boundPos);
+        // auto prev = nd.styleContext.getHSizeConfig();
+        // prev.value += percX;
+
+        // auto prevY = nd.styleContext.getVSizeConfig();
+        // prevY.value += percY;
+        // nd.styleContext.setHSizeConfig(prev);
+        // nd.styleContext.setVSizeConfig(prevY);
     }
 }
 
@@ -558,6 +582,12 @@ void HkPinchHelper::setGrabConfig(const HkPinchConfig& config)
     allowXR_ = config.allowRight;
     allowYT_ = config.allowTop;
     allowYB_ = config.allowBottom;
+
+    freezeXL_ = config.freezeLeft;
+    freezeXR_ = config.freezeRight;
+    freezeYT_ = config.freezeTop;
+    freezeYB_ = config.freezeBottom;
+
     enabled_ = config.enable;
 }
 

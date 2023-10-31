@@ -35,8 +35,7 @@ int main()
     sceneWindow1->addSubWindow(windowFrame); //NOTE: Needs to be added before adding any children
 
     windowFrame->getStyle().setOverflowAllowedXY(false)
-        // .setLayout(HkLayout::HPinch)
-        .setLayout(HkLayout::Horizontal)
+        .setLayout(HkLayout::HPinch)
         .setPinchConfig({ .enable = true })
         .setRowWrapping(false)
         .setHAlignment(HkHAlignment::Left)
@@ -63,25 +62,24 @@ int main()
         .setLayout(HkLayout::Horizontal)
         .setVHSizeConfig(
             { .type = HkSizeType::FitParent },
-            { .type = HkSizeType::PercParent, .value = 0.25f })
-        .setPinchConfig({ .enable = true , .allowRight = true })
+            { .type = HkSizeType::PercParent, .value = 0.5f, .min = 300 })
+        .setPinchConfig({ .enable = true, .allowLeft = true, .allowRight = true, .allowTop = true, .allowBottom = true })
         .setRightMargin(15);
 
     ctr4->getStyle().setColor({ 1.0f,0.0f,0.0f })
-        .setLayout(HkLayout::Vertical)
+        .setLayout(HkLayout::VPinch)
         .setVHSizeConfig(
-            { .type = HkSizeType::FitParent }, // maybe set this one autonomously?
-            { .type = HkSizeType::PercParent, .value = 0.5f })
-        .setPinchConfig({ .enable = true, .allowLeft = true, .allowRight = true })
+            { .type = HkSizeType::FitParent },
+            { .type = HkSizeType::PercParent, .value = 0.25f, .min = 300 })
+        .setPinchConfig({ .enable = true, .allowLeft = true, .allowRight = true, .allowTop = true, .allowBottom = true })
         .setRightMargin(15);
 
     ctr5->getStyle().setColor({ 0.3f,0.5f,0.0f })
         .setLayout(HkLayout::Vertical)
         .setVHSizeConfig(
             { .type = HkSizeType::FitParent },
-            { .type = HkSizeType::PercParent, .value = 0.2499f })
-        .setPinchConfig({ .enable = true, .allowLeft = true });
-    //
+            { .type = HkSizeType::PercParent, .value = 0.25f, .min = 300 })
+        .setPinchConfig({ .enable = true, .allowLeft = true, .allowRight = true, .allowTop = true, .allowBottom = true });
 
     //ctr4 children
     ctr6->getStyle().setColor({ 0.0f,0.0f,1.0f })
@@ -89,7 +87,7 @@ int main()
         .setVHSizeConfig(
             { .type = HkSizeType::PercParent, .value = 0.75f },
             { .type = HkSizeType::FitParent })
-        .setPinchConfig({ .enable = true, .allowLeft = true, .allowRight = true, .allowBottom = true })
+        .setPinchConfig({ .enable = true, .allowLeft = true, .allowRight = true, .allowTop = true, .allowBottom = true })
         .setBottomMargin(15);
 
     ctr7->getStyle().setColor({ 0.3f,0.7f,0.0f })
@@ -99,7 +97,7 @@ int main()
         .setVHSizeConfig(
             { .type = HkSizeType::PercParent, .value = 0.25f },
             { .type = HkSizeType::FitParent })
-        .setPinchConfig({ .enable = true, .allowLeft = true, .allowRight = true, .allowTop = true });
+        .setPinchConfig({ .enable = true, .allowLeft = true, .allowRight = true, .allowTop = true, .allowBottom = true });
     //
 
 // .setLayout(HkLayout::Vertical)
@@ -109,14 +107,14 @@ int main()
         .setVHSizeConfig(
             { .type = HkSizeType::PercParent, .value = 0.5f },
             { .type = HkSizeType::FitParent })
-        .setPinchConfig({ .enable = true, .allowBottom = true })
+        .setPinchConfig({ .enable = true, .allowLeft = true, .allowRight = true, .allowTop = true, .allowBottom = true })
         .setBottomMargin(15);
 
     ctr9->getStyle().setColor({ 0.0f,0.4f,1.0f })
         .setVHSizeConfig(
             { .type = HkSizeType::PercParent, .value = 0.5f },
             { .type = HkSizeType::FitParent })
-        .setPinchConfig({ .enable = true, .allowTop = true });
+        .setPinchConfig({ .enable = true, .allowLeft = true, .allowRight = true, .allowTop = true, .allowBottom = true });
 
     {
         // // ctr9->getStyle().setColor({ 0.4f,0.7f,0.0f })
@@ -166,7 +164,7 @@ int main()
     // ctr->pushChildren({ ctr5, ctr6 });
     // ctr5->pushChildren({ ctr7 });
     ctr4->pushChildren({ ctr6, ctr7 });
-    ctr5->pushChildren({ ctr8, ctr9 });
+    // ctr5->pushChildren({ ctr8, ctr9 });
 
     // // ctr7->pushChildren({ ctr11,ctr12 });
     // ctr8->pushChildren({ ctr13,ctr14 });

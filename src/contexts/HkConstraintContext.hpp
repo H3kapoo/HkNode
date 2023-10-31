@@ -61,7 +61,11 @@ public:
 
     void resolveConstraints(HkTreeStruct& children, const HkScrollbarsSize sbSizes);
     void resolveHorizontalContainer(HkTreeStruct& children);
+    void resolveHorizontalPinch(HkTreeStruct& children);
+
     void resolveVerticalContainer(HkTreeStruct& children);
+    void resolveVerticalPinch(HkTreeStruct& children);
+
     void resolveGridContainer(HkTreeStruct& children);
     void resolveAxisOverflow(const HkTreeStruct& children, const HkScrollbarsSize sbSizes);
 

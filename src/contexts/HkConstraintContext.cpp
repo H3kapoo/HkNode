@@ -24,12 +24,16 @@ void HkConstraintContext::resolveConstraints(HkTreeStruct& children,
     switch (layout)
     {
     case HkLayout::Horizontal:
-    case HkLayout::HPinch:
         resolveHorizontalContainer(children);
         break;
+    case HkLayout::HPinch:
+        resolveHorizontalPinch(children);
+        break;
     case HkLayout::Vertical:
-    case HkLayout::VPinch:
         resolveVerticalContainer(children);
+        break;
+    case HkLayout::VPinch:
+        resolveVerticalPinch(children);
         break;
     case HkLayout::Grid:
         resolveGridContainer(children);
@@ -202,25 +206,11 @@ void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children)
         auto& childSc = child.styleContext;
 
         /* Scale elements according to their config*/
-        if (childSc.getPinchConfig().enable)
-        {
-            auto sc = childSc.getHSizeConfig();
-            const float extra = 0.0f * 1.0f / thisTc_->getScale().x;
-            sc.value += (extra / childCount);
-            childTc.setScale(
-                {
-                    ceil(computeHorizontalScale(sc, childCount)) - childSc.getLeftMargin() - childSc.getRightMargin(),
-                    ceil(computeVerticalScale(childSc.getVSizeConfig(), childCount))
-                });
-        }
-        else
-        {
-            childTc.setScale(
-                {
-                    ceil(computeHorizontalScale(childSc.getHSizeConfig(), childCount)),
-                    ceil(computeVerticalScale(childSc.getVSizeConfig(), childCount))
-                });
-        }
+        childTc.setScale(
+            {
+                ceil(computeHorizontalScale(childSc.getHSizeConfig(), childCount)),
+                ceil(computeVerticalScale(childSc.getVSizeConfig(), childCount))
+            });
 
         /* How much we need to advance to place next child */
         nextXAdvance = startPosX + childSc.getLeftMargin() + childSc.getRightMargin() + childTc.getScale().x;
@@ -274,6 +264,95 @@ void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children)
        This needs to be done here because otherwise we can get wrong min max information and bottom/center alignments
        need this information. It's a trade-off. */
     applyFinalOffsets(children);
+}
+
+void HkConstraintContext::resolveHorizontalPinch(HkTreeStruct& children)
+{
+    float startPosX = 0;
+    float xSize = 0;
+    float xAdvanceFraction = 0.0f;
+    float advancePerc = 0.0f;
+
+    const uint32_t childrenCount = children.size() - sbCount_;
+    for (uint32_t i = 0; i < childrenCount; i++)
+    {
+        auto& child = children[i]->getPayload()->node_;
+        auto& childTc = child.transformContext;
+        auto& childSc = child.styleContext;
+
+        auto sizeCfg = childSc.getHSizeConfig();
+        const float pScaleX = (float)thisTc_->getScale().x;
+        const float minVal = sizeCfg.min / pScaleX;
+        const float maxVal = sizeCfg.max / pScaleX;
+
+        /* Verify if with the new offset, min/max val for THIS item will be exceeded.
+           If yes, limit OFFSET so that limits are not exceeded */
+        if (sizeCfg.value + sizeCfg.offset >= maxVal)
+            sizeCfg.offset = maxVal - sizeCfg.value;
+        if (sizeCfg.value + sizeCfg.offset <= minVal)
+            sizeCfg.offset = minVal - sizeCfg.value;
+
+        /* Verify constraints of the next item as well.
+           Verify next item (it will change alongside this one) in roughly the same way.
+           Difference here is that we calculate 'maybeOffsetForNext' as the maximum 'offset' the next item
+           could support without exceeding limits.
+        */
+        float maybeOffsetForNext = sizeCfg.offset;
+        if (i + 1 < childrenCount)
+        {
+            auto& childN = children[i + 1]->getPayload()->node_;
+            auto& childNSc = childN.styleContext;
+            auto sizeNCfg = childNSc.getHSizeConfig();
+
+            const auto minValN = (sizeNCfg.min) / (float)pScaleX;
+            const auto maxValN = (sizeNCfg.max) / (float)pScaleX;
+
+            if (sizeNCfg.value - sizeCfg.offset <= minValN)
+            {
+                maybeOffsetForNext = sizeCfg.offset - (minValN - (sizeNCfg.value - sizeCfg.offset));
+            }
+        }
+
+        /* Items will change according to the minimum distance we can travel without breaking limits*/
+        sizeCfg.offset = std::min(sizeCfg.offset, maybeOffsetForNext);
+
+        /* Apply new offset and value*/
+        sizeCfg.value += sizeCfg.offset;
+        if (i + 1 < childrenCount)
+        {
+            auto& childN = children[i + 1]->getPayload()->node_;
+            auto& childNSc = childN.styleContext;
+            auto sizeNCfg = childNSc.getHSizeConfig();
+            sizeNCfg.value -= sizeCfg.offset;
+            childNSc.setHSizeConfig(sizeNCfg);
+        }
+        sizeCfg.offset = 0.0f;
+        childSc.setHSizeConfig(sizeCfg);
+
+        /* Calculate position similat to grid layout*/
+        startPosX = xAdvanceFraction * pScaleX;
+        advancePerc += sizeCfg.value;
+        xAdvanceFraction = advancePerc;
+        childTc.setPos({ startPosX + (float)thisTc_->getPos().x , thisTc_->getPos().y });
+
+        /* Scale elements according to their config. Subtract right margin to for the pinch zone*/
+        const auto hSizeConfig = childSc.getHSizeConfig();
+        xSize = childSc.getHSizeConfig().value * pScaleX;
+        xSize -= childSc.getRightMargin();
+
+        /*Ceil is needed so we don't get off by one pixel artifacts*/
+        childTc.setScale({ ceil(xSize), thisTc_->getScale().y });
+    }
+
+    //NOTE: Possible hack for last item not covering all the space aka one stray column of pixels at the end
+    // not covered.
+    // auto& child = children[childrenCount - 1]->getPayload()->node_;
+    // auto& childTc = child.transformContext;
+    // if (childTc.getPos().x + childTc.getScale().x < thisTc_->getPos().x + thisTc_->getScale().x)
+    // {
+    //     const auto diff = thisTc_->getPos().x + thisTc_->getScale().x - (childTc.getPos().x + childTc.getScale().x);
+    //     childTc.addScale({ diff, 0 });
+    // }
 }
 
 void HkConstraintContext::resolveVerticalContainer(HkTreeStruct& children)
@@ -366,6 +445,94 @@ void HkConstraintContext::resolveVerticalContainer(HkTreeStruct& children)
        This needs to be done here because otherwise we can get wrong min max information and bottom/center alignments
        need this information. It's a trade-off. */
     applyFinalOffsets(children);
+}
+
+void HkConstraintContext::resolveVerticalPinch(HkTreeStruct& children)
+{
+    float startPosY = 0;
+    float ySize = 0;
+    float yAdvanceFraction = 0.0f;
+    float advancePerc = 0.0f;
+
+    const uint32_t childrenCount = children.size() - sbCount_;
+    for (uint32_t i = 0; i < childrenCount; i++)
+    {
+        auto& child = children[i]->getPayload()->node_;
+        auto& childTc = child.transformContext;
+        auto& childSc = child.styleContext;
+
+        auto sizeCfg = childSc.getVSizeConfig();
+        const float pScaleY = (float)thisTc_->getScale().y;
+        const float minVal = sizeCfg.min / pScaleY;
+        const float maxVal = sizeCfg.max / pScaleY;
+
+        /* Verify if with the new offset, min/max val for THIS item will be exceeded.
+           If yes, limit OFFSET so that limits are not exceeded */
+        if (sizeCfg.value + sizeCfg.offset >= maxVal)
+            sizeCfg.offset = maxVal - sizeCfg.value;
+        if (sizeCfg.value + sizeCfg.offset <= minVal)
+            sizeCfg.offset = minVal - sizeCfg.value;
+
+        /* Verify constraints of the next item as well.
+           Verify next item (it will change alongside this one) in roughly the same way.
+           Difference here is that we calculate 'maybeOffsetForNext' as the maximum 'offset' the next item
+           could support without exceeding limits.
+        */
+        float maybeOffsetForNext = sizeCfg.offset;
+        if (i + 1 < childrenCount)
+        {
+            auto& childN = children[i + 1]->getPayload()->node_;
+            auto& childNSc = childN.styleContext;
+            auto sizeNCfg = childNSc.getVSizeConfig();
+
+            const auto minValN = (sizeNCfg.min) / (float)pScaleY;
+            const auto maxValN = (sizeNCfg.max) / (float)pScaleY;
+            if (sizeNCfg.value - sizeCfg.offset <= minValN)
+            {
+                maybeOffsetForNext = sizeCfg.offset - (minValN - (sizeNCfg.value - sizeCfg.offset));
+            }
+        }
+
+        /* Items will change according to the minimum distance we can travel without breaking limits*/
+        sizeCfg.offset = std::min(sizeCfg.offset, maybeOffsetForNext);
+
+        /* Apply new offset and value*/
+        sizeCfg.value += sizeCfg.offset;
+        if (i + 1 < childrenCount)
+        {
+            auto& childN = children[i + 1]->getPayload()->node_;
+            auto& childNSc = childN.styleContext;
+            auto sizeNCfg = childNSc.getVSizeConfig();
+            sizeNCfg.value -= sizeCfg.offset;
+            childNSc.setVSizeConfig(sizeNCfg);
+        }
+        sizeCfg.offset = 0.0f;
+        childSc.setVSizeConfig(sizeCfg);
+
+        /* Calculate position similat to grid layout*/
+        startPosY = yAdvanceFraction * pScaleY;
+        advancePerc += sizeCfg.value;
+        yAdvanceFraction = advancePerc;
+        childTc.setPos({ thisTc_->getPos().x, startPosY + (float)thisTc_->getPos().y });
+
+        /* Scale elements according to their config. Subtract right margin to for the pinch zone*/
+        const auto hSizeConfig = childSc.getVSizeConfig();
+        ySize = childSc.getVSizeConfig().value * pScaleY;
+        ySize -= childSc.getBottomMargin();
+
+        /*Ceil is needed so we don't get off by one pixel artifacts*/
+        childTc.setScale({ thisTc_->getScale().x , ceil(ySize) });
+    }
+
+    //NOTE: Possible hack for last item not covering all the space aka one stray column of pixels at the end
+    // not covered.
+    // auto& child = children[childrenCount - 1]->getPayload()->node_;
+    // auto& childTc = child.transformContext;
+    // if (childTc.getPos().x + childTc.getScale().x < thisTc_->getPos().x + thisTc_->getScale().x)
+    // {
+    //     const auto diff = thisTc_->getPos().x + thisTc_->getScale().x - (childTc.getPos().x + childTc.getScale().x);
+    //     childTc.addScale({ diff, 0 });
+    // }
 }
 
 void HkConstraintContext::backPropagateRowChange(HkTreeStruct& children,
@@ -555,7 +722,6 @@ float HkConstraintContext::computeHorizontalScale(const HkSizeConfig& config, co
         /* Fall through, unsupported mode by horizontal/vertical layout*/
         break;
     }
-
     return std::clamp(size, config.min, config.max);
 }
 

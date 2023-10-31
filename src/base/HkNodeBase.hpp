@@ -44,6 +44,8 @@ class HkNodeBase
     friend class HkConstraintContext;
     friend class HkEventsContext;
 
+    friend class HkPinchHelper;
+
 public:
     HkNodeBase(const std::string& windowName, const HkNodeType& type);
 

@@ -321,6 +321,7 @@ void HkNodeBase::resolveDirtyAttributes()
             break;
         }
     }
+
     onDirtyAttribs(node_.styleContext.dirtyAttribs);
 }
 

@@ -67,8 +67,9 @@ struct HkSizeConfig
 {
     HkSizeType type{ HkSizeType::Absolute };
     float value{ 100 };
-    float min{ 1 };
+    float min{ 0 };
     float max{ 4000 };
+    float offset{ 0 };
 };
 
 struct HkPinchConfig
@@ -76,6 +77,9 @@ struct HkPinchConfig
     bool enable{ false };
     bool allowLeft{ false }, allowRight{ false };
     bool allowTop{ false }, allowBottom{ false };
+
+    bool freezeLeft{ false }, freezeRight{ false };
+    bool freezeTop{ false }, freezeBottom{ false };
 };
 
 class HkStyleContext

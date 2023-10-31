@@ -26,6 +26,8 @@ public:
     HkPinchHelper() = default;
     void init(HkWindowData& windowData);
 
+    void enableOrDisableGrabPoints(HkWindowData& windowData, std::vector<HkNodeBase*> children);
+
     /* Functions, in rough order of their calling*/
     void scan(HkWindowData& windowData, HkNodeData& nd, const uint32_t id, const uint32_t level);
     void onMouseButton(HkWindowData& windowData);
@@ -52,10 +54,12 @@ private:
     bool lockedInXL_{ false };
     bool lockedInYT_{ false };
     bool lockedInYB_{ false };
-    // bool allowXL_{ true }, allowXR_{ true };
-    // bool allowYB_{ true }, allowYT_{ true };
     bool allowXL_{ false }, allowXR_{ false };
     bool allowYB_{ false }, allowYT_{ false };
+
+    bool freezeXL_{ false }, freezeXR_{ false };
+    bool freezeYB_{ false }, freezeYT_{ false };
+
     bool enabled_{ false };
     int32_t grabSize_{ 15 };
     HkNodeData pincher_;
