@@ -281,23 +281,24 @@ void HkConstraintContext::resolveHorizontalPinch(HkTreeStruct& children)
         auto& childSc = child.styleContext;
 
         auto sizeCfg = childSc.getHSizeConfig();
+        auto pinchCfg = childSc.getPinchConfig();
         const float pScaleX = (float)thisTc_->getScale().x;
         const float minVal = sizeCfg.min / pScaleX;
         const float maxVal = sizeCfg.max / pScaleX;
 
         /* Verify if with the new offset, min/max val for THIS item will be exceeded.
            If yes, limit OFFSET so that limits are not exceeded */
-        if (sizeCfg.value + sizeCfg.offset >= maxVal)
-            sizeCfg.offset = maxVal - sizeCfg.value;
-        if (sizeCfg.value + sizeCfg.offset <= minVal)
-            sizeCfg.offset = minVal - sizeCfg.value;
+        if (sizeCfg.value + pinchCfg.offsetX >= maxVal)
+            pinchCfg.offsetX = maxVal - sizeCfg.value;
+        if (sizeCfg.value + pinchCfg.offsetX <= minVal)
+            pinchCfg.offsetX = minVal - sizeCfg.value;
 
         /* Verify constraints of the next item as well.
            Verify next item (it will change alongside this one) in roughly the same way.
            Difference here is that we calculate 'maybeOffsetForNext' as the maximum 'offset' the next item
            could support without exceeding limits.
         */
-        float maybeOffsetForNext = sizeCfg.offset;
+        float maybeOffsetForNext = pinchCfg.offsetX;
         if (i + 1 < childrenCount)
         {
             auto& childN = children[i + 1]->getPayload()->node_;
@@ -307,26 +308,27 @@ void HkConstraintContext::resolveHorizontalPinch(HkTreeStruct& children)
             const auto minValN = (sizeNCfg.min) / (float)pScaleX;
             const auto maxValN = (sizeNCfg.max) / (float)pScaleX;
 
-            if (sizeNCfg.value - sizeCfg.offset <= minValN)
+            if (sizeNCfg.value - pinchCfg.offsetX <= minValN)
             {
-                maybeOffsetForNext = sizeCfg.offset - (minValN - (sizeNCfg.value - sizeCfg.offset));
+                maybeOffsetForNext = pinchCfg.offsetX - (minValN - (sizeNCfg.value - pinchCfg.offsetX));
             }
         }
 
         /* Items will change according to the minimum distance we can travel without breaking limits*/
-        sizeCfg.offset = std::min(sizeCfg.offset, maybeOffsetForNext);
+        pinchCfg.offsetX = std::min(pinchCfg.offsetX, maybeOffsetForNext);
 
         /* Apply new offset and value*/
-        sizeCfg.value += sizeCfg.offset;
+        sizeCfg.value += pinchCfg.offsetX;
         if (i + 1 < childrenCount)
         {
             auto& childN = children[i + 1]->getPayload()->node_;
             auto& childNSc = childN.styleContext;
             auto sizeNCfg = childNSc.getHSizeConfig();
-            sizeNCfg.value -= sizeCfg.offset;
+            sizeNCfg.value -= pinchCfg.offsetX;
             childNSc.setHSizeConfig(sizeNCfg);
         }
-        sizeCfg.offset = 0.0f;
+        pinchCfg.offsetX = 0.0f;
+        childSc.setPinchConfig(pinchCfg);
         childSc.setHSizeConfig(sizeCfg);
 
         /* Calculate position similat to grid layout*/
@@ -338,7 +340,7 @@ void HkConstraintContext::resolveHorizontalPinch(HkTreeStruct& children)
         /* Scale elements according to their config. Subtract right margin to for the pinch zone*/
         const auto hSizeConfig = childSc.getHSizeConfig();
         xSize = childSc.getHSizeConfig().value * pScaleX;
-        xSize -= childSc.getRightMargin();
+        xSize -= (i == childrenCount - 1) ? 0 : pinchCfg.grabSize;
 
         /*Ceil is needed so we don't get off by one pixel artifacts*/
         childTc.setScale({ ceil(xSize), thisTc_->getScale().y });
@@ -462,23 +464,24 @@ void HkConstraintContext::resolveVerticalPinch(HkTreeStruct& children)
         auto& childSc = child.styleContext;
 
         auto sizeCfg = childSc.getVSizeConfig();
+        auto pinchCfg = childSc.getPinchConfig();
         const float pScaleY = (float)thisTc_->getScale().y;
         const float minVal = sizeCfg.min / pScaleY;
         const float maxVal = sizeCfg.max / pScaleY;
 
         /* Verify if with the new offset, min/max val for THIS item will be exceeded.
            If yes, limit OFFSET so that limits are not exceeded */
-        if (sizeCfg.value + sizeCfg.offset >= maxVal)
-            sizeCfg.offset = maxVal - sizeCfg.value;
-        if (sizeCfg.value + sizeCfg.offset <= minVal)
-            sizeCfg.offset = minVal - sizeCfg.value;
+        if (sizeCfg.value + pinchCfg.offsetY >= maxVal)
+            pinchCfg.offsetY = maxVal - sizeCfg.value;
+        if (sizeCfg.value + pinchCfg.offsetY <= minVal)
+            pinchCfg.offsetY = minVal - sizeCfg.value;
 
         /* Verify constraints of the next item as well.
            Verify next item (it will change alongside this one) in roughly the same way.
            Difference here is that we calculate 'maybeOffsetForNext' as the maximum 'offset' the next item
            could support without exceeding limits.
         */
-        float maybeOffsetForNext = sizeCfg.offset;
+        float maybeOffsetForNext = pinchCfg.offsetY;
         if (i + 1 < childrenCount)
         {
             auto& childN = children[i + 1]->getPayload()->node_;
@@ -487,26 +490,27 @@ void HkConstraintContext::resolveVerticalPinch(HkTreeStruct& children)
 
             const auto minValN = (sizeNCfg.min) / (float)pScaleY;
             const auto maxValN = (sizeNCfg.max) / (float)pScaleY;
-            if (sizeNCfg.value - sizeCfg.offset <= minValN)
+            if (sizeNCfg.value - pinchCfg.offsetY <= minValN)
             {
-                maybeOffsetForNext = sizeCfg.offset - (minValN - (sizeNCfg.value - sizeCfg.offset));
+                maybeOffsetForNext = pinchCfg.offsetY - (minValN - (sizeNCfg.value - pinchCfg.offsetY));
             }
         }
 
         /* Items will change according to the minimum distance we can travel without breaking limits*/
-        sizeCfg.offset = std::min(sizeCfg.offset, maybeOffsetForNext);
+        pinchCfg.offsetY = std::min(pinchCfg.offsetY, maybeOffsetForNext);
 
         /* Apply new offset and value*/
-        sizeCfg.value += sizeCfg.offset;
+        sizeCfg.value += pinchCfg.offsetY;
         if (i + 1 < childrenCount)
         {
             auto& childN = children[i + 1]->getPayload()->node_;
             auto& childNSc = childN.styleContext;
             auto sizeNCfg = childNSc.getVSizeConfig();
-            sizeNCfg.value -= sizeCfg.offset;
+            sizeNCfg.value -= pinchCfg.offsetY;
             childNSc.setVSizeConfig(sizeNCfg);
         }
-        sizeCfg.offset = 0.0f;
+        pinchCfg.offsetY = 0.0f;
+        childSc.setPinchConfig(pinchCfg);
         childSc.setVSizeConfig(sizeCfg);
 
         /* Calculate position similat to grid layout*/
@@ -518,7 +522,7 @@ void HkConstraintContext::resolveVerticalPinch(HkTreeStruct& children)
         /* Scale elements according to their config. Subtract right margin to for the pinch zone*/
         const auto hSizeConfig = childSc.getVSizeConfig();
         ySize = childSc.getVSizeConfig().value * pScaleY;
-        ySize -= childSc.getBottomMargin();
+        ySize -= (i == childrenCount - 1) ? 0 : pinchCfg.grabSize;
 
         /*Ceil is needed so we don't get off by one pixel artifacts*/
         childTc.setScale({ thisTc_->getScale().x , ceil(ySize) });

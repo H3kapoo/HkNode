@@ -59,91 +59,72 @@ int main()
 
     // WF children
     ctr->getStyle().setColor({ 1.0f,0.0f,1.0f })
-        .setLayout(HkLayout::Horizontal)
-        .setVHSizeConfig(
-            { .type = HkSizeType::FitParent },
+        .setLayout(HkLayout::VPinch)
+        .setHSizeConfig(
             { .type = HkSizeType::PercParent, .value = 0.5f, .min = 300 })
-        .setPinchConfig({ .enable = true, .allowLeft = true, .allowRight = true, .allowTop = true, .allowBottom = true })
-        .setRightMargin(15);
+        .setPinchConfig({ .enable = true, .allowRight = true, .allowTop = true, .allowBottom = true });
 
     ctr4->getStyle().setColor({ 1.0f,0.0f,0.0f })
         .setLayout(HkLayout::VPinch)
-        .setVHSizeConfig(
-            { .type = HkSizeType::FitParent },
+        .setHSizeConfig(
             { .type = HkSizeType::PercParent, .value = 0.25f, .min = 300 })
-        .setPinchConfig({ .enable = true, .allowLeft = true, .allowRight = true, .allowTop = true, .allowBottom = true })
-        .setRightMargin(15);
+        .setPinchConfig({ .enable = true, .allowRight = true, .allowTop = true, .allowBottom = true });
 
     ctr5->getStyle().setColor({ 0.3f,0.5f,0.0f })
-        .setLayout(HkLayout::Vertical)
-        .setVHSizeConfig(
-            { .type = HkSizeType::FitParent },
+        .setLayout(HkLayout::VPinch)
+        .setHSizeConfig(
             { .type = HkSizeType::PercParent, .value = 0.25f, .min = 300 })
-        .setPinchConfig({ .enable = true, .allowLeft = true, .allowRight = true, .allowTop = true, .allowBottom = true });
+        .setPinchConfig({ .enable = true, .allowTop = true, .allowBottom = true });
 
     //ctr4 children
     ctr6->getStyle().setColor({ 0.0f,0.0f,1.0f })
         .setLayout(HkLayout::Horizontal)
-        .setVHSizeConfig(
-            { .type = HkSizeType::PercParent, .value = 0.75f },
-            { .type = HkSizeType::FitParent })
-        .setPinchConfig({ .enable = true, .allowLeft = true, .allowRight = true, .allowTop = true, .allowBottom = true })
-        .setBottomMargin(15);
+        .setVSizeConfig(
+            { .type = HkSizeType::PercParent, .value = 0.75f, .min = 300 })
+        .setPinchConfig({ .enable = true, .allowLeft = true, .allowRight = true, .allowBottom = true });
 
     ctr7->getStyle().setColor({ 0.3f,0.7f,0.0f })
         .setLayout(HkLayout::Horizontal)
         .setOverflowAllowedXY(true)
         .setRowWrapping(true)
-        .setVHSizeConfig(
-            { .type = HkSizeType::PercParent, .value = 0.25f },
-            { .type = HkSizeType::FitParent })
-        .setPinchConfig({ .enable = true, .allowLeft = true, .allowRight = true, .allowTop = true, .allowBottom = true });
+        .setVSizeConfig(
+            { .type = HkSizeType::PercParent, .value = 0.25f, .min = 300 })
+        .setPinchConfig({ .enable = true, .allowLeft = true, .allowRight = true });
     //
 
-// .setLayout(HkLayout::Vertical)
-// .setPinchConfig({ .allowLeft = true ,.allowBottom = true });
+    // ctr8->getStyle().setColor({ 0.5f,0.4f,1.0f })
+    //     .setVHSizeConfig(
+    //         { .type = HkSizeType::PercParent, .value = 0.5f },
+    //         { .type = HkSizeType::FitParent })
+    //     .setPinchConfig({ .enable = true, .allowLeft = true, .allowBottom = true })
+    //     .setBottomMargin(15);
 
-    ctr8->getStyle().setColor({ 0.5f,0.4f,1.0f })
-        .setVHSizeConfig(
-            { .type = HkSizeType::PercParent, .value = 0.5f },
-            { .type = HkSizeType::FitParent })
-        .setPinchConfig({ .enable = true, .allowLeft = true, .allowRight = true, .allowTop = true, .allowBottom = true })
-        .setBottomMargin(15);
+    // ctr9->getStyle().setColor({ 0.0f,0.4f,1.0f })
+    //     .setVHSizeConfig(
+    //         { .type = HkSizeType::PercParent, .value = 0.5f },
+    //         { .type = HkSizeType::FitParent })
+    //     .setPinchConfig({ .enable = true, .allowLeft = true });
 
-    ctr9->getStyle().setColor({ 0.0f,0.4f,1.0f })
-        .setVHSizeConfig(
-            { .type = HkSizeType::PercParent, .value = 0.5f },
-            { .type = HkSizeType::FitParent })
-        .setPinchConfig({ .enable = true, .allowLeft = true, .allowRight = true, .allowTop = true, .allowBottom = true });
 
+
+    ctr10->getStyle().setColor({ 0.0f,0.7f,1.0f })
+        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+        .setVSizeConfig(
+            { .type = HkSizeType::PercParent, .value = 0.5f, .min = 50 })
+        .setPinchConfig({ .enable = true, .allowLeft = true, .allowBottom = true });
+
+    ctr11->getStyle().setColor({ 0.4f,0.7f,0.0f })
+        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+        .setVSizeConfig(
+            { .type = HkSizeType::PercParent, .value = 0.25f, .min = 50 })
+        .setPinchConfig({ .enable = true, .allowLeft = true, .allowBottom = true });
+
+    ctr12->getStyle().setColor({ 0.0f,0.7f,1.0f })
+        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+        .setVSizeConfig(
+            { .type = HkSizeType::PercParent, .value = 0.25f, .min = 50 })
+        .setPinchConfig({ .enable = true, .allowLeft = true, .allowBottom = true });
     {
-        // // ctr9->getStyle().setColor({ 0.4f,0.7f,0.0f })
-        // //     .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-        // //     .setVHSizeConfig(
-        // //         { .type = HkSizeType::PercParent, .value = 1.0f },
-        // //         { .type = HkSizeType::Pinch, .value = 0.5f, .min = 0 })
-        // //     .setRightMargin(15);
-
-
-        // // ctr10->getStyle().setColor({ 0.0f,0.7f,1.0f })
-        // //     .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-        // //     .setVHSizeConfig(
-        // //         { .type = HkSizeType::PercParent, .value = 1.0f },
-        // //         { .type = HkSizeType::Pinch, .value = 0.5f, .min = 15 });
-
-        // // ctr11->getStyle().setColor({ 0.4f,0.7f,0.0f })
-        // //     .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-        // //     .setVHSizeConfig(
-        // //         { .type = HkSizeType::Pinch, .value = 0.5f, .min = 0 },
-        // //         { .type = HkSizeType::PercParent, .value = 1.0f })
-        // //     .setBottomMargin(15);
-
-
-        // // ctr12->getStyle().setColor({ 0.0f,0.7f,1.0f })
-        // //     .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-        // //     .setVHSizeConfig(
-        // //         { .type = HkSizeType::Pinch, .value = 0.5f, .min = 15 },
-        // //         { .type = HkSizeType::PercParent, .value = 1.0f });
 
         // ctr13->getStyle().setColor({ 0.1f,0.7f,0.0f })
         //     .setLayout(HkLayout::Vertical)
@@ -161,9 +142,8 @@ int main()
     }
     // windowFrame->pushChildren({ ctr, ctr4, ctr5, ctr6 });
     windowFrame->pushChildren({ ctr, ctr4, ctr5 });
-    // ctr->pushChildren({ ctr5, ctr6 });
-    // ctr5->pushChildren({ ctr7 });
-    ctr4->pushChildren({ ctr6, ctr7 });
+    // ctr->pushChildren({ ctr10, ctr11, ctr12 });
+    // ctr4->pushChildren({ ctr6, ctr7 });
     // ctr5->pushChildren({ ctr8, ctr9 });
 
     // // ctr7->pushChildren({ ctr11,ctr12 });
