@@ -331,7 +331,7 @@ void HkPinchHelper::onBarRender(HkWindowData& windowData, const glm::ivec2 bound
 
     pincher_.renderContext.windowProjMatrix = windowData.sceneProjMatrix;
 
-    if (lockedInXR_ && allowXR_)
+    if (alwaysOn_ || (lockedInXR_ && allowXR_))
     {
         glScissor(
             boundPos.x,
@@ -354,7 +354,7 @@ void HkPinchHelper::onBarRender(HkWindowData& windowData, const glm::ivec2 bound
             pincher_.transformContext.getModelMatrix());
     }
 
-    if (lockedInXL_ && allowXL_)
+    if (alwaysOn_ || (lockedInXL_ && allowXL_))
     {
         glScissor(
             boundPos.x - grabSize_,
@@ -377,7 +377,7 @@ void HkPinchHelper::onBarRender(HkWindowData& windowData, const glm::ivec2 bound
             pincher_.transformContext.getModelMatrix());
     }
 
-    if (lockedInYT_ && allowYT_)
+    if (alwaysOn_ || (lockedInYT_ && allowYT_))
     {
         glScissor(
             boundPos.x,
@@ -400,7 +400,7 @@ void HkPinchHelper::onBarRender(HkWindowData& windowData, const glm::ivec2 bound
             pincher_.transformContext.getModelMatrix());
     }
 
-    if (lockedInYB_ && allowYB_)
+    if (alwaysOn_ || (lockedInYB_ && allowYB_))
     {
         glScissor(
             boundPos.x,
@@ -539,6 +539,7 @@ void HkPinchHelper::setGrabConfig(const HkPinchConfig& config)
     allowXR_ = config.allowRight;
     allowYT_ = config.allowTop;
     allowYB_ = config.allowBottom;
+    alwaysOn_ = config.alwaysOn;
     enabled_ = config.enable;
 }
 

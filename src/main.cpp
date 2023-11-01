@@ -62,26 +62,26 @@ int main()
         .setLayout(HkLayout::VPinch)
         .setHSizeConfig(
             { .type = HkSizeType::PercParent, .value = 0.5f, .min = 300 })
-        .setPinchConfig({ .enable = true, .allowRight = true, .allowTop = true, .allowBottom = true });
+        .setPinchConfig({ .enable = true, .alwaysOn = true, .allowRight = true, .allowTop = true, .allowBottom = true });
 
     ctr4->getStyle().setColor({ 1.0f,0.0f,0.0f })
         .setLayout(HkLayout::VPinch)
         .setHSizeConfig(
             { .type = HkSizeType::PercParent, .value = 0.25f, .min = 300 })
-        .setPinchConfig({ .enable = true, .allowRight = true, .allowTop = true, .allowBottom = true });
+        .setPinchConfig({ .enable = true,.alwaysOn = true, .allowRight = true, .allowTop = true, .allowBottom = true });
 
     ctr5->getStyle().setColor({ 0.3f,0.5f,0.0f })
         .setLayout(HkLayout::VPinch)
         .setHSizeConfig(
             { .type = HkSizeType::PercParent, .value = 0.25f, .min = 300 })
-        .setPinchConfig({ .enable = true, .allowTop = true, .allowBottom = true });
+        .setPinchConfig({ .enable = true, .alwaysOn = true,.allowTop = true, .allowBottom = true });
 
     //ctr4 children
     ctr6->getStyle().setColor({ 0.0f,0.0f,1.0f })
         .setLayout(HkLayout::Horizontal)
         .setVSizeConfig(
             { .type = HkSizeType::PercParent, .value = 0.75f, .min = 300 })
-        .setPinchConfig({ .enable = true, .allowLeft = true, .allowRight = true, .allowBottom = true });
+        .setPinchConfig({ .enable = true,.alwaysOn = true, .allowLeft = true, .allowRight = true, .allowBottom = true });
 
     ctr7->getStyle().setColor({ 0.3f,0.7f,0.0f })
         .setLayout(HkLayout::Horizontal)
@@ -89,7 +89,7 @@ int main()
         .setRowWrapping(true)
         .setVSizeConfig(
             { .type = HkSizeType::PercParent, .value = 0.25f, .min = 300 })
-        .setPinchConfig({ .enable = true, .allowLeft = true, .allowRight = true });
+        .setPinchConfig({ .enable = true,.alwaysOn = true, .allowLeft = true, .allowRight = true });
     //
 
     // ctr8->getStyle().setColor({ 0.5f,0.4f,1.0f })
@@ -111,19 +111,19 @@ int main()
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         .setVSizeConfig(
             { .type = HkSizeType::PercParent, .value = 0.5f, .min = 50 })
-        .setPinchConfig({ .enable = true, .allowLeft = true, .allowBottom = true });
+        .setPinchConfig({ .enable = true,.alwaysOn = true, .allowLeft = true, .allowBottom = true });
 
     ctr11->getStyle().setColor({ 0.4f,0.7f,0.0f })
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         .setVSizeConfig(
             { .type = HkSizeType::PercParent, .value = 0.25f, .min = 50 })
-        .setPinchConfig({ .enable = true, .allowLeft = true, .allowBottom = true });
+        .setPinchConfig({ .enable = true, .alwaysOn = true,.allowLeft = true, .allowBottom = true });
 
     ctr12->getStyle().setColor({ 0.0f,0.7f,1.0f })
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         .setVSizeConfig(
             { .type = HkSizeType::PercParent, .value = 0.25f, .min = 50 })
-        .setPinchConfig({ .enable = true, .allowLeft = true, .allowBottom = true });
+        .setPinchConfig({ .enable = true, .alwaysOn = true,.allowLeft = true, .allowBottom = true });
     {
 
         // ctr13->getStyle().setColor({ 0.1f,0.7f,0.0f })
@@ -142,8 +142,8 @@ int main()
     }
     // windowFrame->pushChildren({ ctr, ctr4, ctr5, ctr6 });
     windowFrame->pushChildren({ ctr, ctr4, ctr5 });
-    // ctr->pushChildren({ ctr10, ctr11, ctr12 });
-    // ctr4->pushChildren({ ctr6, ctr7 });
+    ctr->pushChildren({ ctr10, ctr11, ctr12 });
+    ctr4->pushChildren({ ctr6, ctr7 });
     // ctr5->pushChildren({ ctr8, ctr9 });
 
     // // ctr7->pushChildren({ ctr11,ctr12 });

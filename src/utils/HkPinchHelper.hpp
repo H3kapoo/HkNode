@@ -56,10 +56,7 @@ private:
     bool lockedInYB_{ false };
     bool allowXL_{ false }, allowXR_{ false };
     bool allowYB_{ false }, allowYT_{ false };
-
-    bool freezeXL_{ false }, freezeXR_{ false };
-    bool freezeYB_{ false }, freezeYT_{ false };
-
+    bool alwaysOn_{ false };
     bool enabled_{ false };
     int32_t grabSize_{ 15 };
     HkNodeData pincher_;
