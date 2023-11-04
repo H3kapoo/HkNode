@@ -6,6 +6,7 @@
 #include "elements/HkWindowFrame.hpp"
 #include "elements/HkContainer.hpp"
 #include "elements/HkButton.hpp"
+#include "elements/HkLabel.hpp"
 
 using namespace hkui;
 
@@ -35,11 +36,11 @@ int main()
     sceneWindow1->addSubWindow(windowFrame); //NOTE: Needs to be added before adding any children
 
     windowFrame->getStyle().setOverflowAllowedXY(false)
-        .setLayout(HkLayout::HPinch)
+        .setLayout(HkLayout::Horizontal)
         .setPinchConfig({ .enable = true })
         .setRowWrapping(false)
-        .setHAlignment(HkHAlignment::Left)
-        .setVAlignment(HkVAlignment::Top);
+        .setHAlignment(HkHAlignment::Center)
+        .setVAlignment(HkVAlignment::Center);
 
     windowFrame->setSize({ 1280 , 720 });
 
@@ -57,6 +58,8 @@ int main()
     HkContainerPtr ctr13 = std::make_shared<HkContainer>("MyContainer13");
     HkContainerPtr ctr14 = std::make_shared<HkContainer>("MyContainer14");
 
+    // label->setText("Pala gateste biban NO CAPS and this is a very bussy string NO CAPS mr.s white carbonara mmmmm....cuvinte GgGPBpbp");
+
     // WF children
     ctr->getStyle().setColor({ 1.0f,0.0f,1.0f })
         .setLayout(HkLayout::VPinch)
@@ -65,7 +68,8 @@ int main()
         .setPinchConfig({ .enable = true, .alwaysOn = true, .allowRight = true, .allowTop = true, .allowBottom = true });
 
     ctr4->getStyle().setColor({ 1.0f,0.0f,0.0f })
-        .setLayout(HkLayout::VPinch)
+        // .setLayout(HkLayout::VPinch)
+        .setLayout(HkLayout::Vertical)
         .setHSizeConfig(
             { .type = HkSizeType::PercParent, .value = 0.25f, .min = 300 })
         .setPinchConfig({ .enable = true,.alwaysOn = true, .allowRight = true, .allowTop = true, .allowBottom = true });
@@ -140,10 +144,21 @@ int main()
         //     windowFrame->pushChildren({ ctr6 });
         //     });
     }
+
+    HkLabelPtr label = std::make_shared<HkLabel>("Label1");
+    label->getStyle()
+        .setVHSizeConfig(
+            { .type = HkSizeType::Absolute, .value = 100 },
+            { .type = HkSizeType::Absolute, .value = 400 });
+
+    label->setText("Pala gateste biban NO CAPS NO CAPS CAPS CAPS CAPS");
+
     // windowFrame->pushChildren({ ctr, ctr4, ctr5, ctr6 });
-    windowFrame->pushChildren({ ctr, ctr4, ctr5 });
-    ctr->pushChildren({ ctr10, ctr11, ctr12 });
-    ctr4->pushChildren({ ctr6, ctr7 });
+    // windowFrame->pushChildren({ ctr, ctr4, ctr5 });
+    windowFrame->pushChildren({ label });
+    // ctr->pushChildren({ ctr10, ctr11, ctr12 });
+    // ctr4->pushChildren({ label });
+    // ctr4->pushChildren({ ctr6, ctr7 });
     // ctr5->pushChildren({ ctr8, ctr9 });
 
     // // ctr7->pushChildren({ ctr11,ctr12 });

@@ -11,6 +11,8 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -g") # debug mode
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../debug) 
 
+include_directories ("/usr/include/freetype2") # linux specific
+
 add_executable(hkNode
     main.cpp
 )
@@ -21,4 +23,4 @@ add_subdirectory(management)
 add_subdirectory(contexts)
 add_subdirectory(renderer)
 add_subdirectory(utils)
-target_link_libraries(${PROJECT_NAME} glfw GLEW GL X11 pthread Xrandr dl)
+target_link_libraries(${PROJECT_NAME} glfw GLEW GL X11 pthread Xrandr dl freetype)

@@ -11,7 +11,7 @@
 namespace hkui
 {
 
-class HkRenderContext
+class HkRenderContext //TODO: Rename to HkRenderConfig?
 {
 public:
     HkRenderContext() = default;

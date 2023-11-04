@@ -15,7 +15,8 @@ enum class HkNodeType
     ScrollBar,
     Knob,
     Button,
-    ImageView
+    ImageView,
+    Label
 };
 
 struct HkNodeInfo
@@ -38,7 +39,7 @@ class HkNodeBase
     friend class HkContainer;
     friend class HkButton;
     friend class HkScrollBar;
-    friend class HkImageView;
+    friend class HkLabel;
     friend class HkKnob;
 
     friend class HkConstraintContext;

@@ -40,10 +40,6 @@ private:
 
     uint32_t shaderId_;
     HkRenderStore* rsPtr;
-
-    /* Statics */
-    // static std::unordered_map<std::string, int32_t> shaderSourceToId_;
-    // static uint32_t currentlyActiveShaderId_;
 };
 
 } // hkui

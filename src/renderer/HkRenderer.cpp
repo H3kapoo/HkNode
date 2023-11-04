@@ -78,12 +78,16 @@ int32_t HkRenderer::addVertexArrayDataToCache(const HkVertexArrayType archType)
 /* Actually render the mesh */
 void HkRenderer::render(const HkRenderContext& renderConfig, const HkStyleContext& styleConfig, const glm::mat4& modelMat)
 {
+    // return;
     /* Set always mandatory to have uniforms */
     if (boundShaderId_ != renderConfig.shaderId)
     {
         shader_.bindId(renderConfig.shaderId);
         shader_.setMatrix4("proj", renderConfig.windowProjMatrix);
         shader_.setMatrix4("model", modelMat);
+
+        //TODO: WHy doesnt it work? caching what shader is bound
+        // boundShaderId_ = renderConfig.shaderId;
     }
 
     /* Setup whatever user defined uniforms need to be set */
@@ -114,6 +118,27 @@ void HkRenderer::render(const HkRenderContext& renderConfig, const HkStyleContex
 
     //TODO: Maybe unbinding is not really needed, just like with VAO
     // glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void HkRenderer::render(const HkTextRenderConfig& textRenderConfig, const glm::mat4& modelMat)
+{
+    if (boundShaderId_ != textRenderConfig.shaderId)
+    {
+        shader_.bindId(textRenderConfig.shaderId);
+        shader_.setMatrix4("proj", textRenderConfig.windowProjMatrix);
+        shader_.setMatrix4("model", modelMat);
+        shader_.setInt("text", GL_TEXTURE0);
+    }
+
+    if (boundVaoId_ != textRenderConfig.vaoId)
+    {
+        glBindVertexArray(textRenderConfig.vaoId);
+        boundVaoId_ = textRenderConfig.vaoId;
+    }
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, textRenderConfig.texId);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
 /* Setup buffers with the currently set architecture */

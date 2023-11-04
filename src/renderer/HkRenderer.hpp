@@ -7,12 +7,13 @@
 #include "../contexts/HkRenderContext.hpp"
 #include "HkShader.hpp"
 #include "HkTextureLoader.hpp"
+#include "HkTextRenderConfig.hpp"
 
 namespace hkui
 {
 enum class HkVertexArrayType
 {
-    QUAD,
+    QUAD
 };
 
 struct HkRenderArch
@@ -28,6 +29,7 @@ public:
     HkTextureInfo addTextureSourceToCache(const std::string& textureSource);
     int32_t addVertexArrayDataToCache(const HkVertexArrayType archType);
     void render(const HkRenderContext& renderConfig, const HkStyleContext& styleConfig, const glm::mat4& modelMat);
+    void render(const HkTextRenderConfig& textRenderConfig, const glm::mat4& modelMat);
 
 private:
     int32_t setupQuadArch();

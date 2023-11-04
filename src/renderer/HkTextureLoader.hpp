@@ -2,6 +2,7 @@
 
 #include <string>
 
+//TODO: Shall be moved to 'utils'
 namespace hkui
 {
 struct HkTextureInfo
