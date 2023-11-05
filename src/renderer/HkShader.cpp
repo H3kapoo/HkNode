@@ -53,6 +53,7 @@ void HkShader::bind() const
 void HkShader::bindId(const uint32_t id)
 {
     shaderId_ = id;
+    bind();
 }
 
 void HkShader::unbind() const { glUseProgram(0); }
@@ -117,12 +118,6 @@ int HkShader::compileShader(const std::string& sourcePath, int32_t shaderType)
     }
 
     return shaderPart;
-}
-
-//TODO: this is the same as bindId??
-void HkShader::setBackfedShaderId(uint32_t shaderId)
-{
-    shaderId_ = shaderId;
 }
 
 uint32_t HkShader::getShaderId() const

@@ -16,6 +16,7 @@
 namespace hkui
 {
 //TODO: Maybe cache 'getUniformLocation'
+//TODO: Maybe local currently bound shader?
 class HkShader
 {
 public:
@@ -28,7 +29,6 @@ public:
     void setInt(const char* location, int value);
     void setVec3f(const char* location, glm::vec3 value);
     void setMatrix4(const char* location, const glm::mat4 transform);
-    void setBackfedShaderId(uint32_t shaderId);
     void bindId(const uint32_t id);
 
     /* Getters */

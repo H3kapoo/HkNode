@@ -3,6 +3,7 @@
 #include <string>
 #include <memory>
 #include <map>
+#include <vector>
 #include <glm/glm.hpp>
 
 #include "../base/HkNodeBase.hpp"
@@ -28,6 +29,10 @@ private:
     HkShader shader_;
     HkFontLoader fontLoader_;
     HkTextRenderConfig cfg_;
+    HkTransformContext tc;
+    glm::mat4 tcs[400];
+    int32_t letterMap[400];
+    const int limit{ 400 };
 };
 
 using HkLabelPtr = std::shared_ptr<HkLabel>;

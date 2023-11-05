@@ -122,12 +122,14 @@ void HkRenderer::render(const HkRenderContext& renderConfig, const HkStyleContex
 
 void HkRenderer::render(const HkTextRenderConfig& textRenderConfig, const glm::mat4& modelMat)
 {
+    //TODO: As described in : https://www.youtube.com/watch?v=S0PyZKX4lyI
+    // we could use triangle strip and draw 4 verts only instead of 6
     if (boundShaderId_ != textRenderConfig.shaderId)
     {
         shader_.bindId(textRenderConfig.shaderId);
         shader_.setMatrix4("proj", textRenderConfig.windowProjMatrix);
-        shader_.setMatrix4("model", modelMat);
-        shader_.setInt("text", GL_TEXTURE0);
+        shader_.setInt("letterTextures", GL_TEXTURE0);
+        shader_.setVec3f("color", textRenderConfig.color);
     }
 
     if (boundVaoId_ != textRenderConfig.vaoId)
@@ -137,8 +139,8 @@ void HkRenderer::render(const HkTextRenderConfig& textRenderConfig, const glm::m
     }
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, textRenderConfig.texId);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, textRenderConfig.texId);
+    glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, textRenderConfig.amount);
 }
 
 /* Setup buffers with the currently set architecture */

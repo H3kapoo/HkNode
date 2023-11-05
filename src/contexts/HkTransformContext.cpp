@@ -178,10 +178,10 @@ void HkTransformContext::computeModelMatrix()
 
     /* Fix for off-by-one pixel rendering error. This is caused because we do calculations with respect to
        top left corner of 1x1 square*/
-    modelMat[3][0] = ceil(modelMat[3][0]);
-    modelMat[3][1] = ceil(modelMat[3][1]);
-    if ((int)modelMat[0][0] % 2 == 1) { modelMat[3][0] += 1; }
-    if ((int)modelMat[1][1] % 2 == 1) { modelMat[3][1] += 1; }
+       // modelMat[3][0] = ceil(modelMat[3][0]);
+       // modelMat[3][1] = ceil(modelMat[3][1]);
+       // if ((int)modelMat[0][0] % 2 == 1) { modelMat[3][0] += 1; }
+       // if ((int)modelMat[1][1] % 2 == 1) { modelMat[3][1] += 1; }
 
     prevPos = pos;
     prevScale = scale;

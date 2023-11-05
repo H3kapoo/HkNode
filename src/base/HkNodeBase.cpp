@@ -12,12 +12,14 @@ HkNodeBase::HkNodeBase(const std::string& windowName, const HkNodeType& type)
 
 void HkNodeBase::renderMySelf()
 {
+    //TODO: THis takes a lot of time
+    // return;
     auto& tc = node_.transformContext;
 
     /* We only render the visible area of the UI element as calculated in the update pass*/
     if (treeStruct_.getType() != HkNodeType::RootWindowFrame)
     {
-        // glEnable(GL_SCISSOR_TEST);
+        glEnable(GL_SCISSOR_TEST);
         glScissor(
             tc.getVPos().x,
             windowDataPtr_->windowSize.y - tc.getVPos().y - tc.getVScale().y,
@@ -48,7 +50,7 @@ void HkNodeBase::renderMySelf()
     /* Use this to render additional non interactive things if needed */
     /* Note: rescissoring to original parent is needed unfortunatelly */
 
-    // glEnable(GL_SCISSOR_TEST);
+    glEnable(GL_SCISSOR_TEST);
     glScissor(
         tc.getVPos().x,
         windowDataPtr_->windowSize.y - tc.getVPos().y - tc.getVScale().y,
@@ -142,6 +144,7 @@ void HkNodeBase::updateMySelf(const bool isSubWindowMinimized)
     /* We don't need to update children's transform data in these events*/
     if (windowDataPtr_->currentEvent != HkEvent::FocusScan
         && windowDataPtr_->currentEvent != HkEvent::HoverScan
+        && windowDataPtr_->currentEvent != HkEvent::MouseMove
         && windowDataPtr_->currentEvent != HkEvent::DropPath)
         // && windowDataPtr_->currentEvent != HkEvent::None)
     {

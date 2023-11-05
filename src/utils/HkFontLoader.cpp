@@ -24,17 +24,26 @@ bool HkFontLoader::load(const std::string& fontPath, const HkTextConfig& config)
     }
 
     FT_Face ftFace;
-    if (FT_New_Face(ftLib, "assets/fonts/LiberationSerif-Regular.ttf", 0, &ftFace))
+    if (FT_New_Face(ftLib, fontPath.c_str(), 0, &ftFace))
     {
         std::cerr << "Failed to load font\n";
         return false;
     }
 
-    charMap_.clear();
+    // charMap_.clear();
 
-    FT_Set_Pixel_Sizes(ftFace, 0, 24);
+    // FT_Set_Pixel_Sizes(ftFace, 256, 256);
+    // FT_Set_Pixel_Sizes(ftFace, 32, 32);
+    FT_Set_Pixel_Sizes(ftFace, 16, 16);
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+    glGenTextures(1, &textureArrayId_);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, textureArrayId_);
+    // glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_R8, 256, 256, 128, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
+    // glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_R8, 32, 32, 128, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
+    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_R8, 16, 16, 128, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
 
     for (uint8_t i = 0; i < 128; i++)
     {
@@ -44,25 +53,22 @@ bool HkFontLoader::load(const std::string& fontPath, const HkTextConfig& config)
             continue;
         }
 
-        uint32_t textureId;
-        glGenTextures(1, &textureId);
-        glBindTexture(GL_TEXTURE_2D, textureId);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RED,
+        glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, int(i),
             ftFace->glyph->bitmap.width,
             ftFace->glyph->bitmap.rows,
-            0,
-            GL_RED,
-            GL_UNSIGNED_BYTE,
-            ftFace->glyph->bitmap.buffer);
+            1, GL_RED, GL_UNSIGNED_BYTE, ftFace->glyph->bitmap.buffer);
+
 
         // set texture options
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        // glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        // glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
         HkChar ch = {
-            .textureId = textureId,
+            .charIndex = i,
             .advance = ftFace->glyph->advance.x,
             .size = glm::ivec2(ftFace->glyph->bitmap.width, ftFace->glyph->bitmap.rows),
             .bearing = glm::ivec2(ftFace->glyph->bitmap_left, ftFace->glyph->bitmap_top)
@@ -70,6 +76,9 @@ bool HkFontLoader::load(const std::string& fontPath, const HkTextConfig& config)
 
         charMap_[i] = ch;
     }
+
+    // maybe unbind
+    glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
     FT_Done_Face(ftFace);
     FT_Done_FreeType(ftLib);
