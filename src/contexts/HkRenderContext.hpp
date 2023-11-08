@@ -6,7 +6,7 @@
 #include <memory>
 #include <vector>
 
-#include "../renderer/HkTextureLoader.hpp"
+#include "../utils/HkTextureLoader.hpp"
 
 namespace hkui
 {

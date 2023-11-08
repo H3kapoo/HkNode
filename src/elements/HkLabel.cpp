@@ -19,16 +19,9 @@ HkLabel::HkLabel(const std::string& name)
             HkFontLoader::HkTextRenderMethod::BITMAP,
             16
         });
-
     if (!success)
     {
-        std::cerr << "Font failed to load!\n";
-    }
-
-    for (auto i = 0; i < 400;i++)
-    {
-        tcs[i] = glm::mat4(1.0f);
-        letterMap[i] = 0;
+        std::cerr << "Font " << "'" << "assets/fonts/LiberationSerif-Regular.ttf" << "'" << "failed to load!\n";
     }
 }
 
@@ -48,92 +41,178 @@ void HkLabel::onFirstHeartbeat()
     cfg_.texId = fontLoader_.getTexId();
     cfg_.color = glm::vec3(0.0f);
     std::cout << text_.size() << "\n";
-    tc.setPos({ 100, 100 });
-    tc.setScale({ 20, 20 });
+}
+
+void HkLabel::nextWordData(const std::string& text, uint32_t index, uint32_t& advance, float& wordLen)
+{
+    const auto size = text.size();
+    while (index < size)
+    {
+        const HkFontLoader::HkChar& ch = fontLoader_.getChar(text[index + advance]);
+        wordLen += (ch.advance >> 6) * textScale_;
+        if (text[index + advance] == ' ' || index + advance == size - 1)
+        {
+            advance += 1;
+            break;
+        }
+        advance += 1;
+    }
+}
+
+void HkLabel::resolveDirtyText()
+{
+    if (!dirtyText_) return;
+
+    lines_.clear();
+
+    const auto end = node_.transformContext.getPos() + node_.transformContext.getScale();
+
+    // const float maxRowLen = maxRowLen_;
+    const float maxRowLen = end.x;
+    float currentRowLen = 0;
+    float maxRowLenSoFar = 0;
+
+    uint32_t currentRowWords = 0;
+    uint32_t startLineIdx = 0;
+    uint32_t lastAddedEndIndex = 0;
+    uint32_t i = 0;
+
+    float wl = 0;
+    while (i < text_.size())
+    {
+        float wordLen = 0.0f;
+        uint32_t advance = 1;
+
+        // nextWordData(text_, i, advance, wordLen);
+        const HkFontLoader::HkChar& ch = fontLoader_.getChar(text_[i]);
+        wordLen = (ch.advance >> 6) * textScale_;
+
+        float nextLen = currentRowLen + wordLen;
+        if (nextLen > maxRowLen)
+        {
+            // printf("%f\n", maxRowLen);s
+
+            lines_.emplace_back(startLineIdx, i, currentRowLen, currentRowWords);
+            currentRowLen = wordLen;
+            startLineIdx = i;
+            lastAddedEndIndex = i;
+        }
+        else
+        {
+            currentRowLen = nextLen;
+        }
+
+        if (currentRowLen > maxRowLenSoFar)
+            maxRowLenSoFar = currentRowLen;
+        i += advance;
+        // i += 1;
+
+    }
+
+    /* Add the last possible line in case it didn't make it to be bigger than 'maxRowLen' */
+    if (lastAddedEndIndex != text_.size())
+    {
+        lines_.emplace_back(lastAddedEndIndex, (uint32_t)text_.size(), currentRowLen, currentRowWords);
+    }
+
+    /* Add whole string as line, it means it never got bigger than 'maxRowLen' */
+    if (lines_.empty())
+    {
+        lines_.emplace_back(startLineIdx, (uint32_t)text_.size(), maxRowLenSoFar, currentRowWords);
+    }
+
+    maxLen_ = maxRowLenSoFar;
+    printf("rowCount = %ld ;maxRowLenSoFar = %f\n", lines_.size(), maxRowLenSoFar);
+    for (uint32_t i = 0; i < lines_.size(); i++)
+    {
+        printf("startIdx = %d ; endIdx = %d ; length = %f; words = %d\n",
+            lines_[i].startIdx, lines_[i].endIdx, lines_[i].length, lines_[i].wordCount);
+    }
+    dirtyText_ = false;
 }
 
 void HkLabel::postRenderAdditionalDetails()
 {
-    //TODO: Restrict rendering zone to just locations that can be visibly seen by user
-    // vPos+vScale
+    resolveDirtyText();
     // Use instancing and methods described in: https://www.youtube.com/watch?v=S0PyZKX4lyI
     cfg_.windowProjMatrix = windowDataPtr_->sceneProjMatrix;
-    // cfg_.amount = 1;
+    shader_.bindId(programId_);
 
-    float factor = 16.0f;
-    float scale = 1.0f; // 16.0f / 256.0f;
-
-    float x = node_.transformContext.getPos().x;
-    float y = node_.transformContext.getPos().y + factor * scale;
-
+    float factor = config_.fontSize;
     const auto end = node_.transformContext.getPos() + node_.transformContext.getScale();
+
+    textPos_.x = 0;//end.x * 0.5f - 1920 / 2;// - maxLen_ * 0.5f;// - totalLen * 0.5f;
+    textPos_.y = 0;//end.y * 0.5f;// - lines_.size() * 0.5f * config_.fontSize;
+
     int32_t workingIndex = 0;
-    for (uint32_t i = 0; i < text_.size(); i++)
+    for (uint32_t line = 0; line < lines_.size(); line++)
     {
-        const HkFontLoader::HkChar ch = fontLoader_.getChar(text_[i]);
+        float x = textPos_.x + node_.transformContext.getPos().x;// - maxLen_ * 0.5f + lines_[line].length * 0.5f;
+        float y = textPos_.y + node_.transformContext.getPos().y + factor * textScale_ + line * config_.fontSize;
 
-        if (text_[i] == ' ')
+        for (uint32_t i = lines_[line].startIdx; i < lines_[line].endIdx; i++)
         {
-            x += (ch.advance >> 6) * scale;
-            continue;
-        }
+            const HkFontLoader::HkChar& ch = fontLoader_.getChar(text_[i]);
 
-        float xpos = x + ch.bearing.x * scale;
-        float ypos = y - ch.bearing.y * scale;
+            if (text_[i] == ' ')
+            {
+                x += (ch.advance >> 6) * textScale_;
+                continue;
+            }
 
-        float w = factor * scale;
-        float h = factor * scale;
+            float xpos = x + ch.bearing.x * textScale_;
+            float ypos = y - ch.bearing.y * textScale_;
+            float w = factor * textScale_;
+            float h = factor * textScale_;
 
-        if (xpos + w * 0.5f >= end.x)
-        {
-            x = node_.transformContext.getPos().x;
-            y += factor * scale;
-            xpos = x + ch.bearing.x * scale;
-            ypos = y - ch.bearing.y * scale;
-        }
+            glm::mat4 modelMat = glm::mat4(1.0f);
+            modelMat = glm::translate(modelMat, glm::vec3(xpos + w * 0.5f, ypos + h * 0.5f, -1.0f)); // it goes negative, expected
+            modelMat = glm::scale(modelMat, glm::vec3(w, h, 1.0f));
 
-        //TODO: Maybe this simplification could be used inside TC class also?
-        glm::mat4 modelMat = glm::mat4(1.0f);
-        modelMat = glm::translate(modelMat, glm::vec3(xpos + w * 0.5f, ypos + h * 0.5f, -1.0f)); // it goes negative, expected
-        modelMat = glm::scale(modelMat, glm::vec3(w, h, 1.0f));
+            tcs[workingIndex] = modelMat;
+            letterMap[workingIndex] = ch.charIndex;
 
-        tcs[workingIndex] = modelMat;
-        letterMap[workingIndex] = ch.charIndex;
+            x += (ch.advance >> 6) * textScale_;
 
-        x += (ch.advance >> 6) * scale;
-        workingIndex++;
-
-        if (workingIndex == limit - 1)
-        {
-            cfg_.amount = workingIndex;
-            shader_.bindId(programId_);
-
-            int transformLoc = glGetUniformLocation(programId_, "model");
-            int indexLoc = glGetUniformLocation(programId_, "letter");
-
-            glUniformMatrix4fv(transformLoc, cfg_.amount, GL_FALSE, &tcs[0][0][0]);
-            glUniform1iv(indexLoc, cfg_.amount, &letterMap[0]);
-            windowDataPtr_->renderer.render(cfg_, tc.getModelMatrix());
-            workingIndex = 0;
+            workingIndex++;
+            if (workingIndex == limit - 1)
+            {
+                renderBatch(workingIndex);
+                workingIndex = 0;
+            }
         }
     }
+    renderBatch(workingIndex);
+}
 
+void HkLabel::renderBatch(const int32_t workingIndex)
+{
     if (workingIndex > 0)
     {
         cfg_.amount = workingIndex;
-        shader_.bindId(programId_);
 
         int transformLoc = glGetUniformLocation(programId_, "model");
         int indexLoc = glGetUniformLocation(programId_, "letter");
 
         glUniformMatrix4fv(transformLoc, cfg_.amount, GL_FALSE, &tcs[0][0][0]);
         glUniform1iv(indexLoc, cfg_.amount, &letterMap[0]);
-        windowDataPtr_->renderer.render(cfg_, tc.getModelMatrix());
+        windowDataPtr_->renderer.render(cfg_);
+    }
+}
+
+void HkLabel::setConfig(const std::string& fontPath, const HkFontLoader::HkTextConfig& config)
+{
+    config_ = config;
+
+    if (!fontLoader_.load(fontPath, config_))
+    {
+        std::cerr << "Font " << "'" << fontPath << "'" << "failed to load!\n";
     }
 }
 
 void HkLabel::setText(const std::string& text)
 {
     text_ = text;
+    dirtyText_ = true;
 }
 } // hkui

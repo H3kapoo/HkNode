@@ -120,7 +120,7 @@ void HkRenderer::render(const HkRenderContext& renderConfig, const HkStyleContex
     // glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void HkRenderer::render(const HkTextRenderConfig& textRenderConfig, const glm::mat4& modelMat)
+void HkRenderer::render(const HkTextRenderConfig& textRenderConfig)
 {
     //TODO: As described in : https://www.youtube.com/watch?v=S0PyZKX4lyI
     // we could use triangle strip and draw 4 verts only instead of 6

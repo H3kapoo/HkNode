@@ -6,7 +6,7 @@
 #include "../contexts/HkStyleContext.hpp"
 #include "../contexts/HkRenderContext.hpp"
 #include "HkShader.hpp"
-#include "HkTextureLoader.hpp"
+#include "../utils/HkTextureLoader.hpp"
 #include "HkTextRenderConfig.hpp"
 
 namespace hkui
@@ -29,7 +29,7 @@ public:
     HkTextureInfo addTextureSourceToCache(const std::string& textureSource);
     int32_t addVertexArrayDataToCache(const HkVertexArrayType archType);
     void render(const HkRenderContext& renderConfig, const HkStyleContext& styleConfig, const glm::mat4& modelMat);
-    void render(const HkTextRenderConfig& textRenderConfig, const glm::mat4& modelMat);
+    void render(const HkTextRenderConfig& textRenderConfig);
 
 private:
     int32_t setupQuadArch();
