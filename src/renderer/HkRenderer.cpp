@@ -60,6 +60,30 @@ HkTextureInfo HkRenderer::addTextureSourceToCache(const std::string& textureSour
     return storedTexInfo;
 }
 
+HkFontLoader* HkRenderer::addFontLoaderSourceToCache(const std::string& fontSource, HkFontLoader::HkTextConfig config)
+{
+    //Lazy key for now
+    std::string key{ fontSource + std::to_string((uint32_t)config.renderMethod) + std::to_string(config.fontSize) };
+    HkFontLoader storedFontLoader = pathToFontLoaderMap_[key];
+    if (storedFontLoader.getTexId() == 0)
+    {
+        const bool result = storedFontLoader.load(fontSource, config);
+        if (result)
+        {
+            pathToFontLoaderMap_[key] = storedFontLoader;
+            std::cout << "Generated font loader for: " << fontSource << " with fontSize: " << config.fontSize << "\n";
+            return &pathToFontLoaderMap_[key];
+        }
+        else
+        {
+            std::cout << "Failed to generate loader for: " << fontSource << "\n";
+        }
+    }
+    std::cout << "returned font with size existing: " << config.fontSize << "\n";
+
+    return &pathToFontLoaderMap_[key];
+}
+
 /* Same thing but for vaos */
 int32_t HkRenderer::addVertexArrayDataToCache(const HkVertexArrayType archType)
 {

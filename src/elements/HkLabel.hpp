@@ -33,8 +33,10 @@ private:
     std::string text_;
     uint32_t vaoId_, vboId_, programId_;
     HkShader shader_;
-    HkFontLoader fontLoader_;
+    // HkFontLoader fontLoader_;
     HkTextRenderConfig cfg_;
+    HkFontLoader* fontLoader_;
+
 
     //TODO: shall be moved out in renderStore or something
     glm::mat4 tcs[400];
@@ -54,8 +56,10 @@ private:
 
     std::vector<HkTextLine> lines_;
     bool dirtyText_{ false };
+    bool dirtyConfig_{ false };
+    std::string fontPath_{ "assets/fonts/LiberationSerif-Regular.ttf" };
+
     float textScale_{ 1.0f };
-    float maxLen_{ 0.0f };
     float maxRowLen_{ 1920.0f };
     uint32_t maxRowWords_{ 10 };
 };

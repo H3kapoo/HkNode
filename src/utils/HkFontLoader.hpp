@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 #include <glm/glm.hpp>
 #include <map>
@@ -9,7 +11,7 @@ class HkFontLoader
 public:
     enum class HkTextRenderMethod
     {
-        BITMAP,
+        BITMAP = 0,
         SDF
     };
 
@@ -17,6 +19,8 @@ public:
     {
         HkTextRenderMethod renderMethod{ 0 };
         uint32_t fontSize{ 16 };
+
+        bool operator==(const HkTextConfig& other) const = default;
     };
 
     struct HkChar

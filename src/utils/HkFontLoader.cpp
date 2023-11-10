@@ -8,6 +8,7 @@
 
 namespace hkui
 {
+
 bool HkFontLoader::load(const std::string& fontPath, const HkTextConfig& config)
 {
     if (config.renderMethod == HkTextRenderMethod::SDF)
@@ -43,13 +44,15 @@ bool HkFontLoader::load(const std::string& fontPath, const HkTextConfig& config)
         128, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
     // glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_R8, 32, 32,
     //     128, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
+    // glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_R8, 60, 60,
+    //     128, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
     // set texture options
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    // glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    // glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    // glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     for (int32_t i = 0; i < 128; i++)
     {
         if (FT_Load_Char(ftFace, i, FT_LOAD_RENDER))

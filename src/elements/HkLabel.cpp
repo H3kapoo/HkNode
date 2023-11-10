@@ -11,18 +11,6 @@ HkLabel::HkLabel(const std::string& name)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     node_.styleContext.setColor(glm::vec3(226 / 255.0f, 183 / 255.0f, 17 / 255.0f));
-
-    //TODO: This shall be delegated to renderStore so we dont load it each time if
-    // already loaded before
-    const bool success = fontLoader_.load("assets/fonts/LiberationSerif-Regular.ttf",
-        HkFontLoader::HkTextConfig{
-            HkFontLoader::HkTextRenderMethod::BITMAP,
-            16
-        });
-    if (!success)
-    {
-        std::cerr << "Font " << "'" << "assets/fonts/LiberationSerif-Regular.ttf" << "'" << "failed to load!\n";
-    }
 }
 
 void HkLabel::onFirstHeartbeat()
@@ -35,12 +23,12 @@ void HkLabel::onFirstHeartbeat()
 
     programId_ = shader_.loadShaderFromSource(DEFAULT_VS, DEFAULT_FS);
     vaoId_ = windowDataPtr_->renderer.addVertexArrayDataToCache(DEFAULT_TYPE);
+    fontLoader_ = windowDataPtr_->renderer.addFontLoaderSourceToCache(fontPath_, config_);
 
     cfg_.shaderId = programId_;
     cfg_.vaoId = vaoId_;
-    cfg_.texId = fontLoader_.getTexId();
+    cfg_.texId = fontLoader_->getTexId();
     cfg_.color = glm::vec3(0.0f);
-    std::cout << text_.size() << "\n";
 }
 
 void HkLabel::nextWordData(const std::string& text, uint32_t index, uint32_t& advance, float& wordLen)
@@ -48,7 +36,7 @@ void HkLabel::nextWordData(const std::string& text, uint32_t index, uint32_t& ad
     const auto size = text.size();
     while (index < size)
     {
-        const HkFontLoader::HkChar& ch = fontLoader_.getChar(text[index + advance]);
+        const HkFontLoader::HkChar& ch = fontLoader_->getChar(text[index + advance]);
         wordLen += (ch.advance >> 6) * textScale_;
         if (text[index + advance] == ' ' || index + advance == size - 1)
         {
@@ -61,7 +49,7 @@ void HkLabel::nextWordData(const std::string& text, uint32_t index, uint32_t& ad
 
 void HkLabel::resolveDirtyText()
 {
-    if (!dirtyText_) return;
+    // if (!dirtyText_) return;
 
     lines_.clear();
 
@@ -76,22 +64,19 @@ void HkLabel::resolveDirtyText()
     uint32_t startLineIdx = 0;
     uint32_t lastAddedEndIndex = 0;
     uint32_t i = 0;
-
-    float wl = 0;
     while (i < text_.size())
     {
         float wordLen = 0.0f;
-        uint32_t advance = 1;
+        uint32_t advance = 0;
+        // uint32_t advance = 1;
 
-        // nextWordData(text_, i, advance, wordLen);
-        const HkFontLoader::HkChar& ch = fontLoader_.getChar(text_[i]);
-        wordLen = (ch.advance >> 6) * textScale_;
+        nextWordData(text_, i, advance, wordLen);
+        // const HkFontLoader::HkChar& ch = fontLoader_.getChar(text_[i]);
+        // wordLen = (ch.advance >> 6) * textScale_;
 
         float nextLen = currentRowLen + wordLen;
         if (nextLen > maxRowLen)
         {
-            // printf("%f\n", maxRowLen);s
-
             lines_.emplace_back(startLineIdx, i, currentRowLen, currentRowWords);
             currentRowLen = wordLen;
             startLineIdx = i;
@@ -121,18 +106,24 @@ void HkLabel::resolveDirtyText()
         lines_.emplace_back(startLineIdx, (uint32_t)text_.size(), maxRowLenSoFar, currentRowWords);
     }
 
-    maxLen_ = maxRowLenSoFar;
-    printf("rowCount = %ld ;maxRowLenSoFar = %f\n", lines_.size(), maxRowLenSoFar);
-    for (uint32_t i = 0; i < lines_.size(); i++)
-    {
-        printf("startIdx = %d ; endIdx = %d ; length = %f; words = %d\n",
-            lines_[i].startIdx, lines_[i].endIdx, lines_[i].length, lines_[i].wordCount);
-    }
+    // printf("rowCount = %ld ;maxRowLenSoFar = %f\n", lines_.size(), maxRowLenSoFar);
+    // for (uint32_t i = 0; i < lines_.size(); i++)
+    // {
+    //     printf("startIdx = %d ; endIdx = %d ; length = %f; words = %d\n",
+    //         lines_[i].startIdx, lines_[i].endIdx, lines_[i].length, lines_[i].wordCount);
+    // }
     dirtyText_ = false;
 }
 
 void HkLabel::postRenderAdditionalDetails()
 {
+    if (dirtyConfig_)
+    {
+        fontLoader_ = windowDataPtr_->renderer.addFontLoaderSourceToCache(fontPath_, config_);
+        cfg_.texId = fontLoader_->getTexId();
+        dirtyConfig_ = false;
+    }
+
     resolveDirtyText();
     // Use instancing and methods described in: https://www.youtube.com/watch?v=S0PyZKX4lyI
     cfg_.windowProjMatrix = windowDataPtr_->sceneProjMatrix;
@@ -141,19 +132,18 @@ void HkLabel::postRenderAdditionalDetails()
     float factor = config_.fontSize;
     const auto end = node_.transformContext.getPos() + node_.transformContext.getScale();
 
-    textPos_.x = 0;//end.x * 0.5f - 1920 / 2;// - maxLen_ * 0.5f;// - totalLen * 0.5f;
-    textPos_.y = 0;//end.y * 0.5f;// - lines_.size() * 0.5f * config_.fontSize;
+    textPos_.x = 0;
+    textPos_.y = 0;
 
     int32_t workingIndex = 0;
     for (uint32_t line = 0; line < lines_.size(); line++)
     {
-        float x = textPos_.x + node_.transformContext.getPos().x;// - maxLen_ * 0.5f + lines_[line].length * 0.5f;
-        float y = textPos_.y + node_.transformContext.getPos().y + factor * textScale_ + line * config_.fontSize;
+        float x = textPos_.x + node_.transformContext.getPos().x;// + (end.x - lines_[line].length) * 0.5f;
+        float y = textPos_.y + node_.transformContext.getPos().y + factor * textScale_ + line * factor;
 
         for (uint32_t i = lines_[line].startIdx; i < lines_[line].endIdx; i++)
         {
-            const HkFontLoader::HkChar& ch = fontLoader_.getChar(text_[i]);
-
+            const HkFontLoader::HkChar& ch = fontLoader_->getChar(text_[i]);
             if (text_[i] == ' ')
             {
                 x += (ch.advance >> 6) * textScale_;
@@ -203,11 +193,8 @@ void HkLabel::renderBatch(const int32_t workingIndex)
 void HkLabel::setConfig(const std::string& fontPath, const HkFontLoader::HkTextConfig& config)
 {
     config_ = config;
-
-    if (!fontLoader_.load(fontPath, config_))
-    {
-        std::cerr << "Font " << "'" << fontPath << "'" << "failed to load!\n";
-    }
+    fontPath_ = fontPath;
+    dirtyConfig_ = true;
 }
 
 void HkLabel::setText(const std::string& text)

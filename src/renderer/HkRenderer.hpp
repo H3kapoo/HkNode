@@ -5,8 +5,9 @@
 
 #include "../contexts/HkStyleContext.hpp"
 #include "../contexts/HkRenderContext.hpp"
-#include "HkShader.hpp"
 #include "../utils/HkTextureLoader.hpp"
+#include "../utils/HkFontLoader.hpp"
+#include "HkShader.hpp"
 #include "HkTextRenderConfig.hpp"
 
 namespace hkui
@@ -28,6 +29,8 @@ public:
     int32_t addShaderSourceToCache(const std::string& vertSource, const std::string& fragSource);
     HkTextureInfo addTextureSourceToCache(const std::string& textureSource);
     int32_t addVertexArrayDataToCache(const HkVertexArrayType archType);
+    HkFontLoader* addFontLoaderSourceToCache(const std::string& fontSource, HkFontLoader::HkTextConfig config);
+
     void render(const HkRenderContext& renderConfig, const HkStyleContext& styleConfig, const glm::mat4& modelMat);
     void render(const HkTextRenderConfig& textRenderConfig);
 
@@ -37,6 +40,7 @@ private:
     std::unordered_map<std::string, uint32_t> pathToShaderIdMap_;
     std::unordered_map<std::string, HkTextureInfo> pathToTextureInfoMap_;
     std::unordered_map<HkVertexArrayType, uint32_t> archNameToVaoIdMap_;
+    std::unordered_map<std::string, HkFontLoader> pathToFontLoaderMap_;
     uint32_t boundVaoId_{ 0 };
     uint32_t boundShaderId_{ 0 };
 
