@@ -25,6 +25,7 @@ struct HkRenderArch
 
 class HkRenderer
 {
+
 public:
     int32_t addShaderSourceToCache(const std::string& vertSource, const std::string& fragSource);
     HkTextureInfo addTextureSourceToCache(const std::string& textureSource);
@@ -32,9 +33,13 @@ public:
     HkFontLoader* addFontLoaderSourceToCache(const std::string& fontSource, HkFontLoader::HkTextConfig config);
 
     void render(const HkRenderContext& renderConfig, const HkStyleContext& styleConfig, const glm::mat4& modelMat);
-    void render(const HkTextRenderConfig& textRenderConfig);
+
+    void beginTextBatch(const HkTextRenderGLConfig& config);
+    void endTextBatch();
+    void addToTextBatch(const int32_t letterId, const glm::mat4& modelMat);
 
 private:
+    void renderTextBatch();
     int32_t setupQuadArch();
 
     std::unordered_map<std::string, uint32_t> pathToShaderIdMap_;
@@ -43,6 +48,10 @@ private:
     std::unordered_map<std::string, HkFontLoader> pathToFontLoaderMap_;
     uint32_t boundVaoId_{ 0 };
     uint32_t boundShaderId_{ 0 };
+
+    HkTextRenderData data_;
+    HkTextRenderGLConfig textConfig_;
+    int32_t currBatchAmount_{ 0 };
 
     HkShader shader_;
     static HkRenderArch renderArch_;

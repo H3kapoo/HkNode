@@ -25,7 +25,6 @@ private:
     void onFirstHeartbeat();
     void postRenderAdditionalDetails();
 
-    void renderBatch(const int32_t workingIndex);
     void resolveDirtyText();
 
     void nextWordData(const std::string& text, uint32_t index, uint32_t& advance, float& wordLen);
@@ -33,15 +32,8 @@ private:
     std::string text_;
     uint32_t vaoId_, vboId_, programId_;
     HkShader shader_;
-    // HkFontLoader fontLoader_;
-    HkTextRenderConfig cfg_;
+    HkTextRenderGLConfig cfg_;
     HkFontLoader* fontLoader_;
-
-
-    //TODO: shall be moved out in renderStore or something
-    glm::mat4 tcs[400];
-    int32_t letterMap[400];
-    const int limit{ 400 };
 
     glm::vec2 textPos_{ 0,0 };
 

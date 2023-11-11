@@ -28,7 +28,8 @@ void HkLabel::onFirstHeartbeat()
     cfg_.shaderId = programId_;
     cfg_.vaoId = vaoId_;
     cfg_.texId = fontLoader_->getTexId();
-    cfg_.color = glm::vec3(0.0f);
+    // cfg_.color = glm::vec3(0.0f);
+    std::cout << text_.size() << "\n";
 }
 
 void HkLabel::nextWordData(const std::string& text, uint32_t index, uint32_t& advance, float& wordLen)
@@ -127,6 +128,8 @@ void HkLabel::postRenderAdditionalDetails()
     resolveDirtyText();
     // Use instancing and methods described in: https://www.youtube.com/watch?v=S0PyZKX4lyI
     cfg_.windowProjMatrix = windowDataPtr_->sceneProjMatrix;
+    windowDataPtr_->renderer.beginTextBatch(cfg_);
+
     shader_.bindId(programId_);
 
     float factor = config_.fontSize;
@@ -159,35 +162,12 @@ void HkLabel::postRenderAdditionalDetails()
             modelMat = glm::translate(modelMat, glm::vec3(xpos + w * 0.5f, ypos + h * 0.5f, -1.0f)); // it goes negative, expected
             modelMat = glm::scale(modelMat, glm::vec3(w, h, 1.0f));
 
-            tcs[workingIndex] = modelMat;
-            letterMap[workingIndex] = ch.charIndex;
-
             x += (ch.advance >> 6) * textScale_;
-
-            workingIndex++;
-            if (workingIndex == limit - 1)
-            {
-                renderBatch(workingIndex);
-                workingIndex = 0;
-            }
+            windowDataPtr_->renderer.addToTextBatch(ch.charIndex, modelMat);
         }
     }
-    renderBatch(workingIndex);
-}
 
-void HkLabel::renderBatch(const int32_t workingIndex)
-{
-    if (workingIndex > 0)
-    {
-        cfg_.amount = workingIndex;
-
-        int transformLoc = glGetUniformLocation(programId_, "model");
-        int indexLoc = glGetUniformLocation(programId_, "letter");
-
-        glUniformMatrix4fv(transformLoc, cfg_.amount, GL_FALSE, &tcs[0][0][0]);
-        glUniform1iv(indexLoc, cfg_.amount, &letterMap[0]);
-        windowDataPtr_->renderer.render(cfg_);
-    }
+    windowDataPtr_->renderer.endTextBatch();
 }
 
 void HkLabel::setConfig(const std::string& fontPath, const HkFontLoader::HkTextConfig& config)

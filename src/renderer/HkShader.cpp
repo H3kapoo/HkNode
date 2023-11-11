@@ -21,6 +21,18 @@ void HkShader::setInt(const char* location, int value)
     glUniform1i(loc, value);
 }
 
+void HkShader::setIntVec(const char* location, uint32_t amount, int* values)
+{
+    bind();
+    int loc = glGetUniformLocation(shaderId_, location);
+    if (loc == -1)
+    {
+        std::cerr << "Uniform '" << location << "' has not been found in bound shader!" << std::endl;
+        return;
+    }
+    glUniform1iv(loc, amount, values);
+}
+
 void HkShader::setVec3f(const char* location, glm::vec3 value)
 {
     bind();
@@ -43,6 +55,18 @@ void HkShader::setMatrix4(const char* location, const glm::mat4 transform)
         return;
     }
     glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
+}
+
+void HkShader::setMatrix4Vec(const char* location, uint32_t amount, const float* flatTransforms)
+{
+    bind();
+    int transformLoc = glGetUniformLocation(shaderId_, location);
+    if (transformLoc == -1)
+    {
+        std::cerr << "Uniform '" << location << "' has not been found in bound shader!" << std::endl;
+        return;
+    }
+    glUniformMatrix4fv(transformLoc, amount, GL_FALSE, flatTransforms);
 }
 
 void HkShader::bind() const

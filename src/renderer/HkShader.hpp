@@ -27,8 +27,10 @@ public:
     /* Setters */
     int32_t loadShaderFromSource(const std::string& vertPath, const std::string& fragPath);
     void setInt(const char* location, int value);
+    void setIntVec(const char* location, uint32_t amount, int* values);
     void setVec3f(const char* location, glm::vec3 value);
     void setMatrix4(const char* location, const glm::mat4 transform);
+    void setMatrix4Vec(const char* location, uint32_t amount, const float* flatTransforms);
     void bindId(const uint32_t id);
 
     /* Getters */

@@ -79,8 +79,6 @@ HkFontLoader* HkRenderer::addFontLoaderSourceToCache(const std::string& fontSour
             std::cout << "Failed to generate loader for: " << fontSource << "\n";
         }
     }
-    std::cout << "returned font with size existing: " << config.fontSize << "\n";
-
     return &pathToFontLoaderMap_[key];
 }
 
@@ -144,27 +142,61 @@ void HkRenderer::render(const HkRenderContext& renderConfig, const HkStyleContex
     // glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void HkRenderer::render(const HkTextRenderConfig& textRenderConfig)
+
+void HkRenderer::beginTextBatch(const HkTextRenderGLConfig& textRenderConfig)
 {
+    currBatchAmount_ = 0;
+    textConfig_ = textRenderConfig;
+
     //TODO: As described in : https://www.youtube.com/watch?v=S0PyZKX4lyI
     // we could use triangle strip and draw 4 verts only instead of 6
-    if (boundShaderId_ != textRenderConfig.shaderId)
+    if (boundShaderId_ != textConfig_.shaderId)
     {
-        shader_.bindId(textRenderConfig.shaderId);
-        shader_.setMatrix4("proj", textRenderConfig.windowProjMatrix);
+        shader_.bindId(textConfig_.shaderId);
+        shader_.setMatrix4("proj", textConfig_.windowProjMatrix);
         shader_.setInt("letterTextures", GL_TEXTURE0);
-        shader_.setVec3f("color", textRenderConfig.color);
+        shader_.setVec3f("color", glm::vec3(.1f));
     }
 
-    if (boundVaoId_ != textRenderConfig.vaoId)
+    if (boundVaoId_ != textConfig_.vaoId)
     {
-        glBindVertexArray(textRenderConfig.vaoId);
-        boundVaoId_ = textRenderConfig.vaoId;
+        glBindVertexArray(textConfig_.vaoId);
+        boundVaoId_ = textConfig_.vaoId;
     }
+}
+
+void HkRenderer::renderTextBatch()
+{
+    /*Note: here it's assumed that 'beginTextBatch' was already called and we are in between that call
+     and 'endTextBatch' call. */
+    if (currBatchAmount_ <= 0) return;
+
+    // shader_.setVec3f("color", glm::vec3(1.0f));
+    shader_.setIntVec("letter", currBatchAmount_, &data_.letterMap[0]);
+    shader_.setMatrix4Vec("model", currBatchAmount_, &data_.modelMap[0][0][0]);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, textRenderConfig.texId);
-    glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, textRenderConfig.amount);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, textConfig_.texId);
+    glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, currBatchAmount_);
+}
+
+void HkRenderer::addToTextBatch(const int32_t letterId,
+    const glm::mat4& modelMat)
+{
+    data_.modelMap[currBatchAmount_] = modelMat;
+    data_.letterMap[currBatchAmount_] = letterId;
+    currBatchAmount_++;
+
+    if (currBatchAmount_ == HkTextRenderData::MAX_BATCH_SIZE - 1)
+    {
+        renderTextBatch();
+        currBatchAmount_ = 0;
+    }
+}
+
+void HkRenderer::endTextBatch()
+{
+    renderTextBatch();
 }
 
 /* Setup buffers with the currently set architecture */
