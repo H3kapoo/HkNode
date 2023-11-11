@@ -30,7 +30,7 @@ public:
     int32_t addShaderSourceToCache(const std::string& vertSource, const std::string& fragSource);
     HkTextureInfo addTextureSourceToCache(const std::string& textureSource);
     int32_t addVertexArrayDataToCache(const HkVertexArrayType archType);
-    HkFontLoader* addFontLoaderSourceToCache(const std::string& fontSource, HkFontLoader::HkTextConfig config);
+    HkFontLoader* addFontLoaderSourceToCache(HkTextUserConfig config);
 
     void render(const HkRenderContext& renderConfig, const HkStyleContext& styleConfig, const glm::mat4& modelMat);
 

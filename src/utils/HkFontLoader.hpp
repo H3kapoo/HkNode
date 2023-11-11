@@ -4,25 +4,13 @@
 #include <glm/glm.hpp>
 #include <map>
 
+#include "../renderer/HkTextRenderConfig.hpp"
+
 namespace hkui
 {
 class HkFontLoader
 {
 public:
-    enum class HkTextRenderMethod
-    {
-        BITMAP = 0,
-        SDF
-    };
-
-    struct HkTextConfig
-    {
-        HkTextRenderMethod renderMethod{ 0 };
-        uint32_t fontSize{ 16 };
-
-        bool operator==(const HkTextConfig& other) const = default;
-    };
-
     struct HkChar
     {
         int32_t charIndex;
@@ -32,7 +20,7 @@ public:
     };
 
     HkFontLoader() = default;
-    bool load(const std::string& fontPath, const HkTextConfig& config);
+    bool load(const std::string& fontPath, const HkTextUserConfig& config);
 
     inline HkChar& getChar(char ch) { return charMap_[int(ch)]; }
     inline uint32_t getTexId() { return textureArrayId_; }

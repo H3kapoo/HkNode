@@ -21,19 +21,19 @@ void HkLabel::onFirstHeartbeat()
     std::string DEFAULT_FS = "assets/shaders/fonts/fFont.glsl";
     const HkVertexArrayType DEFAULT_TYPE = HkVertexArrayType::QUAD;
 
-    programId_ = shader_.loadShaderFromSource(DEFAULT_VS, DEFAULT_FS);
-    vaoId_ = windowDataPtr_->renderer.addVertexArrayDataToCache(DEFAULT_TYPE);
-    fontLoader_ = windowDataPtr_->renderer.addFontLoaderSourceToCache(fontPath_, config_);
+    gLTextConfig_.shaderId = windowDataPtr_->renderer.addShaderSourceToCache(DEFAULT_VS, DEFAULT_FS);
+    gLTextConfig_.vaoId = windowDataPtr_->renderer.addVertexArrayDataToCache(DEFAULT_TYPE);
 
-    cfg_.shaderId = programId_;
-    cfg_.vaoId = vaoId_;
-    cfg_.texId = fontLoader_->getTexId();
-    // cfg_.color = glm::vec3(0.0f);
+    fontLoader_ = windowDataPtr_->renderer.addFontLoaderSourceToCache(usrTextConfig_);
+    gLTextConfig_.texId = fontLoader_->getTexId();
+
+    gLTextConfig_.color = usrTextConfig_.getFontColor();
     std::cout << text_.size() << "\n";
 }
 
 void HkLabel::nextWordData(const std::string& text, uint32_t index, uint32_t& advance, float& wordLen)
 {
+    /*Get advance needed to get to the next word, 1 space separated + also gets the wordLen in pixels */
     const auto size = text.size();
     while (index < size)
     {
@@ -50,13 +50,11 @@ void HkLabel::nextWordData(const std::string& text, uint32_t index, uint32_t& ad
 
 void HkLabel::resolveDirtyText()
 {
-    // if (!dirtyText_) return;
-
+    /* Start clean */
     lines_.clear();
 
-    const auto end = node_.transformContext.getPos() + node_.transformContext.getScale();
+    const auto& end = node_.transformContext.getPos() + node_.transformContext.getScale();
 
-    // const float maxRowLen = maxRowLen_;
     const float maxRowLen = end.x;
     float currentRowLen = 0;
     float maxRowLenSoFar = 0;
@@ -69,12 +67,21 @@ void HkLabel::resolveDirtyText()
     {
         float wordLen = 0.0f;
         uint32_t advance = 0;
-        // uint32_t advance = 1;
+        /* Decide if only full words are allowed on row or just letters from it as well*/
+        if (usrTextConfig_.getWrapAtWord())
+        {
+            advance = 0;
+            nextWordData(text_, i, advance, wordLen);
+        }
+        else
+        {
+            advance = 1;
+            const HkFontLoader::HkChar& ch = fontLoader_->getChar(text_[i]);
+            wordLen = (ch.advance >> 6) * textScale_;
+        }
 
-        nextWordData(text_, i, advance, wordLen);
-        // const HkFontLoader::HkChar& ch = fontLoader_.getChar(text_[i]);
-        // wordLen = (ch.advance >> 6) * textScale_;
 
+        /* If we don't have any more available space on the current text line, save it and start a new line */
         float nextLen = currentRowLen + wordLen;
         if (nextLen > maxRowLen)
         {
@@ -83,6 +90,7 @@ void HkLabel::resolveDirtyText()
             startLineIdx = i;
             lastAddedEndIndex = i;
         }
+        /* Otherwise just keep track of how far we are so far on this text line*/
         else
         {
             currentRowLen = nextLen;
@@ -91,8 +99,6 @@ void HkLabel::resolveDirtyText()
         if (currentRowLen > maxRowLenSoFar)
             maxRowLenSoFar = currentRowLen;
         i += advance;
-        // i += 1;
-
     }
 
     /* Add the last possible line in case it didn't make it to be bigger than 'maxRowLen' */
@@ -113,73 +119,63 @@ void HkLabel::resolveDirtyText()
     //     printf("startIdx = %d ; endIdx = %d ; length = %f; words = %d\n",
     //         lines_[i].startIdx, lines_[i].endIdx, lines_[i].length, lines_[i].wordCount);
     // }
-    dirtyText_ = false;
 }
 
 void HkLabel::postRenderAdditionalDetails()
 {
-    if (dirtyConfig_)
+    /* Used instancing and methods described in: https://www.youtube.com/watch?v=S0PyZKX4lyI */
+
+    /* Resolve options that can only be done at this stage */
+    if (usrTextConfig_.getDirtyStatus())
     {
-        fontLoader_ = windowDataPtr_->renderer.addFontLoaderSourceToCache(fontPath_, config_);
-        cfg_.texId = fontLoader_->getTexId();
-        dirtyConfig_ = false;
+        resolveDirtyText();
+        fontLoader_ = windowDataPtr_->renderer.addFontLoaderSourceToCache(usrTextConfig_);
+        gLTextConfig_.texId = fontLoader_->getTexId();
+        usrTextConfig_.resetDirtyStatus();
     }
 
+    /* Resolve what data is gonna be on each text line */
+    //TODO: Here we shall only resolve if parent size changed from last frame for perf reasons
     resolveDirtyText();
-    // Use instancing and methods described in: https://www.youtube.com/watch?v=S0PyZKX4lyI
-    cfg_.windowProjMatrix = windowDataPtr_->sceneProjMatrix;
-    windowDataPtr_->renderer.beginTextBatch(cfg_);
 
-    shader_.bindId(programId_);
+    gLTextConfig_.windowProjMatrix = windowDataPtr_->sceneProjMatrix;
+    windowDataPtr_->renderer.beginTextBatch(gLTextConfig_);
 
-    float factor = config_.fontSize;
+    float fontSize = usrTextConfig_.getFontSize();
     const auto end = node_.transformContext.getPos() + node_.transformContext.getScale();
 
-    textPos_.x = 0;
-    textPos_.y = 0;
-
-    int32_t workingIndex = 0;
     for (uint32_t line = 0; line < lines_.size(); line++)
     {
-        float x = textPos_.x + node_.transformContext.getPos().x;// + (end.x - lines_[line].length) * 0.5f;
-        float y = textPos_.y + node_.transformContext.getPos().y + factor * textScale_ + line * factor;
+        int32_t x = node_.transformContext.getPos().x + (end.x - lines_[line].length) * 0.5f;
+        int32_t y = node_.transformContext.getPos().y + fontSize * textScale_ + line * fontSize;
 
         for (uint32_t i = lines_[line].startIdx; i < lines_[line].endIdx; i++)
         {
             const HkFontLoader::HkChar& ch = fontLoader_->getChar(text_[i]);
-            if (text_[i] == ' ')
-            {
-                x += (ch.advance >> 6) * textScale_;
-                continue;
-            }
+            if (text_[i] == ' ') { x += (ch.advance >> 6) * textScale_; continue; }
 
+            /* Determine final position and scale*/
             float xpos = x + ch.bearing.x * textScale_;
             float ypos = y - ch.bearing.y * textScale_;
-            float w = factor * textScale_;
-            float h = factor * textScale_;
+            float w = fontSize * textScale_;
+            float h = fontSize * textScale_;
 
+            /* Construct model matrix */
             glm::mat4 modelMat = glm::mat4(1.0f);
             modelMat = glm::translate(modelMat, glm::vec3(xpos + w * 0.5f, ypos + h * 0.5f, -1.0f)); // it goes negative, expected
             modelMat = glm::scale(modelMat, glm::vec3(w, h, 1.0f));
 
+            /* Advance and upload to render batch*/
             x += (ch.advance >> 6) * textScale_;
             windowDataPtr_->renderer.addToTextBatch(ch.charIndex, modelMat);
         }
     }
 
+    /* End batch and render elements who didn't make it from last render call*/
     windowDataPtr_->renderer.endTextBatch();
 }
 
-void HkLabel::setConfig(const std::string& fontPath, const HkFontLoader::HkTextConfig& config)
-{
-    config_ = config;
-    fontPath_ = fontPath;
-    dirtyConfig_ = true;
-}
+void HkLabel::setText(const std::string& text) { text_ = text; }
 
-void HkLabel::setText(const std::string& text)
-{
-    text_ = text;
-    dirtyText_ = true;
-}
+HkTextUserConfig& HkLabel::getTextStyle() { return usrTextConfig_; }
 } // hkui

@@ -60,10 +60,11 @@ HkTextureInfo HkRenderer::addTextureSourceToCache(const std::string& textureSour
     return storedTexInfo;
 }
 
-HkFontLoader* HkRenderer::addFontLoaderSourceToCache(const std::string& fontSource, HkFontLoader::HkTextConfig config)
+HkFontLoader* HkRenderer::addFontLoaderSourceToCache(HkTextUserConfig config)
 {
     //Lazy key for now
-    std::string key{ fontSource + std::to_string((uint32_t)config.renderMethod) + std::to_string(config.fontSize) };
+    std::string fontSource = config.getFontPath();
+    std::string key{ fontSource + std::to_string((uint32_t)config.getRenderMethod()) + std::to_string(config.getFontSize()) };
     HkFontLoader storedFontLoader = pathToFontLoaderMap_[key];
     if (storedFontLoader.getTexId() == 0)
     {
@@ -71,7 +72,7 @@ HkFontLoader* HkRenderer::addFontLoaderSourceToCache(const std::string& fontSour
         if (result)
         {
             pathToFontLoaderMap_[key] = storedFontLoader;
-            std::cout << "Generated font loader for: " << fontSource << " with fontSize: " << config.fontSize << "\n";
+            std::cout << "Generated font loader for: " << fontSource << " with fontSize: " << config.getFontSize() << "\n";
             return &pathToFontLoaderMap_[key];
         }
         else
@@ -155,7 +156,7 @@ void HkRenderer::beginTextBatch(const HkTextRenderGLConfig& textRenderConfig)
         shader_.bindId(textConfig_.shaderId);
         shader_.setMatrix4("proj", textConfig_.windowProjMatrix);
         shader_.setInt("letterTextures", GL_TEXTURE0);
-        shader_.setVec3f("color", glm::vec3(.1f));
+        shader_.setVec3f("color", textConfig_.color);
     }
 
     if (boundVaoId_ != textConfig_.vaoId)
@@ -171,7 +172,6 @@ void HkRenderer::renderTextBatch()
      and 'endTextBatch' call. */
     if (currBatchAmount_ <= 0) return;
 
-    // shader_.setVec3f("color", glm::vec3(1.0f));
     shader_.setIntVec("letter", currBatchAmount_, &data_.letterMap[0]);
     shader_.setMatrix4Vec("model", currBatchAmount_, &data_.modelMap[0][0][0]);
 

@@ -9,9 +9,9 @@
 namespace hkui
 {
 
-bool HkFontLoader::load(const std::string& fontPath, const HkTextConfig& config)
+bool HkFontLoader::load(const std::string& fontPath, const HkTextUserConfig& config)
 {
-    if (config.renderMethod == HkTextRenderMethod::SDF)
+    if (config.getRenderMethod() == HkTextUserConfig::HkTextRenderMethod::SDF)
     {
         std::cerr << "SDF font rendering not implemented yet\n";
         return false;
@@ -31,7 +31,8 @@ bool HkFontLoader::load(const std::string& fontPath, const HkTextConfig& config)
         return false;
     }
 
-    FT_Set_Pixel_Sizes(ftFace, config.fontSize, config.fontSize);
+    const auto fontSize = config.getFontSize();
+    FT_Set_Pixel_Sizes(ftFace, fontSize, fontSize);
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -40,7 +41,7 @@ bool HkFontLoader::load(const std::string& fontPath, const HkTextConfig& config)
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D_ARRAY, textureArrayId_);
 
-    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_R8, config.fontSize, config.fontSize,
+    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_R8, fontSize, fontSize,
         128, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
     // glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_R8, 32, 32,
     //     128, 0, GL_RED, GL_UNSIGNED_BYTE, 0);

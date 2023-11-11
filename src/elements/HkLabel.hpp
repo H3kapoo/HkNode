@@ -18,27 +18,9 @@ public:
     HkLabel(const std::string& name);
 
     void setText(const std::string& text);
-    void setConfig(const std::string& fontPath, const HkFontLoader::HkTextConfig& config);
-    void setMaxRowLen(uint32_t size) { maxRowLen_ = size; dirtyText_ = true; };
+    HkTextUserConfig& getTextStyle();
 
 private:
-    void onFirstHeartbeat();
-    void postRenderAdditionalDetails();
-
-    void resolveDirtyText();
-
-    void nextWordData(const std::string& text, uint32_t index, uint32_t& advance, float& wordLen);
-
-    std::string text_;
-    uint32_t vaoId_, vboId_, programId_;
-    HkShader shader_;
-    HkTextRenderGLConfig cfg_;
-    HkFontLoader* fontLoader_;
-
-    glm::vec2 textPos_{ 0,0 };
-
-    HkFontLoader::HkTextConfig config_;
-
     struct HkTextLine
     {
         uint32_t startIdx{ 0 }, endIdx{ 0 };
@@ -46,14 +28,21 @@ private:
         uint32_t wordCount{ 0 };
     };
 
-    std::vector<HkTextLine> lines_;
-    bool dirtyText_{ false };
-    bool dirtyConfig_{ false };
-    std::string fontPath_{ "assets/fonts/LiberationSerif-Regular.ttf" };
+    /* HkNodeBase */
+    void onFirstHeartbeat();
+    void postRenderAdditionalDetails();
 
+    void resolveDirtyText();
+    void nextWordData(const std::string& text, uint32_t index, uint32_t& advance, float& wordLen);
+
+    HkFontLoader* fontLoader_;
+
+    HkTextRenderGLConfig gLTextConfig_;
+    HkTextUserConfig usrTextConfig_;
+
+    std::vector<HkTextLine> lines_;
+    std::string text_;
     float textScale_{ 1.0f };
-    float maxRowLen_{ 1920.0f };
-    uint32_t maxRowWords_{ 10 };
 };
 
 using HkLabelPtr = std::shared_ptr<HkLabel>;
