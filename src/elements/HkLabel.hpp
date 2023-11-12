@@ -43,6 +43,7 @@ private:
     std::vector<HkTextLine> lines_;
     std::string text_;
     float textScale_{ 1.0f };
+    float maxLenSoFar_{ 0 };
 };
 
 using HkLabelPtr = std::shared_ptr<HkLabel>;

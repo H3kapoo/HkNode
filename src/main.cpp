@@ -37,7 +37,7 @@ int main()
 
     windowFrame->getStyle().setOverflowAllowedXY(false)
         .setLayout(HkLayout::Horizontal)
-        .setPinchConfig({ .enable = true })
+        // .setPinchConfig({ .enable = true })
         .setRowWrapping(false)
         .setHAlignment(HkHAlignment::Center)
         .setVAlignment(HkVAlignment::Center);
@@ -150,14 +150,15 @@ int main()
     label->getTextStyle()
         .setFontPath("assets/fonts/LiberationSerif-Regular.ttf")
         .setRenderMethod(HkTextUserConfig::HkTextRenderMethod::BITMAP)
-        .setFontSize(24)
+        .setFontSize(44)
         .setWrapAtWord(false)
-        .setFontColor(glm::vec3(1.0f, 0.4f, 0.0f));
+        .setTextAngle(45)
+        .setFontColor(glm::vec3(1.0f));
 
     label->getStyle()
         .setVHSizeConfig(
-            { .type = HkSizeType::PercParent, .value = 1.f },
-            { .type = HkSizeType::PercParent, .value = 1.f });
+            { .type = HkSizeType::PercParent, .value = 1.0f },
+            { .type = HkSizeType::PercParent, .value = 1.0f });
 
     // uint32_t a = 60;
     // label->getEvents().setOnScrollListener([&label, &a](int32_t val)
@@ -180,8 +181,8 @@ int main()
     // label->setText(text + text + text + text + text + text + text + text + text + text + text);
     // label->setText(text);
     // label->setText(std::string(text.begin(), text.begin() + 1000));
-    label->setText(smallText + smallText + smallText + smallText + smallText + smallText + smallText + smallText);
-    // label->setText(smallText + smallText);
+    // label->setText(smallText + smallText + smallText + smallText + smallText + smallText + smallText + smallText);
+    label->setText(smallText);
     // windowFrame->pushChildren({ ctr, ctr4, ctr5, ctr6 });
     // windowFrame->pushChildren({ ctr, ctr4, ctr5 });
     windowFrame->pushChildren({ label });

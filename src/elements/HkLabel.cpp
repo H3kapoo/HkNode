@@ -53,7 +53,8 @@ void HkLabel::resolveDirtyText()
     /* Start clean */
     lines_.clear();
 
-    const auto& end = node_.transformContext.getPos() + node_.transformContext.getScale();
+    // const auto& end = node_.transformContext.getPos() + node_.transformContext.getScale();
+    const auto& end = node_.transformContext.getScale();
 
     const float maxRowLen = end.x;
     float currentRowLen = 0;
@@ -112,7 +113,7 @@ void HkLabel::resolveDirtyText()
     {
         lines_.emplace_back(startLineIdx, (uint32_t)text_.size(), maxRowLenSoFar, currentRowWords);
     }
-
+    maxLenSoFar_ = maxRowLenSoFar;
     // printf("rowCount = %ld ;maxRowLenSoFar = %f\n", lines_.size(), maxRowLenSoFar);
     // for (uint32_t i = 0; i < lines_.size(); i++)
     // {
@@ -142,12 +143,14 @@ void HkLabel::postRenderAdditionalDetails()
     windowDataPtr_->renderer.beginTextBatch(gLTextConfig_);
 
     float fontSize = usrTextConfig_.getFontSize();
-    const auto end = node_.transformContext.getPos() + node_.transformContext.getScale();
+    const auto end = node_.transformContext.getScale();
 
+    /* Add each line to batch, skipping white spaces */
+    float middle = 32;
     for (uint32_t line = 0; line < lines_.size(); line++)
     {
-        int32_t x = node_.transformContext.getPos().x + (end.x - lines_[line].length) * 0.5f;
-        int32_t y = node_.transformContext.getPos().y + fontSize * textScale_ + line * fontSize;
+        int32_t x = node_.transformContext.getPos().x; +end.x / 2;// +(end.x - lines_[line].length) * 0.5f;
+        int32_t y = node_.transformContext.getPos().y; +fontSize * textScale_ + line * fontSize;
 
         for (uint32_t i = lines_[line].startIdx; i < lines_[line].endIdx; i++)
         {
@@ -160,9 +163,18 @@ void HkLabel::postRenderAdditionalDetails()
             float w = fontSize * textScale_;
             float h = fontSize * textScale_;
 
-            /* Construct model matrix */
+            /* Construct model matrix. Read from bottom to top */
             glm::mat4 modelMat = glm::mat4(1.0f);
-            modelMat = glm::translate(modelMat, glm::vec3(xpos + w * 0.5f, ypos + h * 0.5f, -1.0f)); // it goes negative, expected
+            modelMat = glm::translate(modelMat, glm::vec3(end.x * 0.5f, end.y * 0.5f, -1.0f));
+
+            /* Note: Due to textures being fontSize x fontSize in dimension, FT Lib cannot cover the whole square
+               area with the letter glyph, due to that, if text is rotated continously, it looks a bit off center
+               but in this case it's fine since we don't plan to continously rotate it.*/
+            if (usrTextConfig_.getTextAngle() != 0.0f)
+            {
+                modelMat = glm::rotate(modelMat, glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+            }
+            modelMat = glm::translate(modelMat, glm::vec3(xpos + w * 0.5f - lines_[line].length * 0.5f, ypos + h * 0.5f, -1.0f));
             modelMat = glm::scale(modelMat, glm::vec3(w, h, 1.0f));
 
             /* Advance and upload to render batch*/

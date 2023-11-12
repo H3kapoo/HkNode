@@ -25,7 +25,6 @@ struct HkRenderArch
 
 class HkRenderer
 {
-
 public:
     int32_t addShaderSourceToCache(const std::string& vertSource, const std::string& fragSource);
     HkTextureInfo addTextureSourceToCache(const std::string& textureSource);

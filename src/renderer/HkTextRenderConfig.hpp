@@ -21,7 +21,6 @@ struct HkTextRenderData
     glm::mat4 modelMap[MAX_BATCH_SIZE];
 };
 
-
 class HkTextUserConfig
 {
     friend class HkLabel;
@@ -45,6 +44,7 @@ public:
     HkTextUserConfig& setFontColor(const glm::vec3& value) { dirtyConfig = true; color = value;  return *this; }
     HkTextUserConfig& setWrapAtWord(const bool value) { dirtyConfig = true; wrapAtWord = value;  return *this; }
     HkTextUserConfig& setTextDirection(const HkTextDirection value) { dirtyConfig = true; direction = value;  return *this; }
+    HkTextUserConfig& setTextAngle(const float value) { dirtyConfig = true; angle = value;  return *this; }
 
     inline std::string getFontPath() const { return fontPath; }
     inline HkTextRenderMethod getRenderMethod() const { return renderMethod; }
@@ -52,6 +52,7 @@ public:
     inline glm::vec3 getFontColor() const { return color; }
     inline bool getWrapAtWord() const { return wrapAtWord; }
     inline HkTextDirection getTextDirection() const { return direction; }
+    inline float getTextAngle() const { return angle; }
 
 private:
     void resetDirtyStatus() { dirtyConfig = false; }
@@ -63,6 +64,7 @@ private:
     glm::vec3 color{ 1.0f };
     bool wrapAtWord{ true };
     HkTextDirection direction{ 0 };
+    float angle{ 0.0f };
     bool dirtyConfig{ false };
 };
 } // hkui
