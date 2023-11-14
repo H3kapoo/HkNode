@@ -101,7 +101,6 @@ int32_t HkRenderer::addVertexArrayDataToCache(const HkVertexArrayType archType)
 /* Actually render the mesh */
 void HkRenderer::render(const HkRenderContext& renderConfig, const HkStyleContext& styleConfig, const glm::mat4& modelMat)
 {
-    // return;
     /* Set always mandatory to have uniforms */
     if (boundShaderId_ != renderConfig.shaderId)
     {

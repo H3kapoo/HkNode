@@ -1,13 +1,15 @@
 #include "HkLabel.hpp"
-#include "../APIGate/GlfwGlewGate.hpp"
 #include <glm/gtc/matrix_transform.hpp>
+
+#include "../APIGate/GlfwGlewGate.hpp"
+#include "../utils/HkDrawDebugger.hpp"
 
 namespace hkui
 {
 HkLabel::HkLabel(const std::string& name)
     : HkNodeBase(name, HkNodeType::Label)
 {
-    glEnable(GL_BLEND);
+    // glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     node_.styleContext.setColor(glm::vec3(226 / 255.0f, 183 / 255.0f, 17 / 255.0f));
@@ -29,9 +31,12 @@ void HkLabel::onFirstHeartbeat()
 
     gLTextConfig_.color = usrTextConfig_.getFontColor();
     std::cout << text_.size() << "\n";
+
+    HkDrawDebugger::get().setDefaultDebugShader();
+
 }
 
-void HkLabel::nextWordData(const std::string& text, uint32_t index, uint32_t& advance, float& wordLen)
+void HkLabel::nextWordData(const std::string& text, uint32_t index, uint32_t& advance, float& wordLen, float& wordHeight)
 {
     /*Get advance needed to get to the next word, 1 space separated + also gets the wordLen in pixels */
     const auto size = text.size();
@@ -39,6 +44,10 @@ void HkLabel::nextWordData(const std::string& text, uint32_t index, uint32_t& ad
     {
         const HkFontLoader::HkChar& ch = fontLoader_->getChar(text[index + advance]);
         wordLen += (ch.advance >> 6) * textScale_;
+        const float charHeightAboveBaseline = ch.size.y - (ch.size.y - ch.bearing.y);
+        if (charHeightAboveBaseline > wordHeight)
+            wordHeight = charHeightAboveBaseline;
+
         if (text[index + advance] == ' ' || index + advance == size - 1)
         {
             advance += 1;
@@ -59,11 +68,13 @@ void HkLabel::resolveDirtyText()
     const float maxRowLen = end.x;
     float currentRowLen = 0;
     float maxRowLenSoFar = 0;
+    float maxHeightForLineSoFar = 0;
 
     uint32_t currentRowWords = 0;
     uint32_t startLineIdx = 0;
     uint32_t lastAddedEndIndex = 0;
     uint32_t i = 0;
+
     while (i < text_.size())
     {
         float wordLen = 0.0f;
@@ -72,13 +83,17 @@ void HkLabel::resolveDirtyText()
         if (usrTextConfig_.getWrapAtWord())
         {
             advance = 0;
-            nextWordData(text_, i, advance, wordLen);
+            nextWordData(text_, i, advance, wordLen, maxHeightForLineSoFar);
         }
         else
         {
             advance = 1;
             const HkFontLoader::HkChar& ch = fontLoader_->getChar(text_[i]);
             wordLen = (ch.advance >> 6) * textScale_;
+
+            const float charHeightAboveBaseline = ch.size.y - (ch.size.y - ch.bearing.y);
+            if (charHeightAboveBaseline > maxHeightForLineSoFar)
+                maxHeightForLineSoFar = charHeightAboveBaseline;
         }
 
 
@@ -86,10 +101,11 @@ void HkLabel::resolveDirtyText()
         float nextLen = currentRowLen + wordLen;
         if (nextLen > maxRowLen)
         {
-            lines_.emplace_back(startLineIdx, i, currentRowLen, currentRowWords);
+            lines_.emplace_back(startLineIdx, i, currentRowLen, currentRowWords, maxHeightForLineSoFar);
             currentRowLen = wordLen;
             startLineIdx = i;
             lastAddedEndIndex = i;
+            maxHeightForLineSoFar = 0;
         }
         /* Otherwise just keep track of how far we are so far on this text line*/
         else
@@ -105,13 +121,13 @@ void HkLabel::resolveDirtyText()
     /* Add the last possible line in case it didn't make it to be bigger than 'maxRowLen' */
     if (lastAddedEndIndex != text_.size())
     {
-        lines_.emplace_back(lastAddedEndIndex, (uint32_t)text_.size(), currentRowLen, currentRowWords);
+        lines_.emplace_back(lastAddedEndIndex, (uint32_t)text_.size(), currentRowLen, currentRowWords, maxHeightForLineSoFar);
     }
 
     /* Add whole string as line, it means it never got bigger than 'maxRowLen' */
     if (lines_.empty())
     {
-        lines_.emplace_back(startLineIdx, (uint32_t)text_.size(), maxRowLenSoFar, currentRowWords);
+        lines_.emplace_back(startLineIdx, (uint32_t)text_.size(), maxRowLenSoFar, currentRowWords, maxHeightForLineSoFar);
     }
     maxLenSoFar_ = maxRowLenSoFar;
     // printf("rowCount = %ld ;maxRowLenSoFar = %f\n", lines_.size(), maxRowLenSoFar);
@@ -139,18 +155,27 @@ void HkLabel::postRenderAdditionalDetails()
     //TODO: Here we shall only resolve if parent size changed from last frame for perf reasons
     resolveDirtyText();
 
+    HkDrawDebugger::get().setProjectionMatrix(windowDataPtr_->sceneProjMatrix);
+
     gLTextConfig_.windowProjMatrix = windowDataPtr_->sceneProjMatrix;
     windowDataPtr_->renderer.beginTextBatch(gLTextConfig_);
 
     float fontSize = usrTextConfig_.getFontSize();
-    const auto end = node_.transformContext.getScale();
+    auto end = node_.transformContext.getScale();
+    glEnable(GL_BLEND);
 
-    /* Add each line to batch, skipping white spaces */
-    float middle = 32;
+    float combinedHeights = 0.0f;
     for (uint32_t line = 0; line < lines_.size(); line++)
     {
-        int32_t x = node_.transformContext.getPos().x; +end.x / 2;// +(end.x - lines_[line].length) * 0.5f;
-        int32_t y = node_.transformContext.getPos().y; +fontSize * textScale_ + line * fontSize;
+        // combinedHeights += lines_[line].maxHeight;
+        combinedHeights += fontSize;
+    }
+
+    /* Add each line to batch, skipping white spaces */
+    for (uint32_t line = 0; line < lines_.size(); line++)
+    {
+        int32_t x = node_.transformContext.getPos().x;// +(end.x - lines_[line].length) * 0.5f;
+        int32_t y = node_.transformContext.getPos().y + fontSize * textScale_ * (line + 0.0f);
 
         for (uint32_t i = lines_[line].startIdx; i < lines_[line].endIdx; i++)
         {
@@ -159,14 +184,16 @@ void HkLabel::postRenderAdditionalDetails()
 
             /* Determine final position and scale*/
             float xpos = x + ch.bearing.x * textScale_;
-            float ypos = y - ch.bearing.y * textScale_;
+            // float ypos = y - ch.bearing.y * textScale_;
+            float ypos = y;
             float w = fontSize * textScale_;
             float h = fontSize * textScale_;
 
+            // std::cout << "ma: " << lines_[line].maxSize << "\n";
+
             /* Construct model matrix. Read from bottom to top */
             glm::mat4 modelMat = glm::mat4(1.0f);
-            modelMat = glm::translate(modelMat, glm::vec3(end.x * 0.5f, end.y * 0.5f, -1.0f));
-
+            modelMat = glm::translate(modelMat, glm::vec3(end.x * 0.0f, end.y * 0.5f - combinedHeights * 0.5f - (fontSize - ch.bearing.y) * 0.5f, -1.0f));
             /* Note: Due to textures being fontSize x fontSize in dimension, FT Lib cannot cover the whole square
                area with the letter glyph, due to that, if text is rotated continously, it looks a bit off center
                but in this case it's fine since we don't plan to continously rotate it.*/
@@ -174,8 +201,16 @@ void HkLabel::postRenderAdditionalDetails()
             {
                 modelMat = glm::rotate(modelMat, glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
             }
-            modelMat = glm::translate(modelMat, glm::vec3(xpos + w * 0.5f - lines_[line].length * 0.5f, ypos + h * 0.5f, -1.0f));
+            // modelMat = glm::translate(modelMat, glm::vec3(xpos + w * 0.5f - lines_[line].length * 0.5f, ypos + h * 0.5f, -1.0f));
+            // modelMat = glm::translate(modelMat, glm::vec3(xpos, ypos, -1.0f));
+            modelMat = glm::translate(modelMat, glm::vec3(xpos, ypos + (fontSize - ch.bearing.y) * 1, -1.0f));
+            modelMat = glm::translate(modelMat, glm::vec3(-0.5f, -0.5f, 0));
             modelMat = glm::scale(modelMat, glm::vec3(w, h, 1.0f));
+            modelMat = glm::translate(modelMat, glm::vec3(0.5f, 0.5f, 0));
+
+            HkDrawDebugger::get().pushDraw10x10(glm::vec2(
+                xpos,
+                ypos + ch.bearing.y));
 
             /* Advance and upload to render batch*/
             x += (ch.advance >> 6) * textScale_;
@@ -183,7 +218,8 @@ void HkLabel::postRenderAdditionalDetails()
         }
     }
 
-    /* End batch and render elements who didn't make it from last render call*/
+
+    // /* End batch and render elements who didn't make it from last render call*/
     windowDataPtr_->renderer.endTextBatch();
 }
 
