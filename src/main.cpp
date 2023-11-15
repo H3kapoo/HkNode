@@ -152,7 +152,7 @@ int main()
         .setRenderMethod(HkTextUserConfig::HkTextRenderMethod::BITMAP)
         .setFontSize(80)
         .setWrapAtWord(true)
-        // .setTextAngle(45)
+        .setTextAngle(45)
         // .setTextAngle(0)
         .setFontColor(glm::vec3(1.0f));
 
@@ -174,17 +174,21 @@ int main()
     // label->setText("Pala gateste biban NO CAPS NO CAPS CAPS CAPS CAPS"
     //     "a ton more text look mom there's a lot of?./ text in here #$%%^");
     // std::string text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis faucibus, erat ut suscipit euismod, lectus est egestas purus, a porta orci ipsum vitae neque. Aenean justo velit, vestibulum vel volutpat nec, dictum eget nisl. Pellentesque a dapibus ex. Sed sed odio blandit, cursus libero et, vehicula lacus. Donec aliquam mi mollis odio luctus, at dignissim purus auctor. Morbi id enim eget tellus rhoncus lobortis. Morbi id quam turpis.\n\nUt quis purus id metus dictum facilisis. Praesent purus enim, ornare at augue non, pretium ultricies nisl. Morbi ultrices rutrum augue, eget egestas odio finibus quis. Pellentesque venenatis, dolor nec eleifend porta, diam diam faucibus arcu, at molestie libero quam id diam. Integer aliquam sem vel erat lacinia vulputate. Cras eget mauris sit amet nunc tempus fermentum. Quisque fermentum imperdiet justo, eget blandit lacus ultricies in. Donec nec suscipit lorem.\n\nPellentesque varius ligula ut eros venenatis, non tristique purus efficitur. Aliquam erat volutpat. In ex augue, mollis sit amet vulputate at, porta eu orci. Aenean et sodales ante. Quisque tristique tincidunt risus at vulputate. Nullam lacinia purus et venenatis scelerisque. Donec sed porta massa. Cras lacinia eros nec sodales aliquam. Donec vel neque ac mi sodales luctus. Phasellus semper nisl metus, id vulputate lectus feugiat non. Mauris nec nisi gravida, ornare mi nec, pulvinar erat. Nullam id quam id ex placerat posuere.\n\nSed tempus tempus odio, non porttitor diam interdum id. Suspendisse vestibulum ipsum sit amet mauris rutrum, ornare fringilla lectus vestibulum. Sed sed aliquam nisi, id rhoncus felis. Mauris fermentum massa velit. Proin vitae tincidunt ante, quis facilisis sem. Vestibulum efficitur, elit eget feugiat fringilla, sapien mi dapibus ex, quis lobortis nisi nulla ac nibh. Praesent luctus mauris vehicula urna auctor lacinia. Maecenas ac felis ex. Suspendisse sed rhoncus nulla, ac egestas felis. Donec euismod at arcu sed laoreet. Vestibulum venenatis luctus ullamcorper. Quisque interdum gravida arcu in elementum.\n\nQuisque eu lobortis metus. Cras imperdiet diam ut sem euismod, sed gravida elit accumsan. Integer a erat dui. Aliquam pharetra pharetra faucibus. Integer ligula enim, convallis a imperdiet eget, sollicitudin at sapien. Aliquam sed justo vel neque eleifend ullamcorper. Nulla consectetur porttitor odio, sed ornare erat blandit quis. Cras ullamcorper magna sit amet diam tristique aliquet. Nulla facilisi. Sed purus libero, laoreet nec nibh ac, sodales commodo mi. In id venenatis ex. Fusce tellus augue, vestibulum ut pretium eu, facilisis eget nunc. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Interdum et malesuada fames ac ante ipsum primis in faucibus.\n\nCurabitur posuere metus ac dolor porttitor, quis commodo nunc varius. Vestibulum consequat, metus non venenatis ullamcorper, odio nulla commodo erat, vitae iaculis mauris lacus id nunc. Curabitur urna magna, viverra vel tellus ac, accumsan condimentum sem. Nunc eu dignissim nibh. Sed dignissim, arcu et tristique sagittis, lectus urna cursus ligula, id tincidunt augue risus sit amet est. Nullam lobortis fermentum metus, nec placerat mauris vestibulum sollicitudin. Etiam ut accumsan arcu, sit amet tempus quam. Maecenas finibus nec turpis a vulputate. Nulla sed urna enim. Aliquam vestibulum gravida erat.";
-    std::string smallText = "The quick brown fox jumps over the lazy dog";
-    // std::string smallText = "AFG auick brown Fox jumps over";
-    // std::string smallText = "AA";
+    // std::string smallText = "The quick brown fox jumps over the lazy dog";
+    // std::string smallText = "o";
+    // std::string smallText = "o";
+    // std::string smallText = "AFG auick brown Fox_ jumps over";
+    std::string smallText = "ooo_ooo_ooo_oo_oo_oooo";
+    // std::string smallText = "A";
 
     // label->setText(text + text + text + text + text + text + text + text + text + text + text);
     // label->setText("AA");
     // label->setText(std::string(text.begin(), text.begin() + 1000));
-    // label->setText(smallText + smallText + smallText + smallText + smallText + smallText + smallText);
+    label->setText(smallText + smallText + smallText + smallText);
+    // label->setText(smallText + smallText + smallText + smallText + smallText + smallText);
     // label->setText(smallText + smallText + smallText + smallText + smallText + smallText + smallText + smallText + smallText + smallText + smallText + smallText);
     // label->setText("o");
-    label->setText("AA");
+    // label->setText("8");
     // label->setText("jfsfgegwegweSGgergrewgGGEF");
     // windowFrame->pushChildren({ ctr, ctr4, ctr5, ctr6 });
     // windowFrame->pushChildren({ ctr, ctr4, ctr5 });

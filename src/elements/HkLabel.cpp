@@ -53,7 +53,7 @@ void HkLabel::nextWordData(const std::string& text, uint32_t index, uint32_t& ad
         if (heightAboveBaseline > highestPoint)
             highestPoint = heightAboveBaseline;
 
-        if (text[index + advance] == ' ' || index + advance == size - 1)
+        if (text[index + advance] == '_' || index + advance == size - 1)
         {
             advance += 1;
             break;
@@ -111,6 +111,7 @@ void HkLabel::resolveDirtyText()
 
         /* If we don't have any more available space on the current text line, save it and start a new line */
         float nextLen = currentRowLen + wordLen;
+        // if (nextLen > maxRowLen)
         if (nextLen > maxRowLen)
         {
             lines_.emplace_back(startLineIdx, i, currentRowLen, currentRowWords, lowestPoint, highestPoint);
@@ -179,10 +180,11 @@ void HkLabel::postRenderAdditionalDetails()
     auto end = node_.transformContext.getScale();
     glEnable(GL_BLEND);
 
+    float spread = 50;
     float combinedHeights = 0.0f;
     for (uint32_t line = 0; line < lines_.size(); line++)
     {
-        combinedHeights += (-lines_[line].lowestPoint + lines_[line].highestPoint);
+        combinedHeights += (-lines_[line].lowestPoint + lines_[line].highestPoint + spread);
     }
 
     float acc = 0;
@@ -191,7 +193,7 @@ void HkLabel::postRenderAdditionalDetails()
     {
         int32_t x = node_.transformContext.getPos().x;// +(end.x - lines_[line].length) * 0.5f;
         int32_t y = node_.transformContext.getPos().y + acc * textScale_;//* (line);
-        acc += (-lines_[line].lowestPoint + lines_[line].highestPoint);
+        acc += (-lines_[line].lowestPoint + lines_[line].highestPoint + spread);
 
         for (uint32_t i = lines_[line].startIdx; i < lines_[line].endIdx; i++)
         {
@@ -200,7 +202,7 @@ void HkLabel::postRenderAdditionalDetails()
 
             /* Determine final position and scale*/
             float xpos = x + ch.bearing.x * textScale_;
-            float ypos = y - ch.bearing.y * textScale_ + lines_[line].highestPoint;
+            float ypos = y - ch.bearing.y * textScale_ + lines_[line].highestPoint + spread * 0.5f;
             // float ypos = y;
             float w = fontSize * textScale_;
             float h = fontSize * textScale_;
@@ -208,35 +210,22 @@ void HkLabel::postRenderAdditionalDetails()
             // std::cout << "ma: " << lines_[line].maxSize << "\n";
 
             // /* Construct model matrix. Read from bottom to top */
-            // glm::mat4 modelMat = glm::mat4(1.0f);
-            // modelMat = glm::translate(modelMat, glm::vec3(end.x * 0.0f, end.y * 0.5f - combinedHeights * 0.5f, -1.0f));
-            // /* Note: Due to textures being fontSize x fontSize in dimension, FT Lib cannot cover the whole square
-            //    area with the letter glyph, due to that, if text is rotated continously, it looks a bit off center
-            //    but in this case it's fine since we don't plan to continously rotate it.*/
-            // if (usrTextConfig_.getTextAngle() != 0.0f)
-            // {
-            //     // modelMat = glm::rotate(modelMat, glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-            //     modelMat = glm::rotate(modelMat, (float)glfwGetTime() * 4, glm::vec3(0.0f, 0.0f, 1.0f));
-            // }
-
-            // modelMat = glm::translate(modelMat, glm::vec3(xpos - lines_[line].length * 0.5f, ypos - (-lines_[line].lowestPoint + lines_[line].highestPoint) * 0.5f, -1.0f));
-            // modelMat = glm::translate(modelMat, glm::vec3(-0.5f, -0.5f, 0));
-            // modelMat = glm::scale(modelMat, glm::vec3(w, h, 1.0f));
-            // modelMat = glm::translate(modelMat, glm::vec3(0.5f, 0.5f, 0));
 
 
             glm::mat4 modelMat = glm::mat4(1.0f);
-            modelMat = glm::translate(modelMat, glm::vec3(end.x * 0.0f, end.y * 0.5f - combinedHeights * 0.5f, -1.0f));
+            modelMat = glm::translate(modelMat, glm::vec3(end.x * 0.5f, end.y * 0.5f - combinedHeights * 0.5f, -1.0f));
             /* Note: Due to textures being fontSize x fontSize in dimension, FT Lib cannot cover the whole square
                area with the letter glyph, due to that, if text is rotated continously, it looks a bit off center
                but in this case it's fine since we don't plan to continously rotate it.*/
+            modelMat = glm::translate(modelMat, glm::vec3(0, combinedHeights * 0.5f, -1.0f));
+
             if (usrTextConfig_.getTextAngle() != 0.0f)
             {
                 // modelMat = glm::rotate(modelMat, glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-                // modelMat = glm::rotate(modelMat, (float)glfwGetTime() * 4, glm::vec3(0.0f, 0.0f, 1.0f));
+                modelMat = glm::rotate(modelMat, (float)glfwGetTime() * 0, glm::vec3(0.0f, 0.0f, 1.0f));
             }
 
-            modelMat = glm::translate(modelMat, glm::vec3(xpos + (end.x - lines_[line].length) * 0.5f, ypos, -1.0f));
+            modelMat = glm::translate(modelMat, glm::vec3(xpos + (-lines_[line].length) * 0.5f, ypos - combinedHeights * 0.5f, -1.0f));
             modelMat = glm::translate(modelMat, glm::vec3(-0.5f, -0.5f, 0));
             modelMat = glm::scale(modelMat, glm::vec3(w, h, 1.0f));
             modelMat = glm::translate(modelMat, glm::vec3(0.5f, 0.5f, 0));
@@ -245,6 +234,7 @@ void HkLabel::postRenderAdditionalDetails()
             x += (ch.advance >> 6) * textScale_;
             windowDataPtr_->renderer.addToTextBatch(ch.charIndex, modelMat);
         }
+
     }
 
     /* End batch and render elements who didn't make it from last render call*/
