@@ -150,9 +150,10 @@ int main()
     label->getTextStyle()
         .setFontPath("assets/fonts/LiberationSerif-Regular.ttf")
         .setRenderMethod(HkTextUserConfig::HkTextRenderMethod::BITMAP)
-        .setFontSize(24)
-        .setWrapAtWord(false)
-        .setTextAngle(0)
+        .setFontSize(80)
+        .setWrapAtWord(true)
+        // .setTextAngle(45)
+        // .setTextAngle(0)
         .setFontColor(glm::vec3(1.0f));
 
     label->getStyle()
@@ -160,15 +161,15 @@ int main()
             { .type = HkSizeType::PercParent, .value = 1.0f },
             { .type = HkSizeType::PercParent, .value = 1.0f });
 
-    uint32_t a = 60;
-    label->getEvents().setOnScrollListener([&label, &a](int32_t val)
-        {
+    // uint32_t a = 60;
+    // label->getEvents().setOnScrollListener([&label, &a](int32_t val)
+    //     {
 
-            label->getTextStyle().setFontSize(a);
-            printf("current size: %d\n", a);
-            a += 1 * val;
-            if (a < 6) a = 6;
-        });
+    //         label->getTextStyle().setFontSize(a);
+    //         printf("current size: %d\n", a);
+    //         a += 1 * val;
+    //         if (a < 6) a = 6;
+    //     });
 
     // label->setText("Pala gateste biban NO CAPS NO CAPS CAPS CAPS CAPS"
     //     "a ton more text look mom there's a lot of?./ text in here #$%%^");
@@ -180,10 +181,11 @@ int main()
     // label->setText(text + text + text + text + text + text + text + text + text + text + text);
     // label->setText("AA");
     // label->setText(std::string(text.begin(), text.begin() + 1000));
-    label->setText(smallText + smallText + smallText + smallText + smallText + smallText + smallText);
+    // label->setText(smallText + smallText + smallText + smallText + smallText + smallText + smallText);
     // label->setText(smallText + smallText + smallText + smallText + smallText + smallText + smallText + smallText + smallText + smallText + smallText + smallText);
-    // label->setText("Abcdefgjpm");
-    // label->setText("j");
+    // label->setText("o");
+    label->setText("AA");
+    // label->setText("jfsfgegwegweSGgergrewgGGEF");
     // windowFrame->pushChildren({ ctr, ctr4, ctr5, ctr6 });
     // windowFrame->pushChildren({ ctr, ctr4, ctr5 });
     windowFrame->pushChildren({ label });

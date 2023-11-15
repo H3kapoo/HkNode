@@ -36,7 +36,7 @@ void HkLabel::onFirstHeartbeat()
 
 }
 
-void HkLabel::nextWordData(const std::string& text, uint32_t index, uint32_t& advance, float& wordLen, float& wordHeight)
+void HkLabel::nextWordData(const std::string& text, uint32_t index, uint32_t& advance, float& wordLen, float& lowestPoint, float& highestPoint)
 {
     /*Get advance needed to get to the next word, 1 space separated + also gets the wordLen in pixels */
     const auto size = text.size();
@@ -44,9 +44,14 @@ void HkLabel::nextWordData(const std::string& text, uint32_t index, uint32_t& ad
     {
         const HkFontLoader::HkChar& ch = fontLoader_->getChar(text[index + advance]);
         wordLen += (ch.advance >> 6) * textScale_;
-        const float charHeightAboveBaseline = ch.size.y - (ch.size.y - ch.bearing.y);
-        if (charHeightAboveBaseline > wordHeight)
-            wordHeight = charHeightAboveBaseline;
+
+        const float heightUnderBaseline = -(ch.size.y - ch.bearing.y);
+        if (heightUnderBaseline < lowestPoint)
+            lowestPoint = heightUnderBaseline;
+
+        const float heightAboveBaseline = +ch.bearing.y;
+        if (heightAboveBaseline > highestPoint)
+            highestPoint = heightAboveBaseline;
 
         if (text[index + advance] == ' ' || index + advance == size - 1)
         {
@@ -86,7 +91,7 @@ void HkLabel::resolveDirtyText()
         if (usrTextConfig_.getWrapAtWord())
         {
             advance = 0;
-            nextWordData(text_, i, advance, wordLen, maxHeightForLineSoFar);
+            nextWordData(text_, i, advance, wordLen, lowestPoint, highestPoint);
         }
         else
         {
@@ -202,32 +207,39 @@ void HkLabel::postRenderAdditionalDetails()
 
             // std::cout << "ma: " << lines_[line].maxSize << "\n";
 
-            /* Construct model matrix. Read from bottom to top */
+            // /* Construct model matrix. Read from bottom to top */
+            // glm::mat4 modelMat = glm::mat4(1.0f);
+            // modelMat = glm::translate(modelMat, glm::vec3(end.x * 0.0f, end.y * 0.5f - combinedHeights * 0.5f, -1.0f));
+            // /* Note: Due to textures being fontSize x fontSize in dimension, FT Lib cannot cover the whole square
+            //    area with the letter glyph, due to that, if text is rotated continously, it looks a bit off center
+            //    but in this case it's fine since we don't plan to continously rotate it.*/
+            // if (usrTextConfig_.getTextAngle() != 0.0f)
+            // {
+            //     // modelMat = glm::rotate(modelMat, glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+            //     modelMat = glm::rotate(modelMat, (float)glfwGetTime() * 4, glm::vec3(0.0f, 0.0f, 1.0f));
+            // }
+
+            // modelMat = glm::translate(modelMat, glm::vec3(xpos - lines_[line].length * 0.5f, ypos - (-lines_[line].lowestPoint + lines_[line].highestPoint) * 0.5f, -1.0f));
+            // modelMat = glm::translate(modelMat, glm::vec3(-0.5f, -0.5f, 0));
+            // modelMat = glm::scale(modelMat, glm::vec3(w, h, 1.0f));
+            // modelMat = glm::translate(modelMat, glm::vec3(0.5f, 0.5f, 0));
+
+
             glm::mat4 modelMat = glm::mat4(1.0f);
             modelMat = glm::translate(modelMat, glm::vec3(end.x * 0.0f, end.y * 0.5f - combinedHeights * 0.5f, -1.0f));
-            // modelMat = glm::translate(modelMat, glm::vec3(end.x * 0.0f, end.y * 0.0f + combinedHeights, -1.0f));
             /* Note: Due to textures being fontSize x fontSize in dimension, FT Lib cannot cover the whole square
                area with the letter glyph, due to that, if text is rotated continously, it looks a bit off center
                but in this case it's fine since we don't plan to continously rotate it.*/
             if (usrTextConfig_.getTextAngle() != 0.0f)
             {
-                modelMat = glm::rotate(modelMat, glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+                // modelMat = glm::rotate(modelMat, glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+                // modelMat = glm::rotate(modelMat, (float)glfwGetTime() * 4, glm::vec3(0.0f, 0.0f, 1.0f));
             }
-            // modelMat = glm::translate(modelMat, glm::vec3(xpos + w * 0.5f - lines_[line].length * 0.5f, ypos + h * 0.5f, -1.0f));
-            modelMat = glm::translate(modelMat, glm::vec3(xpos, ypos, -1.0f));
-            // modelMat = glm::translate(modelMat, glm::vec3(xpos, ypos - (fontSize - ch.bearing.y) * 1, -1.0f));
+
+            modelMat = glm::translate(modelMat, glm::vec3(xpos + (end.x - lines_[line].length) * 0.5f, ypos, -1.0f));
             modelMat = glm::translate(modelMat, glm::vec3(-0.5f, -0.5f, 0));
             modelMat = glm::scale(modelMat, glm::vec3(w, h, 1.0f));
             modelMat = glm::translate(modelMat, glm::vec3(0.5f, 0.5f, 0));
-
-            // HkDrawDebugger::get().pushDraw10x10(glm::vec2(
-            //     xpos,
-            //     fontSize + lines_[line].lowestPoint));
-
-
-            // HkDrawDebugger::get().pushDraw10x10(glm::vec2(
-            //     xpos,
-            //     ypos - 1 * lines_[line].lowestPoint));
 
             /* Advance and upload to render batch*/
             x += (ch.advance >> 6) * textScale_;
@@ -235,8 +247,7 @@ void HkLabel::postRenderAdditionalDetails()
         }
     }
 
-
-    // /* End batch and render elements who didn't make it from last render call*/
+    /* End batch and render elements who didn't make it from last render call*/
     windowDataPtr_->renderer.endTextBatch();
 }
 

@@ -36,7 +36,8 @@ private:
     void postRenderAdditionalDetails();
 
     void resolveDirtyText();
-    void nextWordData(const std::string& text, uint32_t index, uint32_t& advance, float& wordLen, float& wordHeight);
+    void nextWordData(const std::string& text, uint32_t index, uint32_t& advance, float& wordLen,
+        float& lowestPoint, float& highestPoint);
 
     HkFontLoader* fontLoader_;
 
