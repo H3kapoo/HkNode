@@ -62,7 +62,7 @@ private:
     HkTextRenderMethod renderMethod{ 0 };
     uint32_t fontSize{ 16 };
     glm::vec3 color{ 1.0f };
-    bool wrapAtWord{ true };
+    bool wrapAtWord{ false };
     HkTextDirection direction{ 0 };
     float angle{ 0.0f };
     bool dirtyConfig{ false };
