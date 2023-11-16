@@ -25,7 +25,6 @@ private:
     {
         uint32_t startIdx{ 0 }, endIdx{ 0 };
         float length{ 0.0f };
-        uint32_t wordCount{ 0 };
 
         float lowestPoint{ 0.0f };
         float highestPoint{ 0.0f };
@@ -49,6 +48,7 @@ private:
     float textScale_{ 1.0f };
     float maxLenSoFar_{ 0 };
 
+    int32_t combinedCharHeights_{ 0 };
 };
 
 using HkLabelPtr = std::shared_ptr<HkLabel>;

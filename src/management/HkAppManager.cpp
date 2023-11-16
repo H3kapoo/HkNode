@@ -202,7 +202,7 @@ void HkAppManager::runLoop()
             windows_[i]->forceUpdate();
 
             /* HkDebugger, comment to make it go away :) */
-            HkDrawDebugger::get().drawBuffer();
+            // HkDrawDebugger::get().drawBuffer();
 
             glfwSwapBuffers(windows_[i]->getWindowHandle());
             //TODO: waitEvents has a known bug on multiple windows such that the animations will not finish
