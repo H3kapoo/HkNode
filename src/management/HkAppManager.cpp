@@ -115,6 +115,12 @@ void dropCallback(GLFWwindow* window, int count, const char** paths)
     // HkSceneManagement::get().dropEvent(window, count, paths);
 }
 
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    // let the user call the functions
+    // HkSceneManagement::get().dropEvent(window, count, paths);
+}
+
 HkAppManager& HkAppManager::get()
 {
     static HkAppManager instance;
@@ -244,6 +250,7 @@ void HkAppManager::addWindow(const HkWindowManagerPtr& window)
     glfwSetCursorEnterCallback(window->getWindowHandle(), mouseEnterCallback);
     glfwSetScrollCallback(window->getWindowHandle(), mouseScrollCallback);
     glfwSetDropCallback(window->getWindowHandle(), dropCallback);
+    glfwSetKeyCallback(window->getWindowHandle(), keyCallback);
 }
 
 void HkAppManager::removeWindow(const HkWindowManagerPtr& window)

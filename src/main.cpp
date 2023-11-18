@@ -169,11 +169,11 @@ int main()
     // uint32_t a = 60;
     std::string smallText = "AFG auick brown Fox jumps over";
 
-    label->getEvents().setOnClickListener([&label, &smallText]()
-        {
-            // printf("str: %s\n", smallText.c_str());
-            label->setText(smallText + smallText);
-        });
+    // label->getEvents().setOnClickListener([&label, &smallText]()
+    //     {
+    //         // printf("str: %s\n", smallText.c_str());
+    //         label->setText(smallText + smallText);
+    //     });
 
     // label->setText("Pala gateste biban NO CAPS NO CAPS CAPS CAPS CAPS"
     //     "a ton more text look mom there's a lot of?./ text in here #$%%^");
@@ -189,7 +189,7 @@ int main()
     // label->setText(text + text + text + text + text + text + text + text + text + text + text);
     // label->setText(text + text + text + text + text + text);
     // label->setText("AA");
-    label->setText(std::string(text.begin(), text.begin() + 400));
+    // label->setText(std::string(text.begin(), text.begin() + 400));
     // label->setText(text + text + text);
     // label->setText(smallText);
     // label->setText(smallText + smallText + smallText + smallText + smallText + smallText);
