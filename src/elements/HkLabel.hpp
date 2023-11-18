@@ -45,7 +45,8 @@ private:
 
     std::vector<HkTextLine> lines_;
     std::string text_;
-    float textScale_{ 1.0f };
+
+    glm::ivec2 lastScale_{ 1 };
     float maxLenSoFar_{ 0 };
 
     int32_t combinedCharHeights_{ 0 };

@@ -37,7 +37,7 @@ int main()
 
     windowFrame->getStyle().setOverflowAllowedXY(false)
         .setLayout(HkLayout::Horizontal)
-        // .setPinchConfig({ .enable = true })
+        .setPinchConfig({ .enable = true })
         .setRowWrapping(false)
         .setHAlignment(HkHAlignment::Center)
         .setVAlignment(HkVAlignment::Center);
@@ -150,31 +150,29 @@ int main()
     label->getTextStyle()
         .setFontPath("assets/fonts/LiberationSerif-Regular.ttf")
         .setRenderMethod(HkTextUserConfig::HkTextRenderMethod::BITMAP)
-        .setFontSize(12)
-        .setWrapAtWord(true)
+        .setFontSize(32)
+        // .setWrapAtWord(true)
         // .setTextAngle(45)
         // .setTextAngle(0)
         .setFontColor(glm::vec3(1.0f));
 
-    label->getStyle()
-        .setVHSizeConfig(
-            { .type = HkSizeType::PercParent, .value = 1.0f },
-            { .type = HkSizeType::PercParent, .value = 1.0f });
-
     // label->getStyle()
     //     .setVHSizeConfig(
-    //         { .type = HkSizeType::PercParent, .value = 0.4f },
-    //         { .type = HkSizeType::PercParent, .value = 0.4f });
+    //         { .type = HkSizeType::PercParent, .value = 1.0f },
+    //         { .type = HkSizeType::PercParent, .value = 1.0f });
+
+    label->getStyle()
+        .setVHSizeConfig(
+            { .type = HkSizeType::PercParent, .value = 0.5f },
+            { .type = HkSizeType::PercParent, .value = 0.5f });
 
     // uint32_t a = 60;
-    // label->getEvents().setOnScrollListener([&label, &a](int32_t val)
-    //     {
+    std::string smallText = "AFG auick brown Fox jumps over";
 
-    //         label->getTextStyle().setFontSize(a);
-    //         printf("current size: %d\n", a);
-    //         a += 1 * val;
-    //         if (a < 6) a = 6;
-    //     });
+    label->getEvents().setOnClickListener([&label, &smallText]()
+        {
+            printf("str: %s\n", smallText.c_str());
+        });
 
     // label->setText("Pala gateste biban NO CAPS NO CAPS CAPS CAPS CAPS"
     //     "a ton more text look mom there's a lot of?./ text in here #$%%^");
@@ -187,10 +185,12 @@ int main()
     // std::string smallText = "ooo_ooo_ooo_oo_oo_oooo";
     // std::string smallText = "A";
 
-    label->setText(text + text + text + text + text + text + text + text + text + text + text);
+    // label->setText(text + text + text + text + text + text + text + text + text + text + text);
+    // label->setText(text + text + text + text + text + text);
     // label->setText("AA");
-    // label->setText(std::string(text.begin(), text.begin() + 1000));
-    // label->setText(smallText + smallText);
+    label->setText(std::string(text.begin(), text.begin() + 400));
+    // label->setText(text + text + text);
+    // label->setText(smallText);
     // label->setText(smallText + smallText + smallText + smallText + smallText + smallText);
     // label->setText(smallText + smallText + smallText + smallText + smallText + smallText + smallText + smallText + smallText + smallText + smallText + smallText);
     // label->setText("o");
