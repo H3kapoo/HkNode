@@ -45,6 +45,7 @@ private:
 
     std::vector<HkTextLine> lines_;
     std::string text_;
+    bool textChanged_{ false };
 
     glm::ivec2 lastScale_{ 1 };
     float maxLenSoFar_{ 0 };

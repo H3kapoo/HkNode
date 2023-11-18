@@ -176,10 +176,10 @@ void HkLabel::postRenderAdditionalDetails()
     auto& labelPos = node_.transformContext.getPos();
 
     /* Resolve what data is gonna be on each text line. Do this only when scale of parent changes */
-    if (labelScale.x != lastScale_.x || labelScale.y != lastScale_.y)
+    if (labelScale.x != lastScale_.x || labelScale.y != lastScale_.y || textChanged_)
     {
         resolveDirtyText();
-        printf("Calculated again! %f\n", glfwGetTime());
+        textChanged_ = false;
     }
 
     gLTextConfig_.windowProjMatrix = windowDataPtr_->sceneProjMatrix;
@@ -250,7 +250,7 @@ void HkLabel::postRenderAdditionalDetails()
     lastScale_ = labelScale;
 }
 
-void HkLabel::setText(const std::string& text) { text_ = text; }
+void HkLabel::setText(const std::string& text) { text_ = text; textChanged_ = true; }
 
 HkTextUserConfig& HkLabel::getTextStyle() { return usrTextConfig_; }
 } // hkui

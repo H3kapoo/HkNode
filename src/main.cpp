@@ -171,7 +171,8 @@ int main()
 
     label->getEvents().setOnClickListener([&label, &smallText]()
         {
-            printf("str: %s\n", smallText.c_str());
+            // printf("str: %s\n", smallText.c_str());
+            label->setText(smallText + smallText);
         });
 
     // label->setText("Pala gateste biban NO CAPS NO CAPS CAPS CAPS CAPS"
