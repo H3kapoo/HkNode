@@ -80,6 +80,7 @@ private:
     virtual void onGeneralMouseScroll();
     virtual void onFirstHeartbeat();
     virtual void onResolveFocusPass();
+    virtual void onKeyAction();
     virtual void onDirtyAttribs(const std::unordered_set<HkStyleDirtyAttribs>&);
 
     virtual void postRenderAdditionalDetails();

@@ -121,6 +121,7 @@ void HkNodeBase::updateMySelf(const bool isSubWindowMinimized)
     case HkEvent::MouseEnterExit: break;
     case HkEvent::MouseScroll: resolveMouseScrollEvent(); break;
     case HkEvent::DropPath: break;
+    case HkEvent::KeyAction: onKeyAction(); break;
     }
 
     /* Heartbeat to initialize stuff like shaders/VAO that cannot be initted on object creation because
@@ -145,6 +146,7 @@ void HkNodeBase::updateMySelf(const bool isSubWindowMinimized)
     if (windowDataPtr_->currentEvent != HkEvent::FocusScan
         && windowDataPtr_->currentEvent != HkEvent::HoverScan
         && windowDataPtr_->currentEvent != HkEvent::MouseMove
+        && windowDataPtr_->currentEvent != HkEvent::KeyAction
         && windowDataPtr_->currentEvent != HkEvent::DropPath)
         // && windowDataPtr_->currentEvent != HkEvent::None)
     {
@@ -348,6 +350,7 @@ void HkNodeBase::onGeneralMouseMove() {}
 void HkNodeBase::onGeneralMouseClickOrRelease() {}
 void HkNodeBase::onGeneralMouseScroll() {}
 void HkNodeBase::onResolveFocusPass() {}
+void HkNodeBase::onKeyAction() {}
 void HkNodeBase::onDirtyAttribs(const std::unordered_set<HkStyleDirtyAttribs>&) {}
 
 

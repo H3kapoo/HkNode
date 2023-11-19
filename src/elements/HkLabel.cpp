@@ -32,6 +32,123 @@ void HkLabel::onFirstHeartbeat()
     std::cout << text_.size() << "\n";
 }
 
+void HkLabel::onKeyAction()
+{
+    //TODO: You can input stuff, but mod keys like SHIFT to change a key's meaning, still doesnt work yet
+    // maybe try to char input one callback?
+    char b = windowDataPtr_->lastKeyTriggered;
+    if (windowDataPtr_->keyStates[b] && windowDataPtr_->lastKeyTriggered != GLFW_KEY_SPACE)
+    {
+        if (windowDataPtr_->capsLockOn)
+        {
+            text_.push_back(b);
+        }
+        else
+        {
+            text_.push_back(b + 32);
+        }
+        textChanged_ = true;
+    }
+    else if (windowDataPtr_->lastKeyTriggered == GLFW_KEY_SPACE)
+    {
+        text_.push_back(' ');
+        textChanged_ = true;
+    }
+}
+
+void HkLabel::postRenderAdditionalDetails()
+{
+    /* Used instancing and methods described in: https://www.youtube.com/watch?v=S0PyZKX4lyI */
+
+    /* Resolve options that can only be done at this stage */
+    if (usrTextConfig_.getDirtyStatus())
+    {
+        resolveDirtyText();
+        fontLoader_ = windowDataPtr_->renderer.addFontLoaderSourceToCache(usrTextConfig_);
+        gLTextConfig_.texId = fontLoader_->getTexId();
+        usrTextConfig_.resetDirtyStatus();
+    }
+
+    uint32_t fontSize = usrTextConfig_.getFontSize();
+    auto& labelScale = node_.transformContext.getScale();
+    auto& labelPos = node_.transformContext.getPos();
+
+    /* Resolve what data is gonna be on each text line. Do this only when scale of parent changes */
+    if (labelScale.x != lastScale_.x || labelScale.y != lastScale_.y || textChanged_)
+    {
+        resolveDirtyText();
+        textChanged_ = false;
+    }
+
+    gLTextConfig_.windowProjMatrix = windowDataPtr_->sceneProjMatrix;
+    windowDataPtr_->renderer.beginTextBatch(gLTextConfig_);
+
+    //TODO: Spread between lines (line spacing) will be implemented in another feature
+    int32_t spread = 10;
+
+    //TODO: Couldnt we cache the results of the matrices?
+    /* Add each line to batch, skipping white spaces */
+    float accumulatedHeights = 0;
+    for (uint32_t line = 0; line < lines_.size(); line++)
+    {
+        int32_t x = labelPos.x;
+        int32_t y = labelPos.y + accumulatedHeights;
+
+        const int32_t lineHeightPlusSpread = (-lines_[line].lowestPoint + lines_[line].highestPoint + spread * 0.5f);
+        accumulatedHeights += lineHeightPlusSpread;
+
+        for (uint32_t i = lines_[line].startIdx; i < lines_[line].endIdx; i++)
+        {
+            const HkFontLoader::HkChar& ch = fontLoader_->getChar(text_[i]);
+            if (text_[i] == ' ') { x += (ch.advance >> 6); continue; }
+
+            /* Determine final position and scale*/
+            float xpos = x + ch.bearing.x;
+            float ypos = y - ch.bearing.y + lines_[line].highestPoint + spread * 0.0f;
+            float w = fontSize;
+            float h = fontSize;
+
+            /* Only add to render batch lines that are actually inside the container. If text is rotated, the rotated
+            part outside of bounds will not be considered. This cutoff is purely line based. */
+            const int32_t toRotateAlignY = std::ceil(ypos - combinedCharHeights_ * 0.5f + 0.5f * h - labelPos.y);
+            const int32_t pushToMiddleY = std::ceil(labelScale.y * 0.5f + labelPos.y);
+
+            const auto finalY = toRotateAlignY + pushToMiddleY;
+            if ((finalY > labelPos.y + labelScale.y + lineHeightPlusSpread) || (finalY < labelPos.y))
+            {
+                break;
+            }
+
+            /* Construct model matrix. Read from bottom to top */
+            glm::mat4 modelMat = glm::mat4(1.0f);
+            modelMat = glm::translate(modelMat, glm::vec3(
+                std::ceil(labelScale.x * 0.5f + labelPos.x),
+                pushToMiddleY,
+                -1.0f));
+
+            if (usrTextConfig_.getTextAngle() != 0.0f)
+            {
+                modelMat = glm::rotate(modelMat, glm::radians(usrTextConfig_.angle), glm::vec3(0.0f, 0.0f, 1.0f));
+            }
+
+            modelMat = glm::translate(modelMat, glm::vec3(
+                std::ceil(xpos - lines_[line].length * 0.5f + 0.5f * w - labelPos.x),
+                toRotateAlignY,
+                -1.0f));
+            modelMat = glm::scale(modelMat, glm::vec3(w * 1, h * 1, 1.0f));
+
+            /* Advance and upload to render batch*/
+            x += (ch.advance >> 6);
+            windowDataPtr_->renderer.addToTextBatch(ch.charIndex, modelMat);
+        }
+    }
+
+    /* End batch and render elements who didn't make it from last render call*/
+    windowDataPtr_->renderer.endTextBatch();
+
+    lastScale_ = labelScale;
+}
+
 void HkLabel::nextWordData(const std::string& text, uint32_t index, uint32_t& advance, float& wordLen,
     float& lowestPoint, float& highestPoint)
 {
@@ -156,98 +273,6 @@ void HkLabel::resolveDirtyText()
     //     printf("startIdx = %d ; endIdx = %d ; length = %f; low = %f; high = %f\n",
     //         lines_[i].startIdx, lines_[i].endIdx, lines_[i].length, lines_[i].lowestPoint, lines_[i].highestPoint);
     // }
-}
-
-void HkLabel::postRenderAdditionalDetails()
-{
-    /* Used instancing and methods described in: https://www.youtube.com/watch?v=S0PyZKX4lyI */
-
-    /* Resolve options that can only be done at this stage */
-    if (usrTextConfig_.getDirtyStatus())
-    {
-        resolveDirtyText();
-        fontLoader_ = windowDataPtr_->renderer.addFontLoaderSourceToCache(usrTextConfig_);
-        gLTextConfig_.texId = fontLoader_->getTexId();
-        usrTextConfig_.resetDirtyStatus();
-    }
-
-    uint32_t fontSize = usrTextConfig_.getFontSize();
-    auto& labelScale = node_.transformContext.getScale();
-    auto& labelPos = node_.transformContext.getPos();
-
-    /* Resolve what data is gonna be on each text line. Do this only when scale of parent changes */
-    if (labelScale.x != lastScale_.x || labelScale.y != lastScale_.y || textChanged_)
-    {
-        resolveDirtyText();
-        textChanged_ = false;
-    }
-
-    gLTextConfig_.windowProjMatrix = windowDataPtr_->sceneProjMatrix;
-    windowDataPtr_->renderer.beginTextBatch(gLTextConfig_);
-
-    //TODO: Spread between lines (line spacing) will be implemented in another feature
-    int32_t spread = 0;
-
-    /* Add each line to batch, skipping white spaces */
-    float accumulatedHeights = 0;
-    for (uint32_t line = 0; line < lines_.size(); line++)
-    {
-        int32_t x = labelPos.x;
-        int32_t y = labelPos.y + accumulatedHeights;
-
-        const int32_t lineHeightPlusSpread = (-lines_[line].lowestPoint + lines_[line].highestPoint + spread * 0.0f);
-        accumulatedHeights += lineHeightPlusSpread;
-
-        for (uint32_t i = lines_[line].startIdx; i < lines_[line].endIdx; i++)
-        {
-            const HkFontLoader::HkChar& ch = fontLoader_->getChar(text_[i]);
-            if (text_[i] == ' ') { x += (ch.advance >> 6); continue; }
-
-            /* Determine final position and scale*/
-            float xpos = x + ch.bearing.x;
-            float ypos = y - ch.bearing.y + lines_[line].highestPoint + spread * 0.0f;
-            float w = fontSize;
-            float h = fontSize;
-
-            /* Only add to render batch lines that are actually inside the container. If text is rotated, the rotated
-            part outside of bounds will not be considered. This cutoff is purely line based. */
-            const int32_t toRotateAlignY = std::ceil(ypos - combinedCharHeights_ * 0.5f + 0.5f * h - labelPos.y);
-            const int32_t pushToMiddleY = std::ceil(labelScale.y * 0.5f + labelPos.y);
-
-            const auto finalY = toRotateAlignY + pushToMiddleY;
-            if ((finalY > labelPos.y + labelScale.y + lineHeightPlusSpread) || (finalY < labelPos.y))
-            {
-                break;
-            }
-
-            /* Construct model matrix. Read from bottom to top */
-            glm::mat4 modelMat = glm::mat4(1.0f);
-            modelMat = glm::translate(modelMat, glm::vec3(
-                std::ceil(labelScale.x * 0.5f + labelPos.x),
-                pushToMiddleY,
-                -1.0f));
-
-            if (usrTextConfig_.getTextAngle() != 0.0f)
-            {
-                modelMat = glm::rotate(modelMat, glm::radians(usrTextConfig_.angle), glm::vec3(0.0f, 0.0f, 1.0f));
-            }
-
-            modelMat = glm::translate(modelMat, glm::vec3(
-                std::ceil(xpos - lines_[line].length * 0.5f + 0.5f * w - labelPos.x),
-                toRotateAlignY,
-                -1.0f));
-            modelMat = glm::scale(modelMat, glm::vec3(w * 1, h * 1, 1.0f));
-
-            /* Advance and upload to render batch*/
-            x += (ch.advance >> 6);
-            windowDataPtr_->renderer.addToTextBatch(ch.charIndex, modelMat);
-        }
-    }
-
-    /* End batch and render elements who didn't make it from last render call*/
-    windowDataPtr_->renderer.endTextBatch();
-
-    lastScale_ = labelScale;
 }
 
 void HkLabel::setText(const std::string& text) { text_ = text; textChanged_ = true; }

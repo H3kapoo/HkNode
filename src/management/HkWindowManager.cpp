@@ -307,7 +307,6 @@ void HkWindowManager::mouseClickedEventCalled(GLFWwindow*, int button, int actio
         windowData_.isDragging = false;
     }
 
-
     updateAllSubWindows(HkEvent::MouseClick);
 }
 
@@ -318,6 +317,30 @@ void HkWindowManager::mouseScrollEventCalled(GLFWwindow* window, double, double 
 
     updateAllSubWindows(HkEvent::HoverScan);
     updateAllSubWindows(HkEvent::MouseScroll);
+}
+
+void HkWindowManager::keyEventCalled(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    /*Set bit to true if key was pressed and reset it on key release*/
+    windowData_.keyStates[key] = action == GLFW_PRESS ? 1 : 0;
+    windowData_.lastKeyTriggered = key;
+
+    /*
+         00010000 -- capslock slot
+         00000100 -- mods  => should eval to false
+    */
+    if (mods & GLFW_MOD_CAPS_LOCK)
+    {
+        windowData_.capsLockOn = true;
+        // printf("Mods capslock exists: %x\n", mods);
+    }
+    else
+    {
+        windowData_.capsLockOn = false;
+        // printf("Mods capslock NOT EXISTS: %x\n", mods);
+    }
+
+    updateAllSubWindows(HkEvent::KeyAction);
 }
 
 /* This will traverse the whole tree structure from top to bottom (back to front) and return in the

@@ -109,16 +109,22 @@ void HkAppManager::mouseScrollCallback(GLFWwindow* window, double xoffset, doubl
     lastMoveTime2 = currentTime;
 }
 
-void dropCallback(GLFWwindow* window, int count, const char** paths)
-{
-    // let the user call the functions
-    // HkSceneManagement::get().dropEvent(window, count, paths);
-}
+// void dropCallback(GLFWwindow* window, int count, const char** paths)
+// {
+//     // let the user call the functions
+//     // HkSceneManagement::get().dropEvent(window, count, paths);
+// }
 
-void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+void HkAppManager::keyCallback(GLFWwindow* window, int key, int scanCode, int action, int mods)
 {
-    // let the user call the functions
-    // HkSceneManagement::get().dropEvent(window, count, paths);
+    for (uint32_t i = 0; i < windows_.size(); i++)
+    {
+        if (windows_[i]->getWindowHandle() == window)
+        {
+            windows_[i]->keyEventCalled(window, key, scanCode, action, mods);
+            break;
+        }
+    }
 }
 
 HkAppManager& HkAppManager::get()
@@ -249,8 +255,9 @@ void HkAppManager::addWindow(const HkWindowManagerPtr& window)
     glfwSetMouseButtonCallback(window->getWindowHandle(), mouseClickCallback);
     glfwSetCursorEnterCallback(window->getWindowHandle(), mouseEnterCallback);
     glfwSetScrollCallback(window->getWindowHandle(), mouseScrollCallback);
-    glfwSetDropCallback(window->getWindowHandle(), dropCallback);
+    // glfwSetDropCallback(window->getWindowHandle(), dropCallback);
     glfwSetKeyCallback(window->getWindowHandle(), keyCallback);
+    glfwSetInputMode(window->getWindowHandle(), GLFW_LOCK_KEY_MODS, GLFW_TRUE);
 }
 
 void HkAppManager::removeWindow(const HkWindowManagerPtr& window)

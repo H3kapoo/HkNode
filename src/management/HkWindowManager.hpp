@@ -43,6 +43,7 @@ private:
     void mouseMovedEventCalled(GLFWwindow* window, int x, int y);
     void mouseClickedEventCalled(GLFWwindow* window, int button, int action, int mods);
     void mouseScrollEventCalled(GLFWwindow* window, double xOffset, double yOffset);
+    void keyEventCalled(GLFWwindow* window, int key, int scancode, int action, int mods);
 
     void resolveFocus();
     void resolveHover();

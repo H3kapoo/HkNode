@@ -9,13 +9,15 @@
 namespace hkui
 {
 //TODO: Default init each variable to avoid garbage
+#define MAX_KEYS GLFW_KEY_LAST /*Max as defined in GLFW*/
+
 struct HkWindowData
 {
-    /* Window obj itself */
+    /*Window obj itself*/
     GLFWwindow* windowHandle{ NULL };
     uint32_t windowId{ 0 };
 
-    /* Events */
+    /*Events*/
     HkEvent currentEvent;
     glm::ivec2 windowSize;
     glm::ivec2 mousePos;
@@ -28,6 +30,12 @@ struct HkWindowData
     bool receivedDrop;
     int dropCount;
     const char** droppedPaths;
+
+    /*Keyboard input*/
+    bool keyStates[MAX_KEYS]; /* 0 - released ; 1 - pressed*/ //TODO: Use bitfields to reduce mem to MAX_KEYS/8
+    uint32_t lastKeyTriggered{ 0 };
+    bool capsLockOn{ false }; /* This is the only persistent lockable state we need to cache */
+    // bool numLockOn{ false }; /* Does anybody even use this? */
 
     /*Selection*/
     uint32_t focusedSubWindowId{ 0 };
