@@ -37,6 +37,22 @@ public:
         VERTICAL
     };
 
+    //TODO: Unify this with the HkAlignement from hkStyleContext
+    enum class HkTextVAlign
+    {
+        Top,
+        Center,
+        Bottom
+    };
+
+    //TODO: Unify this with the HkAlignement from hkStyleContext
+    enum class HkTextHAlign
+    {
+        Left,
+        Center,
+        Right
+    };
+
     HkTextUserConfig& getTextStyle() { return *this; }
     HkTextUserConfig& setFontPath(const std::string& value) { dirtyConfig = true; fontPath = value;  return *this; }
     HkTextUserConfig& setRenderMethod(const HkTextRenderMethod value) { dirtyConfig = true; renderMethod = value;  return *this; }
@@ -45,6 +61,10 @@ public:
     HkTextUserConfig& setWrapAtWord(const bool value) { dirtyConfig = true; wrapAtWord = value;  return *this; }
     HkTextUserConfig& setTextDirection(const HkTextDirection value) { dirtyConfig = true; direction = value;  return *this; }
     HkTextUserConfig& setTextAngle(const float value) { dirtyConfig = true; angle = value;  return *this; }
+    HkTextUserConfig& setTextHAlign(const HkTextHAlign value) { dirtyConfig = true; hAlign = value;  return *this; }
+    HkTextUserConfig& setTextVAlign(const HkTextVAlign value) { dirtyConfig = true; vAlign = value;  return *this; }
+    HkTextUserConfig& setTextVHAlign(const HkTextVAlign valueV, const HkTextHAlign valueH) { setTextVAlign(valueV); setTextHAlign(valueH);  return *this; }
+    HkTextUserConfig& setLineSpread(const float value) { dirtyConfig = true; lineSpread = value;  return *this; }
 
     inline std::string getFontPath() const { return fontPath; }
     inline HkTextRenderMethod getRenderMethod() const { return renderMethod; }
@@ -53,6 +73,9 @@ public:
     inline bool getWrapAtWord() const { return wrapAtWord; }
     inline HkTextDirection getTextDirection() const { return direction; }
     inline float getTextAngle() const { return angle; }
+    inline HkTextHAlign getTextHAlign() { return hAlign; }
+    inline HkTextVAlign getTextVAlign() { return vAlign; }
+    inline float getLineSpread() const { return lineSpread; }
 
 private:
     void resetDirtyStatus() { dirtyConfig = false; }
@@ -65,6 +88,9 @@ private:
     bool wrapAtWord{ false };
     HkTextDirection direction{ 0 };
     float angle{ 0.0f };
+    HkTextVAlign vAlign{ HkTextVAlign::Top };
+    HkTextHAlign hAlign{ HkTextHAlign::Left };
+    float lineSpread{ 0.0f };
     bool dirtyConfig{ false };
 };
 } // hkui

@@ -151,7 +151,9 @@ int main()
         .setFontPath("assets/fonts/LiberationSerif-Regular.ttf")
         .setRenderMethod(HkTextUserConfig::HkTextRenderMethod::BITMAP)
         .setFontSize(24)
-        .setFontColor(glm::vec3(1.0f));
+        .setFontColor(glm::vec3(1.0f))
+        .setLineSpread(0) //TODO: Implement
+        .setTextVHAlign(HkTextUserConfig::HkTextVAlign::Top, HkTextUserConfig::HkTextHAlign::Left);
 
     // label->getStyle()
     //     .setVHSizeConfig(
