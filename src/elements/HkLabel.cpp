@@ -8,6 +8,7 @@ namespace hkui
 HkLabel::HkLabel(const std::string& name)
     : HkNodeBase(name, HkNodeType::Label)
 {
+    //TODO: maybe these shall not be here?
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -32,28 +33,29 @@ void HkLabel::onFirstHeartbeat()
     std::cout << text_.size() << "\n";
 }
 
+//TODO: To be removed. Label shall not receive user input. Testing for now
+void HkLabel::onCharAction()
+{
+    /* Take action only if we are the currently selected id*/
+    // if (windowDataPtr_->focusedId != treeStruct_.getId()) { return; }
+
+    // char b = windowDataPtr_->pressedChar;
+    // text_.push_back(b);
+    // textChanged_ = true;
+}
+
+//TODO: To be removed. Label shall not receive user input. Testing for now
 void HkLabel::onKeyAction()
 {
-    //TODO: You can input stuff, but mod keys like SHIFT to change a key's meaning, still doesnt work yet
-    // maybe try to char input one callback?
-    char b = windowDataPtr_->lastKeyTriggered;
-    if (windowDataPtr_->keyStates[b] && windowDataPtr_->lastKeyTriggered != GLFW_KEY_SPACE)
-    {
-        if (windowDataPtr_->capsLockOn)
-        {
-            text_.push_back(b);
-        }
-        else
-        {
-            text_.push_back(b + 32);
-        }
-        textChanged_ = true;
-    }
-    else if (windowDataPtr_->lastKeyTriggered == GLFW_KEY_SPACE)
-    {
-        text_.push_back(' ');
-        textChanged_ = true;
-    }
+    // /* Take action only if we are the currently selected id*/
+    // if (windowDataPtr_->focusedId != treeStruct_.getId()) { return; }
+
+    // uint32_t key = windowDataPtr_->lastKeyTriggered;
+    // if (key == GLFW_KEY_BACKSPACE && windowDataPtr_->keyStates[key] && !text_.empty())
+    // {
+    //     text_.erase(text_.size() - 1);
+    //     textChanged_ = true;
+    // }
 }
 
 void HkLabel::postRenderAdditionalDetails()
@@ -84,7 +86,8 @@ void HkLabel::postRenderAdditionalDetails()
     windowDataPtr_->renderer.beginTextBatch(gLTextConfig_);
 
     //TODO: Spread between lines (line spacing) will be implemented in another feature
-    int32_t spread = 10;
+    // int32_t spread = 10;
+    int32_t spread = 0;
 
     //TODO: Couldnt we cache the results of the matrices?
     /* Add each line to batch, skipping white spaces */

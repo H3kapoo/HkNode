@@ -127,6 +127,18 @@ void HkAppManager::keyCallback(GLFWwindow* window, int key, int scanCode, int ac
     }
 }
 
+void HkAppManager::characterCallback(GLFWwindow* window, unsigned int codePoint)
+{
+    for (uint32_t i = 0; i < windows_.size(); i++)
+    {
+        if (windows_[i]->getWindowHandle() == window)
+        {
+            windows_[i]->characterEventCalled(window, codePoint);
+            break;
+        }
+    }
+}
+
 HkAppManager& HkAppManager::get()
 {
     static HkAppManager instance;
@@ -257,6 +269,7 @@ void HkAppManager::addWindow(const HkWindowManagerPtr& window)
     glfwSetScrollCallback(window->getWindowHandle(), mouseScrollCallback);
     // glfwSetDropCallback(window->getWindowHandle(), dropCallback);
     glfwSetKeyCallback(window->getWindowHandle(), keyCallback);
+    glfwSetCharCallback(window->getWindowHandle(), characterCallback);
     glfwSetInputMode(window->getWindowHandle(), GLFW_LOCK_KEY_MODS, GLFW_TRUE);
 }
 

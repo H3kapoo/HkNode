@@ -36,11 +36,15 @@ struct HkWindowData
     uint32_t lastKeyTriggered{ 0 };
     bool capsLockOn{ false }; /* This is the only persistent lockable state we need to cache */
     // bool numLockOn{ false }; /* Does anybody even use this? */
+    uint32_t pressedChar{ 0 };
 
     /*Selection*/
     uint32_t focusedSubWindowId{ 0 };
     uint32_t focusedId{ 0 };
     glm::ivec2 mouseOffsetFromFocusedCenter{ 0,0 };
+
+    /*Hover*/
+    uint32_t hoveredId{ 0 };
 
     /*Drag*/
     bool isDragging{ false };
@@ -48,23 +52,18 @@ struct HkWindowData
     int32_t suggestedCursor{ 0 };
     bool cursorChangeNeeded{ false };
 
-    /*Hover*/
-    uint32_t hoveredId{ 0 };
+    /*Scrolling*/
+    uint32_t nearestScrollContainerId_{ 0 };
 
     /*Rendering*/
     glm::mat4 sceneProjMatrix;
+    HkRenderer renderer;
 
     /*Scene deletion*/
     bool isWindowStillAlive{ true };
 
     /*Visibility*/
     std::unordered_map<uint32_t, bool> subWindowIdToIsMinimizedMap_;
-
-    /*Scrolling*/
-    uint32_t nearestScrollContainerId_{ 0 };
-
-    /*Renderer*/
-    HkRenderer renderer;
 
     /*Animation*/
     uint32_t objectsNeedingAnimFrame{ 0 };

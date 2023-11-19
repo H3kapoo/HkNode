@@ -81,6 +81,7 @@ private:
     virtual void onFirstHeartbeat();
     virtual void onResolveFocusPass();
     virtual void onKeyAction();
+    virtual void onCharAction();
     virtual void onDirtyAttribs(const std::unordered_set<HkStyleDirtyAttribs>&);
 
     virtual void postRenderAdditionalDetails();

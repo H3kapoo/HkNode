@@ -22,6 +22,7 @@ public:
     static void mouseClickCallback(GLFWwindow* window, int button, int action, int mods);
     static void mouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
     static void keyCallback(GLFWwindow* window, int key, int scanCode, int action, int mods);
+    static void characterCallback(GLFWwindow* window, unsigned int codepoint);
 
     bool setup();
     void teardown();

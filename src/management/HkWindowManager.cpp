@@ -310,7 +310,7 @@ void HkWindowManager::mouseClickedEventCalled(GLFWwindow*, int button, int actio
     updateAllSubWindows(HkEvent::MouseClick);
 }
 
-void HkWindowManager::mouseScrollEventCalled(GLFWwindow* window, double, double yOffset)
+void HkWindowManager::mouseScrollEventCalled(GLFWwindow*, double, double yOffset)
 {
     windowData_.lastScrollPosY = windowData_.scrollPosY;
     windowData_.scrollPosY = yOffset;
@@ -319,28 +319,28 @@ void HkWindowManager::mouseScrollEventCalled(GLFWwindow* window, double, double 
     updateAllSubWindows(HkEvent::MouseScroll);
 }
 
-void HkWindowManager::keyEventCalled(GLFWwindow* window, int key, int scancode, int action, int mods)
+/* Use this only for non text input based operations, like make shortcuts*/
+void HkWindowManager::keyEventCalled(GLFWwindow*, int key, int, int action, int)
 {
+    if (key >= MAX_KEYS) { printf("Max keys reached. Cannot fit %d\n!", key); return; }
+
     /*Set bit to true if key was pressed and reset it on key release*/
     windowData_.keyStates[key] = action == GLFW_PRESS ? 1 : 0;
     windowData_.lastKeyTriggered = key;
 
-    /*
-         00010000 -- capslock slot
-         00000100 -- mods  => should eval to false
-    */
-    if (mods & GLFW_MOD_CAPS_LOCK)
-    {
-        windowData_.capsLockOn = true;
-        // printf("Mods capslock exists: %x\n", mods);
-    }
-    else
-    {
-        windowData_.capsLockOn = false;
-        // printf("Mods capslock NOT EXISTS: %x\n", mods);
-    }
-
     updateAllSubWindows(HkEvent::KeyAction);
+}
+
+/* The difference between this and keyEventCallback is that this one takes into account the currently active
+modifiers like ALT/CAPSLOCL/SHFIT and returns the OS deduced character. Example: if shift is not pressed, '/' will be the
+received codepoint but if shitft is pressed, '?' will be the received codepoint. This is to be used in case of text input.
+Note: this does fire contunously if letter is pressed */
+void HkWindowManager::characterEventCalled(GLFWwindow*, unsigned int codePoint)
+{
+    if (codePoint >= MAX_KEYS) { printf("Max code point reached. Cannot fit %d\n!", codePoint); return; }
+
+    windowData_.pressedChar = codePoint;
+    updateAllSubWindows(HkEvent::CharAction);
 }
 
 /* This will traverse the whole tree structure from top to bottom (back to front) and return in the

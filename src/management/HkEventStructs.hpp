@@ -36,6 +36,7 @@ enum class HkEvent
     MouseScroll,
     DropPath,
     AnimationFrame,
-    KeyAction
+    KeyAction,
+    CharAction /* Similar to KeyAction but text input specific*/
 };
 }

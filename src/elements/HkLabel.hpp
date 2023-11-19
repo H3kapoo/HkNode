@@ -33,6 +33,7 @@ private:
     /* HkNodeBase */
     void onFirstHeartbeat();
     void onKeyAction();
+    void onCharAction();
     void postRenderAdditionalDetails();
 
     void resolveDirtyText();
