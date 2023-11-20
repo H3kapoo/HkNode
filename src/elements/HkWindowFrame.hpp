@@ -9,6 +9,7 @@
 #include "../utils/HkPinchHelper.hpp"
 #include "HkContainer.hpp"
 #include "HkButton.hpp"
+#include "HkLabel.hpp"
 
 namespace hkui
 {
@@ -31,6 +32,7 @@ public:
     void setPos(const glm::vec2& pos);
     void setSize(const glm::vec2& size);
     void setWindowMode(const HkWindowFrameMode mode);
+    void setTitle(const std::string& title);
 
     /* Getters */
     bool isAlive() const override;
@@ -62,10 +64,10 @@ private:
     /* Injects */
     void injectWindowDataPtr(HkWindowData* windowDataPtr) override;
 
+    HkLabel titleLabel_;
     HkButton minimizeBtn_;
     HkButton exitBtn_;
     HkContainer wfCont_;
-
 
     bool stillAlive_{ true };
     HkWindowFrameMode mode_;

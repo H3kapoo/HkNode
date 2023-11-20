@@ -32,9 +32,9 @@ using HkTreeStruct = std::vector<HkTreeStructure<HkNodeBase, HkNodeType>*>;
 class HkNodeBase
 {
     friend class HkWindowManager;
-
     friend class HkSceneRenderer;
 
+    /* Add here newly created UI Elements */
     friend class HkWindowFrame;
     friend class HkContainer;
     friend class HkButton;

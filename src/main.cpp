@@ -29,7 +29,7 @@ int main()
 
     HkAppManager::get().addWindow(sceneWindow1);
     // HkAppManager::get().addWindow(sceneWindow2);
-    sceneWindow1->makeContextCurrent();
+    // sceneWindow1->makeContextCurrent();
 
     HkWindowFramePtr windowFrame = std::make_shared<HkWindowFrame>("MyWindowFrame");
     windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);

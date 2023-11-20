@@ -6,6 +6,7 @@ namespace hkui
 
 HkWindowFrame::HkWindowFrame(const std::string& windowName)
     : HkNodeBase(windowName, HkNodeType::RootWindowFrame)
+    , titleLabel_("{Internal}-TitleLabelFor " + windowName)
     , minimizeBtn_("{Internal}-MinimizeButtonFor " + windowName)
     , exitBtn_("{Internal}-ExitButtonFor " + windowName)
     , wfCont_("{Internal}-ContainerFor " + windowName)
@@ -16,11 +17,12 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
     /* Setup defaults that don't have to do with VAOs/Textures/Shaders themselves*/
     node_.styleContext.setColor(glm::vec3(0.0f, 0.5f, 0.9f));
 
-    wfCont_.node_.styleContext.setRowWrapping(true);
+    // wfCont_.node_.styleContext.setRowWrapping(true); //TODO: Why was it enabled by default?
     wfCont_.node_.styleContext.setColor(glm::vec3(0.0f, 0.5f, 0.5f));
 
     pinchHelper_.setGrabSize(15);
 
+    treeStruct_.pushChild(&titleLabel_.treeStruct_);
     treeStruct_.pushChild(&minimizeBtn_.treeStruct_);
     treeStruct_.pushChild(&exitBtn_.treeStruct_);
     treeStruct_.pushChild(&wfCont_.treeStruct_);
@@ -34,10 +36,29 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
         {
             stillAlive_ = false;
         });
+
+    titleLabel_.getStyle().setColor(glm::vec3(0.0f, 0.5f, 0.8f));
+    titleLabel_.getTextStyle()
+        .setFontPath("assets/fonts/LiberationSerif-Regular.ttf")
+        .setRenderMethod(HkTextUserConfig::HkTextRenderMethod::BITMAP)
+        .setFontSize(24)
+        .setWrapAtWord(true)
+        .setFontColor(glm::vec3(1.0f))
+        .setTextVHAlign(HkTextUserConfig::HkTextVAlign::Center, HkTextUserConfig::HkTextHAlign::Center);
+
+    //TODO: Fix clicking and dragging on title not moving the window frame. We need to send events to parent that we are
+    //      currently under drag
+    // titleLabel_.getEvents().setOnClickListener([this]()
+    //     {
+    //         printf("Dragging\n");
+    //         onDrag();
+    //     });
+
 }
 
 void HkWindowFrame::onFirstHeartbeat()
 {
+    /* Here we shall put things that cannot be initialized without first having a valid opengl/glfw context */
     /*Init pinching helper*/
     pinchHelper_.init(*windowDataPtr_);
     pinchHelper_.setGrabConfig({ .allowLeft = true, .allowRight = true, .allowTop = true, .allowBottom = true });
@@ -47,6 +68,7 @@ void HkWindowFrame::onFirstHeartbeat()
 
 void HkWindowFrame::onResolveFocusPass()
 {
+    /* All information needed by pinch helper for various reasons */
     if (wfCont_.getStyle().getPinchConfig().enable)
     {
         boundPos_ = { node_.transformContext.getPos() };
@@ -62,9 +84,7 @@ void HkWindowFrame::onResolveFocusPass()
 void HkWindowFrame::postRenderAdditionalDetails()
 {
     /* Normally we would just pass a reference to pos+scale of TC, but windowFrame is special
-       because it has a top frame and a container object */
-
-       /* To note that we should always render the bars last*/
+       because it has a top frame and a container object. To note that we should always render the bars last */
     if (wfCont_.getStyle().getPinchConfig().enable)
     {
         pinchHelper_.onBarRender(*windowDataPtr_, boundPos_, boundScale_);
@@ -157,8 +177,13 @@ void HkWindowFrame::resolveChildrenConstraints(HkTreeStruct&,
         cachedScale_ = wfCont_.node_.transformContext.getScale();
     }
 
-    node_.constraintContext.windowFrameContainerConstraint(wfCont_.node_.transformContext,
-        exitBtn_.node_.transformContext, minimizeBtn_.node_.transformContext, windowDataPtr_->windowSize,
+    //TODO: This needs to be refactored eventually
+    node_.constraintContext.windowFrameContainerConstraint(
+        titleLabel_.node_.transformContext,
+        wfCont_.node_.transformContext,
+        exitBtn_.node_.transformContext,
+        minimizeBtn_.node_.transformContext,
+        windowDataPtr_->windowSize,
         /* Means we are in the fullscreen fixed mode, we hide the "grab bar"*/
         (mode_ != HkWindowFrameMode::Grabbable ? true : false));
 }
@@ -212,6 +237,8 @@ void HkWindowFrame::setWindowMode(const HkWindowFrameMode mode)
     }
 }
 
+void HkWindowFrame::setTitle(const std::string& title) { titleLabel_.setText(title); }
+
 HkStyleContext& HkWindowFrame::getStyle()
 {
     return wfCont_.getStyle();
@@ -231,6 +258,7 @@ void HkWindowFrame::injectWindowDataPtr(HkWindowData* windowDataPtr)
     /* Window frame is special and has children UI elements,
        each of them need to know about the same window data*/
     windowDataPtr_ = windowDataPtr;
+    titleLabel_.windowDataPtr_ = windowDataPtr;
     minimizeBtn_.windowDataPtr_ = windowDataPtr;
     exitBtn_.windowDataPtr_ = windowDataPtr;
     wfCont_.windowDataPtr_ = windowDataPtr;
