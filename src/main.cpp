@@ -151,9 +151,10 @@ int main()
         .setFontPath("assets/fonts/LiberationSerif-Regular.ttf")
         .setRenderMethod(HkTextUserConfig::HkTextRenderMethod::BITMAP)
         .setFontSize(24)
+        // .setTextAngle(0)
         .setFontColor(glm::vec3(1.0f))
         .setLineSpread(0) //TODO: Implement
-        .setTextVHAlign(HkTextUserConfig::HkTextVAlign::Top, HkTextUserConfig::HkTextHAlign::Left);
+        .setTextVHAlign(HkTextUserConfig::HkTextVAlign::Bottom, HkTextUserConfig::HkTextHAlign::Right);
 
     // label->getStyle()
     //     .setVHSizeConfig(
@@ -162,8 +163,8 @@ int main()
 
     label->getStyle()
         .setVHSizeConfig(
-            { .type = HkSizeType::PercParent, .value = 1.0f },
-            { .type = HkSizeType::PercParent, .value = 1.0f });
+            { .type = HkSizeType::PercParent, .value = 0.5f },
+            { .type = HkSizeType::PercParent, .value = 0.5f });
 
     // uint32_t a = 60;
     // std::string smallText = "AFG auick brown Fox jumps over";
@@ -191,8 +192,8 @@ int main()
     // label->setText("AA");
     // label->setText(std::string(text.begin(), text.begin() + 400));
     // label->setText(text + text + text);
-    label->setText(smallText);
-    // label->setText(smallText + smallText + smallText + smallText + smallText + smallText);
+    // label->setText(smallText);
+    label->setText(smallText + smallText + smallText + smallText + smallText + smallText);
     // label->setText(smallText + smallText + smallText + smallText + smallText + smallText + smallText + smallText + smallText + smallText + smallText + smallText);
     // label->setText("o");
     // label->setText("8");

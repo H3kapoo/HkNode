@@ -19,7 +19,7 @@ void HkNodeBase::renderMySelf()
     /* We only render the visible area of the UI element as calculated in the update pass*/
     if (treeStruct_.getType() != HkNodeType::RootWindowFrame)
     {
-        // glEnable(GL_SCISSOR_TEST);
+        glEnable(GL_SCISSOR_TEST);
         glScissor(
             tc.getVPos().x,
             windowDataPtr_->windowSize.y - tc.getVPos().y - tc.getVScale().y,
@@ -50,7 +50,7 @@ void HkNodeBase::renderMySelf()
     /* Use this to render additional non interactive things if needed */
     /* Note: rescissoring to original parent is needed unfortunatelly */
 
-    // glEnable(GL_SCISSOR_TEST);
+    glEnable(GL_SCISSOR_TEST);
     glScissor(
         tc.getVPos().x,
         windowDataPtr_->windowSize.y - tc.getVPos().y - tc.getVScale().y,
