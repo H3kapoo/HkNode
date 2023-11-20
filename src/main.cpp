@@ -151,10 +151,11 @@ int main()
         .setFontPath("assets/fonts/LiberationSerif-Regular.ttf")
         .setRenderMethod(HkTextUserConfig::HkTextRenderMethod::BITMAP)
         .setFontSize(24)
+        .setWrapAtWord(true)
         // .setTextAngle(0)
         .setFontColor(glm::vec3(1.0f))
-        .setLineSpread(0) //TODO: Implement
-        .setTextVHAlign(HkTextUserConfig::HkTextVAlign::Bottom, HkTextUserConfig::HkTextHAlign::Right);
+        .setLineSpread(10)
+        .setTextVHAlign(HkTextUserConfig::HkTextVAlign::Center, HkTextUserConfig::HkTextHAlign::Center);
 
     // label->getStyle()
     //     .setVHSizeConfig(
@@ -193,7 +194,7 @@ int main()
     // label->setText(std::string(text.begin(), text.begin() + 400));
     // label->setText(text + text + text);
     // label->setText(smallText);
-    label->setText(smallText + smallText + smallText + smallText + smallText + smallText);
+    label->setText(smallText + smallText + smallText + smallText + smallText);
     // label->setText(smallText + smallText + smallText + smallText + smallText + smallText + smallText + smallText + smallText + smallText + smallText + smallText);
     // label->setText("o");
     // label->setText("8");

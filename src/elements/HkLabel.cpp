@@ -87,7 +87,7 @@ void HkLabel::postRenderAdditionalDetails()
 
     //TODO: Spread between lines (line spacing) will be implemented in another feature
     // int32_t spread = 10;
-    int32_t spread = 0;
+    int32_t spread = usrTextConfig_.getLineSpread();
 
     //TODO: Couldnt we cache the results of the matrices?
     /* Add each line to batch, skipping white spaces */
@@ -97,8 +97,8 @@ void HkLabel::postRenderAdditionalDetails()
         int32_t x = labelPos.x;
         int32_t y = labelPos.y + accumulatedHeights;
 
-        const int32_t lineHeightPlusSpread = (-lines_[line].lowestPoint + lines_[line].highestPoint + spread * 0.5f);
-        accumulatedHeights += lineHeightPlusSpread;
+        const int32_t lineHeightPlusSpread = (-lines_[line].lowestPoint + lines_[line].highestPoint);
+        accumulatedHeights += lineHeightPlusSpread + spread;
 
         for (uint32_t i = lines_[line].startIdx; i < lines_[line].endIdx; i++)
         {
@@ -107,11 +107,11 @@ void HkLabel::postRenderAdditionalDetails()
 
             /* Determine final position and scale*/
             float xpos = x + ch.bearing.x;
-            float ypos = y - ch.bearing.y + lines_[line].highestPoint + spread * 0.0f;
+            float ypos = y - ch.bearing.y + lines_[line].highestPoint;
             float w = fontSize;
             float h = fontSize;
 
-            const int32_t toRotateAlignY = std::ceil(ypos - combinedCharHeights_ * 0.5f + 0.5f * h - labelPos.y);
+            int32_t toRotateAlignY = ypos - combinedCharHeights_ * 0.5f + 0.5f * h - labelPos.y;
 
             /* Calculate vertical text alignement*/
             int32_t pushToAlignedY = 0;
@@ -119,17 +119,20 @@ void HkLabel::postRenderAdditionalDetails()
             {
             case HkTextUserConfig::HkTextVAlign::Top:
             {
-                pushToAlignedY = std::ceil(labelPos.y + combinedCharHeights_ * 0.5f); // top side
+                pushToAlignedY = std::ceil(labelPos.y + combinedCharHeights_ * 0.5f);
+                toRotateAlignY = std::ceil(toRotateAlignY);
                 break;
             }
             case HkTextUserConfig::HkTextVAlign::Center:
             {
-                pushToAlignedY = std::ceil(labelScale.y * 0.5f + labelPos.y); // actually middle
+                pushToAlignedY = std::ceil(labelScale.y * 0.5f + labelPos.y);
+                toRotateAlignY = std::ceil(toRotateAlignY - spread * 0.5f);
                 break;
             }
             case HkTextUserConfig::HkTextVAlign::Bottom:
             {
-                pushToAlignedY = std::ceil(labelPos.y + labelScale.y - combinedCharHeights_ * 0.5f); // bot side
+                pushToAlignedY = std::ceil(labelPos.y + labelScale.y - combinedCharHeights_ * 0.5f);
+                toRotateAlignY = std::ceil(toRotateAlignY - spread);
                 break;
             }
             }
@@ -174,10 +177,10 @@ void HkLabel::postRenderAdditionalDetails()
                 pushToAlignedY,
                 -1.0f));
 
-            if (usrTextConfig_.getTextAngle() != 0.0f)
+            // if (usrTextConfig_.getTextAngle() != 0.0f)
             {
                 // modelMat = glm::rotate(modelMat, (float)glfwGetTime() * 2, glm::vec3(0.0f, 0.0f, 1.0f));
-                modelMat = glm::rotate(modelMat, glm::radians(usrTextConfig_.angle), glm::vec3(0.0f, 0.0f, 1.0f));
+                // modelMat = glm::rotate(modelMat, glm::radians(usrTextConfig_.angle), glm::vec3(0.0f, 0.0f, 1.0f));
             }
 
             modelMat = glm::translate(modelMat, glm::vec3(

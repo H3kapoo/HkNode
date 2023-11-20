@@ -64,7 +64,7 @@ public:
     HkTextUserConfig& setTextHAlign(const HkTextHAlign value) { dirtyConfig = true; hAlign = value;  return *this; }
     HkTextUserConfig& setTextVAlign(const HkTextVAlign value) { dirtyConfig = true; vAlign = value;  return *this; }
     HkTextUserConfig& setTextVHAlign(const HkTextVAlign valueV, const HkTextHAlign valueH) { setTextVAlign(valueV); setTextHAlign(valueH);  return *this; }
-    HkTextUserConfig& setLineSpread(const float value) { dirtyConfig = true; lineSpread = value;  return *this; }
+    HkTextUserConfig& setLineSpread(const int32_t value) { dirtyConfig = true; lineSpread = value;  return *this; }
 
     inline std::string getFontPath() const { return fontPath; }
     inline HkTextRenderMethod getRenderMethod() const { return renderMethod; }
@@ -75,7 +75,7 @@ public:
     inline float getTextAngle() const { return angle; }
     inline HkTextHAlign getTextHAlign() { return hAlign; }
     inline HkTextVAlign getTextVAlign() { return vAlign; }
-    inline float getLineSpread() const { return lineSpread; }
+    inline int32_t getLineSpread() const { return lineSpread; }
 
 private:
     void resetDirtyStatus() { dirtyConfig = false; }
@@ -90,7 +90,7 @@ private:
     float angle{ 0.0f };
     HkTextVAlign vAlign{ HkTextVAlign::Top };
     HkTextHAlign hAlign{ HkTextHAlign::Left };
-    float lineSpread{ 0.0f };
+    int32_t lineSpread{ 0 };
     bool dirtyConfig{ false };
 };
 } // hkui
