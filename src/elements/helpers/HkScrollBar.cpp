@@ -7,9 +7,9 @@ HkScrollBar::HkScrollBar(const std::string& name, const bool isHorizontal)
     : HkNodeBase(name, HkNodeType::ScrollBar)
     , isHorizontal_(isHorizontal)
 {
-    node_.styleContext.setColor(glm::vec3(0.95f, 1.0f, 0.95f));
+    node_.styleContext.setColor(glm::vec4(0.95f, 1.0f, 0.95f, 1.0f));
 
-    knob_.styleContext.setColor(glm::vec3(0.5f, 0.7f, 0.9f));
+    knob_.styleContext.setColor(glm::vec4(0.5f, 0.7f, 0.9f, 1.0f));
     knob_.renderContext.colorUniformEn = true;
 
     /* default bar scale depending on orientation */

@@ -36,13 +36,13 @@ int main()
     sceneWindow1->addSubWindow(windowFrame); //NOTE: Needs to be added before adding any children
 
     windowFrame->getStyle().setOverflowAllowedXY(false)
-        .setLayout(HkLayout::Horizontal)
+        .setLayout(HkLayout::HPinch)
         .setPinchConfig({ .enable = true })
         .setRowWrapping(false)
         .setHAlignment(HkHAlignment::Center)
         .setVAlignment(HkVAlignment::Center);
 
-    windowFrame->setSize({ 1280 / 2 , 720 / 1.5f });
+    windowFrame->setSize({ 1280, 720 });
     windowFrame->setPos({ 1920 / 2 - 200 , 1080 / 2 - 100 });
 
     HkContainerPtr ctr = std::make_shared<HkContainer>("MyContainer");
@@ -62,39 +62,40 @@ int main()
     // label->setText("Pala gateste biban NO CAPS and this is a very bussy string NO CAPS mr.s white carbonara mmmmm....cuvinte GgGPBpbp");
 
     // WF children
-    ctr->getStyle().setColor({ 1.0f,0.0f,1.0f })
+    ctr->getStyle().setColor({ 1.0f,0.0f,1.0f ,1.0f })
         .setLayout(HkLayout::VPinch)
         .setHSizeConfig(
             { .type = HkSizeType::PercParent, .value = 0.5f, .min = 300 })
-        .setPinchConfig({ .enable = true, .alwaysOn = true, .allowRight = true, .allowTop = true, .allowBottom = true });
+        .setPinchConfig({ .enable = true, .alwaysOn = false, .allowRight = true, .allowTop = true, .allowBottom = true });
 
-    ctr4->getStyle().setColor({ 1.0f,0.0f,0.0f })
-        .setLayout(HkLayout::VPinch)
+    ctr4->getStyle().setColor({ 1.0f,0.0f,0.0f ,1.0f })
+        .setLayout(HkLayout::Vertical)
         // .setLayout(HkLayout::Vertical)
+        .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center)
         .setHSizeConfig(
             { .type = HkSizeType::PercParent, .value = 0.25f, .min = 300 })
-        .setPinchConfig({ .enable = true,.alwaysOn = true, .allowRight = true, .allowTop = true, .allowBottom = true });
+        .setPinchConfig({ .enable = true,.alwaysOn = false, .allowRight = true, .allowTop = true, .allowBottom = true });
 
-    ctr5->getStyle().setColor({ 0.3f,0.5f,0.0f })
+    ctr5->getStyle().setColor({ 0.3f,0.5f,0.0f ,1.0f })
         .setLayout(HkLayout::VPinch)
         .setHSizeConfig(
             { .type = HkSizeType::PercParent, .value = 0.25f, .min = 300 })
-        .setPinchConfig({ .enable = true, .alwaysOn = true,.allowTop = true, .allowBottom = true });
+        .setPinchConfig({ .enable = true, .alwaysOn = false,.allowTop = true, .allowBottom = true });
 
-    //ctr4 children
-    ctr6->getStyle().setColor({ 0.0f,0.0f,1.0f })
-        .setLayout(HkLayout::Horizontal)
-        .setVSizeConfig(
-            { .type = HkSizeType::PercParent, .value = 0.75f, .min = 300 })
-        .setPinchConfig({ .enable = true,.alwaysOn = true, .allowLeft = true, .allowRight = true, .allowBottom = true });
+    // //ctr4 children
+    // ctr6->getStyle().setColor({ 0.0f,0.0f,1.0f,1.0f })
+    //     .setLayout(HkLayout::Horizontal)
+    //     .setVSizeConfig(
+    //         { .type = HkSizeType::PercParent, .value = 0.75f, .min = 300 })
+    //     .setPinchConfig({ .enable = true,.alwaysOn = false, .allowLeft = true, .allowRight = true, .allowBottom = true });
 
-    ctr7->getStyle().setColor({ 0.3f,0.7f,0.0f })
-        .setLayout(HkLayout::Horizontal)
-        .setOverflowAllowedXY(true)
-        .setRowWrapping(true)
-        .setVSizeConfig(
-            { .type = HkSizeType::PercParent, .value = 0.25f, .min = 300 })
-        .setPinchConfig({ .enable = true,.alwaysOn = true, .allowLeft = true, .allowRight = true });
+    // ctr7->getStyle().setColor({ 0.3f,0.7f,0.0f,1.0f })
+    //     .setLayout(HkLayout::Horizontal)
+    //     .setOverflowAllowedXY(true)
+    //     .setRowWrapping(true)
+    //     .setVSizeConfig(
+    //         { .type = HkSizeType::PercParent, .value = 0.25f, .min = 300 })
+    //     .setPinchConfig({ .enable = true,.alwaysOn = false, .allowLeft = true, .allowRight = true });
     //
 
     // ctr8->getStyle().setColor({ 0.5f,0.4f,1.0f })
@@ -112,39 +113,24 @@ int main()
 
 
 
-    ctr10->getStyle().setColor({ 0.0f,0.7f,1.0f })
+    ctr10->getStyle().setColor({ 0.0f,0.7f,1.0f, 1.0f })
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         .setVSizeConfig(
             { .type = HkSizeType::PercParent, .value = 0.5f, .min = 50 })
-        .setPinchConfig({ .enable = true,.alwaysOn = true, .allowLeft = true, .allowBottom = true });
+        .setPinchConfig({ .enable = true, .alwaysOn = false, .allowLeft = true, .allowBottom = true });
 
-    ctr11->getStyle().setColor({ 0.4f,0.7f,0.0f })
+    ctr11->getStyle().setColor({ 0.4f,0.7f,0.0f, 1.0f })
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         .setVSizeConfig(
             { .type = HkSizeType::PercParent, .value = 0.25f, .min = 50 })
-        .setPinchConfig({ .enable = true, .alwaysOn = true,.allowLeft = true, .allowBottom = true });
+        .setPinchConfig({ .enable = true, .alwaysOn = false, .allowLeft = true, .allowBottom = true });
 
-    ctr12->getStyle().setColor({ 0.0f,0.7f,1.0f })
+    ctr12->getStyle().setColor({ 0.0f,0.7f,1.0f, 1.0f })
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         .setVSizeConfig(
             { .type = HkSizeType::PercParent, .value = 0.25f, .min = 50 })
-        .setPinchConfig({ .enable = true, .alwaysOn = true,.allowLeft = true, .allowBottom = true });
-    {
+        .setPinchConfig({ .enable = true, .alwaysOn = false, .allowLeft = true, .allowBottom = true });
 
-        // ctr13->getStyle().setColor({ 0.1f,0.7f,0.0f })
-        //     .setLayout(HkLayout::Vertical)
-        //     .setPinchConfig({ .allowRight = true, .allowTop = true });
-        // ctr14->getStyle().setColor({ 0.5f,0.7f,1.0f })
-        //     .setLayout(HkLayout::Vertical)
-        //     .setPinchConfig({ .allowLeft = true, .allowTop = true });
-
-        // ctr->pushChildren({ ctr4, ctr5, ctr6 });
-        // bool x = false;
-        // ctr->getEvents().setOnClickListener([&windowFrame, &ctr6, &ctr5]() {
-        //     ctr5->getStyle().setPinchConfig({ .allowLeft = true, .allowRight = true });
-        //     windowFrame->pushChildren({ ctr6 });
-        //     });
-    }
 
     HkLabelPtr label = std::make_shared<HkLabel>("Label1");
 
@@ -153,7 +139,7 @@ int main()
         .setRenderMethod(HkTextUserConfig::HkTextRenderMethod::BITMAP)
         .setFontSize(24)
         .setWrapAtWord(true)
-        .setFontColor(glm::vec3(1.0f))
+        .setFontColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f))
         .setLineSpread(10)
         .setTextVHAlign(HkTextUserConfig::HkTextVAlign::Center, HkTextUserConfig::HkTextHAlign::Center);
 
@@ -167,41 +153,12 @@ int main()
             { .type = HkSizeType::PercParent, .value = 0.5f },
             { .type = HkSizeType::PercParent, .value = 0.5f });
 
-    // uint32_t a = 60;
-    // std::string smallText = "AFG auick brown Fox jumps over";
-
-    // label->getEvents().setOnClickListener([&label, &smallText]()
-    //     {
-    //         // printf("str: %s\n", smallText.c_str());
-    //         label->setText(smallText + smallText);
-    //     });
-
-    // label->setText("Pala gateste biban NO CAPS NO CAPS CAPS CAPS CAPS"
-    //     "a ton more text look mom there's a lot of?./ text in here #$%%^");
-    // std::string text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis faucibus, erat ut suscipit euismod, lectus est egestas purus, a porta orci ipsum vitae neque. Aenean justo velit, vestibulum vel volutpat nec, dictum eget nisl. Pellentesque a dapibus ex. Sed sed odio blandit, cursus libero et, vehicula lacus. Donec aliquam mi mollis odio luctus, at dignissim purus auctor. Morbi id enim eget tellus rhoncus lobortis. Morbi id quam turpis.\n\nUt quis purus id metus dictum facilisis. Praesent purus enim, ornare at augue non, pretium ultricies nisl. Morbi ultrices rutrum augue, eget egestas odio finibus quis. Pellentesque venenatis, dolor nec eleifend porta, diam diam faucibus arcu, at molestie libero quam id diam. Integer aliquam sem vel erat lacinia vulputate. Cras eget mauris sit amet nunc tempus fermentum. Quisque fermentum imperdiet justo, eget blandit lacus ultricies in. Donec nec suscipit lorem.\n\nPellentesque varius ligula ut eros venenatis, non tristique purus efficitur. Aliquam erat volutpat. In ex augue, mollis sit amet vulputate at, porta eu orci. Aenean et sodales ante. Quisque tristique tincidunt risus at vulputate. Nullam lacinia purus et venenatis scelerisque. Donec sed porta massa. Cras lacinia eros nec sodales aliquam. Donec vel neque ac mi sodales luctus. Phasellus semper nisl metus, id vulputate lectus feugiat non. Mauris nec nisi gravida, ornare mi nec, pulvinar erat. Nullam id quam id ex placerat posuere.\n\nSed tempus tempus odio, non porttitor diam interdum id. Suspendisse vestibulum ipsum sit amet mauris rutrum, ornare fringilla lectus vestibulum. Sed sed aliquam nisi, id rhoncus felis. Mauris fermentum massa velit. Proin vitae tincidunt ante, quis facilisis sem. Vestibulum efficitur, elit eget feugiat fringilla, sapien mi dapibus ex, quis lobortis nisi nulla ac nibh. Praesent luctus mauris vehicula urna auctor lacinia. Maecenas ac felis ex. Suspendisse sed rhoncus nulla, ac egestas felis. Donec euismod at arcu sed laoreet. Vestibulum venenatis luctus ullamcorper. Quisque interdum gravida arcu in elementum.\n\nQuisque eu lobortis metus. Cras imperdiet diam ut sem euismod, sed gravida elit accumsan. Integer a erat dui. Aliquam pharetra pharetra faucibus. Integer ligula enim, convallis a imperdiet eget, sollicitudin at sapien. Aliquam sed justo vel neque eleifend ullamcorper. Nulla consectetur porttitor odio, sed ornare erat blandit quis. Cras ullamcorper magna sit amet diam tristique aliquet. Nulla facilisi. Sed purus libero, laoreet nec nibh ac, sodales commodo mi. In id venenatis ex. Fusce tellus augue, vestibulum ut pretium eu, facilisis eget nunc. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Interdum et malesuada fames ac ante ipsum primis in faucibus.\n\nCurabitur posuere metus ac dolor porttitor, quis commodo nunc varius. Vestibulum consequat, metus non venenatis ullamcorper, odio nulla commodo erat, vitae iaculis mauris lacus id nunc. Curabitur urna magna, viverra vel tellus ac, accumsan condimentum sem. Nunc eu dignissim nibh. Sed dignissim, arcu et tristique sagittis, lectus urna cursus ligula, id tincidunt augue risus sit amet est. Nullam lobortis fermentum metus, nec placerat mauris vestibulum sollicitudin. Etiam ut accumsan arcu, sit amet tempus quam. Maecenas finibus nec turpis a vulputate. Nulla sed urna enim. Aliquam vestibulum gravida erat.";
-    // std::string smallText = "The quick brown fox jumps over the lazy dog";
-    // std::string smallText = "o";
-    // std::string smallText = "o";
-    // std::string smallText = "AFG_auick_brown_Fox_jumps_over";
     std::string smallText = "AFG auick brown Fox jumps over";
-    // std::string smallText = "ooo_ooo_ooo_oo_oo_oooo";
-    // std::string smallText = "A";
 
-    // label->setText(text + text + text + text + text + text + text + text + text + text + text);
-    // label->setText(text + text + text + text + text + text);
-    // label->setText(text + text + text + text + text);
-    // label->setText("AA");
-    // label->setText(std::string(text.begin(), text.begin() + 400));
-    // label->setText(text + text + text);
-    // label->setText(smallText);
     label->setText(smallText + smallText + smallText + smallText + smallText);
-    // label->setText(smallText + smallText + smallText + smallText + smallText + smallText + smallText + smallText + smallText + smallText + smallText + smallText);
-    // label->setText("o");
-    // label->setText("8");
-    // label->setText("jfsfgegwegweSGgergrewgGGEF");
-    // windowFrame->pushChildren({ ctr, ctr4, ctr5, ctr6 });
-    // windowFrame->pushChildren({ ctr, ctr4, ctr5 });
-    windowFrame->pushChildren({ label });
+
+    windowFrame->pushChildren({ ctr, ctr4, ctr5 });
+    // windowFrame->pushChildren({ label });
 
     // ctr->pushChildren({ ctr10, ctr11, ctr12 });
     ctr4->pushChildren({ label });
@@ -230,7 +187,7 @@ int main()
 
             const auto& ct = std::make_shared<HkContainer>("MyContauner");
             ct->getStyle()
-                .setColor((i + j) % 2 == 0 ? glm::vec3{ r,g,b } : glm::vec3{ r,g,b })
+                .setColor((i + j) % 2 == 0 ? glm::vec4{ r,g,b, 1.0f } : glm::vec4{ r,g,b, 1.0f })
                 // .setGridRowCol(i + 1, j + 1)
                 .setVHSizeConfig({ .value = 50 }, { .value = 100 })
                 // .setVHSizeConfig({ .type = HkSizeType::FitCell }, { .type = HkSizeType::FitCell })
@@ -272,7 +229,7 @@ int main()
     // sceneWindow2->makeContextCurrent();
 
     HkWindowFramePtr windowFrame2 = std::make_shared<HkWindowFrame>("MyWindowFrame2");
-    windowFrame2->setWindowMode(HkWindowFrameMode::Grabbable);
+    // windowFrame2->setWindowMode(HkWindowFrameMode::Grabbable);
     // sceneWindow1->addSubWindow(windowFrame2); //NOTE: Needs to be added before adding any children
     // sceneWindow2->addSubWindow(windowFrame2); //NOTE: Needs to be added before adding any children
 
@@ -287,8 +244,8 @@ int main()
     HkContainerPtr ctr3 = std::make_shared<HkContainer>("MyContainer3");
 
 
-    ctr2->getStyle().setColor({ 1.0f,0.4f,0.5f });
-    ctr3->getStyle().setColor({ 0.4f,0.5f,0.6f });
+    ctr2->getStyle().setColor({ 1.0f,0.4f,0.5f, 1.0f });
+    ctr3->getStyle().setColor({ 0.4f,0.5f,0.6f, 1.0f });
 
     // ctr2->setSize({ 300, 350 });
     // ctr3->setSize({ 400, 450 });
@@ -298,7 +255,7 @@ int main()
     for (int i = 0;i < 500;i++) // with O2 works ok 01.09.2023
     {
         const auto& ct = std::make_shared<HkContainer>("MyContauner");
-        ct->getStyle().setColor(i % 2 == 0 ? glm::vec3{ 0.75f, 0.75f, 0.75f } : glm::vec3{ 1.0f, 1.0f, 1.0f });
+        ct->getStyle().setColor(i % 2 == 0 ? glm::vec4{ 0.75f, 0.75f, 0.75f,1.0f } : glm::vec4{ 1.0f, 1.0f, 1.0f,1.0f });
         // ct->setSize({ 20, 20 });
         ctrs3.push_back(std::move(ct));
     }

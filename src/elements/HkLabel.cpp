@@ -8,17 +8,11 @@ namespace hkui
 HkLabel::HkLabel(const std::string& name)
     : HkNodeBase(name, HkNodeType::Label)
 {
-    //TODO: maybe these shall not be here?
-
-
-    node_.styleContext.setColor(glm::vec3(226 / 255.0f, 183 / 255.0f, 17 / 255.0f));
+    node_.styleContext.setColor({ 226 / 255.0f, 183 / 255.0f, 17 / 255.0f, 1.0f });
 }
 
 void HkLabel::onFirstHeartbeat()
 {
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
     std::string DEFAULT_VS = "assets/shaders/fonts/vFont.glsl";
     std::string DEFAULT_FS = "assets/shaders/fonts/fFont.glsl";
     const HkVertexArrayType DEFAULT_TYPE = HkVertexArrayType::QUAD;

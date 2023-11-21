@@ -45,6 +45,18 @@ void HkShader::setVec3f(const char* location, glm::vec3 value)
     glUniform3f(loc, value.x, value.y, value.z);
 }
 
+void HkShader::setVec4f(const char* location, glm::vec4 value)
+{
+    bind();
+    int loc = glGetUniformLocation(shaderId_, location);
+    if (loc == -1)
+    {
+        std::cerr << "Uniform '" << location << "' has not been found in bound shader!" << std::endl;
+        return;
+    }
+    glUniform4f(loc, value.r, value.g, value.b, value.a);
+}
+
 void HkShader::setMatrix4(const char* location, const glm::mat4 transform)
 {
     bind();

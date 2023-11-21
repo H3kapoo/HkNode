@@ -86,6 +86,8 @@ void HkAppManager::mouseClickCallback(GLFWwindow* window, int button, int action
 
 void mouseEnterCallback(GLFWwindow* window, int entered)
 {
+    (void)window;
+    (void)entered;
     // let the user call the functions
     // HkSceneManagement::get().mouseEnterEvent(window, entered);
 }

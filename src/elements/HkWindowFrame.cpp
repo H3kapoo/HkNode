@@ -15,10 +15,10 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
     , cachedPos_{ 0,0 }
 {
     /* Setup defaults that don't have to do with VAOs/Textures/Shaders themselves*/
-    node_.styleContext.setColor(glm::vec3(0.0f, 0.5f, 0.9f));
+    node_.styleContext.setColor(glm::vec4(0.0f, 0.5f, 0.9f, 1.0f));
 
     // wfCont_.node_.styleContext.setRowWrapping(true); //TODO: Why was it enabled by default?
-    wfCont_.node_.styleContext.setColor(glm::vec3(0.0f, 0.5f, 0.5f));
+    wfCont_.node_.styleContext.setColor(glm::vec4(0.0f, 0.5f, 0.5f, 1.0f));
 
     pinchHelper_.setGrabSize(15);
 
@@ -37,13 +37,13 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
             stillAlive_ = false;
         });
 
-    titleLabel_.getStyle().setColor(glm::vec3(0.0f, 0.5f, 0.8f));
+    titleLabel_.getStyle().setColor(glm::vec4(0.0f, 0.5f, 0.9f, 1.0f));
     titleLabel_.getTextStyle()
         .setFontPath("assets/fonts/LiberationSerif-Regular.ttf")
         .setRenderMethod(HkTextUserConfig::HkTextRenderMethod::BITMAP)
-        .setFontSize(24)
+        .setFontSize(20)
         .setWrapAtWord(true)
-        .setFontColor(glm::vec3(1.0f))
+        .setFontColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f))
         .setTextVHAlign(HkTextUserConfig::HkTextVAlign::Center, HkTextUserConfig::HkTextHAlign::Center);
     titleLabel_.setText(treeStruct_.getName() + std::to_string(treeStruct_.getId()));
     titleLabel_.setSelectTransparent(true);
@@ -192,7 +192,7 @@ void HkWindowFrame::printTree()
     treeStruct_.printTree();
 }
 
-void HkWindowFrame::setColor(const glm::vec3& color)
+void HkWindowFrame::setColor(const glm::vec4& color)
 {
     node_.styleContext.setColor(color);
 }

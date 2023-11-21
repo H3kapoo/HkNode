@@ -115,7 +115,7 @@ void HkRenderer::render(const HkRenderContext& renderConfig, const HkStyleContex
     /* Setup whatever user defined uniforms need to be set */
     if (renderConfig.colorUniformEn)
     {
-        shader_.setVec3f("color", styleConfig.getColor());
+        shader_.setVec4f("color", styleConfig.getColor());
     }
 
     //TODO: At some point batching will be needed to avoid context switching
@@ -155,7 +155,7 @@ void HkRenderer::beginTextBatch(const HkTextRenderGLConfig& textRenderConfig)
         shader_.bindId(textConfig_.shaderId);
         shader_.setMatrix4("proj", textConfig_.windowProjMatrix);
         shader_.setInt("letterTextures", GL_TEXTURE0);
-        shader_.setVec3f("color", textConfig_.color);
+        shader_.setVec4f("color", textConfig_.color);
     }
 
     if (boundVaoId_ != textConfig_.vaoId)

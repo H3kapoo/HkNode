@@ -2,7 +2,7 @@
 
 namespace hkui
 {
-HkStyleContext& HkStyleContext::setColor(const glm::vec3& value)
+HkStyleContext& HkStyleContext::setColor(const glm::vec4& value)
 {
     color = value;
     return *this;

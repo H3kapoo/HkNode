@@ -8,18 +8,18 @@ HkContainer::HkContainer(const std::string& containerName)
     , vScrollBar_("{Internal}-VScrollBarFor " + containerName, false)
     , scrollbBarsCount_{ 0 }
 {
-    node_.styleContext.setColor(glm::vec3(0.5f, 0.5f, 0.5f));
+    node_.styleContext.setColor(glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
 
     /* NOTE: In the future maybe this dummy can be an actual small UI element, but for now let it be
        just a normal renderable detail */
-    dummyXYIntersectorData_.styleContext.setColor(glm::vec3(0.7f, 1.0f, 0.2f));
+    dummyXYIntersectorData_.styleContext.setColor(glm::vec4(0.7f, 1.0f, 0.2f, 1.0f));
     dummyXYIntersectorData_.renderContext.colorUniformEn = true;
 
     //TODO: Dummy just to test nested scrollbars
     if (treeStruct_.getName() == "MyContainer2")
     {
-        vScrollBar_.node_.styleContext.setColor(glm::vec3(0.4f, 0.2f, 0.6f));
-        hScrollBar_.node_.styleContext.setColor(glm::vec3(0.4f, 0.2f, 0.6f));
+        vScrollBar_.node_.styleContext.setColor(glm::vec4(0.4f, 0.2f, 0.6f, 1.0f));
+        hScrollBar_.node_.styleContext.setColor(glm::vec4(0.4f, 0.2f, 0.6f, 1.0f));
     }
 }
 

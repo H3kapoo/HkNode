@@ -306,8 +306,6 @@ void HkConstraintContext::resolveHorizontalPinch(HkTreeStruct& children)
             auto sizeNCfg = childNSc.getHSizeConfig();
 
             const auto minValN = (sizeNCfg.min) / (float)pScaleX;
-            const auto maxValN = (sizeNCfg.max) / (float)pScaleX;
-
             if (sizeNCfg.value - pinchCfg.offsetX <= minValN)
             {
                 maybeOffsetForNext = pinchCfg.offsetX - (minValN - (sizeNCfg.value - pinchCfg.offsetX));
@@ -338,7 +336,6 @@ void HkConstraintContext::resolveHorizontalPinch(HkTreeStruct& children)
         childTc.setPos({ startPosX + (float)thisTc_->getPos().x , thisTc_->getPos().y });
 
         /* Scale elements according to their config. Subtract right margin to for the pinch zone*/
-        const auto hSizeConfig = childSc.getHSizeConfig();
         xSize = childSc.getHSizeConfig().value * pScaleX;
         xSize -= (i == childrenCount - 1) ? 0 : pinchCfg.grabSize;
 
@@ -489,7 +486,6 @@ void HkConstraintContext::resolveVerticalPinch(HkTreeStruct& children)
             auto sizeNCfg = childNSc.getVSizeConfig();
 
             const auto minValN = (sizeNCfg.min) / (float)pScaleY;
-            const auto maxValN = (sizeNCfg.max) / (float)pScaleY;
             if (sizeNCfg.value - pinchCfg.offsetY <= minValN)
             {
                 maybeOffsetForNext = pinchCfg.offsetY - (minValN - (sizeNCfg.value - pinchCfg.offsetY));
@@ -520,7 +516,6 @@ void HkConstraintContext::resolveVerticalPinch(HkTreeStruct& children)
         childTc.setPos({ thisTc_->getPos().x, startPosY + (float)thisTc_->getPos().y });
 
         /* Scale elements according to their config. Subtract right margin to for the pinch zone*/
-        const auto hSizeConfig = childSc.getVSizeConfig();
         ySize = childSc.getVSizeConfig().value * pScaleY;
         ySize -= (i == childrenCount - 1) ? 0 : pinchCfg.grabSize;
 

@@ -26,8 +26,6 @@ public:
     HkPinchHelper() = default;
     void init(HkWindowData& windowData);
 
-    void enableOrDisableGrabPoints(HkWindowData& windowData, std::vector<HkNodeBase*> children);
-
     /* Functions, in rough order of their calling*/
     void scan(HkWindowData& windowData, HkNodeData& nd, const uint32_t id, const uint32_t level);
     void onMouseButton(HkWindowData& windowData);

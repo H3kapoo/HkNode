@@ -44,7 +44,7 @@ int main()
         .setRenderMethod(HkTextUserConfig::HkTextRenderMethod::BITMAP)
         .setFontSize(24)
         .setWrapAtWord(true)
-        .setFontColor(glm::vec3(1.0f))
+        .setFontColor(glm::vec4(1.0f))
         .setTextVHAlign(HkTextUserConfig::HkTextVAlign::Center, HkTextUserConfig::HkTextHAlign::Center);
 
     /* Set constraint style aka where the element will be positioned and how.

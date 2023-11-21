@@ -91,7 +91,7 @@ public:
     HkStyleContext() = default;
 
     /* Setters */
-    HkStyleContext& setColor(const glm::vec3& value);
+    HkStyleContext& setColor(const glm::vec4& value);
     // Transform related
     HkStyleContext& setRowWrapping(const bool value);
     HkStyleContext& setColWrapping(const bool value);
@@ -126,7 +126,7 @@ public:
     HkStyleContext& setPinchConfig(const HkPinchConfig& value);
 
     /* Inline Getters, impl here, yes */
-    inline const glm::vec3& getColor() const { return color; }
+    inline const glm::vec4& getColor() const { return color; }
     inline bool isRowWrappingEnabled() const { return rowWrap; }
     inline bool isColWrappingEnabled() const { return colWrap; }
     inline uint32_t getLeftMargin() const { return marginLX; }
@@ -152,7 +152,7 @@ private:
     std::unordered_set<HkStyleDirtyAttribs> dirtyAttribs;
 
     /* Attribs */
-    glm::vec3 color;
+    glm::vec4 color;
     bool rowWrap{ false };
     bool colWrap{ false };
     uint32_t marginLX{ 0 }, marginRX{ 0 };

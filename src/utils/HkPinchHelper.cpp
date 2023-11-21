@@ -17,24 +17,8 @@ void HkPinchHelper::init(HkWindowData& windowData)
     pincher_.renderContext.shaderId = windowData.renderer.addShaderSourceToCache(DEFAULT_VS, DEFAULT_FS);
     pincher_.renderContext.vaoId = windowData.renderer.addVertexArrayDataToCache(DEFAULT_TYPE);
 
-    pincher_.styleContext.setColor(glm::vec3(0.2f, 0.2f, 0.2f));
+    pincher_.styleContext.setColor(glm::vec4(0.2f, 0.2f, 0.2f, 1.0f));
     pincher_.renderContext.colorUniformEn = true;
-}
-
-void HkPinchHelper::enableOrDisableGrabPoints(HkWindowData& windowData, std::vector<HkNodeBase*> children)
-{
-    for (const auto& ch : children)
-    {
-        const auto& sc = ch->getStyle().getHSizeConfig();
-        const auto& tc = ch->getTransform().getScale();
-        if (sc.max <= tc.x + 15) // grabSize
-        {
-            std::cout << "Child has same size as max size " << sc.max << "\n";
-            // we should FREEZE RIGHT and LEFT of this child and LEFT of next child + RIGHT of previous child?
-            // and by freeze I mean something that will not change percentage values, but will still allow grab points to be valid
-            // vertical containers cannot be min maxed horizontally, this shall be handled by parent container
-        }
-    }
 }
 
 void HkPinchHelper::scan(HkWindowData& windowData, HkNodeData& nd,
@@ -298,10 +282,6 @@ void HkPinchHelper::onMouseMove(HkWindowData& windowData, HkNodeData& nd, HkNode
         }
 
         if (!isValid) return;
-
-        //TODO: make them local
-        glm::vec2 boundPos = { tc.getPos() };
-        glm::vec2 boundScale = { tc.getScale() };
 
         if (foundInfo.right)
         {

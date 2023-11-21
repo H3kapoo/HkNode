@@ -28,7 +28,7 @@ public:
     void printTree();
 
     /* Setters */
-    void setColor(const glm::vec3& color);
+    void setColor(const glm::vec4& color);
     void setPos(const glm::vec2& pos);
     void setSize(const glm::vec2& size);
     void setWindowMode(const HkWindowFrameMode mode);

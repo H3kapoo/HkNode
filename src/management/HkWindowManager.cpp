@@ -27,6 +27,10 @@ HkWindowManager::HkWindowManager(const std::string& windowName, const HkWindowCo
     glfwMakeContextCurrent(windowHandle_);
     glfwSwapInterval(0); // zero to disable Vsync
 
+    /* Enable blending */
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     windowData_.lastMousePos = windowData_.mousePos = { 0,0 };
     windowData_.focusedId = HkWindowData::NO_SELECTION_ID;
     windowData_.hoveredId = HkWindowData::NO_SELECTION_ID;
