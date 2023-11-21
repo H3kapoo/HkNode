@@ -128,7 +128,7 @@ void HkLabel::postRenderAdditionalDetails()
             case HkTextUserConfig::HkTextVAlign::Center:
             {
                 pushToAlignedY = std::ceil(labelScale.y * 0.5f + labelPos.y);
-                toRotateAlignY = std::ceil(toRotateAlignY - spread * 0.5f);
+                toRotateAlignY = std::ceil(toRotateAlignY);
                 break;
             }
             case HkTextUserConfig::HkTextVAlign::Bottom:
@@ -179,10 +179,10 @@ void HkLabel::postRenderAdditionalDetails()
                 pushToAlignedY,
                 -1.0f));
 
-            // if (usrTextConfig_.getTextAngle() != 0.0f)
+            if (usrTextConfig_.getTextAngle() != 0.0f)
             {
                 // modelMat = glm::rotate(modelMat, (float)glfwGetTime() * 2, glm::vec3(0.0f, 0.0f, 1.0f));
-                // modelMat = glm::rotate(modelMat, glm::radians(usrTextConfig_.angle), glm::vec3(0.0f, 0.0f, 1.0f));
+                modelMat = glm::rotate(modelMat, glm::radians(usrTextConfig_.angle), glm::vec3(0.0f, 0.0f, 1.0f));
             }
 
             modelMat = glm::translate(modelMat, glm::vec3(
@@ -221,8 +221,8 @@ void HkLabel::nextWordData(const std::string& text, uint32_t index, uint32_t& ad
         if (heightAboveBaseline > highestPoint)
             highestPoint = heightAboveBaseline;
 
-        /* A word consista of the SPACE before it + the letters*/
-        if (text[index + advance + 1] == ' ' || index + advance == size - 1)
+        /* A word consista of the SPACE before it + the letters. Change 0 to 1 for that*/
+        if (text[index + advance + 0] == ' ' || index + advance == size - 1)
         {
             advance += 1;
             break;
@@ -284,8 +284,7 @@ void HkLabel::resolveDirtyText()
             startLineIdx = i;
             lastAddedEndIndex = i;
 
-            //TODO: That 0 will represent the 'spread', will be added with another feature
-            combinedCharHeights_ += (-lowestPoint + highestPoint + 0);
+            combinedCharHeights_ += (-lowestPoint + highestPoint + usrTextConfig_.getLineSpread());
 
             /*Handles corner case where next line doesn't fit whole space but there's no more chars and we end up
               with line data being lp = 999  and hp = -999 which is incorrect. We shall not reset points here.*/

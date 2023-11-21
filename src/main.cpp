@@ -42,7 +42,8 @@ int main()
         .setHAlignment(HkHAlignment::Center)
         .setVAlignment(HkVAlignment::Center);
 
-    windowFrame->setSize({ 1280 , 720 });
+    windowFrame->setSize({ 1280 / 2 , 720 / 1.5f });
+    windowFrame->setPos({ 1920 / 2 - 200 , 1080 / 2 - 100 });
 
     HkContainerPtr ctr = std::make_shared<HkContainer>("MyContainer");
     HkContainerPtr ctr4 = std::make_shared<HkContainer>("MyContainer4");
@@ -152,7 +153,6 @@ int main()
         .setRenderMethod(HkTextUserConfig::HkTextRenderMethod::BITMAP)
         .setFontSize(24)
         .setWrapAtWord(true)
-        // .setTextAngle(0)
         .setFontColor(glm::vec3(1.0f))
         .setLineSpread(10)
         .setTextVHAlign(HkTextUserConfig::HkTextVAlign::Center, HkTextUserConfig::HkTextHAlign::Center);
@@ -281,6 +281,7 @@ int main()
         .setPinchConfig({ .enable = true })
         .setHAlignment(HkHAlignment::Left)
         .setVAlignment(HkVAlignment::Center);
+    windowFrame2->setTitle("Second window");
 
     HkContainerPtr ctr2 = std::make_shared<HkContainer>("MyContainer2");
     HkContainerPtr ctr3 = std::make_shared<HkContainer>("MyContainer3");
