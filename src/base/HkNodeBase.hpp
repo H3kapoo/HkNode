@@ -95,11 +95,14 @@ private:
     void resolveMouseMovementEvent();
     void resolveDirtyAttributes();
 
+    void setSelectTransparent(const bool isTransparent);
+
     /* Injects */
     virtual void injectWindowDataPtr(HkWindowData* windowDataPtr);
 
 private:
     bool hadFirstHeartBeat_{ false };
+    bool isTransparent_{ false };
     HkNodeData node_;
     HkTreeStructure<HkNodeBase, HkNodeType> treeStruct_;
     HkWindowData* windowDataPtr_;

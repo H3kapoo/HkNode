@@ -32,7 +32,7 @@ int main()
     // sceneWindow1->makeContextCurrent();
 
     HkWindowFramePtr windowFrame = std::make_shared<HkWindowFrame>("MyWindowFrame");
-    windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
+    windowFrame->setWindowMode(HkWindowFrameMode::Grabbable);
     sceneWindow1->addSubWindow(windowFrame); //NOTE: Needs to be added before adding any children
 
     windowFrame->getStyle().setOverflowAllowedXY(false)

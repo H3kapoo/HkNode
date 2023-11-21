@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22)
-# project(hkNode)
-project(windowFrameWithLabel)
+project(hkNode)
+# project(windowFrameWithLabel)
 
 set(CMAKE_CXX_STANDARD 23)
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -g") # debug mode
@@ -14,13 +14,13 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../debug)
 
 include_directories ("/usr/include/freetype2") # linux specific
 
-# add_executable(${PROJECT_NAME}
-#     main.cpp
-# )
-
 add_executable(${PROJECT_NAME}
-    ../examples/windowFrameWithLabel.cpp
+    main.cpp
 )
+
+# add_executable(${PROJECT_NAME}
+#     ../examples/windowFrameWithLabel.cpp
+# )
 
 add_subdirectory(base)
 add_subdirectory(elements)

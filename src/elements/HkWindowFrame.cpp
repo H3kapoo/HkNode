@@ -45,15 +45,8 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
         .setWrapAtWord(true)
         .setFontColor(glm::vec3(1.0f))
         .setTextVHAlign(HkTextUserConfig::HkTextVAlign::Center, HkTextUserConfig::HkTextHAlign::Center);
-
-    //TODO: Fix clicking and dragging on title not moving the window frame. We need to send events to parent that we are
-    //      currently under drag
-    // titleLabel_.getEvents().setOnClickListener([this]()
-    //     {
-    //         printf("Dragging\n");
-    //         onDrag();
-    //     });
-
+    titleLabel_.setText(treeStruct_.getName() + std::to_string(treeStruct_.getId()));
+    titleLabel_.setSelectTransparent(true);
 }
 
 void HkWindowFrame::onFirstHeartbeat()

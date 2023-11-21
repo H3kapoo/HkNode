@@ -196,10 +196,13 @@ void HkNodeBase::resolveNearestActiveScrollbar()
 /* Try figure out if im the focused one */
 void HkNodeBase::resolveFocus()
 {
-    /*Element is in focus only if mouse if clicked and the mouse pos is inside thr element.
+    /*Element is in focus only if element is not transparent, mouse is clicked and the mouse pos is inside the element.
       Mouse offsets also get computed so is dragging occurs later on focused object, object doesn't
       just snap to clicked mouse position */
-    if (windowDataPtr_->isMouseClicked && windowDataPtr_->lastActiveMouseButton == HkMouseButton::Left
+
+    if (isTransparent_) { return; }
+
+    if (!isTransparent_ && windowDataPtr_->isMouseClicked && windowDataPtr_->lastActiveMouseButton == HkMouseButton::Left
         && node_.transformContext.isPosInsideOfNodeViewableArea(windowDataPtr_->mousePos))
     {
         windowDataPtr_->focusedId = treeStruct_.getId();
@@ -218,6 +221,7 @@ void HkNodeBase::resolveFocus()
 void HkNodeBase::resolveMouseClickEvent()
 {
     //TODO: We shall handle the mouse buttons too somehow..not only the left one
+    if (isTransparent_) { return; }
 
     /* Notify click on actually clicked object only*/
     if (windowDataPtr_->isMouseClicked && windowDataPtr_->hoveredId == treeStruct_.getId()) // maybe the hovered one? not the focused one?
@@ -339,6 +343,8 @@ void HkNodeBase::onFirstHeartbeat()
     node_.renderContext.vaoId = windowDataPtr_->renderer.addVertexArrayDataToCache(DEFAULT_TYPE);
 }
 
+void HkNodeBase::setSelectTransparent(const bool isTransparent) { isTransparent_ = isTransparent; };
+
 /* Events to be consumed by derived if needed */
 void HkNodeBase::postRenderAdditionalDetails() {}
 void HkNodeBase::onAnimationFrameRequested() {}
@@ -367,8 +373,5 @@ HkEventsContext& HkNodeBase::getEvents() { return node_.eventsContext; }
 
 const HkTransformContext& HkNodeBase::getTransform() const { return node_.transformContext; }
 
-HkNodeInfo HkNodeBase::getNodeInfo()
-{
-    return { treeStruct_.getName(), treeStruct_.getType(), treeStruct_.getId() };
-};
+HkNodeInfo HkNodeBase::getNodeInfo() { return { treeStruct_.getName(), treeStruct_.getType(), treeStruct_.getId() }; };
 } // hkui

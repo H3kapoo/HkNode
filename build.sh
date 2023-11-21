@@ -9,5 +9,5 @@ echo "[MANDATORY] Building project.."
 cmake --build debug
 
 echo "[MANDATORY] Moving executable out.."
-# mv debug/hkNode . || true
-mv debug/windowFrameWithLabel . || true
+mv debug/hkNode . || true
+# mv debug/windowFrameWithLabel . || true
