@@ -99,7 +99,8 @@ int32_t HkRenderer::addVertexArrayDataToCache(const HkVertexArrayType archType)
 }
 
 /* Actually render the mesh */
-void HkRenderer::render(const HkRenderContext& renderConfig, const HkStyleContext& styleConfig, const glm::mat4& modelMat)
+void HkRenderer::render(const HkRenderContext& renderConfig, const HkStyleContext& styleConfig, const glm::mat4& modelMat,
+    const bool isBorder)
 {
     /* Set always mandatory to have uniforms */
     if (boundShaderId_ != renderConfig.shaderId)
@@ -107,15 +108,19 @@ void HkRenderer::render(const HkRenderContext& renderConfig, const HkStyleContex
         shader_.bindId(renderConfig.shaderId);
         shader_.setMatrix4("proj", renderConfig.windowProjMatrix);
         shader_.setMatrix4("model", modelMat);
-
-        //TODO: WHy doesnt it work? caching what shader is bound
-        // boundShaderId_ = renderConfig.shaderId;
     }
 
     /* Setup whatever user defined uniforms need to be set */
     if (renderConfig.colorUniformEn)
     {
-        shader_.setVec4f("color", styleConfig.getColor());
+        if (isBorder)
+        {
+            shader_.setVec4f("color", glm::vec4(1.0f));
+        }
+        else
+        {
+            shader_.setVec4f("color", styleConfig.getColor());
+        }
     }
 
     //TODO: At some point batching will be needed to avoid context switching
@@ -132,14 +137,10 @@ void HkRenderer::render(const HkRenderContext& renderConfig, const HkStyleContex
     if (boundVaoId_ != renderConfig.vaoId)
     {
         glBindVertexArray(renderConfig.vaoId);
-        // std::cout << "VAO " << vaoId_ << " is now bound\n";
         boundVaoId_ = renderConfig.vaoId;
     }
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-    //TODO: Maybe unbinding is not really needed, just like with VAO
-    // glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 

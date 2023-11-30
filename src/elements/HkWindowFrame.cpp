@@ -22,7 +22,8 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
 
     pinchHelper_.setGrabSize(15);
 
-    treeStruct_.pushChild(&titleLabel_.treeStruct_);
+    //TODO: Do not push this if window is not grabbable
+    // treeStruct_.pushChild(&titleLabel_.treeStruct_);
     treeStruct_.pushChild(&minimizeBtn_.treeStruct_);
     treeStruct_.pushChild(&exitBtn_.treeStruct_);
     treeStruct_.pushChild(&wfCont_.treeStruct_);
@@ -127,10 +128,14 @@ void HkWindowFrame::onScroll()
 void HkWindowFrame::onDrag()
 {
     if (mode_ != HkWindowFrameMode::Grabbable) return;
-    startPos = node_.transformContext.getPos();
+    // startPos = node_.transformContext.getPos();
     endPos = windowDataPtr_->mouseOffsetFromFocusedCenter + windowDataPtr_->mousePos;
-    isAnimOngoing = true;
-    restarted = true;
+    // isAnimOngoing = true;
+    // restarted = true;
+
+    node_.transformContext.setPos(endPos);
+    node_.transformContext.setContentPos(endPos);
+
 }
 
 void HkWindowFrame::onGeneralMouseMove()
@@ -202,6 +207,8 @@ void HkWindowFrame::setPos(const glm::vec2& pos)
     /* If we are not in grabbable mode, pos cannot be determined by user*/
     if (mode_ != HkWindowFrameMode::Grabbable) return;
     node_.transformContext.setPos(pos);
+
+    node_.transformContext.setContentPos(pos);
 }
 
 void HkWindowFrame::setSize(const glm::vec2& size)
@@ -210,6 +217,9 @@ void HkWindowFrame::setSize(const glm::vec2& size)
     if (mode_ != HkWindowFrameMode::Grabbable) return;
     node_.transformContext.setScale({ size.x, 30 });
     wfCont_.node_.transformContext.setScale(size);
+
+    node_.transformContext.setContentScale({ size.x, 30 });
+    wfCont_.node_.transformContext.setContentScale(size);
 }
 
 void HkWindowFrame::setWindowMode(const HkWindowFrameMode mode)

@@ -229,27 +229,41 @@ void HkContainer::postRenderAdditionalDetails()
        // if (scrollbBarsCount_ == 2)
     if (treeStruct_.getId() == 4) return;
     dummyXYIntersectorData_.renderContext.windowProjMatrix = windowDataPtr_->sceneProjMatrix;
-    dummyXYIntersectorData_.transformContext.setScale({ 20,20 });
+    dummyXYIntersectorData_.transformContext.setContentScale({ 20,20 });
+
+    dummyXYIntersectorData_.transformContext.setContentPos({
+        node_.transformContext.getContentPos().x + node_.transformContext.getContentScale().x - 20,
+        node_.transformContext.getContentPos().y + node_.transformContext.getContentScale().y - 20 });
+
+    windowDataPtr_->renderer.render(dummyXYIntersectorData_.renderContext,
+        dummyXYIntersectorData_.styleContext,
+        dummyXYIntersectorData_.transformContext.getModelMatrix());
+
+    dummyXYIntersectorData_.transformContext.setContentPos({
+        node_.transformContext.getContentPos().x,
+        node_.transformContext.getContentPos().y });
+
+    windowDataPtr_->renderer.render(dummyXYIntersectorData_.renderContext,
+        dummyXYIntersectorData_.styleContext,
+        dummyXYIntersectorData_.transformContext.getModelMatrix());
+
+    // dummyXYIntersectorData_.transformContext.setScale({ 20,20 });
 
     // dummyXYIntersectorData_.transformContext.setPos({
-    //     hScrollBar_.node_.transformContext.getPos().x + hScrollBar_.node_.transformContext.getScale().x,
-    //     hScrollBar_.node_.transformContext.getPos().y });
+    //     node_.transformContext.getPos().x + node_.transformContext.getScale().x - 20,
+    //     node_.transformContext.getPos().y + node_.transformContext.getScale().y - 20 });
 
-    dummyXYIntersectorData_.transformContext.setPos({
-        node_.transformContext.getPos().x + node_.transformContext.getScale().x - 20,
-        node_.transformContext.getPos().y + node_.transformContext.getScale().y - 20 });
+    // windowDataPtr_->renderer.render(dummyXYIntersectorData_.renderContext,
+    //     dummyXYIntersectorData_.styleContext,
+    //     dummyXYIntersectorData_.transformContext.getModelMatrix());
 
-    windowDataPtr_->renderer.render(dummyXYIntersectorData_.renderContext,
-        dummyXYIntersectorData_.styleContext,
-        dummyXYIntersectorData_.transformContext.getModelMatrix());
+    // dummyXYIntersectorData_.transformContext.setPos({
+    //     node_.transformContext.getPos().x,
+    //     node_.transformContext.getPos().y });
 
-    dummyXYIntersectorData_.transformContext.setPos({
-        node_.transformContext.getPos().x,
-        node_.transformContext.getPos().y });
-
-    windowDataPtr_->renderer.render(dummyXYIntersectorData_.renderContext,
-        dummyXYIntersectorData_.styleContext,
-        dummyXYIntersectorData_.transformContext.getModelMatrix());
+    // windowDataPtr_->renderer.render(dummyXYIntersectorData_.renderContext,
+    //     dummyXYIntersectorData_.styleContext,
+    //     dummyXYIntersectorData_.transformContext.getModelMatrix());
 
     /* To note that we should always render the bars last*/
     if (pinchHelper_.isEnabled())

@@ -31,7 +31,8 @@ public:
     int32_t addVertexArrayDataToCache(const HkVertexArrayType archType);
     HkFontLoader* addFontLoaderSourceToCache(HkTextUserConfig config);
 
-    void render(const HkRenderContext& renderConfig, const HkStyleContext& styleConfig, const glm::mat4& modelMat);
+    void render(const HkRenderContext& renderConfig, const HkStyleContext& styleConfig, const glm::mat4& modelMat,
+        const bool isBorder = false);
 
     void beginTextBatch(const HkTextRenderGLConfig& config);
     void endTextBatch();

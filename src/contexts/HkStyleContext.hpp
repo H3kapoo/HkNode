@@ -105,6 +105,7 @@ public:
     HkStyleContext& setTopBottomMargins(const uint32_t valueTB);
     HkStyleContext& setLeftRightMargins(const uint32_t valueLR);
     HkStyleContext& setAllMargins(const uint32_t valueLRTB);
+    HkStyleContext& setBorders(const uint32_t valueL, const uint32_t valueR, const uint32_t valueT, const uint32_t valueB);
     HkStyleContext& setOverflowAllowedX(const bool value);
     HkStyleContext& setOverflowAllowedY(const bool value);
     HkStyleContext& setOverflowAllowedXY(const bool value);
@@ -119,6 +120,7 @@ public:
     HkStyleContext& setVSizeConfig(const HkSizeConfig& value);
     HkStyleContext& setHSizeConfig(const HkSizeConfig& value);
     HkStyleContext& setVHSizeConfig(const HkSizeConfig& valueV, const HkSizeConfig& valueH);
+
     // Background related
     HkStyleContext& setBackgroundImage(const std::string& value);
 
@@ -133,6 +135,10 @@ public:
     inline uint32_t getRightMargin() const { return marginRX; }
     inline uint32_t getTopMargin() const { return marginTY; }
     inline uint32_t getBottomMargin() const { return marginBY; }
+    inline uint32_t getLeftBorder() const { return borderLX; }
+    inline uint32_t getRightBorder() const { return borderRX; }
+    inline uint32_t getTopBorder() const { return borderTY; }
+    inline uint32_t getBottomBorder() const { return borderBY; }
     inline bool isOverflowAllowedX() const { return overflowAllowedX; }
     inline bool isOverflowAllowedY() const { return overflowAllowedY; }
     inline HkLayout getLayout() const { return direction_; }
@@ -157,6 +163,8 @@ private:
     bool colWrap{ false };
     uint32_t marginLX{ 0 }, marginRX{ 0 };
     uint32_t marginTY{ 0 }, marginBY{ 0 };
+    uint32_t borderLX{ 0 }, borderRX{ 0 };
+    uint32_t borderTY{ 0 }, borderBY{ 0 };
     bool overflowAllowedX{ false }, overflowAllowedY{ false };
     HkLayout direction_{ HkLayout::Horizontal };
     HkVAlignment verticalAlignment_{ HkVAlignment::Top };

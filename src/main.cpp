@@ -32,18 +32,14 @@ int main()
     // sceneWindow1->makeContextCurrent();
 
     HkWindowFramePtr windowFrame = std::make_shared<HkWindowFrame>("MyWindowFrame");
-    windowFrame->setWindowMode(HkWindowFrameMode::Grabbable);
+    windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
+    // windowFrame->setWindowMode(HkWindowFrameMode::Grabbable);
     sceneWindow1->addSubWindow(windowFrame); //NOTE: Needs to be added before adding any children
 
-    windowFrame->getStyle().setOverflowAllowedXY(false)
-        .setLayout(HkLayout::HPinch)
-        .setPinchConfig({ .enable = true })
-        .setRowWrapping(false)
-        .setHAlignment(HkHAlignment::Center)
-        .setVAlignment(HkVAlignment::Center);
+
 
     windowFrame->setSize({ 1280, 720 });
-    windowFrame->setPos({ 1920 / 2 - 200 , 1080 / 2 - 100 });
+    windowFrame->setPos({ 1920 / 2 - 500 , 1080 / 2 - 300 });
 
     HkContainerPtr ctr = std::make_shared<HkContainer>("MyContainer");
     HkContainerPtr ctr4 = std::make_shared<HkContainer>("MyContainer4");
@@ -62,25 +58,25 @@ int main()
     // label->setText("Pala gateste biban NO CAPS and this is a very bussy string NO CAPS mr.s white carbonara mmmmm....cuvinte GgGPBpbp");
 
     // WF children
-    ctr->getStyle().setColor({ 1.0f,0.0f,1.0f ,1.0f })
-        .setLayout(HkLayout::VPinch)
-        .setHSizeConfig(
-            { .type = HkSizeType::PercParent, .value = 0.5f, .min = 300 })
-        .setPinchConfig({ .enable = true, .alwaysOn = false, .allowRight = true, .allowTop = true, .allowBottom = true });
+    // ctr->getStyle().setColor({ 1.0f,0.0f,1.0f ,1.0f })
+    //     .setLayout(HkLayout::VPinch)
+    //     .setHSizeConfig(
+    //         { .type = HkSizeType::PercParent, .value = 0.5f, .min = 300 })
+    //     .setPinchConfig({ .enable = true, .alwaysOn = false, .allowRight = true, .allowTop = true, .allowBottom = true });
 
-    ctr4->getStyle().setColor({ 1.0f,0.0f,0.0f ,1.0f })
-        .setLayout(HkLayout::Vertical)
-        // .setLayout(HkLayout::Vertical)
-        .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center)
-        .setHSizeConfig(
-            { .type = HkSizeType::PercParent, .value = 0.25f, .min = 300 })
-        .setPinchConfig({ .enable = true,.alwaysOn = false, .allowRight = true, .allowTop = true, .allowBottom = true });
+    // ctr4->getStyle().setColor({ 1.0f,0.0f,0.0f ,1.0f })
+    //     .setLayout(HkLayout::Vertical)
+    //     // .setLayout(HkLayout::Vertical)
+    //     .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center)
+    //     .setHSizeConfig(
+    //         { .type = HkSizeType::PercParent, .value = 0.25f, .min = 300 })
+    //     .setPinchConfig({ .enable = true,.alwaysOn = false, .allowRight = true, .allowTop = true, .allowBottom = true });
 
-    ctr5->getStyle().setColor({ 0.3f,0.5f,0.0f ,1.0f })
-        .setLayout(HkLayout::VPinch)
-        .setHSizeConfig(
-            { .type = HkSizeType::PercParent, .value = 0.25f, .min = 300 })
-        .setPinchConfig({ .enable = true, .alwaysOn = false,.allowTop = true, .allowBottom = true });
+    // ctr5->getStyle().setColor({ 0.3f,0.5f,0.0f ,1.0f })
+    //     .setLayout(HkLayout::VPinch)
+    //     .setHSizeConfig(
+    //         { .type = HkSizeType::PercParent, .value = 0.25f, .min = 300 })
+    //     .setPinchConfig({ .enable = true, .alwaysOn = false,.allowTop = true, .allowBottom = true });
 
     // //ctr4 children
     // ctr6->getStyle().setColor({ 0.0f,0.0f,1.0f,1.0f })
@@ -114,56 +110,52 @@ int main()
 
 
     ctr10->getStyle().setColor({ 0.0f,0.7f,1.0f, 1.0f })
-        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-        .setVSizeConfig(
-            { .type = HkSizeType::PercParent, .value = 0.5f, .min = 50 })
-        .setPinchConfig({ .enable = true, .alwaysOn = false, .allowLeft = true, .allowBottom = true });
+        .setVHAlignment(HkVAlignment::Center, HkHAlignment::Right)
+        .setMargins(10, 0, 10, 10)
+        // .setLeftMargin(100)
+        .setBorders(20, 10, 50, 20)
+        .setVHSizeConfig(
+            { .value = 400, .min = 50 }, { .value = 300, .min = 50 });
 
     ctr11->getStyle().setColor({ 0.4f,0.7f,0.0f, 1.0f })
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-        .setVSizeConfig(
-            { .type = HkSizeType::PercParent, .value = 0.25f, .min = 50 })
-        .setPinchConfig({ .enable = true, .alwaysOn = false, .allowLeft = true, .allowBottom = true });
-
-    ctr12->getStyle().setColor({ 0.0f,0.7f,1.0f, 1.0f })
-        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-        .setVSizeConfig(
-            { .type = HkSizeType::PercParent, .value = 0.25f, .min = 50 })
-        .setPinchConfig({ .enable = true, .alwaysOn = false, .allowLeft = true, .allowBottom = true });
-
-
-    HkLabelPtr label = std::make_shared<HkLabel>("Label1");
-
-    label->getTextStyle()
-        .setFontPath("assets/fonts/LiberationSerif-Regular.ttf")
-        .setRenderMethod(HkTextUserConfig::HkTextRenderMethod::BITMAP)
-        .setFontSize(24)
-        .setWrapAtWord(true)
-        .setFontColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f))
-        .setLineSpread(10)
-        .setTextVHAlign(HkTextUserConfig::HkTextVAlign::Center, HkTextUserConfig::HkTextHAlign::Center);
-
-    // label->getStyle()
-    //     .setVHSizeConfig(
-    //         { .type = HkSizeType::PercParent, .value = 1.0f },
-    //         { .type = HkSizeType::PercParent, .value = 1.0f });
-
-    label->getStyle()
+        .setLeftMargin(10)
+        .setBottomMargin(10)
+        .setBorders(50, 10, 0, 30)
         .setVHSizeConfig(
-            { .type = HkSizeType::PercParent, .value = 0.5f },
-            { .type = HkSizeType::PercParent, .value = 0.5f });
+            { .value = 200, .min = 50 }, { .value = 100, .min = 50 });
 
-    std::string smallText = "AFG auick brown Fox jumps over";
+    ctr12->getStyle().setColor({ 0.4f,0.7f,0.0f, 1.0f })
+        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+        .setLeftMargin(10)
+        .setBottomMargin(10)
+        .setBorders(30, 30, 30, 30)
+        .setVHSizeConfig(
+            { .value = 100, .min = 50 }, { .value = 200, .min = 50 });
 
-    label->setText(smallText + smallText + smallText + smallText + smallText);
+    ctr9->getStyle().setColor({ 0.4f,0.7f,0.0f, 1.0f })
+        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+        .setLeftMargin(10)
+        .setBottomMargin(10)
+        .setVHSizeConfig(
+            { .value = 100, .min = 50 }, { .value = 100, .min = 50 });
 
-    windowFrame->pushChildren({ ctr, ctr4, ctr5 });
+    // windowFrame->pushChildren({ ctr, ctr4, ctr5 });
     // windowFrame->pushChildren({ label });
 
-    // ctr->pushChildren({ ctr10, ctr11, ctr12 });
-    ctr4->pushChildren({ label });
+    windowFrame->getStyle().setOverflowAllowedXY(false)
+        .setLayout(HkLayout::Horizontal)
+        // .setPinchConfig({ .enable = true })
+        .setRowWrapping(true)
+        .setHAlignment(HkHAlignment::Left)
+        .setVAlignment(HkVAlignment::Center);
+
+    // windowFrame->pushChildren({ ctr10 });
+    windowFrame->pushChildren({ ctr10, ctr11, ctr12 });
+    // ctr4->pushChildren({ label });
     // ctr4->pushChildren({ ctr6, ctr7 });
-    // ctr5->pushChildren({ label });
+    // ctr10->pushChildren({ ctr11, ctr12, ctr9 });
+    ctr10->pushChildren({ ctr9 });
 
     // // ctr7->pushChildren({ ctr11,ctr12 });
     // ctr8->pushChildren({ ctr13,ctr14 });
@@ -172,30 +164,30 @@ int main()
     // windowFrame->pushChildren({ ctr });
 
     // Providing a seed value
-    srand((unsigned)time(NULL));
+    // srand((unsigned)time(NULL));
 
-    int scale = 4;
-    std::vector<HkNodeBasePtr> ctrs2;
-    ctrs2.reserve(scale * scale);
-    for (int i = 0;i < scale; i++) // with O2 works ok 01.09.2023
-    {
-        for (int j = 0;j < scale; j++)
-        {
-            double r = (rand() % 255) / 255.0f;
-            double g = (rand() % 255) / 255.0f;
-            double b = (rand() % 255) / 255.0f;
+    // int scale = 4;
+    // std::vector<HkNodeBasePtr> ctrs2;
+    // ctrs2.reserve(scale * scale);
+    // for (int i = 0;i < scale; i++) // with O2 works ok 01.09.2023
+    // {
+    //     for (int j = 0;j < scale; j++)
+    //     {
+    //         double r = (rand() % 255) / 255.0f;
+    //         double g = (rand() % 255) / 255.0f;
+    //         double b = (rand() % 255) / 255.0f;
 
-            const auto& ct = std::make_shared<HkContainer>("MyContauner");
-            ct->getStyle()
-                .setColor((i + j) % 2 == 0 ? glm::vec4{ r,g,b, 1.0f } : glm::vec4{ r,g,b, 1.0f })
-                // .setGridRowCol(i + 1, j + 1)
-                .setVHSizeConfig({ .value = 50 }, { .value = 100 })
-                // .setVHSizeConfig({ .type = HkSizeType::FitCell }, { .type = HkSizeType::FitCell })
-                .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center);
+    //         const auto& ct = std::make_shared<HkContainer>("MyContauner");
+    //         ct->getStyle()
+    //             .setColor((i + j) % 2 == 0 ? glm::vec4{ r,g,b, 1.0f } : glm::vec4{ r,g,b, 1.0f })
+    //             // .setGridRowCol(i + 1, j + 1)
+    //             .setVHSizeConfig({ .value = 50 }, { .value = 100 })
+    //             // .setVHSizeConfig({ .type = HkSizeType::FitCell }, { .type = HkSizeType::FitCell })
+    //             .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center);
 
-            ctrs2.push_back(std::move(ct));
-        }
-    }
+    //         ctrs2.push_back(std::move(ct));
+    //     }
+    // }
 
     // std::vector<float> rows, cols;
     // rows.assign(scale, 1.0f);
@@ -207,7 +199,7 @@ int main()
     //             .cols{cols},
     //             .rows{rows}
     //         });
-    ctr7->pushChildren(ctrs2);
+    // ctr7->pushChildren(ctrs2);
     // HkImageViewPtr imgView = std::make_shared<HkImageView>("MyImgView");
     // HkImageViewPtr imgView2 = std::make_shared<HkImageView>("MyImgView2");
     // HkImageViewPtr imgView3 = std::make_shared<HkImageView>("MyImgView3");

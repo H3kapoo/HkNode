@@ -6,6 +6,7 @@ namespace hkui
 {
 HkTransformContext::HkTransformContext()
     : scale{ 200, 100 }, rot{ 0,0 }, pos{ 100,100 }
+    , cScale{ 200, 100 }, cRot{ 0,0 }, cPos{ 100,100 }
     , vScale{ 200, 100 }, vPos{ 100, 100 }
 {}
 
@@ -27,7 +28,8 @@ bool HkTransformContext::isPosInsideOfNodeViewableArea(const glm::ivec2& posIn) 
 
 bool HkTransformContext::isAnyDifference() const
 {
-    if (pos.x == prevPos.x && pos.y == prevPos.y && scale.x == prevScale.x && scale.y == prevScale.y)
+    if (cPos.x == prevPos.x && cPos.y == prevPos.y && cScale.x == prevScale.x && cScale.y == prevScale.y)
+        // if (pos.x == prevPos.x && pos.y == prevPos.y && scale.x == prevScale.x && scale.y == prevScale.y)
         return false;
     return true;
 }
@@ -170,10 +172,25 @@ void HkTransformContext::computeModelMatrix()
               General idea is to subtract/add (depends) the pivot position from each vertex of the mesh
               => do scaling => do rotate => add/subtract back the pivot => move object wherever normally
     */
+    // modelMat = glm::mat4(1.0f);
+    // modelMat = glm::translate(modelMat, glm::vec3(pos, -1.0f)); // it goes negative, expected
+    // modelMat = glm::translate(modelMat, glm::vec3(-0.5f, -0.5f, 0));
+    // modelMat = glm::scale(modelMat, glm::vec3(scale, 1.0f));
+    // modelMat = glm::translate(modelMat, glm::vec3(0.5f, 0.5f, 0));
+
+    // /* Fix for off-by-one pixel rendering error. This is caused because we do calculations with respect to
+    //    top left corner of 1x1 square*/
+    // modelMat[3][0] = ceil(modelMat[3][0]);
+    // modelMat[3][1] = ceil(modelMat[3][1]);
+    // if ((int)modelMat[0][0] % 2 == 1) { modelMat[3][0] += 1; }
+    // if ((int)modelMat[1][1] % 2 == 1) { modelMat[3][1] += 1; }
+
+    // prevPos = pos;
+    // prevScale = scale;
     modelMat = glm::mat4(1.0f);
-    modelMat = glm::translate(modelMat, glm::vec3(pos, -1.0f)); // it goes negative, expected
+    modelMat = glm::translate(modelMat, glm::vec3(cPos, -1.0f)); // it goes negative, expected
     modelMat = glm::translate(modelMat, glm::vec3(-0.5f, -0.5f, 0));
-    modelMat = glm::scale(modelMat, glm::vec3(scale, 1.0f));
+    modelMat = glm::scale(modelMat, glm::vec3(cScale, 1.0f));
     modelMat = glm::translate(modelMat, glm::vec3(0.5f, 0.5f, 0));
 
     /* Fix for off-by-one pixel rendering error. This is caused because we do calculations with respect to
@@ -183,8 +200,8 @@ void HkTransformContext::computeModelMatrix()
     if ((int)modelMat[0][0] % 2 == 1) { modelMat[3][0] += 1; }
     if ((int)modelMat[1][1] % 2 == 1) { modelMat[3][1] += 1; }
 
-    prevPos = pos;
-    prevScale = scale;
+    prevPos = cPos;
+    prevScale = cScale;
 }
 
 void HkTransformContext::addPos(const glm::ivec2& pos)
@@ -197,6 +214,16 @@ void HkTransformContext::setPos(const glm::ivec2& pos)
     this->pos = pos;
 }
 
+void HkTransformContext::addContentPos(const glm::ivec2& cPos)
+{
+    this->cPos += cPos;
+}
+
+void HkTransformContext::setContentPos(const glm::ivec2& cPos)
+{
+    this->cPos = cPos;
+}
+
 void HkTransformContext::addScale(const glm::ivec2& scale)
 {
     this->scale += scale;
@@ -205,6 +232,16 @@ void HkTransformContext::addScale(const glm::ivec2& scale)
 void HkTransformContext::setScale(const glm::ivec2& scale)
 {
     this->scale = scale;
+}
+
+void HkTransformContext::addContentScale(const glm::ivec2& cScale)
+{
+    this->cScale += cScale;
+}
+
+void HkTransformContext::setContentScale(const glm::ivec2& cScale)
+{
+    this->cScale = cScale;
 }
 
 void HkTransformContext::setVPos(const glm::ivec2& vPos)
@@ -235,6 +272,16 @@ const glm::ivec2& HkTransformContext::getPos() const
 const glm::ivec2& HkTransformContext::getScale() const
 {
     return scale;
+}
+
+const glm::ivec2& HkTransformContext::getContentPos() const
+{
+    return cPos;
+}
+
+const glm::ivec2& HkTransformContext::getContentScale() const
+{
+    return cScale;
 }
 
 const glm::mat4& HkTransformContext::getModelMatrix()

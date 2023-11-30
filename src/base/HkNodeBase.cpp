@@ -19,7 +19,7 @@ void HkNodeBase::renderMySelf()
     /* We only render the visible area of the UI element as calculated in the update pass*/
     if (treeStruct_.getType() != HkNodeType::RootWindowFrame)
     {
-        glEnable(GL_SCISSOR_TEST);
+        // glEnable(GL_SCISSOR_TEST);
         glScissor(
             tc.getVPos().x,
             windowDataPtr_->windowSize.y - tc.getVPos().y - tc.getVScale().y,
@@ -37,7 +37,11 @@ void HkNodeBase::renderMySelf()
         renderer needs to set up, a config.*/
 
         node_.renderContext.windowProjMatrix = windowDataPtr_->sceneProjMatrix;
-        windowDataPtr_->renderer.render(node_.renderContext, node_.styleContext, tc.getModelMatrix());
+
+        //TODO: Shall render border only if we have one enabled.
+        auto& btc = node_.borderTransformContext;
+        windowDataPtr_->renderer.render(node_.renderContext, node_.styleContext, btc.getModelMatrix(), true);
+        windowDataPtr_->renderer.render(node_.renderContext, node_.styleContext, tc.getModelMatrix(), false);
 
         /* Update children. Also don't require bellow children to be rendered if parent can't be rendered itself */
         auto& children = treeStruct_.getChildren();
@@ -50,7 +54,7 @@ void HkNodeBase::renderMySelf()
     /* Use this to render additional non interactive things if needed */
     /* Note: rescissoring to original parent is needed unfortunatelly */
 
-    glEnable(GL_SCISSOR_TEST);
+    // glEnable(GL_SCISSOR_TEST);
     glScissor(
         tc.getVPos().x,
         windowDataPtr_->windowSize.y - tc.getVPos().y - tc.getVScale().y,

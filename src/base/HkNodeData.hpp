@@ -13,6 +13,7 @@ class HkNodeData
 public:
     HkRenderContext renderContext;
     HkTransformContext transformContext;
+    HkTransformContext borderTransformContext;
     HkConstraintContext constraintContext;
     HkStyleContext styleContext;
     HkEventsContext eventsContext;

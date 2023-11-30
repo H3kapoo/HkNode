@@ -85,6 +85,16 @@ HkStyleContext& HkStyleContext::setAllMargins(const uint32_t valueLRTB)
     return *this;
 }
 
+HkStyleContext& HkStyleContext::setBorders(const uint32_t valueL, const uint32_t valueR, const uint32_t valueT,
+    const uint32_t valueB)
+{
+    borderLX = valueL;
+    borderRX = valueR;
+    borderTY = valueT;
+    borderBY = valueB;
+    return *this;
+}
+
 HkStyleContext& HkStyleContext::setOverflowAllowedX(const bool value)
 {
     overflowAllowedX = value;

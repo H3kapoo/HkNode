@@ -2,6 +2,7 @@
 
 #include <algorithm>
 
+#include "../base/HkNodeData.hpp"
 #include "../base/HkNodeBase.hpp"
 #include "../utils/HkDrawDebugger.hpp"
 
@@ -194,77 +195,166 @@ void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children)
 {
     int32_t startPosX = 0, startPosY = 0;
     int32_t highestYOnRow = 0;
-    uint32_t nextRowFirstId = 0;
-    uint32_t lastRowEndId = 0;
     int32_t nextXAdvance = 0;
-    int32_t maybeHighest = 0;
     uint32_t childCount = children.size() - sbCount_;
     for (uint32_t i = 0; i < childCount; i++)
     {
         auto& child = children[i]->getPayload()->node_;
         auto& childTc = child.transformContext;
+        auto& childBTc = child.borderTransformContext;
         auto& childSc = child.styleContext;
 
-        /* Scale elements according to their config*/
-        childTc.setScale(
+        const int32_t pbX = childSc.getRightBorder() + childSc.getLeftBorder();
+        const int32_t pbY = childSc.getTopBorder() + childSc.getBottomBorder();
+        const int32_t pbmX = pbX + childSc.getRightMargin() + childSc.getLeftMargin();
+        const int32_t pbmY = pbY + childSc.getTopMargin() + childSc.getBottomMargin();
+
+        /* Compute child's content scale */
+        childTc.setContentScale(
             {
                 ceil(computeHorizontalScale(childSc.getHSizeConfig(), childCount)),
                 ceil(computeVerticalScale(childSc.getVSizeConfig(), childCount))
             });
 
-        /* How much we need to advance to place next child */
-        nextXAdvance = startPosX + childSc.getLeftMargin() + childSc.getRightMargin() + childTc.getScale().x;
+        /* Compute child's total scale (borders+margins+padding) */
+        childTc.setScale(
+            {
+                childTc.getContentScale().x + pbmX,
+                childTc.getContentScale().y + pbmY,
+            });
 
+        /* How much we need to advance to place next child. Previous end + current element's total scale */
+        nextXAdvance = startPosX + childTc.getScale().x;
+
+        /* Take care of row wrapping if option is enabled */
         if (styleContextInj_->isRowWrappingEnabled())
         {
             /* This basically "spawns" a new row */
-            if (nextXAdvance > thisTc_->getScale().x)
+            if (nextXAdvance > thisTc_->getContentScale().x)
             {
-                /* Since we got here, its safe to say row ended before this element */
-                lastRowEndId = i == 0 ? 0 : i - 1; // prevent underflow
-
                 startPosX = 0;
                 startPosY += highestYOnRow;
 
-                /*Back Propagate child alignment now that we completed the row */
-                backPropagateRowChange(children, nextRowFirstId, lastRowEndId, highestYOnRow);
-
-                /* After back propagating, its the current element that starts the new row*/
-                nextRowFirstId = i;
-                nextXAdvance = childSc.getLeftMargin() + childSc.getRightMargin() + childTc.getScale().x;
+                nextXAdvance = childTc.getScale().x;
                 highestYOnRow = 0;
             }
-
-            /* Needed so Y of wrapped child starts at lowest Y possible */
-            maybeHighest = childTc.getScale().y + childSc.getTopMargin() + childSc.getBottomMargin();
-            if (maybeHighest > highestYOnRow)
-            {
-                highestYOnRow = maybeHighest;
-            }
-        }
-        else
-        {
-            /* Needed so Y of wrapped child starts at lowest Y possible */
-            maybeHighest = childTc.getScale().y + childSc.getTopMargin() + childSc.getBottomMargin();
-            if (maybeHighest > highestYOnRow)
-            {
-                highestYOnRow = maybeHighest;
-            }
         }
 
-        childTc.setPos({ startPosX + childSc.getLeftMargin(), startPosY + childSc.getTopMargin() });
+        /* Needed so Y of wrapped child starts at lowest Y possible */
+        highestYOnRow = std::max(childTc.getScale().y, highestYOnRow);
+
+        /* Set absolute position of element */
+        childTc.setPos({ startPosX, startPosY });
+
+        /* Set the start X to the next advance position*/
         startPosX = nextXAdvance;
+
+        /* ------------------------------------- PBM OFFSETS ZONE ------------------------------------ */
+        /* Set child's content border scale. We don't care about absolute size */
+        childBTc.setContentScale(
+            {
+                childTc.getContentScale().x + pbX,
+                childTc.getContentScale().y + pbY,
+            });
+
+        /* Set element's contentPos taking into account PBM*/
+        childTc.setContentPos(
+            {
+                childTc.getPos().x + childSc.getLeftMargin() + childSc.getLeftBorder(),
+                childTc.getPos().y + childSc.getTopMargin() + childSc.getTopBorder()
+            });
+
+        /* Set element's border contentPos taking into account PB. We don't care about absolute pos */
+        childBTc.setContentPos(
+            {
+                childTc.getContentPos().x - childSc.getLeftBorder(),
+                childTc.getContentPos().y - childSc.getTopBorder()
+            });
+        /* ------------------------------------------------------------------------------------------- */
     }
 
-    /*Back Propagate child alignment for the last row..or the only one row is no overflow occured with rowWrapping */
-    backPropagateRowChange(children, nextRowFirstId, children.size() - sbCount_ - 1, highestYOnRow);
-
     /* Above calculations have been with respect to 0,0 ,so now we need to offset the generated "container"
-       by the container's alignment type.
+       by the container's parent alignment type.
        This needs to be done here because otherwise we can get wrong min max information and bottom/center alignments
        need this information. It's a trade-off. */
-    applyFinalOffsets(children);
+    pushElementsIntoPosition(children);
 }
+
+// void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children)
+// {
+//     int32_t startPosX = 0, startPosY = 0;
+//     int32_t highestYOnRow = 0;
+//     uint32_t nextRowFirstId = 0;
+//     uint32_t lastRowEndId = 0;
+//     int32_t nextXAdvance = 0;
+//     int32_t maybeHighest = 0;
+//     uint32_t childCount = children.size() - sbCount_;
+//     for (uint32_t i = 0; i < childCount; i++)
+//     {
+//         auto& child = children[i]->getPayload()->node_;
+//         auto& childTc = child.transformContext;
+//         auto& childSc = child.styleContext;
+
+//         /* Scale elements according to their config*/
+//         childTc.setScale(
+//             {
+//                 ceil(computeHorizontalScale(childSc.getHSizeConfig(), childCount)),
+//                 ceil(computeVerticalScale(childSc.getVSizeConfig(), childCount))
+//             });
+
+//         /* How much we need to advance to place next child */
+//         nextXAdvance = startPosX + childSc.getLeftMargin() + childSc.getRightMargin() + childTc.getScale().x;
+
+//         if (styleContextInj_->isRowWrappingEnabled())
+//         {
+//             /* This basically "spawns" a new row */
+//             if (nextXAdvance > thisTc_->getScale().x)
+//             {
+//                 /* Since we got here, its safe to say row ended before this element */
+//                 lastRowEndId = i == 0 ? 0 : i - 1; // prevent underflow
+
+//                 startPosX = 0;
+//                 startPosY += highestYOnRow;
+
+//                 /*Back Propagate child alignment now that we completed the row */
+//                 backPropagateRowChange(children, nextRowFirstId, lastRowEndId, highestYOnRow);
+
+//                 /* After back propagating, its the current element that starts the new row*/
+//                 nextRowFirstId = i;
+//                 nextXAdvance = childSc.getLeftMargin() + childSc.getRightMargin() + childTc.getScale().x;
+//                 highestYOnRow = 0;
+//             }
+
+//             /* Needed so Y of wrapped child starts at lowest Y possible */
+//             maybeHighest = childTc.getScale().y + childSc.getTopMargin() + childSc.getBottomMargin();
+//             if (maybeHighest > highestYOnRow)
+//             {
+//                 highestYOnRow = maybeHighest;
+//             }
+//         }
+//         else
+//         {
+//             /* Needed so Y of wrapped child starts at lowest Y possible */
+//             maybeHighest = childTc.getScale().y + childSc.getTopMargin() + childSc.getBottomMargin();
+//             if (maybeHighest > highestYOnRow)
+//             {
+//                 highestYOnRow = maybeHighest;
+//             }
+//         }
+
+//         childTc.setPos({ startPosX + childSc.getLeftMargin(), startPosY + childSc.getTopMargin() });
+//         startPosX = nextXAdvance;
+//     }
+
+//     /*Back Propagate child alignment for the last row..or the only one row is no overflow occured with rowWrapping */
+//     backPropagateRowChange(children, nextRowFirstId, children.size() - sbCount_ - 1, highestYOnRow);
+
+//     /* Above calculations have been with respect to 0,0 ,so now we need to offset the generated "container"
+//        by the container's alignment type.
+//        This needs to be done here because otherwise we can get wrong min max information and bottom/center alignments
+//        need this information. It's a trade-off. */
+//     applyFinalOffsets(children);
+// }
 
 void HkConstraintContext::resolveHorizontalPinch(HkTreeStruct& children)
 {
@@ -443,7 +533,7 @@ void HkConstraintContext::resolveVerticalContainer(HkTreeStruct& children)
        by the container's alignment type.
        This needs to be done here because otherwise we can get wrong min max information and bottom/center alignments
        need this information. It's a trade-off. */
-    applyFinalOffsets(children);
+    pushElementsIntoPosition(children);
 }
 
 void HkConstraintContext::resolveVerticalPinch(HkTreeStruct& children)
@@ -534,6 +624,26 @@ void HkConstraintContext::resolveVerticalPinch(HkTreeStruct& children)
     // }
 }
 
+void HkConstraintContext::applyPBMOffsets(HkNodeData& nd) const
+{
+    // auto& childTc = nd.transformContext;
+    // auto& childBTc = nd.borderTransformContext;
+    // auto& childSc = nd.styleContext;
+
+    // const int32_t pbX = childSc.getRightBorder() + childSc.getLeftBorder();
+    // const int32_t pbY = childSc.getTopBorder() + childSc.getBottomBorder();
+
+    // const int32_t pbmX = pbX + childSc.getRightMargin() + childSc.getLeftMargin();
+    // const int32_t pbmY = pbY + childSc.getTopMargin() + childSc.getBottomMargin();
+
+    // /* Compute child's total scale (borders+margins+padding) */
+    // childTc.setScale(
+    //     {
+    //         childTc.getContentScale().x + pbmX,
+    //         childTc.getContentScale().y + pbmY,
+    //     });
+}
+
 void HkConstraintContext::backPropagateRowChange(HkTreeStruct& children,
     const uint32_t nextRowFirstId, const uint32_t lastRowEndId, const uint32_t highestYOnRow) const
 {
@@ -580,8 +690,9 @@ void HkConstraintContext::backPropagateColChange(HkTreeStruct& children,
     }
 }
 
-void HkConstraintContext::applyFinalOffsets(HkTreeStruct& children) const
+void HkConstraintContext::pushElementsIntoPosition(HkTreeStruct& children) const
 {
+    //TODO: This shall return the offsets, not apply them here as well
     int32_t startPosX = 0, startPosY = 0;
     MinMaxPos result = getMinAndMaxPositions(children); // we calculate the same thing later. optimize
 
@@ -589,13 +700,13 @@ void HkConstraintContext::applyFinalOffsets(HkTreeStruct& children) const
     switch (styleContextInj_->getHAlignment())
     {
     case HkHAlignment::Left:
-        startPosX = thisTc_->getPos().x;
+        startPosX = thisTc_->getContentPos().x;
         break;
     case HkHAlignment::Center:
-        startPosX = thisTc_->getPos().x + thisTc_->getScale().x / 2 - ((result.maxX - result.minX) / 2);
+        startPosX = thisTc_->getContentPos().x + thisTc_->getContentScale().x / 2 - ((result.maxX - result.minX) / 2);
         break;
     case HkHAlignment::Right:
-        startPosX = (thisTc_->getPos().x + thisTc_->getScale().x) - (result.maxX - result.minX);
+        startPosX = (thisTc_->getContentPos().x + thisTc_->getContentScale().x) - (result.maxX - result.minX);
         break;
     }
 
@@ -603,13 +714,13 @@ void HkConstraintContext::applyFinalOffsets(HkTreeStruct& children) const
     switch (styleContextInj_->getVAlignment())
     {
     case HkVAlignment::Top:
-        startPosY = thisTc_->getPos().y;
+        startPosY = thisTc_->getContentPos().y;
         break;
     case HkVAlignment::Center:
-        startPosY = thisTc_->getPos().y + thisTc_->getScale().y / 2 - ((result.maxY - result.minY) / 2);
+        startPosY = thisTc_->getContentPos().y + thisTc_->getContentScale().y / 2 - ((result.maxY - result.minY) / 2);
         break;
     case HkVAlignment::Bottom:
-        startPosY = (thisTc_->getPos().y + thisTc_->getScale().y) - (result.maxY - result.minY);
+        startPosY = (thisTc_->getContentPos().y + thisTc_->getContentScale().y) - (result.maxY - result.minY);
         break;
     }
 
@@ -618,7 +729,10 @@ void HkConstraintContext::applyFinalOffsets(HkTreeStruct& children) const
     {
         auto& child = children[i]->getPayload()->node_;
         auto& childTc = child.transformContext;
+        auto& childBTc = child.borderTransformContext;
         childTc.addPos({ startPosX , startPosY });
+        childTc.addContentPos({ startPosX , startPosY });
+        childBTc.addContentPos({ startPosX , startPosY });
     }
 }
 
@@ -701,6 +815,8 @@ void HkConstraintContext::computeChildrenOverflowBasedOnMinMax(const MinMaxPos& 
 
 float HkConstraintContext::computeHorizontalScale(const HkSizeConfig& config, const uint32_t childCount)
 {
+    /* When it comes to parent relative scaling, use the "contentScale" instead of just "scale", we don't
+       need the absolute scale here */
     float size = 1.0f;
     switch (config.type)
     {
@@ -708,13 +824,13 @@ float HkConstraintContext::computeHorizontalScale(const HkSizeConfig& config, co
         size = config.value;
         break;
     case HkSizeType::PercParent:
-        size = config.value * (float)thisTc_->getScale().x;
+        size = config.value * (float)thisTc_->getContentScale().x;
         break;
     case HkSizeType::FitParent:
-        size = thisTc_->getScale().x;
+        size = thisTc_->getContentScale().x;
         break;
     case HkSizeType::Balanced:
-        size = (float)thisTc_->getScale().x / childCount;
+        size = (float)thisTc_->getContentScale().x / childCount;
         break;
     case HkSizeType::FitCell:
     case HkSizeType::PercCell:
@@ -726,6 +842,8 @@ float HkConstraintContext::computeHorizontalScale(const HkSizeConfig& config, co
 
 float HkConstraintContext::computeVerticalScale(const HkSizeConfig& config, const uint32_t childCount)
 {
+    /* When it comes to parent relative scaling, use the "contentScale" instead of just "scale", we don't
+       need the absolute scale here */
     float size = 1.0f;
     switch (config.type)
     {
@@ -733,13 +851,13 @@ float HkConstraintContext::computeVerticalScale(const HkSizeConfig& config, cons
         size = config.value;
         break;
     case HkSizeType::PercParent:
-        size = config.value * (float)thisTc_->getScale().y;
+        size = config.value * (float)thisTc_->getContentScale().y;
         break;
     case HkSizeType::FitParent:
-        size = thisTc_->getScale().y;
+        size = thisTc_->getContentScale().y;
         break;
     case HkSizeType::Balanced:
-        size = (float)thisTc_->getScale().y / childCount;
+        size = (float)thisTc_->getContentScale().y / childCount;
         break;
     case HkSizeType::FitCell:
     case HkSizeType::PercCell:
@@ -795,7 +913,6 @@ MinMaxPos HkConstraintContext::getMinAndMaxPositions(const HkTreeStruct& childre
     }
     return result;
 }
-
 
 /* This simply constraints the Knob inside the scrollbar itself, at given currentValue (0 to 1) */
 void HkConstraintContext::constrainSBKnob(bool isFromHorizontalSB, int overflowSize, float currKnobValue,
@@ -859,7 +976,26 @@ void HkConstraintContext::windowFrameContainerConstraint(HkTransformContext& tit
     HkTransformContext& exitBtn, HkTransformContext& minBtn) const
 {
     /* TODO: dirty flags shall be used here to not do redundant repositioning */
-    wfCtr.setPos({ thisTc_->getPos().x, thisTc_->getPos().y + thisTc_->getScale().y });
+    wfCtr.setContentPos({ thisTc_->getContentPos().x, thisTc_->getContentPos().y + thisTc_->getContentScale().y });
+    wfCtr.setContentScale({ thisTc_->getContentScale().x, wfCtr.getContentScale().y });
+
+    titleLabel.setContentScale({ 200 , thisTc_->getContentScale().y });
+    titleLabel.setContentPos(thisTc_->getContentPos());
+
+    exitBtn.setContentScale({ 20, 20 }); // hardcoded, but technically ok situation
+    exitBtn.setContentPos({
+        thisTc_->getContentPos().x + thisTc_->getContentScale().x - 20 - 10,
+        thisTc_->getContentPos().y + 20 / 2 - 5
+        });
+
+    minBtn.setContentScale({ 20, 20 });
+    minBtn.setContentPos({
+        thisTc_->getContentPos().x + thisTc_->getContentScale().x - 20 - 40,
+        thisTc_->getContentPos().y + 20 / 2 - 5
+        });
+
+    //
+    wfCtr.setPos({ thisTc_->getContentPos().x, thisTc_->getPos().y + thisTc_->getScale().y });
     wfCtr.setScale({ thisTc_->getScale().x, wfCtr.getScale().y });
 
     titleLabel.setScale({ 200 , thisTc_->getScale().y });
@@ -886,6 +1022,16 @@ void HkConstraintContext::windowFrameContainerConstraint(HkTransformContext& tit
         windowFrameContainerConstraint(titleLabel, wfCtr, exitBtn, minBtn);
         return;
     }
+
+    thisTc_->setContentPos({ 0,0 });
+    /* Necessary so we still "render" the frame in renderMySelf scissor pass */
+    thisTc_->setContentScale({ -1,-1 });
+
+
+    // wfCtr.setScale(windowSize + 1); //TODO: hacK: looks like wfCtr gets a windowSize thats lacking exactly 1px behind (looks like GPU dependent)
+    wfCtr.setContentScale(windowSize); //TODO: hacK: looks like wfCtr gets a windowSize thats lacking exactly 1px behind (looks like GPU dependent)
+    wfCtr.setContentPos({ 0,0 });
+
 
     thisTc_->setPos({ 0,0 });
     /* Necessary so we still "render" the frame in renderMySelf scissor pass */

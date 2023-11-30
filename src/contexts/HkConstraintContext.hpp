@@ -48,6 +48,7 @@ struct HkScrollbarsSize
     int32_t vsbSize{ 10 };
 };
 
+class HkNodeData;
 class HkNodeBase;
 enum class HkNodeType;
 using HkTreeStruct = std::vector<HkTreeStructure<HkNodeBase, HkNodeType>*>;
@@ -69,11 +70,13 @@ public:
     void resolveGridContainer(HkTreeStruct& children);
     void resolveAxisOverflow(const HkTreeStruct& children, const HkScrollbarsSize sbSizes);
 
+    void applyPBMOffsets(HkNodeData& nd) const;
+
     void backPropagateRowChange(HkTreeStruct& children, const uint32_t nextRowFirstId,
         const uint32_t lastRowEndId, const uint32_t highestYOnRow) const;
     void backPropagateColChange(HkTreeStruct& children, const uint32_t nextColFirstId,
         const uint32_t lastColEndId, const uint32_t longestXOnCol) const;
-    void applyFinalOffsets(HkTreeStruct& children) const;
+    void pushElementsIntoPosition(HkTreeStruct& children) const;
 
     void computeScrollBarCount();
     void computeChildrenOverflowBasedOnMinMax(const MinMaxPos& minMax,
