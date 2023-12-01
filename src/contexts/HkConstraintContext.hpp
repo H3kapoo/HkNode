@@ -70,10 +70,8 @@ public:
     void resolveGridContainer(HkTreeStruct& children);
     void resolveAxisOverflow(const HkTreeStruct& children, const HkScrollbarsSize sbSizes);
 
-    void applyPBMOffsets(HkNodeData& nd) const;
-
-    void backPropagateRowChange(HkTreeStruct& children, const uint32_t nextRowFirstId,
-        const uint32_t lastRowEndId, const uint32_t highestYOnRow) const;
+    void resolveRowChildrenAlignment(HkTreeStruct& children, const uint32_t rowFirstId,
+        const uint32_t rowLastId, const uint32_t highestYOnRow) const;
     void backPropagateColChange(HkTreeStruct& children, const uint32_t nextColFirstId,
         const uint32_t lastColEndId, const uint32_t longestXOnCol) const;
     void pushElementsIntoPosition(HkTreeStruct& children) const;

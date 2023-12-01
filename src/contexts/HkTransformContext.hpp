@@ -53,6 +53,7 @@ public:
     bool isPosInsideOfNodeViewableArea(const glm::ivec2& pin) const;
     HkTransformBBox computeBBoxWith(const HkTransformContext& otherTc) const;
     bool isAnyDifference() const;
+    void copyContentDataToAbsoluteData();
 
     /* Actual UI scale taking into account padding,border,margins*/
     glm::ivec2 actualScale, actualPos;
@@ -66,11 +67,11 @@ private:
     /* Absolute transform of the mesh. Includes margins+borders+padding */
     glm::ivec2 scale, rot, pos;
 
-    /* Whats the actual viewable by user part of the mesh */
-    glm::ivec2 vScale, vPos;
-
     /* Content transform of the mesh. Doesnt include anything but the viewable content area */
     glm::ivec2 cScale, cRot, cPos;
+
+    /* Whats the actual viewable by user part of the mesh */
+    glm::ivec2 vScale, vPos;
 
     /* Is matrix dirty? */
     glm::ivec2 prevScale, prevPos;

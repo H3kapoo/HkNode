@@ -110,7 +110,7 @@ int main()
 
 
     ctr10->getStyle().setColor({ 0.0f,0.7f,1.0f, 1.0f })
-        .setVHAlignment(HkVAlignment::Center, HkHAlignment::Right)
+        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         .setMargins(10, 0, 10, 10)
         // .setLeftMargin(100)
         .setBorders(20, 10, 50, 20)
@@ -119,6 +119,7 @@ int main()
 
     ctr11->getStyle().setColor({ 0.4f,0.7f,0.0f, 1.0f })
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+        .setTopMargin(5)
         .setLeftMargin(10)
         .setBottomMargin(10)
         .setBorders(50, 10, 0, 30)
@@ -126,9 +127,9 @@ int main()
             { .value = 200, .min = 50 }, { .value = 100, .min = 50 });
 
     ctr12->getStyle().setColor({ 0.4f,0.7f,0.0f, 1.0f })
-        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+        .setVHAlignment(HkVAlignment::Bottom, HkHAlignment::Left)
         .setLeftMargin(10)
-        .setBottomMargin(10)
+        .setBottomMargin(30)
         .setBorders(30, 30, 30, 30)
         .setVHSizeConfig(
             { .value = 100, .min = 50 }, { .value = 200, .min = 50 });
@@ -143,12 +144,12 @@ int main()
     // windowFrame->pushChildren({ ctr, ctr4, ctr5 });
     // windowFrame->pushChildren({ label });
 
-    windowFrame->getStyle().setOverflowAllowedXY(false)
+    windowFrame->getStyle().setOverflowAllowedXY(true)
         .setLayout(HkLayout::Horizontal)
         // .setPinchConfig({ .enable = true })
-        .setRowWrapping(true)
+        // .setRowWrapping(true)
         .setHAlignment(HkHAlignment::Left)
-        .setVAlignment(HkVAlignment::Center);
+        .setVAlignment(HkVAlignment::Top);
 
     // windowFrame->pushChildren({ ctr10 });
     windowFrame->pushChildren({ ctr10, ctr11, ctr12 });

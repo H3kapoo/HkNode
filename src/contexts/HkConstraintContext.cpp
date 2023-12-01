@@ -196,6 +196,8 @@ void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children)
     int32_t startPosX = 0, startPosY = 0;
     int32_t highestYOnRow = 0;
     int32_t nextXAdvance = 0;
+    uint32_t rowFirstId = 0;
+    uint32_t rowLastId = 0;
     uint32_t childCount = children.size() - sbCount_;
     for (uint32_t i = 0; i < childCount; i++)
     {
@@ -217,11 +219,10 @@ void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children)
             });
 
         /* Compute child's total scale (borders+margins+padding) */
-        childTc.setScale(
-            {
-                childTc.getContentScale().x + pbmX,
-                childTc.getContentScale().y + pbmY,
-            });
+        childTc.setScale({ childTc.getContentScale().x + pbmX, childTc.getContentScale().y + pbmY });
+
+        /* Set child's content border scale. We don't care about absolute size */
+        childBTc.setContentScale({ childTc.getContentScale().x + pbX,childTc.getContentScale().y + pbY });
 
         /* How much we need to advance to place next child. Previous end + current element's total scale */
         nextXAdvance = startPosX + childTc.getScale().x;
@@ -234,6 +235,10 @@ void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children)
             {
                 startPosX = 0;
                 startPosY += highestYOnRow;
+
+                rowLastId = i;
+                resolveRowChildrenAlignment(children, rowFirstId, rowLastId, highestYOnRow);
+                rowFirstId = i;
 
                 nextXAdvance = childTc.getScale().x;
                 highestYOnRow = 0;
@@ -249,14 +254,6 @@ void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children)
         /* Set the start X to the next advance position*/
         startPosX = nextXAdvance;
 
-        /* ------------------------------------- PBM OFFSETS ZONE ------------------------------------ */
-        /* Set child's content border scale. We don't care about absolute size */
-        childBTc.setContentScale(
-            {
-                childTc.getContentScale().x + pbX,
-                childTc.getContentScale().y + pbY,
-            });
-
         /* Set element's contentPos taking into account PBM*/
         childTc.setContentPos(
             {
@@ -270,91 +267,20 @@ void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children)
                 childTc.getContentPos().x - childSc.getLeftBorder(),
                 childTc.getContentPos().y - childSc.getTopBorder()
             });
-        /* ------------------------------------------------------------------------------------------- */
     }
+
+    /* ------------------------------------- FINAL PUSH INTO PLACE ----------------------------------- */
+    /* Align children based on their individual alignment option on the row they live in. This needs to be done
+       in another pass because we need previous pass' information */
+    resolveRowChildrenAlignment(children, rowFirstId, childCount, highestYOnRow);
 
     /* Above calculations have been with respect to 0,0 ,so now we need to offset the generated "container"
        by the container's parent alignment type.
        This needs to be done here because otherwise we can get wrong min max information and bottom/center alignments
        need this information. It's a trade-off. */
     pushElementsIntoPosition(children);
+    /* ----------------------------------------------------------------------------------------------- */
 }
-
-// void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children)
-// {
-//     int32_t startPosX = 0, startPosY = 0;
-//     int32_t highestYOnRow = 0;
-//     uint32_t nextRowFirstId = 0;
-//     uint32_t lastRowEndId = 0;
-//     int32_t nextXAdvance = 0;
-//     int32_t maybeHighest = 0;
-//     uint32_t childCount = children.size() - sbCount_;
-//     for (uint32_t i = 0; i < childCount; i++)
-//     {
-//         auto& child = children[i]->getPayload()->node_;
-//         auto& childTc = child.transformContext;
-//         auto& childSc = child.styleContext;
-
-//         /* Scale elements according to their config*/
-//         childTc.setScale(
-//             {
-//                 ceil(computeHorizontalScale(childSc.getHSizeConfig(), childCount)),
-//                 ceil(computeVerticalScale(childSc.getVSizeConfig(), childCount))
-//             });
-
-//         /* How much we need to advance to place next child */
-//         nextXAdvance = startPosX + childSc.getLeftMargin() + childSc.getRightMargin() + childTc.getScale().x;
-
-//         if (styleContextInj_->isRowWrappingEnabled())
-//         {
-//             /* This basically "spawns" a new row */
-//             if (nextXAdvance > thisTc_->getScale().x)
-//             {
-//                 /* Since we got here, its safe to say row ended before this element */
-//                 lastRowEndId = i == 0 ? 0 : i - 1; // prevent underflow
-
-//                 startPosX = 0;
-//                 startPosY += highestYOnRow;
-
-//                 /*Back Propagate child alignment now that we completed the row */
-//                 backPropagateRowChange(children, nextRowFirstId, lastRowEndId, highestYOnRow);
-
-//                 /* After back propagating, its the current element that starts the new row*/
-//                 nextRowFirstId = i;
-//                 nextXAdvance = childSc.getLeftMargin() + childSc.getRightMargin() + childTc.getScale().x;
-//                 highestYOnRow = 0;
-//             }
-
-//             /* Needed so Y of wrapped child starts at lowest Y possible */
-//             maybeHighest = childTc.getScale().y + childSc.getTopMargin() + childSc.getBottomMargin();
-//             if (maybeHighest > highestYOnRow)
-//             {
-//                 highestYOnRow = maybeHighest;
-//             }
-//         }
-//         else
-//         {
-//             /* Needed so Y of wrapped child starts at lowest Y possible */
-//             maybeHighest = childTc.getScale().y + childSc.getTopMargin() + childSc.getBottomMargin();
-//             if (maybeHighest > highestYOnRow)
-//             {
-//                 highestYOnRow = maybeHighest;
-//             }
-//         }
-
-//         childTc.setPos({ startPosX + childSc.getLeftMargin(), startPosY + childSc.getTopMargin() });
-//         startPosX = nextXAdvance;
-//     }
-
-//     /*Back Propagate child alignment for the last row..or the only one row is no overflow occured with rowWrapping */
-//     backPropagateRowChange(children, nextRowFirstId, children.size() - sbCount_ - 1, highestYOnRow);
-
-//     /* Above calculations have been with respect to 0,0 ,so now we need to offset the generated "container"
-//        by the container's alignment type.
-//        This needs to be done here because otherwise we can get wrong min max information and bottom/center alignments
-//        need this information. It's a trade-off. */
-//     applyFinalOffsets(children);
-// }
 
 void HkConstraintContext::resolveHorizontalPinch(HkTreeStruct& children)
 {
@@ -624,34 +550,17 @@ void HkConstraintContext::resolveVerticalPinch(HkTreeStruct& children)
     // }
 }
 
-void HkConstraintContext::applyPBMOffsets(HkNodeData& nd) const
+void HkConstraintContext::resolveRowChildrenAlignment(HkTreeStruct& children,
+    const uint32_t rowFirstId, const uint32_t rowLastId, const uint32_t highestYOnRow) const
 {
-    // auto& childTc = nd.transformContext;
-    // auto& childBTc = nd.borderTransformContext;
-    // auto& childSc = nd.styleContext;
-
-    // const int32_t pbX = childSc.getRightBorder() + childSc.getLeftBorder();
-    // const int32_t pbY = childSc.getTopBorder() + childSc.getBottomBorder();
-
-    // const int32_t pbmX = pbX + childSc.getRightMargin() + childSc.getLeftMargin();
-    // const int32_t pbmY = pbY + childSc.getTopMargin() + childSc.getBottomMargin();
-
-    // /* Compute child's total scale (borders+margins+padding) */
-    // childTc.setScale(
-    //     {
-    //         childTc.getContentScale().x + pbmX,
-    //         childTc.getContentScale().y + pbmY,
-    //     });
-}
-
-void HkConstraintContext::backPropagateRowChange(HkTreeStruct& children,
-    const uint32_t nextRowFirstId, const uint32_t lastRowEndId, const uint32_t highestYOnRow) const
-{
-    for (uint32_t j = nextRowFirstId; j <= lastRowEndId;j++)
+    for (uint32_t j = rowFirstId; j < rowLastId;j++)
     {
-        auto& childBpTc = children[j]->getPayload()->node_.transformContext; //TODO: Minimize this call
-        auto& childBpSc = children[j]->getPayload()->node_.styleContext;
+        auto& child = children[j]->getPayload()->node_;
+        auto& childBpTc = child.transformContext;
+        auto& childBpBTc = child.borderTransformContext;
+        auto& childBpSc = child.styleContext;
 
+        //TODO: This isnt the value we shall use. To be fixed by future feature
         switch (childBpSc.getVAlignment())
         {
         case HkVAlignment::Top:
@@ -659,9 +568,13 @@ void HkConstraintContext::backPropagateRowChange(HkTreeStruct& children,
             break;
         case HkVAlignment::Center:
             childBpTc.addPos({ 0, highestYOnRow / 2 - childBpTc.getScale().y / 2 });
+            childBpTc.addContentPos({ 0, highestYOnRow / 2 - childBpTc.getScale().y / 2 });
+            childBpBTc.addContentPos({ 0, highestYOnRow / 2 - childBpTc.getScale().y / 2 });
             break;
         case HkVAlignment::Bottom:
             childBpTc.addPos({ 0, highestYOnRow - childBpTc.getScale().y });
+            childBpTc.addContentPos({ 0, highestYOnRow - childBpTc.getScale().y });
+            childBpBTc.addContentPos({ 0, highestYOnRow - childBpTc.getScale().y });
             break;
         }
     }
@@ -747,6 +660,7 @@ void HkConstraintContext::computeScrollBarCount()
 void HkConstraintContext::computeChildrenOverflowBasedOnMinMax(const MinMaxPos& minMax,
     const HkScrollbarsSize sbSizes)
 {
+    //TODO: This shall be done relative to parent's contentSize/Pos instead
     /*Reset variables */
     isOverflowX_ = false;
     isOverflowY_ = false;
@@ -875,11 +789,16 @@ void HkConstraintContext::resolveAxisOverflow(const HkTreeStruct& children,
     computeChildrenOverflowBasedOnMinMax(result, sbSizes);
     for (uint32_t i = 0; i < children.size() - sbCount_; i++)
     {
-        auto& childTc = children[i]->getPayload()->node_.transformContext;
+        auto& child = children[i]->getPayload()->node_;
+        auto& childTc = child.transformContext;
+        auto& childBTc = child.borderTransformContext;
         const auto leftOverflow = (result.minX < thisTc_->getPos().x) ? thisTc_->getPos().x - result.minX : 0;
         const auto topOverflow = (result.minY < thisTc_->getPos().y) ? thisTc_->getPos().y - result.minY : 0;
-        childTc.addPos({ leftOverflow + offsetPercentage_.x * -overflowXYSize_.x,
-            topOverflow + offsetPercentage_.y * -overflowXYSize_.y, });
+        const auto offsetXY = glm::ivec2(leftOverflow + offsetPercentage_.x * -overflowXYSize_.x,
+            topOverflow + offsetPercentage_.y * -overflowXYSize_.y);
+        childTc.addPos(offsetXY);
+        childTc.addContentPos(offsetXY);
+        childBTc.addContentPos(offsetXY);
     }
 }
 
@@ -919,20 +838,20 @@ void HkConstraintContext::constrainSBKnob(bool isFromHorizontalSB, int overflowS
     HkTransformContext& knobTc) const
 {
     //setting scale of knob
-    const auto preKNobSize = std::min(thisTc_->getScale().x, thisTc_->getScale().y);
-    knobTc.setScale({ preKNobSize, preKNobSize });
+    const auto preKNobSize = std::min(thisTc_->getContentScale().x, thisTc_->getContentScale().y);
+    knobTc.setContentScale({ preKNobSize, preKNobSize });
 
     const auto margins = 2;
     const auto minAxisKobSize = 30;
     /* Orientation calcs do differ */
     if (isFromHorizontalSB)
     {
-        const auto knobSizeX = thisTc_->getScale().x - overflowSize / 1;
-        knobTc.setScale({ std::max(minAxisKobSize, knobSizeX) - 2 * margins , preKNobSize - 2 * margins });
-        const auto minX = thisTc_->getPos().x + margins;
-        const auto maxX = thisTc_->getPos().x + thisTc_->getScale().x - knobTc.getScale().x - margins;
+        const auto knobSizeX = thisTc_->getContentScale().x - overflowSize;
+        knobTc.setContentScale({ std::max(minAxisKobSize, knobSizeX) - 2 * margins , preKNobSize - 2 * margins });
+        const auto minX = thisTc_->getContentPos().x + margins;
+        const auto maxX = thisTc_->getContentPos().x + thisTc_->getContentScale().x - knobTc.getContentScale().x - margins;
         const auto posX = minX * (1.0f - currKnobValue) + currKnobValue * maxX;
-        knobTc.setPos({ posX, thisTc_->getPos().y + margins });
+        knobTc.setContentPos({ posX, thisTc_->getContentPos().y + margins });
     }
     else
     {
@@ -944,23 +863,25 @@ void HkConstraintContext::constrainSBKnob(bool isFromHorizontalSB, int overflowS
         const auto posY = minY * (1.0f - currKnobValue) + currKnobValue * maxY;
         knobTc.setPos({ thisTc_->getPos().x + margins, posY });
     }
+
+    knobTc.copyContentDataToAbsoluteData();
 }
 
 /* Keeps scrollbar object at the bottom or at the right of the container. */
 void HkConstraintContext::scrollBarConstrain(HkTransformContext& scrollBarTc, const uint32_t otherSbMargin) const
 {
     ScrollbarMargin margins;
-    const auto sbScale = scrollBarTc.getScale();
+    const auto sbScale = scrollBarTc.getContentScale();
     (sbScale.x > sbScale.y) ? (margins.hsbMargin = sbScale.y) : (margins.vsbMargin = sbScale.x);
 
     const auto barScale = std::max(margins.hsbMargin, margins.vsbMargin);
     if (margins.hsbMargin && isOverflowX_)
     {
         /* We should take into account if vertical bar is present so that bottom right 'intersection'
-           between bars is filled or not. Same thing shoukd apply for vertical calcs bellow */
+           between bars is filled or not. Same thing should apply for vertical calcs bellow */
         const auto verticalBarAwareMargin = isOverflowY_ ? otherSbMargin : 0;
-        scrollBarTc.setScale({ thisTc_->getScale().x - verticalBarAwareMargin, barScale });
-        scrollBarTc.setPos({ thisTc_->getPos().x, thisTc_->getPos().y + thisTc_->getScale().y - barScale });
+        scrollBarTc.setContentScale({ thisTc_->getScale().x - verticalBarAwareMargin, barScale });
+        scrollBarTc.setContentPos({ thisTc_->getPos().x, thisTc_->getPos().y + thisTc_->getScale().y - barScale });
     }
     else if (margins.vsbMargin && isOverflowY_)
     {
@@ -968,6 +889,27 @@ void HkConstraintContext::scrollBarConstrain(HkTransformContext& scrollBarTc, co
         scrollBarTc.setScale({ barScale, thisTc_->getScale().y - horizontalBarAwareMargin });
         scrollBarTc.setPos({ thisTc_->getPos().x + thisTc_->getScale().x - barScale, thisTc_->getPos().y });
     }
+    scrollBarTc.copyContentDataToAbsoluteData();
+
+    // ScrollbarMargin margins;
+    // const auto sbScale = scrollBarTc.getScale();
+    // (sbScale.x > sbScale.y) ? (margins.hsbMargin = sbScale.y) : (margins.vsbMargin = sbScale.x);
+
+    // const auto barScale = std::max(margins.hsbMargin, margins.vsbMargin);
+    // if (margins.hsbMargin && isOverflowX_)
+    // {
+    //     /* We should take into account if vertical bar is present so that bottom right 'intersection'
+    //        between bars is filled or not. Same thing shoukd apply for vertical calcs bellow */
+    //     const auto verticalBarAwareMargin = isOverflowY_ ? otherSbMargin : 0;
+    //     scrollBarTc.setScale({ thisTc_->getScale().x - verticalBarAwareMargin, barScale });
+    //     scrollBarTc.setPos({ thisTc_->getPos().x, thisTc_->getPos().y + thisTc_->getScale().y - barScale });
+    // }
+    // else if (margins.vsbMargin && isOverflowY_)
+    // {
+    //     const auto horizontalBarAwareMargin = isOverflowX_ ? otherSbMargin : 0;
+    //     scrollBarTc.setScale({ barScale, thisTc_->getScale().y - horizontalBarAwareMargin });
+    //     scrollBarTc.setPos({ thisTc_->getPos().x + thisTc_->getScale().x - barScale, thisTc_->getPos().y });
+    // }
 }
 
 /* WindowFrame is a special UI element that 'drags' a container along with it that sits underneath the window frame. This

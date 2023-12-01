@@ -34,6 +34,13 @@ bool HkTransformContext::isAnyDifference() const
     return true;
 }
 
+void HkTransformContext::copyContentDataToAbsoluteData()
+{
+    pos = cPos;
+    scale = cScale;
+    rot = cRot;
+}
+
 /* Simply computes the axis aligned Bounding Box between this TC and otherTC */
 HkTransformBBox HkTransformContext::computeBBoxWith(const HkTransformContext& otherTc) const
 {

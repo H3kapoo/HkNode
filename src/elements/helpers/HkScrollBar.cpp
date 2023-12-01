@@ -25,11 +25,11 @@ void HkScrollBar::onFirstHeartbeat()
     knob_.renderContext.shaderId = windowDataPtr_->renderer.addShaderSourceToCache(DEFAULT_VS, DEFAULT_FS);
     knob_.renderContext.vaoId = windowDataPtr_->renderer.addVertexArrayDataToCache(DEFAULT_TYPE);
 
-    knob_.transformContext.setScale({ barSize_, barSize_ });
-    knob_.transformContext.setPos(
+    knob_.transformContext.setContentScale({ barSize_, barSize_ });
+    knob_.transformContext.setContentPos(
         {
-            node_.transformContext.getPos().x + node_.transformContext.getScale().x - barSize_,
-            node_.transformContext.getPos().y + node_.transformContext.getScale().y - barSize_
+            node_.transformContext.getContentPos().x + node_.transformContext.getContentScale().x - barSize_,
+            node_.transformContext.getContentPos().y + node_.transformContext.getContentScale().y - barSize_
         });
 
     HkNodeBase::onFirstHeartbeat();
@@ -67,9 +67,10 @@ void HkScrollBar::onDrag()
 void HkScrollBar::onClick()
 {
     /* Only reposition knob if we click outside of it*/
+    //TODO: isPosInsideOfNode is based on asbolute pos, maybe contentPos is needed instead?
     if (!knob_.transformContext.isPosInsideOfNode(windowDataPtr_->mousePos))
     {
-        computeKnobValue((-(knob_.transformContext.getScale()) / 2));
+        computeKnobValue((-(knob_.transformContext.getContentScale()) / 2));
     }
 }
 
@@ -120,12 +121,12 @@ void HkScrollBar::setBarScale(uint32_t scale)
 {
     if (isHorizontal_)
     {
-        node_.transformContext.setScale({ node_.transformContext.getScale().x, scale });
+        node_.transformContext.setContentScale({ node_.transformContext.getContentScale().x, scale });
     }
     /* Vertical*/
     else
     {
-        node_.transformContext.setScale({ scale, node_.transformContext.getScale().y });
+        node_.transformContext.setContentScale({ scale, node_.transformContext.getContentScale().y });
     }
 }
 
@@ -135,16 +136,16 @@ void HkScrollBar::computeKnobValue(const glm::ivec2 offsetFromCenter)
 {
     if (isHorizontal_)
     {
-        const float minX = node_.transformContext.getPos().x;
-        const float maxX = node_.transformContext.getPos().x + node_.transformContext.getScale().x
+        const float minX = node_.transformContext.getContentPos().x;
+        const float maxX = node_.transformContext.getContentPos().x + node_.transformContext.getContentScale().x
             - knob_.transformContext.getScale().x;
         // https://rosettacode.org/wiki/Map_range
         setKnobValue(((windowDataPtr_->mousePos.x + offsetFromCenter.x) - minX) / (maxX - minX));
     }
     else
     {
-        const float minY = node_.transformContext.getPos().y;
-        const float maxY = node_.transformContext.getPos().y + node_.transformContext.getScale().y
+        const float minY = node_.transformContext.getContentPos().y;
+        const float maxY = node_.transformContext.getContentPos().y + node_.transformContext.getContentScale().y
             - knob_.transformContext.getScale().y;
         // https://rosettacode.org/wiki/Map_range
         setKnobValue(((windowDataPtr_->mousePos.y + offsetFromCenter.y) - minY) / (maxY - minY));
