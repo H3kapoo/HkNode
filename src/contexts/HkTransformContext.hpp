@@ -35,31 +35,37 @@ public:
 
     void setVScale(const glm::ivec2& vScale);
     void setVPos(const glm::ivec2& vPos);
+    void setCVScale(const glm::ivec2& vScale);
+    void setCVPos(const glm::ivec2& vPos);
 
     /* Getters */
     const glm::ivec2& getContentPos() const;
     const glm::ivec2& getContentScale() const;
-
     const glm::ivec2& getPos() const;
     const glm::ivec2& getScale() const;
 
     const glm::ivec2& getVPos() const;
     const glm::ivec2& getVScale() const;
+    const glm::ivec2& getCVPos() const;
+    const glm::ivec2& getCVScale() const;
 
     const glm::mat4& getModelMatrix();
 
     /* Pub funcs */
     bool isPosInsideOfNode(const glm::ivec2& pin) const;
     bool isPosInsideOfNodeViewableArea(const glm::ivec2& pin) const;
-    HkTransformBBox computeBBoxWith(const HkTransformContext& otherTc) const;
+    static HkTransformBBox computeBBoxWith(const HkTransformBBox& leftTc,
+        const HkTransformBBox& rightTc);
     bool isAnyDifference() const;
     void copyContentDataToAbsoluteData();
 
     /* Actual UI scale taking into account padding,border,margins*/
     glm::ivec2 actualScale, actualPos;
 private:
-    HKAxisBoundsPoints computeXIntersectionPointsWith(const HkTransformContext& otherTc) const;
-    HKAxisBoundsPoints computeYIntersectionPointsWith(const HkTransformContext& otherTc) const;
+    static HKAxisBoundsPoints computeXIntersectionPointsWith(const HkTransformBBox& leftTc,
+        const HkTransformBBox& rightTc);
+    static HKAxisBoundsPoints computeYIntersectionPointsWith(const HkTransformBBox& leftTc,
+        const HkTransformBBox& rightTc);
     void computeModelMatrix();
 
     glm::mat4 modelMat;
@@ -72,6 +78,9 @@ private:
 
     /* Whats the actual viewable by user part of the mesh */
     glm::ivec2 vScale, vPos;
+
+    /* Whats the content viewable by user part of the mesh */
+    glm::ivec2 cvScale, cvPos;
 
     /* Is matrix dirty? */
     glm::ivec2 prevScale, prevPos;

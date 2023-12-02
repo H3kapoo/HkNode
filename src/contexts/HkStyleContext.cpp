@@ -92,6 +92,7 @@ HkStyleContext& HkStyleContext::setBorders(const uint32_t valueL, const uint32_t
     borderRX = valueR;
     borderTY = valueT;
     borderBY = valueB;
+    borderEnabled = (borderLX + borderRX + borderBY + borderTY) > 0 ? true : false;
     return *this;
 }
 

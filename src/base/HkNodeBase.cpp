@@ -16,31 +16,36 @@ void HkNodeBase::renderMySelf()
     // return;
     auto& tc = node_.transformContext;
 
-    /* We only render the visible area of the UI element as calculated in the update pass*/
-    if (treeStruct_.getType() != HkNodeType::RootWindowFrame)
-    {
-        // glEnable(GL_SCISSOR_TEST);
-        glScissor(
-            tc.getVPos().x,
-            windowDataPtr_->windowSize.y - tc.getVPos().y - tc.getVScale().y,
-            tc.getVScale().x,
-            tc.getVScale().y);
-    }
-
     //TODO: tc.isAnyDifference() is correct here but main() loop doesnt know not to clear screen on each pass anymore
     // A flag maybe is needed? Conditional clear?
     /* Normal rendering */
-    if (tc.getVScale().x && tc.getVScale().y)
+    // if (tc.getVScale().x && tc.getVScale().y)
     {
-        /*Experimental: What if we move all actual rendering inside the window scope? Since renderStore its already there
-        this would make sense. This leaves us with the renderContext only containing a blueprint of what the actual
-        renderer needs to set up, a config.*/
-
         node_.renderContext.windowProjMatrix = windowDataPtr_->sceneProjMatrix;
 
-        //TODO: Shall render border only if we have one enabled.
-        auto& btc = node_.borderTransformContext;
-        windowDataPtr_->renderer.render(node_.renderContext, node_.styleContext, btc.getModelMatrix(), true);
+        if (node_.styleContext.isBorderEnabled())
+        {
+            auto& btc = node_.borderTransformContext;
+            glEnable(GL_SCISSOR_TEST);
+            glScissor(
+                btc.getVPos().x,
+                windowDataPtr_->windowSize.y - btc.getVPos().y - btc.getVScale().y,
+                btc.getVScale().x,
+                btc.getVScale().y);
+            windowDataPtr_->renderer.render(node_.renderContext, node_.styleContext, btc.getModelMatrix(), true);
+        }
+
+        /* We only render the visible area of the UI element as calculated in the update pass*/
+        if (treeStruct_.getType() != HkNodeType::RootWindowFrame)
+        {
+            glEnable(GL_SCISSOR_TEST);
+            glScissor(
+                tc.getVPos().x,
+                windowDataPtr_->windowSize.y - tc.getVPos().y - tc.getVScale().y,
+                tc.getVScale().x,
+                tc.getVScale().y);
+        }
+
         windowDataPtr_->renderer.render(node_.renderContext, node_.styleContext, tc.getModelMatrix(), false);
 
         /* Update children. Also don't require bellow children to be rendered if parent can't be rendered itself */
@@ -53,8 +58,7 @@ void HkNodeBase::renderMySelf()
 
     /* Use this to render additional non interactive things if needed */
     /* Note: rescissoring to original parent is needed unfortunatelly */
-
-    // glEnable(GL_SCISSOR_TEST);
+    glEnable(GL_SCISSOR_TEST);
     glScissor(
         tc.getVPos().x,
         windowDataPtr_->windowSize.y - tc.getVPos().y - tc.getVScale().y,
@@ -101,14 +105,28 @@ void HkNodeBase::updateMySelf(const bool isSubWindowMinimized)
     {
         const auto& pTc = parentTreeStruct->getPayload()->node_.transformContext;
 
-        HkTransformContext cx;
-        cx.setPos(pTc.getVPos());
-        cx.setScale(pTc.getVScale());
+        HkTransformBBox pvBox;
+        HkTransformBBox nBox;
+        HkTransformBBox nBorderBox;
 
-        /* Compute intersection TC with the parent Tc*/
-        const auto bboxTc = node_.transformContext.computeBBoxWith(cx);
+        pvBox.pos = pTc.getVPos();
+        pvBox.scale = pTc.getVScale();
+
+        nBox.pos = node_.transformContext.getContentPos();
+        nBox.scale = node_.transformContext.getContentScale();
+
+        nBorderBox.pos = node_.borderTransformContext.getContentPos();
+        nBorderBox.scale = node_.borderTransformContext.getContentScale();
+
+        /* Compute node TC  intersection with the parent Tc*/
+        const auto bboxTc = HkTransformContext::computeBBoxWith(nBox, pvBox);
         node_.transformContext.setVPos(bboxTc.pos);
         node_.transformContext.setVScale(bboxTc.scale);
+
+        /* Compute node border TC intersection with the parent Tc*/
+        const auto borderBboxTc = HkTransformContext::computeBBoxWith(nBorderBox, pvBox);
+        node_.borderTransformContext.setVPos(borderBboxTc.pos);
+        node_.borderTransformContext.setVScale(borderBboxTc.scale);
     }
 
     /* Main HkEvents handler */

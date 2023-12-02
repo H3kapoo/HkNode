@@ -110,6 +110,7 @@ int main()
 
 
     ctr10->getStyle().setColor({ 0.0f,0.7f,1.0f, 1.0f })
+        .setOverflowAllowedXY(true)
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         .setMargins(10, 0, 10, 10)
         // .setLeftMargin(100)
@@ -132,14 +133,14 @@ int main()
         .setBottomMargin(30)
         .setBorders(30, 30, 30, 30)
         .setVHSizeConfig(
-            { .value = 100, .min = 50 }, { .value = 200, .min = 50 });
+            { .value = 100, .min = 50 }, { .value = 300, .min = 50 });
 
     ctr9->getStyle().setColor({ 0.4f,0.7f,0.0f, 1.0f })
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         .setLeftMargin(10)
         .setBottomMargin(10)
         .setVHSizeConfig(
-            { .value = 100, .min = 50 }, { .value = 100, .min = 50 });
+            { .value = 500, .min = 50 }, { .value = 100, .min = 50 });
 
     // windowFrame->pushChildren({ ctr, ctr4, ctr5 });
     // windowFrame->pushChildren({ label });
@@ -152,11 +153,12 @@ int main()
         .setVAlignment(HkVAlignment::Top);
 
     // windowFrame->pushChildren({ ctr10 });
-    windowFrame->pushChildren({ ctr10, ctr11, ctr12 });
+    windowFrame->pushChildren({ ctr10, ctr11 });
     // ctr4->pushChildren({ label });
     // ctr4->pushChildren({ ctr6, ctr7 });
     // ctr10->pushChildren({ ctr11, ctr12, ctr9 });
-    ctr10->pushChildren({ ctr9 });
+    // ctr10->pushChildren({ ctr9 });
+    ctr10->pushChildren({ ctr9, ctr12 });
 
     // // ctr7->pushChildren({ ctr11,ctr12 });
     // ctr8->pushChildren({ ctr13,ctr14 });

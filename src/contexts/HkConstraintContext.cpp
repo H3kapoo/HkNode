@@ -222,7 +222,7 @@ void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children)
         childTc.setScale({ childTc.getContentScale().x + pbmX, childTc.getContentScale().y + pbmY });
 
         /* Set child's content border scale. We don't care about absolute size */
-        childBTc.setContentScale({ childTc.getContentScale().x + pbX,childTc.getContentScale().y + pbY });
+        childBTc.setContentScale({ childTc.getContentScale().x + pbX, childTc.getContentScale().y + pbY });
 
         /* How much we need to advance to place next child. Previous end + current element's total scale */
         nextXAdvance = startPosX + childTc.getScale().x;
@@ -267,6 +267,12 @@ void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children)
                 childTc.getContentPos().x - childSc.getLeftBorder(),
                 childTc.getContentPos().y - childSc.getTopBorder()
             });
+
+        // printf("Pos: (%d %d) Scale: (%d %d)\n", childTc.getPos().x, childTc.getPos().y,
+        //     childTc.getScale().x, childTc.getScale().y);
+
+        // printf("BPos: (%d %d) BScale: (%d %d)\n", childBTc.getContentPos().x, childBTc.getContentPos().y,
+        //     childBTc.getContentScale().x, childBTc.getContentScale().y);
     }
 
     /* ------------------------------------- FINAL PUSH INTO PLACE ----------------------------------- */
@@ -450,7 +456,10 @@ void HkConstraintContext::resolveVerticalContainer(HkTreeStruct& children)
 
         childTc.setPos({ startPosX + childSc.getLeftMargin()  , startPosY + childSc.getTopMargin() });
         startPosY = nextYAdvance;
+
     }
+
+
 
     /*Back Propagate child alignment for the last row..or the only one row if no overflow occured with rowWrapping */
     backPropagateColChange(children, nextColFirstId, children.size() - sbCount_ - 1, longestXOnCol);
@@ -660,7 +669,6 @@ void HkConstraintContext::computeScrollBarCount()
 void HkConstraintContext::computeChildrenOverflowBasedOnMinMax(const MinMaxPos& minMax,
     const HkScrollbarsSize sbSizes)
 {
-    //TODO: This shall be done relative to parent's contentSize/Pos instead
     /*Reset variables */
     isOverflowX_ = false;
     isOverflowY_ = false;
@@ -670,26 +678,26 @@ void HkConstraintContext::computeChildrenOverflowBasedOnMinMax(const MinMaxPos& 
     /* Calculate X overflow */
     if (styleContextInj_->isOverflowAllowedX())
     {
-        if (minMax.maxX > thisTc_->getPos().x + thisTc_->getScale().x)
+        if (minMax.maxX > thisTc_->getContentPos().x + thisTc_->getContentScale().x)
         {
             isOverflowX_ = true;
-            overflowXYSize_.x = minMax.maxX - (thisTc_->getPos().x + thisTc_->getScale().x);
+            overflowXYSize_.x = minMax.maxX - (thisTc_->getContentPos().x + thisTc_->getContentScale().x);
         }
 
-        if (minMax.minX < thisTc_->getPos().x)
+        if (minMax.minX < thisTc_->getContentPos().x)
         {
             isOverflowX_ = true;
-            overflowXYSize_.x += thisTc_->getPos().x - minMax.minX;
+            overflowXYSize_.x += thisTc_->getContentPos().x - minMax.minX;
         }
 
         /* Try to see if Y axis also needs to overflow to fit everything nicely*/
         if (isOverflowX_ && styleContextInj_->isOverflowAllowedY())
         {
 
-            if (minMax.maxY + sbSizes.hsbSize > thisTc_->getPos().y + thisTc_->getScale().y)
+            if (minMax.maxY + sbSizes.hsbSize > thisTc_->getContentPos().y + thisTc_->getContentScale().y)
             {
                 isOverflowY_ = true;
-                overflowXYSize_.y = sbSizes.hsbSize + minMax.maxY - (thisTc_->getPos().y + thisTc_->getScale().y);
+                overflowXYSize_.y = sbSizes.hsbSize + minMax.maxY - (thisTc_->getContentPos().y + thisTc_->getContentScale().y);
                 overflowXYSize_.x += sbSizes.vsbSize;
             }
             /* If there's been a calculation on Y already, exit prematurely*/
@@ -700,25 +708,25 @@ void HkConstraintContext::computeChildrenOverflowBasedOnMinMax(const MinMaxPos& 
     /* Calculate Y overflow */
     if (styleContextInj_->isOverflowAllowedY())
     {
-        if (minMax.maxY > thisTc_->getPos().y + thisTc_->getScale().y)
+        if (minMax.maxY > thisTc_->getContentPos().y + thisTc_->getContentScale().y)
         {
             isOverflowY_ = true;
-            overflowXYSize_.y = minMax.maxY - (thisTc_->getPos().y + thisTc_->getScale().y);
+            overflowXYSize_.y = minMax.maxY - (thisTc_->getContentPos().y + thisTc_->getContentScale().y);
         }
 
-        if (minMax.minY < thisTc_->getPos().y)
+        if (minMax.minY < thisTc_->getContentPos().y)
         {
             isOverflowY_ = true;
-            overflowXYSize_.y += thisTc_->getPos().y - minMax.minY;
+            overflowXYSize_.y += thisTc_->getContentPos().y - minMax.minY;
         }
 
         /* Try to see if X axis also needs to overflow to fit everything nicely*/
         if (isOverflowY_ && styleContextInj_->isOverflowAllowedX())
         {
-            if (minMax.maxX + sbSizes.vsbSize > thisTc_->getPos().x + thisTc_->getScale().x)
+            if (minMax.maxX + sbSizes.vsbSize > thisTc_->getContentPos().x + thisTc_->getContentScale().x)
             {
                 isOverflowX_ = true;
-                overflowXYSize_.x = sbSizes.vsbSize + minMax.maxX - (thisTc_->getPos().x + thisTc_->getScale().x);
+                overflowXYSize_.x = sbSizes.vsbSize + minMax.maxX - (thisTc_->getContentPos().x + thisTc_->getContentScale().x);
                 overflowXYSize_.y += sbSizes.hsbSize;
             }
             /* If there's been a calculation on Y already, exit prematurely*/
@@ -792,8 +800,8 @@ void HkConstraintContext::resolveAxisOverflow(const HkTreeStruct& children,
         auto& child = children[i]->getPayload()->node_;
         auto& childTc = child.transformContext;
         auto& childBTc = child.borderTransformContext;
-        const auto leftOverflow = (result.minX < thisTc_->getPos().x) ? thisTc_->getPos().x - result.minX : 0;
-        const auto topOverflow = (result.minY < thisTc_->getPos().y) ? thisTc_->getPos().y - result.minY : 0;
+        const auto leftOverflow = (result.minX < thisTc_->getContentPos().x) ? thisTc_->getContentPos().x - result.minX : 0;
+        const auto topOverflow = (result.minY < thisTc_->getContentPos().y) ? thisTc_->getContentPos().y - result.minY : 0;
         const auto offsetXY = glm::ivec2(leftOverflow + offsetPercentage_.x * -overflowXYSize_.x,
             topOverflow + offsetPercentage_.y * -overflowXYSize_.y);
         childTc.addPos(offsetXY);
@@ -837,7 +845,7 @@ MinMaxPos HkConstraintContext::getMinAndMaxPositions(const HkTreeStruct& childre
 void HkConstraintContext::constrainSBKnob(bool isFromHorizontalSB, int overflowSize, float currKnobValue,
     HkTransformContext& knobTc) const
 {
-    //setting scale of knob
+    /* setting scale of knob */
     const auto preKNobSize = std::min(thisTc_->getContentScale().x, thisTc_->getContentScale().y);
     knobTc.setContentScale({ preKNobSize, preKNobSize });
 
@@ -855,13 +863,13 @@ void HkConstraintContext::constrainSBKnob(bool isFromHorizontalSB, int overflowS
     }
     else
     {
-        const auto knobSizeY = thisTc_->getScale().y - overflowSize;
-        knobTc.setScale({ preKNobSize - 2 * margins, std::max(minAxisKobSize, knobSizeY) - 2 * margins });
+        const auto knobSizeY = thisTc_->getContentScale().y - overflowSize;
+        knobTc.setContentScale({ preKNobSize - 2 * margins, std::max(minAxisKobSize, knobSizeY) - 2 * margins });
 
-        const auto minY = thisTc_->getPos().y + margins;
-        const auto maxY = thisTc_->getPos().y + thisTc_->getScale().y - knobTc.getScale().y - margins;
+        const auto minY = thisTc_->getContentPos().y + margins;
+        const auto maxY = thisTc_->getContentPos().y + thisTc_->getContentScale().y - knobTc.getContentScale().y - margins;
         const auto posY = minY * (1.0f - currKnobValue) + currKnobValue * maxY;
-        knobTc.setPos({ thisTc_->getPos().x + margins, posY });
+        knobTc.setContentPos({ thisTc_->getContentPos().x + margins, posY });
     }
 
     knobTc.copyContentDataToAbsoluteData();
@@ -880,36 +888,16 @@ void HkConstraintContext::scrollBarConstrain(HkTransformContext& scrollBarTc, co
         /* We should take into account if vertical bar is present so that bottom right 'intersection'
            between bars is filled or not. Same thing should apply for vertical calcs bellow */
         const auto verticalBarAwareMargin = isOverflowY_ ? otherSbMargin : 0;
-        scrollBarTc.setContentScale({ thisTc_->getScale().x - verticalBarAwareMargin, barScale });
-        scrollBarTc.setContentPos({ thisTc_->getPos().x, thisTc_->getPos().y + thisTc_->getScale().y - barScale });
+        scrollBarTc.setContentScale({ thisTc_->getContentScale().x - verticalBarAwareMargin, barScale });
+        scrollBarTc.setContentPos({ thisTc_->getContentPos().x, thisTc_->getContentPos().y + thisTc_->getContentScale().y - barScale });
     }
     else if (margins.vsbMargin && isOverflowY_)
     {
         const auto horizontalBarAwareMargin = isOverflowX_ ? otherSbMargin : 0;
-        scrollBarTc.setScale({ barScale, thisTc_->getScale().y - horizontalBarAwareMargin });
-        scrollBarTc.setPos({ thisTc_->getPos().x + thisTc_->getScale().x - barScale, thisTc_->getPos().y });
+        scrollBarTc.setContentScale({ barScale, thisTc_->getContentScale().y - horizontalBarAwareMargin });
+        scrollBarTc.setContentPos({ thisTc_->getContentPos().x + thisTc_->getContentScale().x - barScale, thisTc_->getContentPos().y });
     }
     scrollBarTc.copyContentDataToAbsoluteData();
-
-    // ScrollbarMargin margins;
-    // const auto sbScale = scrollBarTc.getScale();
-    // (sbScale.x > sbScale.y) ? (margins.hsbMargin = sbScale.y) : (margins.vsbMargin = sbScale.x);
-
-    // const auto barScale = std::max(margins.hsbMargin, margins.vsbMargin);
-    // if (margins.hsbMargin && isOverflowX_)
-    // {
-    //     /* We should take into account if vertical bar is present so that bottom right 'intersection'
-    //        between bars is filled or not. Same thing shoukd apply for vertical calcs bellow */
-    //     const auto verticalBarAwareMargin = isOverflowY_ ? otherSbMargin : 0;
-    //     scrollBarTc.setScale({ thisTc_->getScale().x - verticalBarAwareMargin, barScale });
-    //     scrollBarTc.setPos({ thisTc_->getPos().x, thisTc_->getPos().y + thisTc_->getScale().y - barScale });
-    // }
-    // else if (margins.vsbMargin && isOverflowY_)
-    // {
-    //     const auto horizontalBarAwareMargin = isOverflowX_ ? otherSbMargin : 0;
-    //     scrollBarTc.setScale({ barScale, thisTc_->getScale().y - horizontalBarAwareMargin });
-    //     scrollBarTc.setPos({ thisTc_->getPos().x + thisTc_->getScale().x - barScale, thisTc_->getPos().y });
-    // }
 }
 
 /* WindowFrame is a special UI element that 'drags' a container along with it that sits underneath the window frame. This
@@ -936,24 +924,29 @@ void HkConstraintContext::windowFrameContainerConstraint(HkTransformContext& tit
         thisTc_->getContentPos().y + 20 / 2 - 5
         });
 
+    wfCtr.copyContentDataToAbsoluteData();
+    titleLabel.copyContentDataToAbsoluteData();
+    exitBtn.copyContentDataToAbsoluteData();
+    minBtn.copyContentDataToAbsoluteData();
+
     //
-    wfCtr.setPos({ thisTc_->getContentPos().x, thisTc_->getPos().y + thisTc_->getScale().y });
-    wfCtr.setScale({ thisTc_->getScale().x, wfCtr.getScale().y });
+    // wfCtr.setPos({ thisTc_->getContentPos().x, thisTc_->getPos().y + thisTc_->getScale().y });
+    // wfCtr.setScale({ thisTc_->getScale().x, wfCtr.getScale().y });
 
-    titleLabel.setScale({ 200 , thisTc_->getScale().y });
-    titleLabel.setPos(thisTc_->getPos());
+    // titleLabel.setScale({ 200 , thisTc_->getScale().y });
+    // titleLabel.setPos(thisTc_->getPos());
 
-    exitBtn.setScale({ 20, 20 }); // hardcoded, but technically ok situation
-    exitBtn.setPos({
-        thisTc_->getPos().x + thisTc_->getScale().x - 20 - 10,
-        thisTc_->getPos().y + 20 / 2 - 5
-        });
+    // exitBtn.setScale({ 20, 20 }); // hardcoded, but technically ok situation
+    // exitBtn.setPos({
+    //     thisTc_->getPos().x + thisTc_->getScale().x - 20 - 10,
+    //     thisTc_->getPos().y + 20 / 2 - 5
+    //     });
 
-    minBtn.setScale({ 20, 20 });
-    minBtn.setPos({
-        thisTc_->getPos().x + thisTc_->getScale().x - 20 - 40,
-        thisTc_->getPos().y + 20 / 2 - 5
-        });
+    // minBtn.setScale({ 20, 20 });
+    // minBtn.setPos({
+    //     thisTc_->getPos().x + thisTc_->getScale().x - 20 - 40,
+    //     thisTc_->getPos().y + 20 / 2 - 5
+    //     });
 }
 
 void HkConstraintContext::windowFrameContainerConstraint(HkTransformContext& titleLabel, HkTransformContext& wfCtr,
@@ -974,15 +967,18 @@ void HkConstraintContext::windowFrameContainerConstraint(HkTransformContext& tit
     wfCtr.setContentScale(windowSize); //TODO: hacK: looks like wfCtr gets a windowSize thats lacking exactly 1px behind (looks like GPU dependent)
     wfCtr.setContentPos({ 0,0 });
 
-
-    thisTc_->setPos({ 0,0 });
-    /* Necessary so we still "render" the frame in renderMySelf scissor pass */
-    thisTc_->setScale({ -1,-1 });
+    wfCtr.copyContentDataToAbsoluteData();
+    thisTc_->copyContentDataToAbsoluteData();
 
 
-    // wfCtr.setScale(windowSize + 1); //TODO: hacK: looks like wfCtr gets a windowSize thats lacking exactly 1px behind (looks like GPU dependent)
-    wfCtr.setScale(windowSize); //TODO: hacK: looks like wfCtr gets a windowSize thats lacking exactly 1px behind (looks like GPU dependent)
-    wfCtr.setPos({ 0,0 });
+    // thisTc_->setPos({ 0,0 });
+    // /* Necessary so we still "render" the frame in renderMySelf scissor pass */
+    // thisTc_->setScale({ -1,-1 });
+
+
+    // // wfCtr.setScale(windowSize + 1); //TODO: hacK: looks like wfCtr gets a windowSize thats lacking exactly 1px behind (looks like GPU dependent)
+    // wfCtr.setScale(windowSize); //TODO: hacK: looks like wfCtr gets a windowSize thats lacking exactly 1px behind (looks like GPU dependent)
+    // wfCtr.setPos({ 0,0 });
 }
 
 void HkConstraintContext::injectStyleContext(HkStyleContext* styleContext)

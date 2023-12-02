@@ -138,7 +138,7 @@ void HkScrollBar::computeKnobValue(const glm::ivec2 offsetFromCenter)
     {
         const float minX = node_.transformContext.getContentPos().x;
         const float maxX = node_.transformContext.getContentPos().x + node_.transformContext.getContentScale().x
-            - knob_.transformContext.getScale().x;
+            - knob_.transformContext.getContentScale().x;
         // https://rosettacode.org/wiki/Map_range
         setKnobValue(((windowDataPtr_->mousePos.x + offsetFromCenter.x) - minX) / (maxX - minX));
     }
@@ -146,7 +146,7 @@ void HkScrollBar::computeKnobValue(const glm::ivec2 offsetFromCenter)
     {
         const float minY = node_.transformContext.getContentPos().y;
         const float maxY = node_.transformContext.getContentPos().y + node_.transformContext.getContentScale().y
-            - knob_.transformContext.getScale().y;
+            - knob_.transformContext.getContentScale().y;
         // https://rosettacode.org/wiki/Map_range
         setKnobValue(((windowDataPtr_->mousePos.y + offsetFromCenter.y) - minY) / (maxY - minY));
     }

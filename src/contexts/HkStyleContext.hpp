@@ -131,6 +131,7 @@ public:
     inline const glm::vec4& getColor() const { return color; }
     inline bool isRowWrappingEnabled() const { return rowWrap; }
     inline bool isColWrappingEnabled() const { return colWrap; }
+    inline bool isBorderEnabled() const { return borderEnabled; }
     inline uint32_t getLeftMargin() const { return marginLX; }
     inline uint32_t getRightMargin() const { return marginRX; }
     inline uint32_t getTopMargin() const { return marginTY; }
@@ -161,6 +162,7 @@ private:
     glm::vec4 color;
     bool rowWrap{ false };
     bool colWrap{ false };
+    bool borderEnabled{ false };
     uint32_t marginLX{ 0 }, marginRX{ 0 };
     uint32_t marginTY{ 0 }, marginBY{ 0 };
     uint32_t borderLX{ 0 }, borderRX{ 0 };

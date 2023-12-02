@@ -115,7 +115,7 @@ void HkRenderer::render(const HkRenderContext& renderConfig, const HkStyleContex
     {
         if (isBorder)
         {
-            shader_.setVec4f("color", glm::vec4(1.0f));
+            shader_.setVec4f("color", glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
         }
         else
         {
