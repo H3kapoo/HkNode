@@ -90,9 +90,9 @@ public:
         HkTransformContext& knobTc) const;
 
     /* WindowFrame related */
-    void windowFrameContainerConstraint(HkTransformContext& titleLabel, HkTransformContext& wfCtr, HkTransformContext& exitBtn,
-        HkTransformContext& minBtn) const;
-    void windowFrameContainerConstraint(HkTransformContext& titleLabel, HkTransformContext& wfCtr,
+    void windowFrameContainerConstraint(HkTransformContext& titleLabel, HkTransformContext& wfCtr, HkTransformContext& wfBorder,
+        HkTransformContext& exitBtn, HkTransformContext& minBtn) const;
+    void windowFrameContainerConstraint(HkTransformContext& titleLabel, HkTransformContext& wfCtr, HkTransformContext& wfBorder,
         HkTransformContext& exitBtn, HkTransformContext& minBtn, const glm::ivec2& windowSize, const bool isFullscreen) const;
 
     /* Injects */

@@ -59,8 +59,6 @@ public:
     bool isAnyDifference() const;
     void copyContentDataToAbsoluteData();
 
-    /* Actual UI scale taking into account padding,border,margins*/
-    glm::ivec2 actualScale, actualPos;
 private:
     static HKAxisBoundsPoints computeXIntersectionPointsWith(const HkTransformBBox& leftTc,
         const HkTransformBBox& rightTc);

@@ -186,8 +186,9 @@ void HkContainer::resolveScrollBarChildrenIfNeeded()
             hScrollBar_.setScrollBarActive(false);
             treeStruct_.removeChildren({ hScrollBar_.treeStruct_.getId() });
         }
+
         node_.constraintContext.scrollBarConstrain(hScrollBar_.node_.transformContext,
-            vScrollBar_.node_.transformContext.getScale().x);
+            vScrollBar_.node_.transformContext.getContentScale().x);
     }
 
     /* Place vertical scrollbar if neeeded */
@@ -200,7 +201,6 @@ void HkContainer::resolveScrollBarChildrenIfNeeded()
         {
             scrollbBarsCount_++;
             treeStruct_.pushChild(&vScrollBar_.treeStruct_);
-            //TODO: There has to be a better way
             vScrollBar_.injectWindowDataPtr(windowDataPtr_);
             vScrollBar_.setScrollBarActive(true);
         }
@@ -211,11 +211,7 @@ void HkContainer::resolveScrollBarChildrenIfNeeded()
             treeStruct_.removeChildren({ vScrollBar_.treeStruct_.getId() });
         }
         node_.constraintContext.scrollBarConstrain(vScrollBar_.node_.transformContext,
-            hScrollBar_.node_.transformContext.getScale().y);
-
-        //TODO: Note? somehow if we put these inside the ifs above, altough flow enters in IFs only one time,
-        // in runtime, scrollbars will still constrain each frame somehow, but bellow functions arent called..
-        // something to do with references ? Not really a but but worth noting.
+            hScrollBar_.node_.transformContext.getContentScale().y);
     }
 }
 

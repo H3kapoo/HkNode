@@ -903,7 +903,7 @@ void HkConstraintContext::scrollBarConstrain(HkTransformContext& scrollBarTc, co
 /* WindowFrame is a special UI element that 'drags' a container along with it that sits underneath the window frame. This
    function helps constraint that container to the windowFrame element */
 void HkConstraintContext::windowFrameContainerConstraint(HkTransformContext& titleLabel, HkTransformContext& wfCtr,
-    HkTransformContext& exitBtn, HkTransformContext& minBtn) const
+    HkTransformContext& wfBorder, HkTransformContext& exitBtn, HkTransformContext& minBtn) const
 {
     /* TODO: dirty flags shall be used here to not do redundant repositioning */
     wfCtr.setContentPos({ thisTc_->getContentPos().x, thisTc_->getContentPos().y + thisTc_->getContentScale().y });
@@ -912,7 +912,7 @@ void HkConstraintContext::windowFrameContainerConstraint(HkTransformContext& tit
     titleLabel.setContentScale({ 200 , thisTc_->getContentScale().y });
     titleLabel.setContentPos(thisTc_->getContentPos());
 
-    exitBtn.setContentScale({ 20, 20 }); // hardcoded, but technically ok situation
+    exitBtn.setContentScale({ 20, 20 }); // hardcoded, but technically ok situation. Edit: fix later
     exitBtn.setContentPos({
         thisTc_->getContentPos().x + thisTc_->getContentScale().x - 20 - 10,
         thisTc_->getContentPos().y + 20 / 2 - 5
@@ -924,37 +924,23 @@ void HkConstraintContext::windowFrameContainerConstraint(HkTransformContext& tit
         thisTc_->getContentPos().y + 20 / 2 - 5
         });
 
+    //TODO: Maybe not a good ideea to do it here
+    // wfBorder.setContentScale({ wfCtr.getContentScale().x + 20,  wfCtr.getContentScale().y + 10 });
+    // wfBorder.setContentPos({ wfCtr.getContentPos().x - 10, wfCtr.getContentPos().y });
+
     wfCtr.copyContentDataToAbsoluteData();
     titleLabel.copyContentDataToAbsoluteData();
     exitBtn.copyContentDataToAbsoluteData();
     minBtn.copyContentDataToAbsoluteData();
-
-    //
-    // wfCtr.setPos({ thisTc_->getContentPos().x, thisTc_->getPos().y + thisTc_->getScale().y });
-    // wfCtr.setScale({ thisTc_->getScale().x, wfCtr.getScale().y });
-
-    // titleLabel.setScale({ 200 , thisTc_->getScale().y });
-    // titleLabel.setPos(thisTc_->getPos());
-
-    // exitBtn.setScale({ 20, 20 }); // hardcoded, but technically ok situation
-    // exitBtn.setPos({
-    //     thisTc_->getPos().x + thisTc_->getScale().x - 20 - 10,
-    //     thisTc_->getPos().y + 20 / 2 - 5
-    //     });
-
-    // minBtn.setScale({ 20, 20 });
-    // minBtn.setPos({
-    //     thisTc_->getPos().x + thisTc_->getScale().x - 20 - 40,
-    //     thisTc_->getPos().y + 20 / 2 - 5
-    //     });
 }
 
 void HkConstraintContext::windowFrameContainerConstraint(HkTransformContext& titleLabel, HkTransformContext& wfCtr,
-    HkTransformContext& exitBtn, HkTransformContext& minBtn, const glm::ivec2& windowSize, const bool isFullscreen) const
+    HkTransformContext& wfBorder, HkTransformContext& exitBtn, HkTransformContext& minBtn, const glm::ivec2& windowSize,
+    const bool isFullscreen) const
 {
     if (!isFullscreen)
     {
-        windowFrameContainerConstraint(titleLabel, wfCtr, exitBtn, minBtn);
+        windowFrameContainerConstraint(titleLabel, wfCtr, wfBorder, exitBtn, minBtn);
         return;
     }
 
@@ -962,23 +948,12 @@ void HkConstraintContext::windowFrameContainerConstraint(HkTransformContext& tit
     /* Necessary so we still "render" the frame in renderMySelf scissor pass */
     thisTc_->setContentScale({ -1,-1 });
 
-
     // wfCtr.setScale(windowSize + 1); //TODO: hacK: looks like wfCtr gets a windowSize thats lacking exactly 1px behind (looks like GPU dependent)
-    wfCtr.setContentScale(windowSize); //TODO: hacK: looks like wfCtr gets a windowSize thats lacking exactly 1px behind (looks like GPU dependent)
+    wfCtr.setContentScale(windowSize);
     wfCtr.setContentPos({ 0,0 });
 
     wfCtr.copyContentDataToAbsoluteData();
     thisTc_->copyContentDataToAbsoluteData();
-
-
-    // thisTc_->setPos({ 0,0 });
-    // /* Necessary so we still "render" the frame in renderMySelf scissor pass */
-    // thisTc_->setScale({ -1,-1 });
-
-
-    // // wfCtr.setScale(windowSize + 1); //TODO: hacK: looks like wfCtr gets a windowSize thats lacking exactly 1px behind (looks like GPU dependent)
-    // wfCtr.setScale(windowSize); //TODO: hacK: looks like wfCtr gets a windowSize thats lacking exactly 1px behind (looks like GPU dependent)
-    // wfCtr.setPos({ 0,0 });
 }
 
 void HkConstraintContext::injectStyleContext(HkStyleContext* styleContext)

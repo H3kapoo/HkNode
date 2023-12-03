@@ -116,26 +116,29 @@ void HkWindowFrame::onAnimationFrameRequested()
         return 1.0 + c3 * std::pow(x - 1.0, 3.0) + c1 * std::pow(x - 1.0, 2.0);};
 
     glm::vec2 interpPos = startPos + (endPos - startPos) * (float)easeInOutCubic(t);
+    //TODO: THis needs refactor as well
+    const int32_t borderSize = 10;
     node_.transformContext.setPos(interpPos);
+    node_.transformContext.setContentPos(interpPos);
+    node_.borderTransformContext.setContentPos({ interpPos.x - borderSize, interpPos.y - borderSize });
     glfwPostEmptyEvent(); //TODO: This should be posted ONLY once per frame
 }
 
 void HkWindowFrame::onScroll()
 {
-    node_.transformContext.addScale({ windowDataPtr_->scrollPosY * 4, 0 });
+    // node_.transformContext.addScale({ windowDataPtr_->scrollPosY * 4, 0 });
 }
 
 void HkWindowFrame::onDrag()
 {
     if (mode_ != HkWindowFrameMode::Grabbable) return;
-    // startPos = node_.transformContext.getPos();
+    startPos = node_.transformContext.getPos();
     endPos = windowDataPtr_->mouseOffsetFromFocusedCenter + windowDataPtr_->mousePos;
-    // isAnimOngoing = true;
-    // restarted = true;
+    isAnimOngoing = true;
+    restarted = true;
 
-    node_.transformContext.setPos(endPos);
-    node_.transformContext.setContentPos(endPos);
-
+    // node_.transformContext.setPos(endPos);
+    // node_.transformContext.setContentPos(endPos);
 }
 
 void HkWindowFrame::onGeneralMouseMove()
@@ -157,11 +160,9 @@ void HkWindowFrame::onGeneralMouseMove()
     }
 }
 
-void HkWindowFrame::onClick()
-{}
+void HkWindowFrame::onClick() {}
 
-void HkWindowFrame::onRelease()
-{}
+void HkWindowFrame::onRelease() {}
 
 void HkWindowFrame::onWindowResize() {}
 
@@ -179,13 +180,26 @@ void HkWindowFrame::resolveChildrenConstraints(HkTreeStruct&,
     node_.constraintContext.windowFrameContainerConstraint(
         titleLabel_.node_.transformContext,
         wfCont_.node_.transformContext,
+        wfCont_.node_.borderTransformContext,
         exitBtn_.node_.transformContext,
         minimizeBtn_.node_.transformContext,
         windowDataPtr_->windowSize,
         /* Means we are in the fullscreen fixed mode, we hide the "grab bar"*/
         (mode_ != HkWindowFrameMode::Grabbable ? true : false));
-}
 
+    const int32_t borderSize = 10;
+    node_.borderTransformContext.setContentPos(
+        {
+            node_.transformContext.getContentPos().x - borderSize,
+            node_.transformContext.getContentPos().y - borderSize
+        });
+    node_.borderTransformContext.setContentScale(
+        {
+            node_.transformContext.getContentScale().x + borderSize * 2,
+            node_.transformContext.getContentScale().y +
+                wfCont_.node_.transformContext.getContentScale().y + borderSize * 2
+        });
+}
 
 void HkWindowFrame::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)
 {

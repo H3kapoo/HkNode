@@ -23,10 +23,11 @@ void HkNodeBase::renderMySelf()
     {
         node_.renderContext.windowProjMatrix = windowDataPtr_->sceneProjMatrix;
 
-        if (node_.styleContext.isBorderEnabled())
+        glEnable(GL_SCISSOR_TEST);
+        //TODO: Second condition needs to dissapear
+        if (node_.styleContext.isBorderEnabled() || treeStruct_.getType() == HkNodeType::RootWindowFrame)
         {
             auto& btc = node_.borderTransformContext;
-            glEnable(GL_SCISSOR_TEST);
             glScissor(
                 btc.getVPos().x,
                 windowDataPtr_->windowSize.y - btc.getVPos().y - btc.getVScale().y,
@@ -38,7 +39,6 @@ void HkNodeBase::renderMySelf()
         /* We only render the visible area of the UI element as calculated in the update pass*/
         if (treeStruct_.getType() != HkNodeType::RootWindowFrame)
         {
-            glEnable(GL_SCISSOR_TEST);
             glScissor(
                 tc.getVPos().x,
                 windowDataPtr_->windowSize.y - tc.getVPos().y - tc.getVScale().y,
@@ -79,15 +79,25 @@ void HkNodeBase::updateMySelf(const bool isSubWindowMinimized)
 {
     const auto& parentTreeStruct = treeStruct_.getParent();
     auto& tc = node_.transformContext;
+    auto& bTc = node_.borderTransformContext;
 
     /* Compute renderable/inveractive area for each element */
     if (treeStruct_.getType() == HkNodeType::RootWindowFrame)
     {
         tc.setVPos(tc.getPos());
         tc.setVScale(tc.getScale());
+        bTc.setVPos(bTc.getContentPos());
+        bTc.setVScale(bTc.getContentScale());
     }
     else if (parentTreeStruct && parentTreeStruct->getType() == HkNodeType::RootWindowFrame)
     {
+        //TODO: Remove from here
+        if (isSubWindowMinimized)
+        {
+            auto& pTc = parentTreeStruct->getPayload()->node_.borderTransformContext;
+            pTc.setVScale({ pTc.getContentScale().x, 50 });
+        }
+
         /* Minimize only container of windowframe */
         if (isSubWindowMinimized && treeStruct_.getType() == HkNodeType::Container)
         {
