@@ -32,7 +32,7 @@ int main()
 
     /* Minimal size setting & style config so WindowFrame is pinchable and scalable using the mouse.
        Set also grabbable window title. Default windowFrame orientation is Horizontal */
-    windowFrame->getStyle().setPinchConfig({ .enable = true });
+    windowFrame->getContainerStyle().setPinchConfig({ .enable = true });
     windowFrame->setSize({ 1280 , 720 });
     windowFrame->setTitle("My Window Title");
 

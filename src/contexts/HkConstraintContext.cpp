@@ -267,12 +267,6 @@ void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children)
                 childTc.getContentPos().x - childSc.getLeftBorder(),
                 childTc.getContentPos().y - childSc.getTopBorder()
             });
-
-        // printf("Pos: (%d %d) Scale: (%d %d)\n", childTc.getPos().x, childTc.getPos().y,
-        //     childTc.getScale().x, childTc.getScale().y);
-
-        // printf("BPos: (%d %d) BScale: (%d %d)\n", childBTc.getContentPos().x, childBTc.getContentPos().y,
-        //     childBTc.getContentScale().x, childBTc.getContentScale().y);
     }
 
     /* ------------------------------------- FINAL PUSH INTO PLACE ----------------------------------- */
@@ -619,16 +613,19 @@ void HkConstraintContext::pushElementsIntoPosition(HkTreeStruct& children) const
     MinMaxPos result = getMinAndMaxPositions(children); // we calculate the same thing later. optimize
 
     /* Calculate start point for placement on the X axis based on container options*/
+    const int32_t padding = 10;
+    auto cp = thisTc_->getContentPos() + padding;
+    auto cs = thisTc_->getContentScale() - padding * 2;
     switch (styleContextInj_->getHAlignment())
     {
     case HkHAlignment::Left:
-        startPosX = thisTc_->getContentPos().x;
+        startPosX = cp.x;
         break;
     case HkHAlignment::Center:
-        startPosX = thisTc_->getContentPos().x + thisTc_->getContentScale().x / 2 - ((result.maxX - result.minX) / 2);
+        startPosX = cp.x + cs.x / 2 - ((result.maxX - result.minX) / 2);
         break;
     case HkHAlignment::Right:
-        startPosX = (thisTc_->getContentPos().x + thisTc_->getContentScale().x) - (result.maxX - result.minX);
+        startPosX = (cp.x + cs.x) - (result.maxX - result.minX);
         break;
     }
 
@@ -636,13 +633,13 @@ void HkConstraintContext::pushElementsIntoPosition(HkTreeStruct& children) const
     switch (styleContextInj_->getVAlignment())
     {
     case HkVAlignment::Top:
-        startPosY = thisTc_->getContentPos().y;
+        startPosY = cp.y;
         break;
     case HkVAlignment::Center:
-        startPosY = thisTc_->getContentPos().y + thisTc_->getContentScale().y / 2 - ((result.maxY - result.minY) / 2);
+        startPosY = cp.y + cs.y / 2 - ((result.maxY - result.minY) / 2);
         break;
     case HkVAlignment::Bottom:
-        startPosY = (thisTc_->getContentPos().y + thisTc_->getContentScale().y) - (result.maxY - result.minY);
+        startPosY = (cp.y + cs.y) - (result.maxY - result.minY);
         break;
     }
 
@@ -675,29 +672,33 @@ void HkConstraintContext::computeChildrenOverflowBasedOnMinMax(const MinMaxPos& 
     overflowXYSize_.x = 0;
     overflowXYSize_.y = 0;
 
+    const int32_t padding = 10;
+    auto cp = thisTc_->getContentPos() + padding;
+    auto cs = thisTc_->getContentScale() - padding * 2;
+
     /* Calculate X overflow */
     if (styleContextInj_->isOverflowAllowedX())
     {
-        if (minMax.maxX > thisTc_->getContentPos().x + thisTc_->getContentScale().x)
+        if (minMax.maxX > cp.x + cs.x)
         {
             isOverflowX_ = true;
-            overflowXYSize_.x = minMax.maxX - (thisTc_->getContentPos().x + thisTc_->getContentScale().x);
+            overflowXYSize_.x = minMax.maxX - (cp.x + cs.x);
         }
 
-        if (minMax.minX < thisTc_->getContentPos().x)
+        if (minMax.minX < cp.x)
         {
             isOverflowX_ = true;
-            overflowXYSize_.x += thisTc_->getContentPos().x - minMax.minX;
+            overflowXYSize_.x += cp.x - minMax.minX;
         }
 
         /* Try to see if Y axis also needs to overflow to fit everything nicely*/
         if (isOverflowX_ && styleContextInj_->isOverflowAllowedY())
         {
 
-            if (minMax.maxY + sbSizes.hsbSize > thisTc_->getContentPos().y + thisTc_->getContentScale().y)
+            if (minMax.maxY + sbSizes.hsbSize > cp.y + cs.y)
             {
                 isOverflowY_ = true;
-                overflowXYSize_.y = sbSizes.hsbSize + minMax.maxY - (thisTc_->getContentPos().y + thisTc_->getContentScale().y);
+                overflowXYSize_.y = sbSizes.hsbSize + minMax.maxY - (cp.y + cs.y);
                 overflowXYSize_.x += sbSizes.vsbSize;
             }
             /* If there's been a calculation on Y already, exit prematurely*/
@@ -708,25 +709,25 @@ void HkConstraintContext::computeChildrenOverflowBasedOnMinMax(const MinMaxPos& 
     /* Calculate Y overflow */
     if (styleContextInj_->isOverflowAllowedY())
     {
-        if (minMax.maxY > thisTc_->getContentPos().y + thisTc_->getContentScale().y)
+        if (minMax.maxY > cp.y + cs.y)
         {
             isOverflowY_ = true;
-            overflowXYSize_.y = minMax.maxY - (thisTc_->getContentPos().y + thisTc_->getContentScale().y);
+            overflowXYSize_.y = minMax.maxY - (cp.y + cs.y);
         }
 
-        if (minMax.minY < thisTc_->getContentPos().y)
+        if (minMax.minY < cp.y)
         {
             isOverflowY_ = true;
-            overflowXYSize_.y += thisTc_->getContentPos().y - minMax.minY;
+            overflowXYSize_.y += cp.y - minMax.minY;
         }
 
         /* Try to see if X axis also needs to overflow to fit everything nicely*/
         if (isOverflowY_ && styleContextInj_->isOverflowAllowedX())
         {
-            if (minMax.maxX + sbSizes.vsbSize > thisTc_->getContentPos().x + thisTc_->getContentScale().x)
+            if (minMax.maxX + sbSizes.vsbSize > cp.x + cs.x)
             {
                 isOverflowX_ = true;
-                overflowXYSize_.x = sbSizes.vsbSize + minMax.maxX - (thisTc_->getContentPos().x + thisTc_->getContentScale().x);
+                overflowXYSize_.x = sbSizes.vsbSize + minMax.maxX - (cp.x + cs.x);
                 overflowXYSize_.y += sbSizes.hsbSize;
             }
             /* If there's been a calculation on Y already, exit prematurely*/

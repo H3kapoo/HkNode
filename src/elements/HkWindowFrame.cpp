@@ -23,7 +23,7 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
     pinchHelper_.setGrabSize(15);
 
     //TODO: Do not push this if window is not grabbable
-    // treeStruct_.pushChild(&titleLabel_.treeStruct_);
+    treeStruct_.pushChild(&titleLabel_.treeStruct_);
     treeStruct_.pushChild(&minimizeBtn_.treeStruct_);
     treeStruct_.pushChild(&exitBtn_.treeStruct_);
     treeStruct_.pushChild(&wfCont_.treeStruct_);
@@ -117,7 +117,7 @@ void HkWindowFrame::onAnimationFrameRequested()
 
     glm::vec2 interpPos = startPos + (endPos - startPos) * (float)easeInOutCubic(t);
     //TODO: THis needs refactor as well
-    const int32_t borderSize = 10;
+    const int32_t borderSize = node_.styleContext.getBottomBorder();
     node_.transformContext.setPos(interpPos);
     node_.transformContext.setContentPos(interpPos);
     node_.borderTransformContext.setContentPos({ interpPos.x - borderSize, interpPos.y - borderSize });
@@ -136,26 +136,28 @@ void HkWindowFrame::onDrag()
     endPos = windowDataPtr_->mouseOffsetFromFocusedCenter + windowDataPtr_->mousePos;
     isAnimOngoing = true;
     restarted = true;
-
-    // node_.transformContext.setPos(endPos);
-    // node_.transformContext.setContentPos(endPos);
 }
 
 void HkWindowFrame::onGeneralMouseMove()
 {
+    //TODO: FInd out why with borderSize > 0, container scales in all directionss
     if (wfCont_.getStyle().getPinchConfig().enable)
     {
-        boundPos_ = { node_.transformContext.getPos() };
-        boundScale_ = {
-            node_.transformContext.getScale().x,
-            wfCont_.node_.transformContext.getScale().y + node_.transformContext.getScale().y
-        };
-
         if (pinchHelper_.onMouseMoveCustom(*windowDataPtr_, boundPos_, boundScale_))
         {
-            node_.transformContext.setScale({ boundScale_.x, 30 });
-            node_.transformContext.setPos(boundPos_);
-            wfCont_.node_.transformContext.setScale({ boundScale_.x, boundScale_.y - 30 });
+            const int32_t lBorderSize = node_.styleContext.getLeftBorder();
+            const int32_t rBorderSize = node_.styleContext.getRightBorder();
+            const int32_t tBorderSize = node_.styleContext.getTopBorder();
+            const int32_t bBorderSize = node_.styleContext.getBottomBorder();
+
+            node_.transformContext.setContentScale({ boundScale_.x - (lBorderSize + rBorderSize), 30 });
+            node_.transformContext.setContentPos({ boundPos_.x + lBorderSize, boundPos_.y + tBorderSize });
+            wfCont_.node_.transformContext.setContentScale(
+                { boundScale_.x - (lBorderSize + rBorderSize),
+                boundScale_.y - 30 - (tBorderSize + bBorderSize) });
+
+            node_.transformContext.copyContentDataToAbsoluteData();
+            wfCont_.node_.transformContext.copyContentDataToAbsoluteData();
         }
     }
 }
@@ -180,25 +182,35 @@ void HkWindowFrame::resolveChildrenConstraints(HkTreeStruct&,
     node_.constraintContext.windowFrameContainerConstraint(
         titleLabel_.node_.transformContext,
         wfCont_.node_.transformContext,
-        wfCont_.node_.borderTransformContext,
+        wfCont_.node_.borderTransformContext, //TODO: Needs to be removed
         exitBtn_.node_.transformContext,
         minimizeBtn_.node_.transformContext,
         windowDataPtr_->windowSize,
         /* Means we are in the fullscreen fixed mode, we hide the "grab bar"*/
         (mode_ != HkWindowFrameMode::Grabbable ? true : false));
 
-    const int32_t borderSize = 10;
+    //TODO: This shall not be here, but in constraints context
+    const int32_t lBorderSize = node_.styleContext.getLeftBorder();
+    const int32_t rBorderSize = node_.styleContext.getRightBorder();
+    const int32_t tBorderSize = node_.styleContext.getTopBorder();
+    const int32_t bBorderSize = node_.styleContext.getBottomBorder();
     node_.borderTransformContext.setContentPos(
         {
-            node_.transformContext.getContentPos().x - borderSize,
-            node_.transformContext.getContentPos().y - borderSize
+            node_.transformContext.getContentPos().x - lBorderSize,
+            node_.transformContext.getContentPos().y - tBorderSize
         });
     node_.borderTransformContext.setContentScale(
         {
-            node_.transformContext.getContentScale().x + borderSize * 2,
+            node_.transformContext.getContentScale().x + rBorderSize + lBorderSize,
             node_.transformContext.getContentScale().y +
-                wfCont_.node_.transformContext.getContentScale().y + borderSize * 2
+                wfCont_.node_.transformContext.getContentScale().y + bBorderSize + tBorderSize
         });
+
+    boundPos_ = { node_.borderTransformContext.getContentPos() };
+    boundScale_ = {
+        node_.borderTransformContext.getContentScale().x,
+        node_.borderTransformContext.getContentScale().y
+    };
 }
 
 void HkWindowFrame::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)
@@ -256,7 +268,8 @@ void HkWindowFrame::setWindowMode(const HkWindowFrameMode mode)
 
 void HkWindowFrame::setTitle(const std::string& title) { titleLabel_.setText(title); }
 
-HkStyleContext& HkWindowFrame::getStyle()
+/* Return container of frame style*/
+HkStyleContext& HkWindowFrame::getContainerStyle()
 {
     return wfCont_.getStyle();
 }

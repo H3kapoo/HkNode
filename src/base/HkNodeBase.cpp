@@ -24,8 +24,7 @@ void HkNodeBase::renderMySelf()
         node_.renderContext.windowProjMatrix = windowDataPtr_->sceneProjMatrix;
 
         glEnable(GL_SCISSOR_TEST);
-        //TODO: Second condition needs to dissapear
-        if (node_.styleContext.isBorderEnabled() || treeStruct_.getType() == HkNodeType::RootWindowFrame)
+        if (node_.styleContext.isBorderEnabled())
         {
             auto& btc = node_.borderTransformContext;
             glScissor(
@@ -50,7 +49,7 @@ void HkNodeBase::renderMySelf()
 
         /* Update children. Also don't require bellow children to be rendered if parent can't be rendered itself */
         auto& children = treeStruct_.getChildren();
-        for (uint32_t i = 0;i < children.size(); i++)
+        for (uint32_t i = 0; i < children.size(); i++)
         {
             children[i]->getPayload()->renderMySelf();
         }
@@ -87,17 +86,14 @@ void HkNodeBase::updateMySelf(const bool isSubWindowMinimized)
         tc.setVPos(tc.getPos());
         tc.setVScale(tc.getScale());
         bTc.setVPos(bTc.getContentPos());
-        bTc.setVScale(bTc.getContentScale());
+
+        //TODO: Hardcoded 50 value, needs to be removed.
+        isSubWindowMinimized ?
+            bTc.setVScale({ bTc.getContentScale().x, 34 }) : // double borderSize + WF size
+            bTc.setVScale(bTc.getContentScale());
     }
     else if (parentTreeStruct && parentTreeStruct->getType() == HkNodeType::RootWindowFrame)
     {
-        //TODO: Remove from here
-        if (isSubWindowMinimized)
-        {
-            auto& pTc = parentTreeStruct->getPayload()->node_.borderTransformContext;
-            pTc.setVScale({ pTc.getContentScale().x, 50 });
-        }
-
         /* Minimize only container of windowframe */
         if (isSubWindowMinimized && treeStruct_.getType() == HkNodeType::Container)
         {
@@ -358,7 +354,7 @@ void HkNodeBase::resolveDirtyAttributes()
             break;
         }
         case HkStyleDirtyAttribs::Pinch:
-            // WIll be resolved by each element individually. Can't really be resolved from here
+            // Will be resolved by each element individually. Can't really be resolved from here
             break;
         }
     }

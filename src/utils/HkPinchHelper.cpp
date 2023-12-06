@@ -318,12 +318,12 @@ void HkPinchHelper::onBarRender(HkWindowData& windowData, const glm::ivec2 bound
             windowData.windowSize.y - boundPos.y - boundScale.y - extendB,
             boundScale.x + grabSize_,
             boundScale.y + 2 * extendT + extendB);
-        pincher_.transformContext.setScale(
+        pincher_.transformContext.setContentScale(
             {
                 grabSize_,
                 boundScale.y + extendT + extendB
             });
-        pincher_.transformContext.setPos(
+        pincher_.transformContext.setContentPos(
             {
                 boundPos.x + boundScale.x,
                 boundPos.y - extendT
@@ -341,12 +341,12 @@ void HkPinchHelper::onBarRender(HkWindowData& windowData, const glm::ivec2 bound
             windowData.windowSize.y - boundPos.y - boundScale.y - extendB,
             boundScale.x + grabSize_,
             boundScale.y + 2 * extendT + extendB);
-        pincher_.transformContext.setScale(
+        pincher_.transformContext.setContentScale(
             {
                 grabSize_,
                 boundScale.y + extendT + extendB
             });
-        pincher_.transformContext.setPos(
+        pincher_.transformContext.setContentPos(
             {
                 boundPos.x - grabSize_,
                 boundPos.y - extendT
@@ -364,12 +364,12 @@ void HkPinchHelper::onBarRender(HkWindowData& windowData, const glm::ivec2 bound
             windowData.windowSize.y - boundPos.y - boundScale.y,
             boundScale.x,
             boundScale.y + grabSize_);
-        pincher_.transformContext.setScale(
+        pincher_.transformContext.setContentScale(
             {
                 boundScale.x,
                 grabSize_
             });
-        pincher_.transformContext.setPos(
+        pincher_.transformContext.setContentPos(
             {
                 boundPos.x,
                 boundPos.y - grabSize_
@@ -387,12 +387,12 @@ void HkPinchHelper::onBarRender(HkWindowData& windowData, const glm::ivec2 bound
             windowData.windowSize.y - boundPos.y - boundScale.y - grabSize_,
             boundScale.x,
             boundScale.y);
-        pincher_.transformContext.setScale(
+        pincher_.transformContext.setContentScale(
             {
                 boundScale.x,
                 grabSize_
             });
-        pincher_.transformContext.setPos(
+        pincher_.transformContext.setContentPos(
             {
                 boundPos.x,
                 boundPos.y + boundScale.y

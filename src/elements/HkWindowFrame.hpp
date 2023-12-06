@@ -36,7 +36,9 @@ public:
 
     /* Getters */
     bool isAlive() const override;
-    HkStyleContext& getStyle() override;
+    // HkStyleContext& getStyle() override;
+    HkStyleContext& getContainerStyle();
+
     const HkTransformContext& getTransform() const override;
 
 private:

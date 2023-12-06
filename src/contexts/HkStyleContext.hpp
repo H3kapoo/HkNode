@@ -35,7 +35,7 @@ enum class HkHAlignment
 enum class HkStyleDirtyAttribs
 {
     BG,
-    Pinch
+    Pinch,
 };
 
 /* Vector of floats representing the percentage of the space the row/col should occupy

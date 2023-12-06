@@ -32,11 +32,9 @@ int main()
     // sceneWindow1->makeContextCurrent();
 
     HkWindowFramePtr windowFrame = std::make_shared<HkWindowFrame>("MyWindowFrame");
-    windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
-    // windowFrame->setWindowMode(HkWindowFrameMode::Grabbable);
+    // windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
+    windowFrame->setWindowMode(HkWindowFrameMode::Grabbable);
     sceneWindow1->addSubWindow(windowFrame); //NOTE: Needs to be added before adding any children
-
-
 
     windowFrame->setSize({ 1280, 720 });
     windowFrame->setPos({ 1920 / 2 - 500 , 1080 / 2 - 300 });
@@ -112,7 +110,7 @@ int main()
     ctr10->getStyle().setColor({ 0.0f,0.7f,1.0f, 1.0f })
         // .setOverflowAllowedXY(true)
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-        .setMargins(100, 0, 10, 10)
+        // .setMargins(100, 0, 10, 10)
         // .setLeftMargin(100)
         .setBorders(20, 10, 50, 20)
         .setVHSizeConfig(
@@ -120,9 +118,9 @@ int main()
 
     ctr11->getStyle().setColor({ 0.4f,0.7f,0.0f, 1.0f })
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-        .setTopMargin(5)
-        .setLeftMargin(10)
-        .setBottomMargin(10)
+        // .setTopMargin(5)
+        // .setLeftMargin(10)
+        // .setBottomMargin(10)
         .setBorders(50, 10, 0, 30)
         .setVHSizeConfig(
             { .value = 200, .min = 50 }, { .value = 100, .min = 50 });
@@ -131,7 +129,7 @@ int main()
         // .setOverflowAllowedXY(true)
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         .setLeftMargin(10)
-        .setBottomMargin(30)
+        // .setBottomMargin(30)
         .setBorders(30, 30, 30, 30)
         .setColor({ 1.0f, 0.3f, .5f, 1.0f })
         .setVHSizeConfig(
@@ -150,21 +148,23 @@ int main()
     // windowFrame->pushChildren({ label });
 
     windowFrame->getStyle()
-        // .setBorders(30, 30, 30, 30) //TODO: windowFrame needs better propagate options to right subObject
+        .setBorders(2, 2, 2, 20);
+
+    windowFrame->getContainerStyle()
         .setOverflowAllowedXY(true)
         .setLayout(HkLayout::Horizontal)
-        // .setPinchConfig({ .enable = true })
-        // .setRowWrapping(true)
+        .setPinchConfig({ .enable = true })
+        .setRowWrapping(true)
         .setHAlignment(HkHAlignment::Left)
         .setVAlignment(HkVAlignment::Top);
 
     // windowFrame->pushChildren({ ctr10 });
-    windowFrame->pushChildren({ ctr10, ctr11 });
+    windowFrame->pushChildren({ ctr9 , ctr10, ctr11 });
     // ctr4->pushChildren({ label });
     // ctr4->pushChildren({ ctr6, ctr7 });
     // ctr10->pushChildren({ ctr11, ctr12, ctr9 });
     // ctr10->pushChildren({ ctr9 });
-    ctr10->pushChildren({ ctr9 });
+    // ctr10->pushChildren({ ctr9 });
     ctr9->pushChildren({ ctr12 });
 
     // // ctr7->pushChildren({ ctr11,ctr12 });
