@@ -116,11 +116,8 @@ void HkWindowFrame::onAnimationFrameRequested()
         return 1.0 + c3 * std::pow(x - 1.0, 3.0) + c1 * std::pow(x - 1.0, 2.0);};
 
     glm::vec2 interpPos = startPos + (endPos - startPos) * (float)easeInOutCubic(t);
-    //TODO: THis needs refactor as well
-    const int32_t borderSize = node_.styleContext.getBottomBorder();
     node_.transformContext.setPos(interpPos);
     node_.transformContext.setContentPos(interpPos);
-    node_.borderTransformContext.setContentPos({ interpPos.x - borderSize, interpPos.y - borderSize });
     glfwPostEmptyEvent(); //TODO: This should be posted ONLY once per frame
 }
 
@@ -268,6 +265,7 @@ void HkWindowFrame::setWindowMode(const HkWindowFrameMode mode)
 
 void HkWindowFrame::setTitle(const std::string& title) { titleLabel_.setText(title); }
 
+//TODO: To be removed later with windowFrame enhancement
 /* Return container of frame style*/
 HkStyleContext& HkWindowFrame::getContainerStyle()
 {

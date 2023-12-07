@@ -8,6 +8,12 @@ HkStyleContext& HkStyleContext::setColor(const glm::vec4& value)
     return *this;
 }
 
+HkStyleContext& HkStyleContext::setBorderColor(const glm::vec4& value)
+{
+    borderColor = value;
+    return *this;
+}
+
 HkStyleContext& HkStyleContext::setRowWrapping(const bool value)
 {
     rowWrap = value;
@@ -93,6 +99,16 @@ HkStyleContext& HkStyleContext::setBorders(const uint32_t valueL, const uint32_t
     borderTY = valueT;
     borderBY = valueB;
     borderEnabled = (borderLX + borderRX + borderBY + borderTY) > 0 ? true : false;
+    return *this;
+}
+
+HkStyleContext& HkStyleContext::setPadding(const uint32_t valueL, const uint32_t valueR, const uint32_t valueT,
+    const uint32_t valueB)
+{
+    paddLX = valueL;
+    paddRX = valueR;
+    paddTY = valueT;
+    paddBY = valueB;
     return *this;
 }
 

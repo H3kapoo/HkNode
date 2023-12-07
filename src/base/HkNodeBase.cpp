@@ -12,14 +12,12 @@ HkNodeBase::HkNodeBase(const std::string& windowName, const HkNodeType& type)
 
 void HkNodeBase::renderMySelf()
 {
-    //TODO: THis takes a lot of time
-    // return;
     auto& tc = node_.transformContext;
 
     //TODO: tc.isAnyDifference() is correct here but main() loop doesnt know not to clear screen on each pass anymore
     // A flag maybe is needed? Conditional clear?
     /* Normal rendering */
-    // if (tc.getVScale().x && tc.getVScale().y)
+    if (tc.getVScale().x && tc.getVScale().y)
     {
         node_.renderContext.windowProjMatrix = windowDataPtr_->sceneProjMatrix;
 
@@ -87,10 +85,14 @@ void HkNodeBase::updateMySelf(const bool isSubWindowMinimized)
         tc.setVScale(tc.getScale());
         bTc.setVPos(bTc.getContentPos());
 
-        //TODO: Hardcoded 50 value, needs to be removed.
+        /* If we are the root window and we are minimized, minimize border vScale as well */
         isSubWindowMinimized ?
-            bTc.setVScale({ bTc.getContentScale().x, 34 }) : // double borderSize + WF size
-            bTc.setVScale(bTc.getContentScale());
+            bTc.setVScale(
+                {
+                    bTc.getContentScale().x,
+                    node_.styleContext.getTopBorder() + node_.styleContext.getBottomBorder() + 30
+                })
+            : bTc.setVScale(bTc.getContentScale());
     }
     else if (parentTreeStruct && parentTreeStruct->getType() == HkNodeType::RootWindowFrame)
     {

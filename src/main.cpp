@@ -111,8 +111,7 @@ int main()
         // .setOverflowAllowedXY(true)
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         // .setMargins(100, 0, 10, 10)
-        // .setLeftMargin(100)
-        .setBorders(20, 10, 50, 20)
+        // .setBorders(20, 10, 50, 20)
         .setVHSizeConfig(
             { .value = 400, .min = 50 }, { .value = 300, .min = 50 });
 
@@ -121,16 +120,16 @@ int main()
         // .setTopMargin(5)
         // .setLeftMargin(10)
         // .setBottomMargin(10)
-        .setBorders(50, 10, 0, 30)
+        // .setBorders(50, 10, 0, 30)
         .setVHSizeConfig(
             { .value = 200, .min = 50 }, { .value = 100, .min = 50 });
 
     ctr12->getStyle().setColor({ 0.4f,0.7f,0.0f, 1.0f })
         // .setOverflowAllowedXY(true)
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-        .setLeftMargin(10)
+        // .setLeftMargin(10)
         // .setBottomMargin(30)
-        .setBorders(30, 30, 30, 30)
+        // .setBorders(30, 30, 30, 30)
         .setColor({ 1.0f, 0.3f, .5f, 1.0f })
         .setVHSizeConfig(
             { .value = 100, .min = 50 }, { .value = 300, .min = 50 });
@@ -138,19 +137,17 @@ int main()
     ctr9->getStyle().setColor({ 0.4f,0.7f,0.0f, 1.0f })
         .setOverflowAllowedXY(true)
         // .setOverflowAllowedX(true)
-        .setVHAlignment(HkVAlignment::Bottom, HkHAlignment::Left)
-        .setLeftMargin(10)
-        .setBottomMargin(10)
+        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+        // .setLeftMargin(10)
+        // .setBottomMargin(10)
         .setVHSizeConfig(
             { .value = 400, .min = 50 }, { .value = 200, .min = 50 });
 
-    // windowFrame->pushChildren({ ctr, ctr4, ctr5 });
-    // windowFrame->pushChildren({ label });
-
     windowFrame->getStyle()
-        .setBorders(2, 2, 2, 20);
-
+        .setBorderColor({ 1.0f,0.0f,0.0f,1.0f })
+        .setBorders(3, 3, 3, 3);
     windowFrame->getContainerStyle()
+        .setPadding(0, 100, 0, 10)
         .setOverflowAllowedXY(true)
         .setLayout(HkLayout::Horizontal)
         .setPinchConfig({ .enable = true })

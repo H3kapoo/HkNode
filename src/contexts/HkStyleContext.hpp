@@ -92,6 +92,7 @@ public:
 
     /* Setters */
     HkStyleContext& setColor(const glm::vec4& value);
+    HkStyleContext& setBorderColor(const glm::vec4& value);
     // Transform related
     HkStyleContext& setRowWrapping(const bool value);
     HkStyleContext& setColWrapping(const bool value);
@@ -106,6 +107,7 @@ public:
     HkStyleContext& setLeftRightMargins(const uint32_t valueLR);
     HkStyleContext& setAllMargins(const uint32_t valueLRTB);
     HkStyleContext& setBorders(const uint32_t valueL, const uint32_t valueR, const uint32_t valueT, const uint32_t valueB);
+    HkStyleContext& setPadding(const uint32_t valueL, const uint32_t valueR, const uint32_t valueT, const uint32_t valueB);
     HkStyleContext& setOverflowAllowedX(const bool value);
     HkStyleContext& setOverflowAllowedY(const bool value);
     HkStyleContext& setOverflowAllowedXY(const bool value);
@@ -129,6 +131,7 @@ public:
 
     /* Inline Getters, impl here, yes */
     inline const glm::vec4& getColor() const { return color; }
+    inline const glm::vec4& getBorderColor() const { return borderColor; }
     inline bool isRowWrappingEnabled() const { return rowWrap; }
     inline bool isColWrappingEnabled() const { return colWrap; }
     inline bool isBorderEnabled() const { return borderEnabled; }
@@ -140,6 +143,10 @@ public:
     inline uint32_t getRightBorder() const { return borderRX; }
     inline uint32_t getTopBorder() const { return borderTY; }
     inline uint32_t getBottomBorder() const { return borderBY; }
+    inline uint32_t getLeftPadding() const { return paddLX; }
+    inline uint32_t getRightPadding() const { return paddRX; }
+    inline uint32_t getTopPadding() const { return paddTY; }
+    inline uint32_t getBottomPadding() const { return paddBY; }
     inline bool isOverflowAllowedX() const { return overflowAllowedX; }
     inline bool isOverflowAllowedY() const { return overflowAllowedY; }
     inline HkLayout getLayout() const { return direction_; }
@@ -160,6 +167,7 @@ private:
 
     /* Attribs */
     glm::vec4 color;
+    glm::vec4 borderColor;
     bool rowWrap{ false };
     bool colWrap{ false };
     bool borderEnabled{ false };
@@ -167,6 +175,8 @@ private:
     uint32_t marginTY{ 0 }, marginBY{ 0 };
     uint32_t borderLX{ 0 }, borderRX{ 0 };
     uint32_t borderTY{ 0 }, borderBY{ 0 };
+    uint32_t paddLX{ 0 }, paddRX{ 0 };
+    uint32_t paddTY{ 0 }, paddBY{ 0 };
     bool overflowAllowedX{ false }, overflowAllowedY{ false };
     HkLayout direction_{ HkLayout::Horizontal };
     HkVAlignment verticalAlignment_{ HkVAlignment::Top };

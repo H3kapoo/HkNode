@@ -206,10 +206,10 @@ void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children)
         auto& childBTc = child.borderTransformContext;
         auto& childSc = child.styleContext;
 
-        const int32_t pbX = childSc.getRightBorder() + childSc.getLeftBorder();
-        const int32_t pbY = childSc.getTopBorder() + childSc.getBottomBorder();
-        const int32_t pbmX = pbX + childSc.getRightMargin() + childSc.getLeftMargin();
-        const int32_t pbmY = pbY + childSc.getTopMargin() + childSc.getBottomMargin();
+        const int32_t bX = childSc.getRightBorder() + childSc.getLeftBorder();
+        const int32_t bY = childSc.getTopBorder() + childSc.getBottomBorder();
+        const int32_t bmX = bX + childSc.getRightMargin() + childSc.getLeftMargin();
+        const int32_t bmY = bY + childSc.getTopMargin() + childSc.getBottomMargin();
 
         /* Compute child's content scale */
         childTc.setContentScale(
@@ -218,11 +218,11 @@ void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children)
                 ceil(computeVerticalScale(childSc.getVSizeConfig(), childCount))
             });
 
-        /* Compute child's total scale (borders+margins+padding) */
-        childTc.setScale({ childTc.getContentScale().x + pbmX, childTc.getContentScale().y + pbmY });
+        /* Compute child's total scale (borders+margins) */
+        childTc.setScale({ childTc.getContentScale().x + bmX, childTc.getContentScale().y + bmY });
 
         /* Set child's content border scale. We don't care about absolute size */
-        childBTc.setContentScale({ childTc.getContentScale().x + pbX, childTc.getContentScale().y + pbY });
+        childBTc.setContentScale({ childTc.getContentScale().x + bX, childTc.getContentScale().y + bY });
 
         /* How much we need to advance to place next child. Previous end + current element's total scale */
         nextXAdvance = startPosX + childTc.getScale().x;
@@ -608,14 +608,17 @@ void HkConstraintContext::backPropagateColChange(HkTreeStruct& children,
 
 void HkConstraintContext::pushElementsIntoPosition(HkTreeStruct& children) const
 {
-    //TODO: This shall return the offsets, not apply them here as well
     int32_t startPosX = 0, startPosY = 0;
     MinMaxPos result = getMinAndMaxPositions(children); // we calculate the same thing later. optimize
 
+    const int32_t lPadd = styleContextInj_->getLeftPadding();
+    const int32_t rPadd = styleContextInj_->getRightPadding();
+    const int32_t tPadd = styleContextInj_->getTopPadding();
+    const int32_t bPadd = styleContextInj_->getBottomPadding();
+    const glm::ivec2 cp = { thisTc_->getContentPos().x + lPadd, thisTc_->getContentPos().y + tPadd };
+    const glm::ivec2 cs = { thisTc_->getContentScale().x - (lPadd + rPadd), thisTc_->getContentScale().y - (bPadd + tPadd) };
+
     /* Calculate start point for placement on the X axis based on container options*/
-    const int32_t padding = 10;
-    auto cp = thisTc_->getContentPos() + padding;
-    auto cs = thisTc_->getContentScale() - padding * 2;
     switch (styleContextInj_->getHAlignment())
     {
     case HkHAlignment::Left:
@@ -672,9 +675,12 @@ void HkConstraintContext::computeChildrenOverflowBasedOnMinMax(const MinMaxPos& 
     overflowXYSize_.x = 0;
     overflowXYSize_.y = 0;
 
-    const int32_t padding = 10;
-    auto cp = thisTc_->getContentPos() + padding;
-    auto cs = thisTc_->getContentScale() - padding * 2;
+    const int32_t lPadd = styleContextInj_->getLeftPadding();
+    const int32_t rPadd = styleContextInj_->getRightPadding();
+    const int32_t tPadd = styleContextInj_->getTopPadding();
+    const int32_t bPadd = styleContextInj_->getBottomPadding();
+    const glm::ivec2 cp = { thisTc_->getContentPos().x + lPadd, thisTc_->getContentPos().y + tPadd };
+    const glm::ivec2 cs = { thisTc_->getContentScale().x - (lPadd + rPadd), thisTc_->getContentScale().y - (bPadd + tPadd) };
 
     /* Calculate X overflow */
     if (styleContextInj_->isOverflowAllowedX())
