@@ -136,6 +136,9 @@ int main()
 
     ctr9->getStyle().setColor({ 0.4f,0.7f,0.0f, 1.0f })
         .setOverflowAllowedXY(true)
+        .setPadding(10, 10, 10, 10)
+        .setBorders(5, 5, 5, 5)
+        .setBorderColor({ 0.6f, 0.0f, 1.0f,1.0f })
         // .setOverflowAllowedX(true)
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         // .setLeftMargin(10)
@@ -143,26 +146,28 @@ int main()
         .setVHSizeConfig(
             { .value = 400, .min = 50 }, { .value = 200, .min = 50 });
 
+    //TODO: Resolve this "2 style" behaviour as it;s very confusing
     windowFrame->getStyle()
-        .setBorderColor({ 1.0f,0.0f,0.0f,1.0f })
+        .setBorderColor({ 0.6f,0.6f,0.0f,1.0f })
         .setBorders(3, 3, 3, 3);
     windowFrame->getContainerStyle()
-        .setPadding(0, 100, 0, 10)
+        // .setPadding(10, 10, 10, 10)
         .setOverflowAllowedXY(true)
-        .setLayout(HkLayout::Horizontal)
+        .setLayout(HkLayout::Grid)
         .setPinchConfig({ .enable = true })
-        .setRowWrapping(true)
+        // .setRowWrapping(true)
+        // .setColWrapping(true)
         .setHAlignment(HkHAlignment::Left)
         .setVAlignment(HkVAlignment::Top);
 
     // windowFrame->pushChildren({ ctr10 });
-    windowFrame->pushChildren({ ctr9 , ctr10, ctr11 });
+    // windowFrame->pushChildren({ ctr9 , ctr10, ctr11 });
     // ctr4->pushChildren({ label });
     // ctr4->pushChildren({ ctr6, ctr7 });
     // ctr10->pushChildren({ ctr11, ctr12, ctr9 });
     // ctr10->pushChildren({ ctr9 });
     // ctr10->pushChildren({ ctr9 });
-    ctr9->pushChildren({ ctr12 });
+    // ctr9->pushChildren({ ctr12 });
 
     // // ctr7->pushChildren({ ctr11,ctr12 });
     // ctr8->pushChildren({ ctr13,ctr14 });
@@ -173,40 +178,46 @@ int main()
     // Providing a seed value
     // srand((unsigned)time(NULL));
 
-    // int scale = 4;
-    // std::vector<HkNodeBasePtr> ctrs2;
-    // ctrs2.reserve(scale * scale);
-    // for (int i = 0;i < scale; i++) // with O2 works ok 01.09.2023
-    // {
-    //     for (int j = 0;j < scale; j++)
-    //     {
-    //         double r = (rand() % 255) / 255.0f;
-    //         double g = (rand() % 255) / 255.0f;
-    //         double b = (rand() % 255) / 255.0f;
+    int scale = 2;
+    std::vector<HkNodeBasePtr> ctrs2;
+    ctrs2.reserve(scale * scale);
+    for (int i = 1; i <= scale; i++) // with O2 works ok 01.09.2023
+    {
+        for (int j = 1; j <= scale; j++)
+        {
+            double r = (rand() % 255) / 255.0f;
+            double g = (rand() % 255) / 255.0f;
+            double b = (rand() % 255) / 255.0f;
 
-    //         const auto& ct = std::make_shared<HkContainer>("MyContauner");
-    //         ct->getStyle()
-    //             .setColor((i + j) % 2 == 0 ? glm::vec4{ r,g,b, 1.0f } : glm::vec4{ r,g,b, 1.0f })
-    //             // .setGridRowCol(i + 1, j + 1)
-    //             .setVHSizeConfig({ .value = 50 }, { .value = 100 })
-    //             // .setVHSizeConfig({ .type = HkSizeType::FitCell }, { .type = HkSizeType::FitCell })
-    //             .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center);
+            const auto& ct = std::make_shared<HkContainer>("MyContauner");
+            ct->getStyle()
+                .setColor((i + j) % 2 == 0 ? glm::vec4{ r,g,b, 1.0f } : glm::vec4{ r,g,b, 1.0f })
+                // .setColor({ 1.0f, 1.0f, 0.6f, 1.0f })
+                .setBorderColor({ 1.0f, 0.0f, 0.0f, 1.0f })
+                .setBorders(2, 2, 2, 2)
+                .setMargins(10, 10, 10, 10)
+                .setGridRowCol(i, j)
+                .setVHSizeConfig({ .value = 150 }, { .value = 150 })
+                // .setVHSizeConfig({ .type = HkSizeType::FitCell }, { .type = HkSizeType::FitCell })
+                .setVHAlignment(HkVAlignment::Center, HkHAlignment::Right);
+            // .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left);
 
-    //         ctrs2.push_back(std::move(ct));
-    //     }
-    // }
+            ctrs2.push_back(std::move(ct));
+        }
+    }
 
-    // std::vector<float> rows, cols;
-    // rows.assign(scale, 1.0f);
-    // cols.assign(scale, 1.0f);
-    // ctr7->getStyle()
-    //     .setLayout(HkLayout::Grid)
-    //     .setGridConfig(
-    //         HkGridConfig{
-    //             .cols{cols},
-    //             .rows{rows}
-    //         });
-    // ctr7->pushChildren(ctrs2);
+    std::vector<float> rows, cols;
+    rows.assign(scale, 1.0f);
+    cols.assign(scale, 1.0f);
+    windowFrame->getContainerStyle()
+        .setLayout(HkLayout::Grid)
+        .setGridConfig(
+            HkGridConfig{
+                .cols{cols},
+                .rows{rows}
+            });
+    windowFrame->pushChildren(ctrs2);
+    // windowFrame->printTree();
     // HkImageViewPtr imgView = std::make_shared<HkImageView>("MyImgView");
     // HkImageViewPtr imgView2 = std::make_shared<HkImageView>("MyImgView2");
     // HkImageViewPtr imgView3 = std::make_shared<HkImageView>("MyImgView3");

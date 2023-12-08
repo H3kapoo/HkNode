@@ -62,11 +62,13 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children)
     {
         auto& child = children[i]->getPayload()->node_;
         auto& childTc = child.transformContext;
+        auto& childBTc = child.borderTransformContext;
         auto& childSc = child.styleContext;
 
         /* Return on possibly invalid index access*/
-        if (childSc.getGridCol() > gridConfigColsSize || childSc.getGridCol() < 1 ||
-            childSc.getGridRow() > gridConfigRowsSize || childSc.getGridRow() < 1)
+        //TODO: Later we shall log the errors if any
+        if (childSc.getGridCol() - 1 > gridConfigColsSize || childSc.getGridCol() < 1 ||
+            childSc.getGridRow() - 1 > gridConfigRowsSize || childSc.getGridRow() < 1)
         {
             return;
         }
@@ -84,62 +86,6 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children)
             yAdvanceFraction += (gridConfig.rows[j] * rowEqualPart);
         }
 
-        /* Take margins into consideration in calculations */
-        startPosX = childSc.getLeftMargin();
-        startPosY = childSc.getTopMargin();
-        uint32_t allXScale = childTc.getScale().x + childSc.getLeftMargin() + childSc.getRightMargin();
-        uint32_t allYScale = childTc.getScale().y + childSc.getTopMargin() + childSc.getBottomMargin();
-
-        /* By default, elements will be left aligned. When Center/Right alignment is chosen, we need to
-           advance fractionally a little bit more to the right in order to put elements at the right place.
-           This additional advance is half for Center and full for Right*/
-        switch (childSc.getHAlignment())
-        {
-        case HkHAlignment::Left:
-        {
-            startPosX += xAdvanceFraction * (float)thisTc_->getScale().x;
-        }
-        break;
-        case HkHAlignment::Center:
-        {
-            const float xAdvanceToCenter = (gridConfig.cols[childSc.getGridCol() - 1] * colEqualPart) * 0.5f;
-            startPosX += (xAdvanceFraction + xAdvanceToCenter) * (float)thisTc_->getScale().x - allXScale * 0.5f;
-        }
-        break;
-        case HkHAlignment::Right:
-        {
-            const float xAdvanceToRight = (gridConfig.cols[childSc.getGridCol() - 1] * colEqualPart);
-            startPosX += (xAdvanceFraction + xAdvanceToRight) * (float)thisTc_->getScale().x - allXScale;
-        }
-        break;
-        }
-
-        /* By default, elements will be top aligned. When Center/Bottom alignment is chosen, we need to
-           advance fractionally a little bit more to the bottom in order to put elements at the right place.
-           This additional advance is half for Center and full for Bottom*/
-        switch (childSc.getVAlignment())
-        {
-        case HkVAlignment::Top:
-        {
-            startPosY += yAdvanceFraction * (float)thisTc_->getScale().y;
-        }
-        break;
-        case HkVAlignment::Center:
-        {
-            const float yAdvanceToCenter = (gridConfig.rows[childSc.getGridRow() - 1] * rowEqualPart) * 0.5f;
-            startPosY += (yAdvanceFraction + yAdvanceToCenter) * (float)thisTc_->getScale().y - allYScale * 0.5f;
-        }
-        break;
-        case HkVAlignment::Bottom:
-        {
-            const float yAdvanceToRight = (gridConfig.rows[childSc.getGridRow() - 1] * rowEqualPart);
-            startPosY += (yAdvanceFraction + yAdvanceToRight) * (float)thisTc_->getScale().y - allYScale;
-        }
-        break;
-        }
-
-        childTc.setPos({ startPosX + (float)thisTc_->getPos().x ,startPosY + (float)thisTc_->getPos().y });
-
         /* Scale elements according to their config*/
         const auto hSizeConfig = childSc.getHSizeConfig();
         const auto vSizeConfig = childSc.getVSizeConfig();
@@ -149,11 +95,11 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children)
             xSize = hSizeConfig.value;
             break;
         case HkSizeType::PercCell:
-            xSize = (gridConfig.cols[childSc.getGridCol() - 1] * colEqualPart) * (float)thisTc_->getScale().x;
+            xSize = (gridConfig.cols[childSc.getGridCol() - 1] * colEqualPart) * (float)thisTc_->getContentScale().x;
             xSize *= hSizeConfig.value;
             break;
         case HkSizeType::FitCell:
-            xSize = (gridConfig.cols[childSc.getGridCol() - 1] * colEqualPart) * (float)thisTc_->getScale().x;
+            xSize = (gridConfig.cols[childSc.getGridCol() - 1] * colEqualPart) * (float)thisTc_->getContentScale().x;
             break;
         case HkSizeType::PercParent:
         case HkSizeType::FitParent:
@@ -169,11 +115,11 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children)
             ySize = vSizeConfig.value;
             break;
         case HkSizeType::PercCell:
-            ySize = (gridConfig.rows[childSc.getGridRow() - 1] * rowEqualPart) * (float)thisTc_->getScale().y;
+            ySize = (gridConfig.rows[childSc.getGridRow() - 1] * rowEqualPart) * (float)thisTc_->getContentScale().y;
             ySize *= vSizeConfig.value;
             break;
         case HkSizeType::FitCell:
-            ySize = (gridConfig.rows[childSc.getGridRow() - 1] * rowEqualPart) * (float)thisTc_->getScale().y;
+            ySize = (gridConfig.rows[childSc.getGridRow() - 1] * rowEqualPart) * (float)thisTc_->getContentScale().y;
             break;
         case HkSizeType::PercParent:
         case HkSizeType::FitParent:
@@ -187,7 +133,81 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children)
         ySize = std::clamp(ySize, vSizeConfig.min, vSizeConfig.max);
 
         /*Ceil is needed so we don't get off by one pixel artifacts*/
-        childTc.setScale({ ceil(xSize), ceil(ySize) });
+        // childTc.setScale({ ceil(xSize), ceil(ySize) });
+        childTc.setContentScale({ ceil(xSize), ceil(ySize) });
+
+        const int32_t bX = childSc.getRightBorder() + childSc.getLeftBorder();
+        const int32_t bY = childSc.getTopBorder() + childSc.getBottomBorder();
+        const int32_t bmX = bX + childSc.getRightMargin() + childSc.getLeftMargin();
+        const int32_t bmY = bY + childSc.getTopMargin() + childSc.getBottomMargin();
+        childTc.setScale({ childTc.getContentScale().x + bmX, childTc.getContentScale().y + bmY });
+        childBTc.setContentScale({ childTc.getContentScale().x + bX, childTc.getContentScale().y + bY });
+
+
+        /* By default, elements will be left aligned. When Center/Right alignment is chosen, we need to
+           advance fractionally a little bit more to the right in order to put elements at the right place.
+           This additional advance is half for Center and full for Right*/
+        switch (childSc.getHAlignment())
+        {
+        case HkHAlignment::Left:
+        {
+            startPosX = xAdvanceFraction * (float)thisTc_->getContentScale().x;
+            break;
+        }
+        case HkHAlignment::Center:
+        {
+            const float xAdvanceToCenter = (gridConfig.cols[childSc.getGridCol() - 1] * colEqualPart) * 0.5f;
+            startPosX = (xAdvanceFraction + xAdvanceToCenter) * (float)thisTc_->getContentScale().x - childTc.getScale().x * 0.5f;
+            break;
+        }
+        case HkHAlignment::Right:
+        {
+            const float xAdvanceToRight = (gridConfig.cols[childSc.getGridCol() - 1] * colEqualPart);
+            startPosX = (xAdvanceFraction + xAdvanceToRight) * (float)thisTc_->getContentScale().x - childTc.getScale().x;
+            break;
+        }
+        }
+
+        /* By default, elements will be top aligned. When Center/Bottom alignment is chosen, we need to
+           advance fractionally a little bit more to the bottom in order to put elements at the right place.
+           This additional advance is half for Center and full for Bottom*/
+        switch (childSc.getVAlignment())
+        {
+        case HkVAlignment::Top:
+        {
+            startPosY = yAdvanceFraction * (float)thisTc_->getContentScale().y;
+            break;
+        }
+        case HkVAlignment::Center:
+        {
+            const float yAdvanceToCenter = (gridConfig.rows[childSc.getGridRow() - 1] * rowEqualPart) * 0.5f;
+            startPosY = (yAdvanceFraction + yAdvanceToCenter) * (float)thisTc_->getContentScale().y - childTc.getScale().y * 0.5f;
+            break;
+        }
+        case HkVAlignment::Bottom:
+        {
+            const float yAdvanceToRight = (gridConfig.rows[childSc.getGridRow() - 1] * rowEqualPart);
+            startPosY = (yAdvanceFraction + yAdvanceToRight) * (float)thisTc_->getContentScale().y - childTc.getScale().y;
+            break;
+        }
+        }
+
+        /* Set absolute position of element */
+        childTc.setPos({ startPosX + (float)thisTc_->getContentPos().x ,startPosY + (float)thisTc_->getContentPos().y });
+
+        /* Set element's contentPos taking into account BM*/
+        childTc.setContentPos(
+            {
+                childTc.getPos().x + childSc.getLeftMargin() + childSc.getLeftBorder(),
+                childTc.getPos().y + childSc.getTopMargin() + childSc.getTopBorder()
+            });
+
+        /* Set element's border contentPos taking into account PB. We don't care about absolute pos */
+        childBTc.setContentPos(
+            {
+                childTc.getContentPos().x - childSc.getLeftBorder(),
+                childTc.getContentPos().y - childSc.getTopBorder()
+            });
     }
 }
 
@@ -254,7 +274,7 @@ void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children)
         /* Set the start X to the next advance position*/
         startPosX = nextXAdvance;
 
-        /* Set element's contentPos taking into account PBM*/
+        /* Set element's contentPos taking into account BM*/
         childTc.setContentPos(
             {
                 childTc.getPos().x + childSc.getLeftMargin() + childSc.getLeftBorder(),
@@ -375,94 +395,91 @@ void HkConstraintContext::resolveVerticalContainer(HkTreeStruct& children)
     //TODO: move into hpp so we dont redeclare them each frame
     int32_t startPosX = 0, startPosY = 0;
     int32_t longestXOnCol = 0;
-    uint32_t nextColFirstId = 0;
-    uint32_t lastColEndId = 0;
+    uint32_t colFirstId = 0;
+    uint32_t colLastId = 0;
     int32_t nextYAdvance = 0;
-    int32_t maybeLongest = 0;
     uint32_t childCount = children.size() - sbCount_;
     for (uint32_t i = 0; i < childCount; i++)
     {
         auto& child = children[i]->getPayload()->node_;
         auto& childTc = child.transformContext;
+        auto& childBTc = child.borderTransformContext;
         auto& childSc = child.styleContext;
 
-        /* Scale elements according to their config*/
-        if (childSc.getPinchConfig().enable)
-        {
-            auto sc = childSc.getVSizeConfig();
-            const float extra = 0.0f * 1.0f / thisTc_->getScale().y;
-            sc.value += extra / childCount;
-            childTc.setScale(
-                {
-                    ceil(computeHorizontalScale(childSc.getHSizeConfig(), childCount)),
-                    ceil(computeVerticalScale(sc, childCount)
-                        - childSc.getBottomMargin() - childSc.getTopMargin())
-                });
-        }
-        else
-        {
-            childTc.setScale(
-                {
-                    ceil(computeHorizontalScale(childSc.getHSizeConfig(), childCount)),
-                    ceil(computeVerticalScale(childSc.getVSizeConfig(), childCount))
-                });
-        }
+        const int32_t bX = childSc.getRightBorder() + childSc.getLeftBorder();
+        const int32_t bY = childSc.getTopBorder() + childSc.getBottomBorder();
+        const int32_t bmX = bX + childSc.getRightMargin() + childSc.getLeftMargin();
+        const int32_t bmY = bY + childSc.getTopMargin() + childSc.getBottomMargin();
 
-        /* How much we need to advance to place next child */
-        nextYAdvance = startPosY + childSc.getBottomMargin() + childSc.getTopMargin() + childTc.getScale().y; //TODO: Minimize this call
+        /* Compute child's content scale */
+        childTc.setContentScale(
+            {
+                ceil(computeHorizontalScale(childSc.getHSizeConfig(), childCount)),
+                ceil(computeVerticalScale(childSc.getVSizeConfig(), childCount))
+            });
+
+        /* Compute child's total scale (borders+margins) */
+        childTc.setScale({ childTc.getContentScale().x + bmX, childTc.getContentScale().y + bmY });
+
+        /* Set child's content border scale. We don't care about absolute size */
+        childBTc.setContentScale({ childTc.getContentScale().x + bX, childTc.getContentScale().y + bY });
+
+        /* How much we need to advance to place next child. Previous end + current element's total scale */
+        nextYAdvance = startPosY + childTc.getScale().y;
+
+        /* Take care of col wrapping if option is enabled */
         if (styleContextInj_->isColWrappingEnabled())
         {
             /* This basically "spawns" a new col */
-            if (nextYAdvance > thisTc_->getScale().y)
+            if (nextYAdvance > thisTc_->getContentScale().y)
             {
-                /* Since we got here, its safe to say row ended before this element */
-                lastColEndId = i == 0 ? 0 : i - 1; // prevent underflow
-
-                startPosX += longestXOnCol;
                 startPosY = 0;
+                startPosX += longestXOnCol;
 
-                /*Back Propagate child alignment now that we completed the col */
+                colLastId = i;
+                resolveColChildrenAlignment(children, colFirstId, colLastId, longestXOnCol);
+                colFirstId = i;
 
-                backPropagateColChange(children, nextColFirstId, lastColEndId, longestXOnCol);
-
-                /* After back propagating, its the current element that starts the new col*/
-                nextColFirstId = i;
-                nextYAdvance = childSc.getLeftMargin() + childSc.getRightMargin() + childTc.getScale().y;
+                nextYAdvance = childTc.getScale().y;
                 longestXOnCol = 0;
             }
-
-            /* Needed so Y of wrapped child starts at lowest Y possible */
-            maybeLongest = childTc.getScale().x + childSc.getLeftMargin() + childSc.getRightMargin();
-            if (maybeLongest > longestXOnCol)
-            {
-                longestXOnCol = maybeLongest;
-            }
-        }
-        else
-        {
-            /* Needed so Y of wrapped child starts at lowest Y possible */
-            maybeLongest = childTc.getScale().x + childSc.getLeftMargin() + childSc.getRightMargin();
-            if (maybeLongest > longestXOnCol)
-            {
-                longestXOnCol = maybeLongest;
-            }
         }
 
-        childTc.setPos({ startPosX + childSc.getLeftMargin()  , startPosY + childSc.getTopMargin() });
+        /* Needed so X of wrapped child starts at lowest X possible */
+        longestXOnCol = std::max(childTc.getScale().x, longestXOnCol);
+
+        /* Set absolute position of element */
+        childTc.setPos({ startPosX, startPosY });
+
+        /* Set the start Y to the next advance position*/
         startPosY = nextYAdvance;
 
+        /* Set element's contentPos taking into account BM*/
+        childTc.setContentPos(
+            {
+                childTc.getPos().x + childSc.getLeftMargin() + childSc.getLeftBorder(),
+                childTc.getPos().y + childSc.getTopMargin() + childSc.getTopBorder()
+            });
+
+        /* Set element's border contentPos taking into account PB. We don't care about absolute pos */
+        childBTc.setContentPos(
+            {
+                childTc.getContentPos().x - childSc.getLeftBorder(),
+                childTc.getContentPos().y - childSc.getTopBorder()
+            });
     }
 
-
-
-    /*Back Propagate child alignment for the last row..or the only one row if no overflow occured with rowWrapping */
-    backPropagateColChange(children, nextColFirstId, children.size() - sbCount_ - 1, longestXOnCol);
+    /* ------------------------------------- FINAL PUSH INTO PLACE ----------------------------------- */
+    /* Align children based on their individual alignment option on the row they live in. This needs to be done
+       in another pass because we need previous pass' information */
+    resolveColChildrenAlignment(children, colFirstId, childCount, longestXOnCol);
 
     /* Above calculations have been with respect to 0,0 ,so now we need to offset the generated "container"
-       by the container's alignment type.
+       by the container's parent alignment type.
        This needs to be done here because otherwise we can get wrong min max information and bottom/center alignments
        need this information. It's a trade-off. */
     pushElementsIntoPosition(children);
+    /* ----------------------------------------------------------------------------------------------- */
 }
 
 void HkConstraintContext::resolveVerticalPinch(HkTreeStruct& children)
@@ -556,7 +573,7 @@ void HkConstraintContext::resolveVerticalPinch(HkTreeStruct& children)
 void HkConstraintContext::resolveRowChildrenAlignment(HkTreeStruct& children,
     const uint32_t rowFirstId, const uint32_t rowLastId, const uint32_t highestYOnRow) const
 {
-    for (uint32_t j = rowFirstId; j < rowLastId;j++)
+    for (uint32_t j = rowFirstId; j < rowLastId; j++)
     {
         auto& child = children[j]->getPayload()->node_;
         auto& childBpTc = child.transformContext;
@@ -583,13 +600,15 @@ void HkConstraintContext::resolveRowChildrenAlignment(HkTreeStruct& children,
     }
 }
 
-void HkConstraintContext::backPropagateColChange(HkTreeStruct& children,
-    const uint32_t nextColFirstId, const uint32_t lastColEndId, const uint32_t longestXOnCol) const
+void HkConstraintContext::resolveColChildrenAlignment(HkTreeStruct& children,
+    const uint32_t colFirstId, const uint32_t colLastId, const uint32_t longestXOnCol) const
 {
-    for (uint32_t j = nextColFirstId; j <= lastColEndId;j++)
+    for (uint32_t j = colFirstId; j < colLastId; j++)
     {
-        auto& childBpTc = children[j]->getPayload()->node_.transformContext;
-        auto& childBpSc = children[j]->getPayload()->node_.styleContext;
+        auto& child = children[j]->getPayload()->node_;
+        auto& childBpTc = child.transformContext;
+        auto& childBpBTc = child.borderTransformContext;
+        auto& childBpSc = child.styleContext;
 
         switch (childBpSc.getHAlignment())
         {
@@ -598,9 +617,13 @@ void HkConstraintContext::backPropagateColChange(HkTreeStruct& children,
             break;
         case HkHAlignment::Center:
             childBpTc.addPos({ longestXOnCol / 2 - childBpTc.getScale().x / 2, 0 });
+            childBpTc.addContentPos({ longestXOnCol / 2 - childBpTc.getScale().x / 2, 0 });
+            childBpBTc.addContentPos({ longestXOnCol / 2 - childBpTc.getScale().x / 2, 0 });
             break;
         case HkHAlignment::Right:
             childBpTc.addPos({ longestXOnCol - childBpTc.getScale().x, 0 });
+            childBpTc.addContentPos({ longestXOnCol - childBpTc.getScale().x, 0 });
+            childBpBTc.addContentPos({ longestXOnCol - childBpTc.getScale().x, 0 });
             break;
         }
     }
@@ -872,7 +895,6 @@ void HkConstraintContext::constrainSBKnob(bool isFromHorizontalSB, int overflowS
     {
         const auto knobSizeY = thisTc_->getContentScale().y - overflowSize;
         knobTc.setContentScale({ preKNobSize - 2 * margins, std::max(minAxisKobSize, knobSizeY) - 2 * margins });
-
         const auto minY = thisTc_->getContentPos().y + margins;
         const auto maxY = thisTc_->getContentPos().y + thisTc_->getContentScale().y - knobTc.getContentScale().y - margins;
         const auto posY = minY * (1.0f - currKnobValue) + currKnobValue * maxY;

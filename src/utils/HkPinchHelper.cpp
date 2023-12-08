@@ -301,6 +301,7 @@ void HkPinchHelper::onMouseMove(HkWindowData& windowData, HkNodeData& nd, HkNode
     }
 }
 
+//pass by const&
 void HkPinchHelper::onBarRender(HkWindowData& windowData, const glm::ivec2 boundPos, const glm::ivec2 boundScale)
 {
     const int32_t extendT = (lockedInYT_ && allowYT_) ? grabSize_ : 0;
@@ -386,7 +387,8 @@ void HkPinchHelper::onBarRender(HkWindowData& windowData, const glm::ivec2 bound
             boundPos.x,
             windowData.windowSize.y - boundPos.y - boundScale.y - grabSize_,
             boundScale.x,
-            boundScale.y);
+            //TODO: To check later why "+grabSize_" wasnt here before"
+            boundScale.y + grabSize_);
         pincher_.transformContext.setContentScale(
             {
                 boundScale.x,

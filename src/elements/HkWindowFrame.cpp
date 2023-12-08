@@ -65,12 +65,6 @@ void HkWindowFrame::onResolveFocusPass()
     /* All information needed by pinch helper for various reasons */
     if (wfCont_.getStyle().getPinchConfig().enable)
     {
-        boundPos_ = { node_.transformContext.getPos() };
-        boundScale_ = {
-            node_.transformContext.getScale().x,
-            wfCont_.node_.transformContext.getScale().y + node_.transformContext.getScale().y
-        };
-
         pinchHelper_.scanCustom(*windowDataPtr_, boundPos_, boundScale_);
     }
 }
@@ -137,7 +131,7 @@ void HkWindowFrame::onDrag()
 
 void HkWindowFrame::onGeneralMouseMove()
 {
-    //TODO: FInd out why with borderSize > 0, container scales in all directionss
+    //TODO: When hovering over bottom grab point, a part of the top frame is scissored out
     if (wfCont_.getStyle().getPinchConfig().enable)
     {
         if (pinchHelper_.onMouseMoveCustom(*windowDataPtr_, boundPos_, boundScale_))
@@ -203,7 +197,9 @@ void HkWindowFrame::resolveChildrenConstraints(HkTreeStruct&,
                 wfCont_.node_.transformContext.getContentScale().y + bBorderSize + tBorderSize
         });
 
-    boundPos_ = { node_.borderTransformContext.getContentPos() };
+    boundPos_ = { node_.borderTransformContext.getContentPos().x,
+        node_.borderTransformContext.getContentPos().y
+    };
     boundScale_ = {
         node_.borderTransformContext.getContentScale().x,
         node_.borderTransformContext.getContentScale().y

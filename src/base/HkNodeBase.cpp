@@ -84,6 +84,7 @@ void HkNodeBase::updateMySelf(const bool isSubWindowMinimized)
         tc.setVPos(tc.getPos());
         tc.setVScale(tc.getScale());
         bTc.setVPos(bTc.getContentPos());
+        bTc.setVScale(bTc.getContentScale());
 
         /* If we are the root window and we are minimized, minimize border vScale as well */
         isSubWindowMinimized ?

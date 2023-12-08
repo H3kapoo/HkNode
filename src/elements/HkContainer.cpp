@@ -261,6 +261,7 @@ void HkContainer::postRenderAdditionalDetails()
     //     dummyXYIntersectorData_.styleContext,
     //     dummyXYIntersectorData_.transformContext.getModelMatrix());
 
+    //TODO: UNCOMMENT LATER
     /* To note that we should always render the bars last*/
     if (pinchHelper_.isEnabled())
     {

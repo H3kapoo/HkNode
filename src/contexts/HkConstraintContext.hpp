@@ -72,8 +72,8 @@ public:
 
     void resolveRowChildrenAlignment(HkTreeStruct& children, const uint32_t rowFirstId,
         const uint32_t rowLastId, const uint32_t highestYOnRow) const;
-    void backPropagateColChange(HkTreeStruct& children, const uint32_t nextColFirstId,
-        const uint32_t lastColEndId, const uint32_t longestXOnCol) const;
+    void resolveColChildrenAlignment(HkTreeStruct& children, const uint32_t colFirstId,
+        const uint32_t colLastId, const uint32_t longestXOnCol) const;
     void pushElementsIntoPosition(HkTreeStruct& children) const;
 
     void computeScrollBarCount();
