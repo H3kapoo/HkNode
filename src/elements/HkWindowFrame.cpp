@@ -38,7 +38,7 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
             stillAlive_ = false;
         });
 
-    titleLabel_.getStyle().setColor(glm::vec4(0.0f, 0.5f, 0.9f, 1.0f));
+    titleLabel_.getStyle().setColor(glm::vec4(0.0f, 0.5f, 0.9f, 0.0f));
     titleLabel_.getTextStyle()
         .setFontPath("assets/fonts/LiberationSerif-Regular.ttf")
         .setRenderMethod(HkTextUserConfig::HkTextRenderMethod::BITMAP)

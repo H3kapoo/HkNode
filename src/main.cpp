@@ -62,35 +62,33 @@ int main()
     //         { .type = HkSizeType::PercParent, .value = 0.5f, .min = 300 })
     //     .setPinchConfig({ .enable = true, .alwaysOn = false, .allowRight = true, .allowTop = true, .allowBottom = true });
 
-    // ctr4->getStyle().setColor({ 1.0f,0.0f,0.0f ,1.0f })
-    //     .setLayout(HkLayout::Vertical)
-    //     // .setLayout(HkLayout::Vertical)
-    //     .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center)
-    //     .setHSizeConfig(
-    //         { .type = HkSizeType::PercParent, .value = 0.25f, .min = 300 })
-    //     .setPinchConfig({ .enable = true,.alwaysOn = false, .allowRight = true, .allowTop = true, .allowBottom = true });
+    ctr4->getStyle().setColor({ 1.0f,0.0f,0.0f ,1.0f })
+        .setLayout(HkLayout::Vertical)
+        .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center)
+        .setHSizeConfig(
+            { .type = HkSizeType::PercParent, .value = 0.5f, .min = 30 })
+        .setPinchConfig({ .enable = true, .allowRight = true, .allowTop = true, .allowBottom = true });
 
-    // ctr5->getStyle().setColor({ 0.3f,0.5f,0.0f ,1.0f })
-    //     .setLayout(HkLayout::VPinch)
-    //     .setHSizeConfig(
-    //         { .type = HkSizeType::PercParent, .value = 0.25f, .min = 300 })
-    //     .setPinchConfig({ .enable = true, .alwaysOn = false,.allowTop = true, .allowBottom = true });
+    ctr5->getStyle().setColor({ 0.3f,0.5f,0.0f ,1.0f })
+        .setLayout(HkLayout::Vertical)
+        .setHSizeConfig(
+            { .type = HkSizeType::PercParent, .value = 0.5f, .min = 30 })
+        .setPinchConfig({ .enable = true, .allowTop = true, .allowBottom = true });
 
     // //ctr4 children
-    // ctr6->getStyle().setColor({ 0.0f,0.0f,1.0f,1.0f })
-    //     .setLayout(HkLayout::Horizontal)
-    //     .setVSizeConfig(
-    //         { .type = HkSizeType::PercParent, .value = 0.75f, .min = 300 })
-    //     .setPinchConfig({ .enable = true,.alwaysOn = false, .allowLeft = true, .allowRight = true, .allowBottom = true });
+    ctr6->getStyle().setColor({ 0.0f,0.0f,1.0f,1.0f })
+        .setLayout(HkLayout::Horizontal)
+        .setVSizeConfig(
+            { .type = HkSizeType::PercParent, .value = 0.75f, .min = 30 })
+        .setPinchConfig({ .enable = true, .allowLeft = true, .allowRight = true, .allowBottom = true });
 
-    // ctr7->getStyle().setColor({ 0.3f,0.7f,0.0f,1.0f })
-    //     .setLayout(HkLayout::Horizontal)
-    //     .setOverflowAllowedXY(true)
-    //     .setRowWrapping(true)
-    //     .setVSizeConfig(
-    //         { .type = HkSizeType::PercParent, .value = 0.25f, .min = 300 })
-    //     .setPinchConfig({ .enable = true,.alwaysOn = false, .allowLeft = true, .allowRight = true });
-    //
+    ctr7->getStyle().setColor({ 0.3f,0.7f,0.0f,1.0f })
+        .setLayout(HkLayout::HPinch)
+        .setRowWrapping(true)
+        .setVSizeConfig(
+            { .type = HkSizeType::PercParent, .value = 0.25f, .min = 30 })
+        .setPinchConfig({ .enable = true, .allowLeft = true, .allowRight = true });
+
 
     // ctr8->getStyle().setColor({ 0.5f,0.4f,1.0f })
     //     .setVHSizeConfig(
@@ -107,78 +105,62 @@ int main()
 
 
 
-    ctr10->getStyle().setColor({ 0.0f,0.7f,1.0f, 1.0f })
-        // .setOverflowAllowedXY(true)
-        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-        // .setMargins(100, 0, 10, 10)
-        // .setBorders(20, 10, 50, 20)
-        .setVHSizeConfig(
-            { .value = 400, .min = 50 }, { .value = 300, .min = 50 });
-
-    ctr11->getStyle().setColor({ 0.4f,0.7f,0.0f, 1.0f })
-        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-        // .setTopMargin(5)
-        // .setLeftMargin(10)
-        // .setBottomMargin(10)
-        // .setBorders(50, 10, 0, 30)
-        .setVHSizeConfig(
-            { .value = 200, .min = 50 }, { .value = 100, .min = 50 });
-
-    ctr12->getStyle().setColor({ 0.4f,0.7f,0.0f, 1.0f })
-        // .setOverflowAllowedXY(true)
-        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-        // .setLeftMargin(10)
-        // .setBottomMargin(30)
-        // .setBorders(30, 30, 30, 30)
-        .setColor({ 1.0f, 0.3f, .5f, 1.0f })
-        .setVHSizeConfig(
-            { .value = 100, .min = 50 }, { .value = 300, .min = 50 });
-
     ctr9->getStyle().setColor({ 0.4f,0.7f,0.0f, 1.0f })
-        .setOverflowAllowedXY(true)
-        .setPadding(10, 10, 10, 10)
-        .setBorders(5, 5, 5, 5)
+        // .setPadding(10, 10, 10, 10)
+        // .setBorders(5, 5, 5, 5)
         .setBorderColor({ 0.6f, 0.0f, 1.0f,1.0f })
         // .setOverflowAllowedX(true)
         .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
         // .setLeftMargin(10)
         // .setBottomMargin(10)
+        .setPinchConfig({ .enable = true, .allowRight = true })
+        .setHSizeConfig(
+            { .type = HkSizeType::PercParent, .value = 0.25f, .min = 30 });
+
+    ctr10->getStyle().setColor({ 0.0f,0.7f,1.0f, 1.0f })
+        .setLayout(HkLayout::VPinch)
+        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+        .setPinchConfig({ .enable = true, .allowLeft = true, .allowRight = true })
+        .setHSizeConfig(
+            { .type = HkSizeType::PercParent, .value = 0.5f, .min = 30 });
+
+    ctr11->getStyle().setColor({ 0.4f,0.7f,0.0f, 1.0f })
+        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+        .setPinchConfig({ .enable = true, .allowLeft = true })
+        .setHSizeConfig(
+            { .type = HkSizeType::PercParent, .value = 0.25f, .min = 30 });
+
+    ctr12->getStyle().setColor({ 0.4f,0.7f,0.0f, 1.0f })
+        .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
+        .setColor({ 1.0f, 0.3f, .5f, 1.0f })
         .setVHSizeConfig(
-            { .value = 400, .min = 50 }, { .value = 200, .min = 50 });
+            { .value = 100, .min = 50 }, { .value = 100, .min = 50 });
+
 
     //TODO: Resolve this "2 style" behaviour as it;s very confusing
-    windowFrame->getStyle()
-        .setBorderColor({ 0.6f,0.6f,0.0f,1.0f })
-        .setBorders(3, 3, 3, 3);
+    // windowFrame->getStyle()
+    //     .setBorderColor({ 0.6f,0.6f,0.0f,1.0f })
+    //     .setBorders(3, 3, 3, 3);
     windowFrame->getContainerStyle()
+        // .setColor({ .04f, .54f, .34f, 1.0f })
         // .setPadding(10, 10, 10, 10)
-        .setOverflowAllowedXY(true)
-        .setLayout(HkLayout::Grid)
+        .setOverflowAllowedXY(false)
+        .setLayout(HkLayout::HPinch)
         .setPinchConfig({ .enable = true })
         // .setRowWrapping(true)
         // .setColWrapping(true)
         .setHAlignment(HkHAlignment::Left)
         .setVAlignment(HkVAlignment::Top);
 
-    // windowFrame->pushChildren({ ctr10 });
-    // windowFrame->pushChildren({ ctr9 , ctr10, ctr11 });
-    // ctr4->pushChildren({ label });
-    // ctr4->pushChildren({ ctr6, ctr7 });
-    // ctr10->pushChildren({ ctr11, ctr12, ctr9 });
-    // ctr10->pushChildren({ ctr9 });
-    // ctr10->pushChildren({ ctr9 });
-    // ctr9->pushChildren({ ctr12 });
-
-    // // ctr7->pushChildren({ ctr11,ctr12 });
-    // ctr8->pushChildren({ ctr13,ctr14 });
-
-    // ctr13->pushChildren({ ctr9,ctr10 });
-    // windowFrame->pushChildren({ ctr });
+    windowFrame->pushChildren({ ctr9,ctr10,ctr11 });
+    ctr10->pushChildren({ ctr6, ctr7 });
+    ctr7->pushChildren({ ctr4, ctr5 });
+    ctr5->pushChildren({ ctr12 });
 
     // Providing a seed value
     // srand((unsigned)time(NULL));
 
-    int scale = 2;
+    int scale = 1;
     std::vector<HkNodeBasePtr> ctrs2;
     ctrs2.reserve(scale * scale);
     for (int i = 1; i <= scale; i++) // with O2 works ok 01.09.2023
@@ -189,34 +171,48 @@ int main()
             double g = (rand() % 255) / 255.0f;
             double b = (rand() % 255) / 255.0f;
 
-            const auto& ct = std::make_shared<HkContainer>("MyContauner");
+            const auto& ct = std::make_shared<HkButton>("MyContauner");
             ct->getStyle()
                 .setColor((i + j) % 2 == 0 ? glm::vec4{ r,g,b, 1.0f } : glm::vec4{ r,g,b, 1.0f })
                 // .setColor({ 1.0f, 1.0f, 0.6f, 1.0f })
-                .setBorderColor({ 1.0f, 0.0f, 0.0f, 1.0f })
-                .setBorders(2, 2, 2, 2)
-                .setMargins(10, 10, 10, 10)
+                .setBorderColor({ 0.22f, 0.65f, 0.9f, 1.0f })
+                // .setBorders(2, 2, 2, 2)
+                // .setBorders(5, 5, 5, 5)
+                // .setMargins(10, 10, 10, 10)
                 .setGridRowCol(i, j)
-                .setVHSizeConfig({ .value = 150 }, { .value = 150 })
-                // .setVHSizeConfig({ .type = HkSizeType::FitCell }, { .type = HkSizeType::FitCell })
-                .setVHAlignment(HkVAlignment::Center, HkHAlignment::Right);
+                // .setVHSizeConfig({ .value = 150 }, { .value = 150 })
+                .setVHSizeConfig({ .type = HkSizeType::FitCell }, { .type = HkSizeType::FitCell })
+                // .setVHSizeConfig({ .type = HkSizeType::PercCell, .value = .5f },
+                //     { .type = HkSizeType::PercCell, .value = .5f })
+                .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center);
             // .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left);
 
             ctrs2.push_back(std::move(ct));
         }
     }
 
-    std::vector<float> rows, cols;
-    rows.assign(scale, 1.0f);
-    cols.assign(scale, 1.0f);
-    windowFrame->getContainerStyle()
-        .setLayout(HkLayout::Grid)
-        .setGridConfig(
-            HkGridConfig{
-                .cols{cols},
-                .rows{rows}
-            });
-    windowFrame->pushChildren(ctrs2);
+    // ctrs2[0]->getStyle()
+    //     .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left);
+    // ctrs2[1]->getStyle()
+    //     .setVHAlignment(HkVAlignment::Top, HkHAlignment::Right);
+    // ctrs2[2]->getStyle()
+    //     .setVHAlignment(HkVAlignment::Bottom, HkHAlignment::Left);
+    // ctrs2[3]->getStyle()
+    //     .setVHAlignment(HkVAlignment::Bottom, HkHAlignment::Right);
+
+    // std::vector<float> rows, cols;
+    // rows.assign(scale, 1.0f);
+    // cols.assign(scale, 1.0f);
+    // windowFrame->getContainerStyle()
+    //     .setLayout(HkLayout::Grid)
+    //     .setOverflowAllowedXY(true)
+    //     .setPadding(30, 30, 30, 30)
+    //     .setGridConfig(
+    //         HkGridConfig{
+    //             .cols{cols},
+    //             .rows{rows}
+    //         });
+    // windowFrame->pushChildren(ctrs2);
     // windowFrame->printTree();
     // HkImageViewPtr imgView = std::make_shared<HkImageView>("MyImgView");
     // HkImageViewPtr imgView2 = std::make_shared<HkImageView>("MyImgView2");
@@ -239,11 +235,11 @@ int main()
     // sceneWindow2->makeContextCurrent();
 
     HkWindowFramePtr windowFrame2 = std::make_shared<HkWindowFrame>("MyWindowFrame2");
-    // windowFrame2->setWindowMode(HkWindowFrameMode::Grabbable);
+    windowFrame2->setWindowMode(HkWindowFrameMode::Grabbable);
     // sceneWindow1->addSubWindow(windowFrame2); //NOTE: Needs to be added before adding any children
     // sceneWindow2->addSubWindow(windowFrame2); //NOTE: Needs to be added before adding any children
 
-    windowFrame2->getStyle().setOverflowAllowedXY(true)
+    windowFrame2->getContainerStyle().setOverflowAllowedXY(true)
         .setLayout(HkLayout::Horizontal)
         .setPinchConfig({ .enable = true })
         .setHAlignment(HkHAlignment::Left)
@@ -280,7 +276,7 @@ int main()
     // sceneWindow3->makeContextCurrent();
 
     HkWindowFramePtr windowFrame3 = std::make_shared<HkWindowFrame>("MyWindowFrame2");
-    windowFrame3->setWindowMode(HkWindowFrameMode::Grabbable);
+    // windowFrame3->setWindowMode(HkWindowFrameMode::Grabbable);
     // sceneWindow3->addSubWindow(windowFrame3); //NOTE: Needs to be added before adding any children
     // sceneWindow1->addSubWindow(windowFrame3); //NOTE: Needs to be added before adding any children
 

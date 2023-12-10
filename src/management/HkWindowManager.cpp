@@ -115,12 +115,6 @@ void HkWindowManager::updateAllSubWindows(const HkEvent& ev)
         }
     }
 
-    //EXPERIMENTAL, MAYBE NEEDS REMOVAL
-    // double currTime = glfwGetTime();
-    // windowData_.deltaTime = currTime - windowData_.previousTime;
-    // windowData_.previousTime = currTime;
-    //
-    //TODO: If theres no animation left to be done, reset prevTime back to zero
     windowData_.currentEvent = HkEvent::None; /* Reset current event */
 
     /* Update suggested cursor accordingly. No priority is taken into account for now*/
@@ -130,19 +124,22 @@ void HkWindowManager::updateAllSubWindows(const HkEvent& ev)
 void HkWindowManager::decideCursor()
 {
     /* Very important to change cursor only if it might of changed*/
-    if (!windowData_.cursorChangeNeeded == true) return;
+    if (!windowData_.cursorChangeNeeded) return;
 
     /* First cursor different than the default one will be the new cursor in this case*/
+    // printf("%f Maybe cursor: %d %d\n", glfwGetTime(), (windowData_.suggestedCursor != GLFW_ARROW_CURSOR), potentialCursor_);
+
     if (potentialCursor_ == 0 && windowData_.suggestedCursor != GLFW_ARROW_CURSOR)
     {
         potentialCursor_ = windowData_.suggestedCursor;
+        // printf("%f Cursor changed to: %d\n", glfwGetTime(), potentialCursor_);
     }
 }
 
 void HkWindowManager::updateCursor()
 {
     /* Very important to change cursor only if it might of changed*/
-    if (!windowData_.cursorChangeNeeded == true) return;
+    if (!windowData_.cursorChangeNeeded) return;
 
     /* init cursor types */
     if (!cursorsInited_)
@@ -154,12 +151,13 @@ void HkWindowManager::updateCursor()
     }
 
     /* If we have a potential new cursor that we know is not the default one,
-    change current cursor o it*/
+       change current cursor it*/
     potentialCursor_ != 0 ?
         decidedCursor_ = potentialCursor_ : decidedCursor_ = GLFW_ARROW_CURSOR;
 
-    switch (decidedCursor_)
+    switch (potentialCursor_)
     {
+    default:
     case GLFW_ARROW_CURSOR:
         glfwSetCursor(windowHandle_, NULL);
         break;
@@ -176,6 +174,7 @@ void HkWindowManager::updateCursor()
 
     /* Reset change needed.. already handled*/
     windowData_.cursorChangeNeeded = false;
+    windowData_.suggestedCursor = GLFW_ARROW_CURSOR;
     potentialCursor_ = 0;
 }
 

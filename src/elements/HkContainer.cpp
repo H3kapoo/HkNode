@@ -111,13 +111,6 @@ void HkContainer::onGeneralMouseMove()
         pinchHelper_.onMouseMove(*windowDataPtr_, node_,
             treeStruct_.getParent()->getPayload()->node_,
             treeStruct_.getId());
-
-        // std::vector<HkNodeBase*> children;
-        // for (const auto& ch : treeStruct_.getChildren())
-        // {
-        //     children.push_back(ch->getPayload());
-        // }
-        // pinchHelper_.enableOrDisableGrabPoints(*windowDataPtr_, children);
     }
 }
 
@@ -219,10 +212,10 @@ void HkContainer::resolveScrollBarChildrenIfNeeded()
    of parent have been rendered */
 void HkContainer::postRenderAdditionalDetails()
 {
-    /* If both scrollbars are active, it's obvious we need the intersector at bottom right. It is handled in the Container class because
-       container should know when both SBs are active and what to do with them. Also clicking on the dummy object basically means clicking
-       on the container itself and since coordinates for this location are already known, maybe we can do some particular stuff with that info */
-       // if (scrollbBarsCount_ == 2)
+    // /* If both scrollbars are active, it's obvious we need the intersector at bottom right. It is handled in the Container class because
+    //    container should know when both SBs are active and what to do with them. Also clicking on the dummy object basically means clicking
+    //    on the container itself and since coordinates for this location are already known, maybe we can do some particular stuff with that info */
+    //    // if (scrollbBarsCount_ == 2)
     if (treeStruct_.getId() == 4) return;
     dummyXYIntersectorData_.renderContext.windowProjMatrix = windowDataPtr_->sceneProjMatrix;
     dummyXYIntersectorData_.transformContext.setContentScale({ 20,20 });
@@ -243,25 +236,6 @@ void HkContainer::postRenderAdditionalDetails()
         dummyXYIntersectorData_.styleContext,
         dummyXYIntersectorData_.transformContext.getModelMatrix());
 
-    // dummyXYIntersectorData_.transformContext.setScale({ 20,20 });
-
-    // dummyXYIntersectorData_.transformContext.setPos({
-    //     node_.transformContext.getPos().x + node_.transformContext.getScale().x - 20,
-    //     node_.transformContext.getPos().y + node_.transformContext.getScale().y - 20 });
-
-    // windowDataPtr_->renderer.render(dummyXYIntersectorData_.renderContext,
-    //     dummyXYIntersectorData_.styleContext,
-    //     dummyXYIntersectorData_.transformContext.getModelMatrix());
-
-    // dummyXYIntersectorData_.transformContext.setPos({
-    //     node_.transformContext.getPos().x,
-    //     node_.transformContext.getPos().y });
-
-    // windowDataPtr_->renderer.render(dummyXYIntersectorData_.renderContext,
-    //     dummyXYIntersectorData_.styleContext,
-    //     dummyXYIntersectorData_.transformContext.getModelMatrix());
-
-    //TODO: UNCOMMENT LATER
     /* To note that we should always render the bars last*/
     if (pinchHelper_.isEnabled())
     {

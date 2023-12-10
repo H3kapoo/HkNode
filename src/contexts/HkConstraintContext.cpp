@@ -86,6 +86,24 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children)
             yAdvanceFraction += (gridConfig.rows[j] * rowEqualPart);
         }
 
+        const int32_t bX = childSc.getRightBorder() + childSc.getLeftBorder();
+        const int32_t bY = childSc.getTopBorder() + childSc.getBottomBorder();
+        const int32_t bmX = bX + childSc.getRightMargin() + childSc.getLeftMargin();
+        const int32_t bmY = bY + childSc.getTopMargin() + childSc.getBottomMargin();
+
+        const int32_t lPadd = styleContextInj_->getLeftPadding();
+        const int32_t rPadd = styleContextInj_->getRightPadding();
+        const int32_t tPadd = styleContextInj_->getTopPadding();
+        const int32_t bPadd = styleContextInj_->getBottomPadding();
+
+        float xScalePadded = thisTc_->getContentScale().x - (rPadd + lPadd);
+        xScalePadded -= xScalePadded * (bX / xScalePadded);
+        const float xPosPadded = thisTc_->getContentPos().x + rPadd;
+
+        float yScalePadded = thisTc_->getContentScale().y - (bPadd + tPadd);
+        yScalePadded -= yScalePadded * (bY / yScalePadded);
+        const float yPosPadded = thisTc_->getContentPos().y + tPadd;
+
         /* Scale elements according to their config*/
         const auto hSizeConfig = childSc.getHSizeConfig();
         const auto vSizeConfig = childSc.getVSizeConfig();
@@ -95,11 +113,11 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children)
             xSize = hSizeConfig.value;
             break;
         case HkSizeType::PercCell:
-            xSize = (gridConfig.cols[childSc.getGridCol() - 1] * colEqualPart) * (float)thisTc_->getContentScale().x;
+            xSize = (gridConfig.cols[childSc.getGridCol() - 1] * colEqualPart) * xScalePadded;
             xSize *= hSizeConfig.value;
             break;
         case HkSizeType::FitCell:
-            xSize = (gridConfig.cols[childSc.getGridCol() - 1] * colEqualPart) * (float)thisTc_->getContentScale().x;
+            xSize = (gridConfig.cols[childSc.getGridCol() - 1] * colEqualPart) * xScalePadded;
             break;
         case HkSizeType::PercParent:
         case HkSizeType::FitParent:
@@ -115,11 +133,12 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children)
             ySize = vSizeConfig.value;
             break;
         case HkSizeType::PercCell:
-            ySize = (gridConfig.rows[childSc.getGridRow() - 1] * rowEqualPart) * (float)thisTc_->getContentScale().y;
+            ySize = (gridConfig.rows[childSc.getGridRow() - 1] * rowEqualPart) * yScalePadded;
             ySize *= vSizeConfig.value;
             break;
         case HkSizeType::FitCell:
-            ySize = (gridConfig.rows[childSc.getGridRow() - 1] * rowEqualPart) * (float)thisTc_->getContentScale().y;
+            ySize = (gridConfig.rows[childSc.getGridRow() - 1] * rowEqualPart) * yScalePadded;
+            ySize -= yScalePadded * (bY / yScalePadded);
             break;
         case HkSizeType::PercParent:
         case HkSizeType::FitParent:
@@ -133,16 +152,9 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children)
         ySize = std::clamp(ySize, vSizeConfig.min, vSizeConfig.max);
 
         /*Ceil is needed so we don't get off by one pixel artifacts*/
-        // childTc.setScale({ ceil(xSize), ceil(ySize) });
         childTc.setContentScale({ ceil(xSize), ceil(ySize) });
-
-        const int32_t bX = childSc.getRightBorder() + childSc.getLeftBorder();
-        const int32_t bY = childSc.getTopBorder() + childSc.getBottomBorder();
-        const int32_t bmX = bX + childSc.getRightMargin() + childSc.getLeftMargin();
-        const int32_t bmY = bY + childSc.getTopMargin() + childSc.getBottomMargin();
         childTc.setScale({ childTc.getContentScale().x + bmX, childTc.getContentScale().y + bmY });
         childBTc.setContentScale({ childTc.getContentScale().x + bX, childTc.getContentScale().y + bY });
-
 
         /* By default, elements will be left aligned. When Center/Right alignment is chosen, we need to
            advance fractionally a little bit more to the right in order to put elements at the right place.
@@ -151,19 +163,19 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children)
         {
         case HkHAlignment::Left:
         {
-            startPosX = xAdvanceFraction * (float)thisTc_->getContentScale().x;
+            startPosX = xAdvanceFraction * xScalePadded;
             break;
         }
         case HkHAlignment::Center:
         {
             const float xAdvanceToCenter = (gridConfig.cols[childSc.getGridCol() - 1] * colEqualPart) * 0.5f;
-            startPosX = (xAdvanceFraction + xAdvanceToCenter) * (float)thisTc_->getContentScale().x - childTc.getScale().x * 0.5f;
+            startPosX = (xAdvanceFraction + xAdvanceToCenter) * xScalePadded - childTc.getContentScale().x * 0.5f;
             break;
         }
         case HkHAlignment::Right:
         {
             const float xAdvanceToRight = (gridConfig.cols[childSc.getGridCol() - 1] * colEqualPart);
-            startPosX = (xAdvanceFraction + xAdvanceToRight) * (float)thisTc_->getContentScale().x - childTc.getScale().x;
+            startPosX = (xAdvanceFraction + xAdvanceToRight) * xScalePadded - childTc.getContentScale().x;
             break;
         }
         }
@@ -175,25 +187,25 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children)
         {
         case HkVAlignment::Top:
         {
-            startPosY = yAdvanceFraction * (float)thisTc_->getContentScale().y;
+            startPosY = yAdvanceFraction * yScalePadded;
             break;
         }
         case HkVAlignment::Center:
         {
             const float yAdvanceToCenter = (gridConfig.rows[childSc.getGridRow() - 1] * rowEqualPart) * 0.5f;
-            startPosY = (yAdvanceFraction + yAdvanceToCenter) * (float)thisTc_->getContentScale().y - childTc.getScale().y * 0.5f;
+            startPosY = (yAdvanceFraction + yAdvanceToCenter) * yScalePadded - childTc.getContentScale().y * 0.5f;
             break;
         }
         case HkVAlignment::Bottom:
         {
             const float yAdvanceToRight = (gridConfig.rows[childSc.getGridRow() - 1] * rowEqualPart);
-            startPosY = (yAdvanceFraction + yAdvanceToRight) * (float)thisTc_->getContentScale().y - childTc.getScale().y;
+            startPosY = (yAdvanceFraction + yAdvanceToRight) * yScalePadded - childTc.getContentScale().y;
             break;
         }
         }
 
         /* Set absolute position of element */
-        childTc.setPos({ startPosX + (float)thisTc_->getContentPos().x ,startPosY + (float)thisTc_->getContentPos().y });
+        childTc.setPos({ startPosX + xPosPadded,  startPosY + yPosPadded });
 
         /* Set element's contentPos taking into account BM*/
         childTc.setContentPos(
@@ -318,7 +330,7 @@ void HkConstraintContext::resolveHorizontalPinch(HkTreeStruct& children)
 
         auto sizeCfg = childSc.getHSizeConfig();
         auto pinchCfg = childSc.getPinchConfig();
-        const float pScaleX = (float)thisTc_->getScale().x;
+        const float pScaleX = (float)thisTc_->getContentScale().x;
         const float minVal = sizeCfg.min / pScaleX;
         const float maxVal = sizeCfg.max / pScaleX;
 
@@ -369,25 +381,29 @@ void HkConstraintContext::resolveHorizontalPinch(HkTreeStruct& children)
         startPosX = xAdvanceFraction * pScaleX;
         advancePerc += sizeCfg.value;
         xAdvanceFraction = advancePerc;
-        childTc.setPos({ startPosX + (float)thisTc_->getPos().x , thisTc_->getPos().y });
+        childTc.setContentPos({ startPosX + (float)thisTc_->getContentPos().x , thisTc_->getContentPos().y });
 
         /* Scale elements according to their config. Subtract right margin to for the pinch zone*/
         xSize = childSc.getHSizeConfig().value * pScaleX;
         xSize -= (i == childrenCount - 1) ? 0 : pinchCfg.grabSize;
 
         /*Ceil is needed so we don't get off by one pixel artifacts*/
-        childTc.setScale({ ceil(xSize), thisTc_->getScale().y });
+        childTc.setContentScale({ ceil(xSize), thisTc_->getContentScale().y });
+
+        childTc.copyContentDataToAbsoluteData();
     }
 
     //NOTE: Possible hack for last item not covering all the space aka one stray column of pixels at the end
     // not covered.
-    // auto& child = children[childrenCount - 1]->getPayload()->node_;
-    // auto& childTc = child.transformContext;
-    // if (childTc.getPos().x + childTc.getScale().x < thisTc_->getPos().x + thisTc_->getScale().x)
-    // {
-    //     const auto diff = thisTc_->getPos().x + thisTc_->getScale().x - (childTc.getPos().x + childTc.getScale().x);
-    //     childTc.addScale({ diff, 0 });
-    // }
+    auto& child = children[childrenCount - 1]->getPayload()->node_;
+    auto& childTc = child.transformContext;
+    if (childTc.getContentPos().x + childTc.getContentScale().x < thisTc_->getContentPos().x + thisTc_->getContentScale().x)
+    {
+        const auto diff = thisTc_->getContentPos().x + thisTc_->getContentScale().x
+            - (childTc.getContentPos().x + childTc.getContentScale().x);
+        childTc.addContentScale({ diff, 0 });
+        childTc.copyContentDataToAbsoluteData();
+    }
 }
 
 void HkConstraintContext::resolveVerticalContainer(HkTreeStruct& children)
@@ -498,7 +514,7 @@ void HkConstraintContext::resolveVerticalPinch(HkTreeStruct& children)
 
         auto sizeCfg = childSc.getVSizeConfig();
         auto pinchCfg = childSc.getPinchConfig();
-        const float pScaleY = (float)thisTc_->getScale().y;
+        const float pScaleY = (float)thisTc_->getContentScale().y;
         const float minVal = sizeCfg.min / pScaleY;
         const float maxVal = sizeCfg.max / pScaleY;
 
@@ -549,25 +565,29 @@ void HkConstraintContext::resolveVerticalPinch(HkTreeStruct& children)
         startPosY = yAdvanceFraction * pScaleY;
         advancePerc += sizeCfg.value;
         yAdvanceFraction = advancePerc;
-        childTc.setPos({ thisTc_->getPos().x, startPosY + (float)thisTc_->getPos().y });
+        childTc.setContentPos({ thisTc_->getContentPos().x, startPosY + (float)thisTc_->getContentPos().y });
 
         /* Scale elements according to their config. Subtract right margin to for the pinch zone*/
         ySize = childSc.getVSizeConfig().value * pScaleY;
         ySize -= (i == childrenCount - 1) ? 0 : pinchCfg.grabSize;
 
         /*Ceil is needed so we don't get off by one pixel artifacts*/
-        childTc.setScale({ thisTc_->getScale().x , ceil(ySize) });
+        childTc.setContentScale({ thisTc_->getContentScale().x, ceil(ySize) });
+
+        childTc.copyContentDataToAbsoluteData();
     }
 
     //NOTE: Possible hack for last item not covering all the space aka one stray column of pixels at the end
     // not covered.
-    // auto& child = children[childrenCount - 1]->getPayload()->node_;
-    // auto& childTc = child.transformContext;
-    // if (childTc.getPos().x + childTc.getScale().x < thisTc_->getPos().x + thisTc_->getScale().x)
-    // {
-    //     const auto diff = thisTc_->getPos().x + thisTc_->getScale().x - (childTc.getPos().x + childTc.getScale().x);
-    //     childTc.addScale({ diff, 0 });
-    // }
+    auto& child = children[childrenCount - 1]->getPayload()->node_;
+    auto& childTc = child.transformContext;
+    if (childTc.getContentPos().y + childTc.getContentScale().y < thisTc_->getContentPos().y + thisTc_->getContentScale().y)
+    {
+        const auto diff = thisTc_->getContentPos().y + thisTc_->getContentScale().y
+            - (childTc.getContentPos().y + childTc.getContentScale().y);
+        childTc.addContentScale({ 0, diff });
+        childTc.copyContentDataToAbsoluteData();
+    }
 }
 
 void HkConstraintContext::resolveRowChildrenAlignment(HkTreeStruct& children,

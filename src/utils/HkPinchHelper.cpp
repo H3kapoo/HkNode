@@ -257,14 +257,27 @@ void HkPinchHelper::onMouseMove(HkWindowData& windowData, HkNodeData& nd, HkNode
 
         /* Set cursor to whatever we might need */
         if ((lockedInXR_ || lockedInXL_) && windowData.suggestedCursor != GLFW_CROSSHAIR_CURSOR)
+        {
             cursorChange(windowData, GLFW_HRESIZE_CURSOR);
+        }
 
         if ((lockedInYT_ || lockedInYB_) && windowData.suggestedCursor != GLFW_CROSSHAIR_CURSOR)
+        {
             cursorChange(windowData, GLFW_VRESIZE_CURSOR);
+        }
 
         if ((lockedInXR_ && lockedInYB_) || (lockedInXR_ && lockedInYT_)
             || (lockedInXL_ && lockedInYB_) || (lockedInXL_ && lockedInYT_))
+        {
             cursorChange(windowData, GLFW_CROSSHAIR_CURSOR);
+        }
+
+        /* If we didn't manage to grab anything, do not suggest reset of cursor, but inform windowManager that
+           a change to default cursor may occur */
+        if (!(lockedInXL_ || lockedInXR_ || lockedInYB_ || lockedInYT_))
+        {
+            windowData.cursorChangeNeeded = true;
+        }
     }
     /* If we are holding click and moving, we need to update position/scale of pinched object */
     else
@@ -286,7 +299,7 @@ void HkPinchHelper::onMouseMove(HkWindowData& windowData, HkNodeData& nd, HkNode
         if (foundInfo.right)
         {
             auto prev = nd.styleContext.getPinchConfig();
-            const auto pScaleX = pnd.transformContext.getScale().x;
+            const auto pScaleX = pnd.transformContext.getContentScale().x;
             prev.offsetX = ((windowData.mousePos.x - windowData.lastMousePos.x) / (float)pScaleX);
             nd.styleContext.setPinchConfig(prev);
         }
@@ -294,7 +307,7 @@ void HkPinchHelper::onMouseMove(HkWindowData& windowData, HkNodeData& nd, HkNode
         if (foundInfo.bottom)
         {
             auto prev = nd.styleContext.getPinchConfig();
-            const auto pScaleY = pnd.transformContext.getScale().y;
+            const auto pScaleY = pnd.transformContext.getContentScale().y;
             prev.offsetY = ((windowData.mousePos.y - windowData.lastMousePos.y) / (float)pScaleY);
             nd.styleContext.setPinchConfig(prev);
         }
@@ -471,7 +484,9 @@ bool HkPinchHelper::onMouseMoveCustom(HkWindowData& windowData, glm::ivec2& boun
 
         /* If we didn't manage to grab anything, reset cursor */
         if (!(lockedInXL_ || lockedInXR_ || lockedInYB_ || lockedInYT_))
+        {
             cursorChange(windowData, GLFW_ARROW_CURSOR);
+        }
 
         /* Return false as this is "scan" pass (maybe separate func in the future), not "resolve" one */
         return false;
