@@ -85,9 +85,11 @@ void HkLabel::postRenderAdditionalDetails()
     // int32_t spread = 10;
     int32_t spread = usrTextConfig_.getLineSpread();
 
-    //TODO: Couldnt we cache the results of the matrices?
-    /* Add each line to batch, skipping white spaces */
+
     float accumulatedHeights = 0;
+    int32_t dotsCount = 0;
+
+    /* Add each line to batch, skipping white spaces */
     for (uint32_t line = 0; line < lines_.size(); line++)
     {
         int32_t x = labelPos.x;
@@ -96,10 +98,23 @@ void HkLabel::postRenderAdditionalDetails()
         const int32_t lineHeightPlusSpread = (-lines_[line].lowestPoint + lines_[line].highestPoint);
         accumulatedHeights += lineHeightPlusSpread + spread;
 
+        if (line == lines_.size() - 1 && lines_[line].endIdx != text_.size())
+        {
+            // printf("We have not filled the last line: %d %d\n", lines_[line].endIdx, text_.size());
+            dotsCount = 3;
+        }
+
         for (uint32_t i = lines_[line].startIdx; i < lines_[line].endIdx; i++)
         {
-            const HkFontLoader::HkChar& ch = fontLoader_->getChar(text_[i]);
-            if (text_[i] == ' ') { x += (ch.advance >> 6); continue; }
+            char c;
+            if (dotsCount && (i >= lines_[line].endIdx - dotsCount)) c = '.';
+            else c = text_[i];
+
+            const HkFontLoader::HkChar& ch = fontLoader_->getChar(c);
+            if (c == ' ') { x += (ch.advance >> 6); continue; }
+
+            // const HkFontLoader::HkChar& ch = fontLoader_->getChar(text_[i]);
+            // if (text_[i] == ' ') { x += (ch.advance >> 6); continue; }
 
             /* Determine final position and scale*/
             float xpos = x + ch.bearing.x;
@@ -175,7 +190,6 @@ void HkLabel::postRenderAdditionalDetails()
 
             if (usrTextConfig_.getTextAngle() != 0.0f)
             {
-                // modelMat = glm::rotate(modelMat, (float)glfwGetTime() * 2, glm::vec3(0.0f, 0.0f, 1.0f));
                 modelMat = glm::rotate(modelMat, glm::radians(usrTextConfig_.angle), glm::vec3(0.0f, 0.0f, 1.0f));
             }
 
@@ -287,6 +301,20 @@ void HkLabel::resolveDirtyText()
                 lowestPoint = 9991.0f;
                 highestPoint = -9999.0f;
             }
+
+            /* Only print as many lines as user requested. Change the last 3 chars to be '...' indicating full
+               text couldn't be properly fit. */
+            if (lines_.size() == usrTextConfig_.getMaxRows())
+            {
+                printf("Max rows reached 1\n");
+                const HkFontLoader::HkChar& ch = fontLoader_->getChar('.');
+                const HkFontLoader::HkChar& a = fontLoader_->getChar(text_[i - 1]);
+                const HkFontLoader::HkChar& b = fontLoader_->getChar(text_[i - 2]);
+                const HkFontLoader::HkChar& c = fontLoader_->getChar(text_[i - 3]);
+                lines_[lines_.size() - 1].length -= ((a.advance >> 6) + (b.advance >> 6) + (c.advance >> 6)); /* Subtract last 3 chars added*/
+                lines_[lines_.size() - 1].length += (ch.advance >> 6) * 3; /* Add length of 3 dots */
+                return;
+            }
         }
         /* Otherwise just keep track of how far we are so far on this text line*/
         else
@@ -305,6 +333,19 @@ void HkLabel::resolveDirtyText()
         lines_.emplace_back(lastAddedEndIndex, (uint32_t)textLen, currentRowLen, lowestPoint, highestPoint);
         combinedCharHeights_ += (-lowestPoint + highestPoint + 0);
 
+        /* Only print as many lines as user requested. Change the last 3 chars to be '...' indicating full
+           text couldn't be properly fit. */
+        if (lines_.size() == usrTextConfig_.getMaxRows())
+        {
+            printf("Max rows reached 1\n");
+            const HkFontLoader::HkChar& ch = fontLoader_->getChar('.');
+            const HkFontLoader::HkChar& a = fontLoader_->getChar(text_[i - 1]);
+            const HkFontLoader::HkChar& b = fontLoader_->getChar(text_[i - 2]);
+            const HkFontLoader::HkChar& c = fontLoader_->getChar(text_[i - 3]);
+            lines_[lines_.size() - 1].length -= ((a.advance >> 6) + (b.advance >> 6) + (c.advance >> 6)); /* Subtract last 3 chars added*/
+            lines_[lines_.size() - 1].length += (ch.advance >> 6) * 3; /* Add length of 3 dots */
+            return;
+        }
     }
 
     /* Add whole string as line, it means it never got bigger than 'maxRowLen' */

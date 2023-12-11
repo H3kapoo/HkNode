@@ -65,6 +65,7 @@ public:
     HkTextUserConfig& setTextVAlign(const HkTextVAlign value) { dirtyConfig = true; vAlign = value;  return *this; }
     HkTextUserConfig& setTextVHAlign(const HkTextVAlign valueV, const HkTextHAlign valueH) { setTextVAlign(valueV); setTextHAlign(valueH);  return *this; }
     HkTextUserConfig& setLineSpread(const int32_t value) { dirtyConfig = true; lineSpread = value;  return *this; }
+    HkTextUserConfig& setMaxRows(const uint32_t value) { dirtyConfig = true; maxRows = value;  return *this; }
 
     inline std::string getFontPath() const { return fontPath; }
     inline HkTextRenderMethod getRenderMethod() const { return renderMethod; }
@@ -76,6 +77,7 @@ public:
     inline HkTextHAlign getTextHAlign() { return hAlign; }
     inline HkTextVAlign getTextVAlign() { return vAlign; }
     inline int32_t getLineSpread() const { return lineSpread; }
+    inline uint32_t getMaxRows() const { return maxRows; }
 
 private:
     void resetDirtyStatus() { dirtyConfig = false; }
@@ -91,6 +93,7 @@ private:
     HkTextVAlign vAlign{ HkTextVAlign::Top };
     HkTextHAlign hAlign{ HkTextHAlign::Left };
     int32_t lineSpread{ 0 };
+    uint32_t maxRows{ 99999 };
     bool dirtyConfig{ false };
 };
 } // hkui
