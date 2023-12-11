@@ -81,12 +81,8 @@ void HkLabel::postRenderAdditionalDetails()
     gLTextConfig_.windowProjMatrix = windowDataPtr_->sceneProjMatrix;
     windowDataPtr_->renderer.beginTextBatch(gLTextConfig_);
 
-    //TODO: Spread between lines (line spacing) will be implemented in another feature
-    // int32_t spread = 10;
-    int32_t spread = usrTextConfig_.getLineSpread();
-
-
     float accumulatedHeights = 0;
+    int32_t spread = usrTextConfig_.getLineSpread();
     int32_t dotsCount = 0;
 
     /* Add each line to batch, skipping white spaces */
@@ -100,7 +96,6 @@ void HkLabel::postRenderAdditionalDetails()
 
         if (line == lines_.size() - 1 && lines_[line].endIdx != text_.size())
         {
-            // printf("We have not filled the last line: %d %d\n", lines_[line].endIdx, text_.size());
             dotsCount = 3;
         }
 
