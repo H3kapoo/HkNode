@@ -56,11 +56,11 @@ void HkNodeBase::renderMySelf()
     /* Use this to render additional non interactive things if needed */
     /* Note: rescissoring to original parent is needed unfortunatelly */
     glEnable(GL_SCISSOR_TEST);
-    // glScissor(
-    //     tc.getVPos().x,
-    //     windowDataPtr_->windowSize.y - tc.getVPos().y - tc.getVScale().y,
-    //     tc.getVScale().x,
-    //     tc.getVScale().y);
+    glScissor(
+        tc.getVPos().x,
+        windowDataPtr_->windowSize.y - tc.getVPos().y - tc.getVScale().y,
+        tc.getVScale().x,
+        tc.getVScale().y);
 
     postRenderAdditionalDetails();
 
@@ -203,7 +203,9 @@ void HkNodeBase::resolveChildrenConstraints(HkTreeStruct& children, const HkScro
 /* Try figure out if im the hovered one */
 void HkNodeBase::resolveHover()
 {
-    // we need the last scrollable conte    nt weve met
+    if (isTransparent_) { return; }
+
+    // we need the last scrollable content weve met
     if (node_.transformContext.isPosInsideOfNodeViewableArea(windowDataPtr_->mousePos))
     {
         windowDataPtr_->hoveredId = treeStruct_.getId();
@@ -230,7 +232,6 @@ void HkNodeBase::resolveFocus()
     /*Element is in focus only if element is not transparent, mouse is clicked and the mouse pos is inside the element.
       Mouse offsets also get computed so is dragging occurs later on focused object, object doesn't
       just snap to clicked mouse position */
-
     if (isTransparent_) { return; }
 
     if (!isTransparent_ && windowDataPtr_->isMouseClicked && windowDataPtr_->lastActiveMouseButton == HkMouseButton::Left
@@ -295,18 +296,22 @@ void HkNodeBase::resolveMouseScrollEvent()
 /* Resolve specific and general mouse mvmt evt */
 void HkNodeBase::resolveMouseMovementEvent()
 {
-    //TODO: It works here but all shaders need to have hovered uniform
-    // if (treeStruct_.getType() == HkNodeType::Container)
-    // {
-    //     if (windowDataPtr_->hoveredId == treeStruct_.getId())
-    //     {
-    //         // node_.renderContext.getShader().setInt("hovered", 1);
-    //     }
-    //     else
-    //     {
-    //         // node_.renderContext.getShader().setInt("hovered", 0);
-    //     }
-    // }
+    /* Handle exit special case when prevHovered is not initialized yet*/
+    if (windowDataPtr_->prevHoveredId == 0)
+    {
+        windowDataPtr_->prevHoveredId = windowDataPtr_->hoveredId;
+        node_.eventsContext.invokeMouseEvent(windowDataPtr_->mousePos.x, windowDataPtr_->mousePos.x,
+            HkMouseAction::Exited, HkMouseButton::None);
+    }
+
+    /* Handle exit event for previously hovered item */
+    if (windowDataPtr_->hoveredId != windowDataPtr_->prevHoveredId && windowDataPtr_->prevHoveredId == treeStruct_.getId())
+    {
+        windowDataPtr_->prevHoveredId = windowDataPtr_->hoveredId;
+        node_.eventsContext.invokeMouseEvent(windowDataPtr_->mousePos.x, windowDataPtr_->mousePos.x,
+            HkMouseAction::Exited, HkMouseButton::None);
+    }
+
     /* If scene detected a dragging action, separatelly specify that dragged element*/
     if (windowDataPtr_->isDragging && windowDataPtr_->focusedId == treeStruct_.getId())
         onDrag();
@@ -318,6 +323,11 @@ void HkNodeBase::resolveMouseMovementEvent()
     /* Here we should already know for sure who's the hovered element */
     if (windowDataPtr_->hoveredId == treeStruct_.getId())
     {
+        /* Handle enter event for hovered item. This is made internally such that event will be invoked just once,
+           even tho call here happens each frame */
+        node_.eventsContext.invokeMouseEvent(windowDataPtr_->mousePos.x, windowDataPtr_->mousePos.x,
+            HkMouseAction::Entered, HkMouseButton::None);
+
         node_.eventsContext.invokeMouseEvent(windowDataPtr_->mousePos.x, windowDataPtr_->mousePos.x,
             HkMouseAction::Move, HkMouseButton::None);
     }

@@ -4,8 +4,8 @@
         {
             "label": "build",
             "type": "shell",
-            // "command": "echo 'start' && cmake -B debug -GNinja src && cmake --build debug && mv debug/hkNode ${workspaceFolder}/",
-            "command": "echo 'start' && cmake -B debug -GNinja src && cmake --build debug && mv debug/windowFrameWithLabel ${workspaceFolder}/",
+            "command": "echo 'start' && cmake -B debug -GNinja src && cmake --build debug && mv debug/hkNode ${workspaceFolder}/",
+            // "command": "echo 'start' && cmake -B debug -GNinja src && cmake --build debug && mv debug/windowFrameWithLabel ${workspaceFolder}/",
             "group": "build",
             "problemMatcher": []
         },

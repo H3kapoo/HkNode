@@ -94,10 +94,7 @@ void HkLabel::postRenderAdditionalDetails()
         const int32_t lineHeightPlusSpread = (-lines_[line].lowestPoint + lines_[line].highestPoint);
         accumulatedHeights += lineHeightPlusSpread + spread;
 
-        if (line == lines_.size() - 1 && lines_[line].endIdx != text_.size())
-        {
-            dotsCount = 3;
-        }
+        if (line == lines_.size() - 1 && lines_[line].endIdx != text_.size()) { dotsCount = 3; }
 
         for (uint32_t i = lines_[line].startIdx; i < lines_[line].endIdx; i++)
         {
@@ -107,9 +104,6 @@ void HkLabel::postRenderAdditionalDetails()
 
             const HkFontLoader::HkChar& ch = fontLoader_->getChar(c);
             if (c == ' ') { x += (ch.advance >> 6); continue; }
-
-            // const HkFontLoader::HkChar& ch = fontLoader_->getChar(text_[i]);
-            // if (text_[i] == ' ') { x += (ch.advance >> 6); continue; }
 
             /* Determine final position and scale*/
             float xpos = x + ch.bearing.x;

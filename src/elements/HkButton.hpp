@@ -5,6 +5,7 @@
 #include <functional>
 
 #include "../base/HkNodeBase.hpp"
+#include "HkLabel.hpp"
 
 namespace hkui
 {
@@ -13,12 +14,13 @@ class HkButton : public HkNodeBase
 public:
     HkButton(const std::string& name);
 
-    void setOnClickListener(std::function<void()> callback);
+    void setText(const std::string& text);
 
 private:
-    void onClick() override;
+    /* HkNodeBase */
+    void onFirstHeartbeat() override;
 
-    std::function<void()> onClickCallback_{ nullptr };
+    HkLabel textLabel_;
 };
 
 using HkButtonPtr = std::shared_ptr<HkButton>;

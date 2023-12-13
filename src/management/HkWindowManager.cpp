@@ -68,12 +68,11 @@ void HkWindowManager::updateAllSubWindows(const HkEvent& ev)
     if (windowData_.previousTime == 0.0f)
     {
         windowData_.previousTime = glfwGetTime();
-        std::cout << "enterd here\n";
     }
 
     if (windowData_.currentEvent == HkEvent::FocusScan)
     {
-        std::cout << "Number of subwindows: " << rootSubWindows_.size() << "\n";
+        // std::cout << "Number of subwindows: " << rootSubWindows_.size() << "\n";
         for (int32_t i = rootSubWindows_.size() - 1; i >= 0; i--)
         {
             //TODO: Could we pass a RENDERER object here who has all the bind for the current window?

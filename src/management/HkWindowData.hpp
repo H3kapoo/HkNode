@@ -45,6 +45,7 @@ struct HkWindowData
 
     /*Hover*/
     uint32_t hoveredId{ 0 };
+    uint32_t prevHoveredId{ 0 };
 
     /*Drag*/
     bool isDragging{ false };

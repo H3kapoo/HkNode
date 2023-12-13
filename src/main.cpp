@@ -33,7 +33,7 @@ int main()
 
     HkWindowFramePtr windowFrame = std::make_shared<HkWindowFrame>("MyWindowFrame");
     windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
-    // windowFrame->setWindowMode(HkWindowFrameMode::Grabbable);
+    windowFrame->setWindowMode(HkWindowFrameMode::Grabbable);
     sceneWindow1->addSubWindow(windowFrame); //NOTE: Needs to be added before adding any children
 
     windowFrame->setSize({ 1280, 720 });
@@ -49,107 +49,73 @@ int main()
     HkContainerPtr ctr9 = std::make_shared<HkContainer>("MyContainer9");
     HkContainerPtr ctr10 = std::make_shared<HkContainer>("MyContainer10");
     HkContainerPtr ctr11 = std::make_shared<HkContainer>("MyContainer11");
-    HkContainerPtr ctr12 = std::make_shared<HkContainer>("MyContainer12");
     HkContainerPtr ctr13 = std::make_shared<HkContainer>("MyContainer13");
     HkContainerPtr ctr14 = std::make_shared<HkContainer>("MyContainer14");
 
-    // label->setText("Pala gateste biban NO CAPS and this is a very bussy string NO CAPS mr.s white carbonara mmmmm....cuvinte GgGPBpbp");
+    HkButtonPtr button = std::make_shared<HkButton>("MyButton");
+    HkButtonPtr button2 = std::make_shared<HkButton>("MyButton2");
 
-    // WF children
-    // ctr->getStyle().setColor({ 1.0f,0.0f,1.0f ,1.0f })
-    //     .setLayout(HkLayout::VPinch)
-    //     .setHSizeConfig(
-    //         { .type = HkSizeType::PercParent, .value = 0.5f, .min = 300 })
-    //     .setPinchConfig({ .enable = true, .alwaysOn = false, .allowRight = true, .allowTop = true, .allowBottom = true });
-
-    // ctr4->getStyle().setColor({ 1.0f,0.0f,0.0f ,1.0f })
-    //     .setLayout(HkLayout::Vertical)
-    //     .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center)
-    //     .setHSizeConfig(
-    //         { .type = HkSizeType::PercParent, .value = 0.5f, .min = 30 })
-    //     .setPinchConfig({ .enable = true, .allowRight = true, .allowTop = true, .allowBottom = true });
-
-    // ctr5->getStyle().setColor({ 0.3f,0.5f,0.0f ,1.0f })
-    //     .setLayout(HkLayout::Vertical)
-    //     .setHSizeConfig(
-    //         { .type = HkSizeType::PercParent, .value = 0.5f, .min = 30 })
-    //     .setPinchConfig({ .enable = true, .allowTop = true, .allowBottom = true });
-
-    // // //ctr4 children
-    // ctr6->getStyle().setColor({ 0.0f,0.0f,1.0f,1.0f })
-    //     .setLayout(HkLayout::Horizontal)
-    //     .setVSizeConfig(
-    //         { .type = HkSizeType::PercParent, .value = 0.75f, .min = 30 })
-    //     .setPinchConfig({ .enable = true, .allowLeft = true, .allowRight = true, .allowBottom = true });
-
-    // ctr7->getStyle().setColor({ 0.3f,0.7f,0.0f,1.0f })
-    //     .setLayout(HkLayout::HPinch)
-    //     .setRowWrapping(true)
-    //     .setVSizeConfig(
-    //         { .type = HkSizeType::PercParent, .value = 0.25f, .min = 30 })
-    //     .setPinchConfig({ .enable = true, .allowLeft = true, .allowRight = true });
-
-
-    // ctr8->getStyle().setColor({ 0.5f,0.4f,1.0f })
+    // HkLabelPtr label = std::make_shared<HkLabel>("MYLabel");
+    // label->setText("Pala gateste biban NO CAPS and this is a very bussy string NO CAPS mr.s white carbonara mmmmm....cuvinte GgGPBpbp"
+    //     " Pala gateste biban NO CAPS and this is a very bussy string NO CAPS mr.s white carbonara mmmmm....cuvinte GgGPBpbp");
+    // // label->getStyle().setColor({ 0.0f, 0.0f, 0.0f, 0.0f });
+    // label->getStyle()
     //     .setVHSizeConfig(
-    //         { .type = HkSizeType::PercParent, .value = 0.5f },
-    //         { .type = HkSizeType::FitParent })
-    //     .setPinchConfig({ .enable = true, .allowLeft = true, .allowBottom = true })
-    //     .setBottomMargin(15);
+    //         { .type = HkSizeType::PercParent, .value = 0.5f, .min = 50 },
+    //         { .type = HkSizeType::PercParent, .value = 0.5f, .min = 50 });
 
-    // ctr9->getStyle().setColor({ 0.0f,0.4f,1.0f })
-    //     .setVHSizeConfig(
-    //         { .type = HkSizeType::PercParent, .value = 0.5f },
-    //         { .type = HkSizeType::FitParent })
-    //     .setPinchConfig({ .enable = true, .allowLeft = true });
+    // label->getTextStyle()
+    //     .setMaxRows(2)
+    //     .setWrapAtWord(true)
+    //     .setTextVHAlign(HkTextUserConfig::HkTextVAlign::Center, HkTextUserConfig::HkTextHAlign::Center);
 
-
-
-    // ctr9->getStyle().setColor({ 0.4f,0.7f,0.0f, 1.0f })
-    //     // .setPadding(10, 10, 10, 10)
-    //     // .setBorders(5, 5, 5, 5)
-    //     .setBorderColor({ 0.6f, 0.0f, 1.0f,1.0f })
-    //     // .setOverflowAllowedX(true)
-    //     .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-    //     // .setLeftMargin(10)
-    //     // .setBottomMargin(10)
-    //     .setPinchConfig({ .enable = true, .allowRight = true })
-    //     .setHSizeConfig(
-    //         { .type = HkSizeType::PercParent, .value = 0.25f, .min = 30 });
-
-    // ctr10->getStyle().setColor({ 0.0f,0.7f,1.0f, 1.0f })
-    //     .setLayout(HkLayout::VPinch)
-    //     .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-    //     .setPinchConfig({ .enable = true, .allowLeft = true, .allowRight = true })
-    //     .setHSizeConfig(
-    //         { .type = HkSizeType::PercParent, .value = 0.5f, .min = 30 });
-
-    // ctr11->getStyle().setColor({ 0.4f,0.7f,0.0f, 1.0f })
-    //     .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left)
-    //     .setPinchConfig({ .enable = true, .allowLeft = true })
-    //     .setHSizeConfig(
-    //         { .type = HkSizeType::PercParent, .value = 0.25f, .min = 30 });
-
-    HkLabelPtr label = std::make_shared<HkLabel>("MYLabel");
-    label->setText("Pala gateste biban NO CAPS and this is a very bussy string NO CAPS mr.s white carbonara mmmmm....cuvinte GgGPBpbp"
-        " Pala gateste biban NO CAPS and this is a very bussy string NO CAPS mr.s white carbonara mmmmm....cuvinte GgGPBpbp");
-    // label->getStyle().setColor({ 0.0f, 0.0f, 0.0f, 0.0f });
-    label->getStyle()
-        .setVHSizeConfig(
-            { .type = HkSizeType::PercParent, .value = 0.5f, .min = 50 },
-            { .type = HkSizeType::PercParent, .value = 0.5f, .min = 50 });
-
-    label->getTextStyle()
-        .setMaxRows(2)
-        .setWrapAtWord(true)
-        .setTextVHAlign(HkTextUserConfig::HkTextVAlign::Center, HkTextUserConfig::HkTextHAlign::Center);
-
-    ctr12->getStyle().setColor({ 0.4f,0.7f,0.0f, 1.0f })
+    button->getStyle()
+        .setColor({ 0.4f, 0.7f, 0.0f, 1.0f })
         .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center)
-        .setColor({ 1.0f, 0.3f, .5f, 1.0f })
+        .setBorders(10, 10, 10, 10)
+        .setBorderColor({ 0.0f, 0.0f, 1.0f, 1.0f })
         .setVHSizeConfig(
-            { .type = HkSizeType::PercParent, .value = 0.5f, .min = 50 },
-            { .type = HkSizeType::PercParent, .value = 0.5f, .min = 50 });
+            { .type = HkSizeType::PercParent, .value = 0.25f, .min = 50 },
+            { .type = HkSizeType::PercParent, .value = 0.25f, .min = 50 });
+
+    button2->getStyle()
+        .setColor({ 0.4f, 0.7f, 0.0f, 1.0f })
+        .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center)
+        .setBorders(10, 10, 10, 10)
+        .setBorderColor({ 0.0f, 0.0f, 1.0f, 1.0f })
+        .setVHSizeConfig(
+            { .type = HkSizeType::PercParent, .value = 0.25f, .min = 50 },
+            { .type = HkSizeType::PercParent, .value = 0.25f, .min = 50 });
+
+    button->getEvents().setOnEnterListener([&button]()
+        {
+            button->getStyle().setColor({ 0.4f, 0.7f, 1.0f, 1.0f });
+        });
+
+    button->getEvents().setOnExitListener([&button]()
+        {
+            button->getStyle().setColor({ 0.4f, 0.7f, 0.0f, 1.0f });
+        });
+
+    button->getEvents().setOnClickListener([&button]()
+        {
+            printf("Clicked on: %s\n", button->getNodeInfo().name.c_str());
+        });
+
+    button2->getEvents().setOnEnterListener([&button2]()
+        {
+            button2->getStyle().setColor({ 0.4f, 0.7f, 1.0f, 1.0f });
+        });
+
+    button2->getEvents().setOnExitListener([&button2]()
+        {
+            button2->getStyle().setColor({ 0.4f, 0.7f, 0.0f, 1.0f });
+        });
+
+    button2->getEvents().setOnClickListener([&button2]()
+        {
+            printf("Clicked on: %s\n", button2->getNodeInfo().name.c_str());
+        });
 
 
     //TODO: Resolve this "2 style" behaviour as it;s very confusing
@@ -160,15 +126,14 @@ int main()
         // .setColor({ .04f, .54f, .34f, 1.0f })
         // .setPadding(10, 10, 10, 10)
         .setOverflowAllowedXY(false)
-        .setLayout(HkLayout::Horizontal)
-        .setPinchConfig({ .enable = true })
+        .setLayout(HkLayout::Vertical)
+        // .setPinchConfig({ .enable = true })
         // .setRowWrapping(true)
         // .setColWrapping(true)
         .setHAlignment(HkHAlignment::Center)
         .setVAlignment(HkVAlignment::Center);
 
-    windowFrame->pushChildren({ ctr12 });
-    ctr12->pushChildren({ label });
+    windowFrame->pushChildren({ button, button2 });
     // ctr10->pushChildren({ ctr6, ctr7 });
     // ctr7->pushChildren({ ctr4, ctr5 });
     // ctr5->pushChildren({ ctr12 });

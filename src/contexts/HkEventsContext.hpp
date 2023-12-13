@@ -40,19 +40,20 @@ private:
     void invokeMouseEvent(int32_t x, int32_t y, HkMouseAction action, HkMouseButton btn);
 
     /* Storage (not sure if they should be const& also, maybe they will get lost) */
-    std::function<void()> basicClickCb;
-    std::function<void()> basicReleaseCb;
-    std::function<void(int32_t x, int32_t y, HkMouseAction action, HkMouseButton btn)> mouseCallback;
+    std::function<void()> basicClickCb_;
+    std::function<void()> basicReleaseCb_;
+    std::function<void(int32_t x, int32_t y, HkMouseAction action, HkMouseButton btn)> mouseCallback_;
 
-    std::function<void()> basicHoverCallback;
-    std::function<void(int32_t x, int32_t y)> hoverCallback;
+    std::function<void()> basicHoverCallback_;
+    std::function<void(int32_t x, int32_t y)> hoverCallback_;
 
-    std::function<void()> basicMouseExitCallback;
-    std::function<void()> basicMouseEnterCallback;
+    std::function<void()> basicMouseExitCallback_;
+    std::function<void()> basicMouseEnterCallback_;
 
-    std::function<void()> basicMouseScrollCallback;
-    std::function<void(int32_t x)> mouseScrollCallback;
+    std::function<void()> basicMouseScrollCallback_;
+    std::function<void(int32_t x)> mouseScrollCallback_;
 
-    //TODO: Maybe to minimize memory, we could create the callbacks on demand
+    /* This is needed so that exit from an object cannot happen without first being inside of it */
+    bool mouseIsInside_{ false };
 };
 } // hkui

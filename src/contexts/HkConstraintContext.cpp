@@ -231,6 +231,18 @@ void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children)
     uint32_t rowFirstId = 0;
     uint32_t rowLastId = 0;
     uint32_t childCount = children.size() - sbCount_;
+
+    int32_t combinedMarginsX = 0;
+    int32_t combinedMarginsY = 0;
+    for (uint32_t i = 0; i < childCount; i++)
+    {
+        auto& child = children[i]->getPayload()->node_;
+        auto& childSc = child.styleContext;
+
+        combinedMarginsX += childSc.getRightBorder() + childSc.getLeftBorder();
+        combinedMarginsY += childSc.getTopBorder() + childSc.getBottomBorder();
+    }
+
     for (uint32_t i = 0; i < childCount; i++)
     {
         auto& child = children[i]->getPayload()->node_;
@@ -243,11 +255,14 @@ void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children)
         const int32_t bmX = bX + childSc.getRightMargin() + childSc.getLeftMargin();
         const int32_t bmY = bY + childSc.getTopMargin() + childSc.getBottomMargin();
 
+        float parentSizeX = thisTc_->getContentScale().x - combinedMarginsX;
+        float parentSizeY = thisTc_->getContentScale().y - combinedMarginsY;
+
         /* Compute child's content scale */
         childTc.setContentScale(
             {
-                ceil(computeHorizontalScale(childSc.getHSizeConfig(), childCount)),
-                ceil(computeVerticalScale(childSc.getVSizeConfig(), childCount))
+                ceil(computeHorizontalScale(childSc.getHSizeConfig(), childCount, parentSizeX)),
+                ceil(computeVerticalScale(childSc.getVSizeConfig(), childCount, parentSizeY))
             });
 
         /* Compute child's total scale (borders+margins) */
@@ -263,7 +278,7 @@ void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children)
         if (styleContextInj_->isRowWrappingEnabled())
         {
             /* This basically "spawns" a new row */
-            if (nextXAdvance > thisTc_->getContentScale().x)
+            if (nextXAdvance > parentSizeX)
             {
                 startPosX = 0;
                 startPosY += highestYOnRow;
@@ -408,13 +423,24 @@ void HkConstraintContext::resolveHorizontalPinch(HkTreeStruct& children)
 
 void HkConstraintContext::resolveVerticalContainer(HkTreeStruct& children)
 {
-    //TODO: move into hpp so we dont redeclare them each frame
     int32_t startPosX = 0, startPosY = 0;
     int32_t longestXOnCol = 0;
     uint32_t colFirstId = 0;
     uint32_t colLastId = 0;
     int32_t nextYAdvance = 0;
     uint32_t childCount = children.size() - sbCount_;
+
+    int32_t combinedMarginsX = 0;
+    int32_t combinedMarginsY = 0;
+    for (uint32_t i = 0; i < childCount; i++)
+    {
+        auto& child = children[i]->getPayload()->node_;
+        auto& childSc = child.styleContext;
+
+        combinedMarginsX += childSc.getRightBorder() + childSc.getLeftBorder();
+        combinedMarginsY += childSc.getTopBorder() + childSc.getBottomBorder();
+    }
+
     for (uint32_t i = 0; i < childCount; i++)
     {
         auto& child = children[i]->getPayload()->node_;
@@ -427,11 +453,14 @@ void HkConstraintContext::resolveVerticalContainer(HkTreeStruct& children)
         const int32_t bmX = bX + childSc.getRightMargin() + childSc.getLeftMargin();
         const int32_t bmY = bY + childSc.getTopMargin() + childSc.getBottomMargin();
 
+        float parentSizeX = thisTc_->getContentScale().x - combinedMarginsX;
+        float parentSizeY = thisTc_->getContentScale().y - combinedMarginsY;
+
         /* Compute child's content scale */
         childTc.setContentScale(
             {
-                ceil(computeHorizontalScale(childSc.getHSizeConfig(), childCount)),
-                ceil(computeVerticalScale(childSc.getVSizeConfig(), childCount))
+                ceil(computeHorizontalScale(childSc.getHSizeConfig(), childCount, parentSizeX)),
+                ceil(computeVerticalScale(childSc.getVSizeConfig(), childCount, parentSizeY))
             });
 
         /* Compute child's total scale (borders+margins) */
@@ -447,7 +476,7 @@ void HkConstraintContext::resolveVerticalContainer(HkTreeStruct& children)
         if (styleContextInj_->isColWrappingEnabled())
         {
             /* This basically "spawns" a new col */
-            if (nextYAdvance > thisTc_->getContentScale().y)
+            if (nextYAdvance > parentSizeY)
             {
                 startPosY = 0;
                 startPosX += longestXOnCol;
@@ -785,7 +814,7 @@ void HkConstraintContext::computeChildrenOverflowBasedOnMinMax(const MinMaxPos& 
     }
 }
 
-float HkConstraintContext::computeHorizontalScale(const HkSizeConfig& config, const uint32_t childCount)
+float HkConstraintContext::computeHorizontalScale(const HkSizeConfig& config, const uint32_t childCount, const float parentSize)
 {
     /* When it comes to parent relative scaling, use the "contentScale" instead of just "scale", we don't
        need the absolute scale here */
@@ -796,13 +825,13 @@ float HkConstraintContext::computeHorizontalScale(const HkSizeConfig& config, co
         size = config.value;
         break;
     case HkSizeType::PercParent:
-        size = config.value * (float)thisTc_->getContentScale().x;
+        size = config.value * parentSize;
         break;
     case HkSizeType::FitParent:
-        size = thisTc_->getContentScale().x;
+        size = parentSize;
         break;
     case HkSizeType::Balanced:
-        size = (float)thisTc_->getContentScale().x / childCount;
+        size = parentSize / childCount;
         break;
     case HkSizeType::FitCell:
     case HkSizeType::PercCell:
@@ -812,7 +841,7 @@ float HkConstraintContext::computeHorizontalScale(const HkSizeConfig& config, co
     return std::clamp(size, config.min, config.max);
 }
 
-float HkConstraintContext::computeVerticalScale(const HkSizeConfig& config, const uint32_t childCount)
+float HkConstraintContext::computeVerticalScale(const HkSizeConfig& config, const uint32_t childCount, const float parentSize)
 {
     /* When it comes to parent relative scaling, use the "contentScale" instead of just "scale", we don't
        need the absolute scale here */
@@ -823,13 +852,13 @@ float HkConstraintContext::computeVerticalScale(const HkSizeConfig& config, cons
         size = config.value;
         break;
     case HkSizeType::PercParent:
-        size = config.value * (float)thisTc_->getContentScale().y;
+        size = config.value * parentSize;
         break;
     case HkSizeType::FitParent:
-        size = thisTc_->getContentScale().y;
+        size = parentSize;
         break;
     case HkSizeType::Balanced:
-        size = (float)thisTc_->getContentScale().y / childCount;
+        size = parentSize / childCount;
         break;
     case HkSizeType::FitCell:
     case HkSizeType::PercCell:
@@ -954,23 +983,24 @@ void HkConstraintContext::scrollBarConstrain(HkTransformContext& scrollBarTc, co
 void HkConstraintContext::windowFrameContainerConstraint(HkTransformContext& titleLabel, HkTransformContext& wfCtr,
     HkTransformContext& wfBorder, HkTransformContext& exitBtn, HkTransformContext& minBtn) const
 {
+    const int32_t buttonScale = 20;
     /* TODO: dirty flags shall be used here to not do redundant repositioning */
     wfCtr.setContentPos({ thisTc_->getContentPos().x, thisTc_->getContentPos().y + thisTc_->getContentScale().y });
     wfCtr.setContentScale({ thisTc_->getContentScale().x, wfCtr.getContentScale().y });
 
     titleLabel.setContentScale({ 200 , thisTc_->getContentScale().y });
-    titleLabel.setContentPos(thisTc_->getContentPos());
+    titleLabel.setContentPos({ thisTc_->getContentPos().x + 5, thisTc_->getContentPos().y });
 
-    exitBtn.setContentScale({ 20, 20 }); // hardcoded, but technically ok situation. Edit: fix later
+    exitBtn.setContentScale({ buttonScale, buttonScale }); // hardcoded, but technically ok situation. Edit: fix later
     exitBtn.setContentPos({
-        thisTc_->getContentPos().x + thisTc_->getContentScale().x - 20 - 10,
-        thisTc_->getContentPos().y + 20 / 2 - 5
+        thisTc_->getContentPos().x + thisTc_->getContentScale().x - buttonScale - buttonScale / 2,
+        thisTc_->getContentPos().y + buttonScale / 2 - 5
         });
 
-    minBtn.setContentScale({ 20, 20 });
+    minBtn.setContentScale({ buttonScale, buttonScale });
     minBtn.setContentPos({
-        thisTc_->getContentPos().x + thisTc_->getContentScale().x - 20 - 40,
-        thisTc_->getContentPos().y + 20 / 2 - 5
+        thisTc_->getContentPos().x + thisTc_->getContentScale().x - buttonScale - buttonScale * 2,
+        thisTc_->getContentPos().y + buttonScale / 2 - 5
         });
 
     //TODO: Maybe not a good ideea to do it here

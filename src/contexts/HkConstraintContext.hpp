@@ -79,8 +79,8 @@ public:
     void computeScrollBarCount();
     void computeChildrenOverflowBasedOnMinMax(const MinMaxPos& minMax,
         const HkScrollbarsSize sbSizes);
-    float computeHorizontalScale(const HkSizeConfig& config, const uint32_t childCount);
-    float computeVerticalScale(const HkSizeConfig& config, const uint32_t childCount);
+    float computeHorizontalScale(const HkSizeConfig& config, const uint32_t childCount, const float parentSize);
+    float computeVerticalScale(const HkSizeConfig& config, const uint32_t childCount, const float parentSize);
 
     MinMaxPos getMinAndMaxPositions(const HkTreeStruct& children) const;
 

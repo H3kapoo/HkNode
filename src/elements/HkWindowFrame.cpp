@@ -15,10 +15,11 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
     , cachedPos_{ 0,0 }
 {
     /* Setup defaults that don't have to do with VAOs/Textures/Shaders themselves*/
-    node_.styleContext.setColor(glm::vec4(0.0f, 0.5f, 0.9f, 1.0f));
+    node_.styleContext.setColor({ 0.169f, 0.15f, 0.157f, 1.0f });
 
     // wfCont_.node_.styleContext.setRowWrapping(true); //TODO: Why was it enabled by default?
-    wfCont_.node_.styleContext.setColor(glm::vec4(0.0f, 0.5f, 0.5f, 1.0f));
+
+    wfCont_.node_.styleContext.setColor({ 0.2f, 0.18f, 0.188f, 1.0f });
 
     pinchHelper_.setGrabSize(15);
 
@@ -28,15 +29,49 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
     treeStruct_.pushChild(&exitBtn_.treeStruct_);
     treeStruct_.pushChild(&wfCont_.treeStruct_);
 
-    minimizeBtn_.setOnClickListener([this]()
+    minimizeBtn_.getEvents().setOnClickListener([this]()
         {
             isMinimized_ = !isMinimized_;
         });
 
-    exitBtn_.setOnClickListener([this]()
+    exitBtn_.getEvents().setOnClickListener([this]()
         {
             stillAlive_ = false;
         });
+
+    minimizeBtn_.getEvents().setOnEnterListener([this]()
+        {
+            minimizeBtn_.getStyle().setColor({ 0.32f, 0.215f, 0.22f, 1.0f });
+        });
+
+    minimizeBtn_.getEvents().setOnExitListener([this]()
+        {
+            minimizeBtn_.getStyle().setColor({ 0.3f, 0.18f, 0.188f, 1.0f });
+        });
+
+    exitBtn_.getEvents().setOnEnterListener([this]()
+        {
+            exitBtn_.getStyle().setColor({ 0.32f, 0.215f, 0.22f, 1.0f });
+        });
+
+    exitBtn_.getEvents().setOnExitListener([this]()
+        {
+            exitBtn_.getStyle().setColor({ 0.3f, 0.18f, 0.188f, 1.0f });
+        });
+
+
+    exitBtn_.getStyle()
+        .setColor({ 0.3f, 0.18f, 0.188f, 1.0f })
+        .setBorders(2, 2, 2, 2)
+        .setBorderColor({ 0.1f, 0.09f, 0.094f, 1.0f });
+
+    minimizeBtn_.getStyle()
+        .setColor({ 0.3f, 0.18f, 0.188f, 1.0f })
+        .setBorders(2, 2, 2, 2)
+        .setBorderColor({ 0.1f, 0.09f, 0.094f, 1.0f });
+
+    minimizeBtn_.setText("_");
+    exitBtn_.setText("X");
 
     titleLabel_.getStyle().setColor(glm::vec4(0.0f, 0.5f, 0.9f, 0.0f));
     titleLabel_.getTextStyle()
@@ -45,7 +80,7 @@ HkWindowFrame::HkWindowFrame(const std::string& windowName)
         .setFontSize(20)
         .setWrapAtWord(true)
         .setFontColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f))
-        .setTextVHAlign(HkTextUserConfig::HkTextVAlign::Center, HkTextUserConfig::HkTextHAlign::Center);
+        .setTextVHAlign(HkTextUserConfig::HkTextVAlign::Center, HkTextUserConfig::HkTextHAlign::Left);
     titleLabel_.setText(treeStruct_.getName() + std::to_string(treeStruct_.getId()));
     titleLabel_.setSelectTransparent(true);
 }
@@ -204,6 +239,31 @@ void HkWindowFrame::resolveChildrenConstraints(HkTreeStruct&,
         node_.borderTransformContext.getContentScale().x,
         node_.borderTransformContext.getContentScale().y
     };
+
+    /* Setup buttons border */
+    const int32_t bSize = 1;
+    exitBtn_.node_.borderTransformContext.setContentPos(
+        {
+            exitBtn_.node_.transformContext.getContentPos().x - bSize,
+            exitBtn_.node_.transformContext.getContentPos().y - bSize
+        });
+    exitBtn_.node_.borderTransformContext.setContentScale(
+        {
+            exitBtn_.node_.transformContext.getContentScale().x + bSize + bSize,
+            exitBtn_.node_.transformContext.getContentScale().y + bSize + bSize
+        });
+
+    minimizeBtn_.node_.borderTransformContext.setContentPos(
+        {
+            minimizeBtn_.node_.transformContext.getContentPos().x - bSize,
+            minimizeBtn_.node_.transformContext.getContentPos().y - bSize
+        });
+    minimizeBtn_.node_.borderTransformContext.setContentScale(
+        {
+            minimizeBtn_.node_.transformContext.getContentScale().x + bSize + bSize,
+            minimizeBtn_.node_.transformContext.getContentScale().y + bSize + bSize
+        });
+
 }
 
 void HkWindowFrame::pushChildren(const std::vector<HkNodeBasePtr>& newChildren)
