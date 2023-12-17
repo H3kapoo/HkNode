@@ -96,12 +96,10 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children)
         const int32_t tPadd = styleContextInj_->getTopPadding();
         const int32_t bPadd = styleContextInj_->getBottomPadding();
 
-        float xScalePadded = thisTc_->getContentScale().x - (rPadd + lPadd);
-        xScalePadded -= xScalePadded * (bX / xScalePadded);
-        const float xPosPadded = thisTc_->getContentPos().x + rPadd;
+        const float xScalePadded = thisTc_->getContentScale().x - (rPadd + lPadd);
+        const float xPosPadded = thisTc_->getContentPos().x + lPadd;
 
-        float yScalePadded = thisTc_->getContentScale().y - (bPadd + tPadd);
-        yScalePadded -= yScalePadded * (bY / yScalePadded);
+        const float yScalePadded = thisTc_->getContentScale().y - (bPadd + tPadd);
         const float yPosPadded = thisTc_->getContentPos().y + tPadd;
 
         /* Scale elements according to their config*/
@@ -115,9 +113,11 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children)
         case HkSizeType::PercCell:
             xSize = (gridConfig.cols[childSc.getGridCol() - 1] * colEqualPart) * xScalePadded;
             xSize *= hSizeConfig.value;
+            xSize -= bX;
             break;
         case HkSizeType::FitCell:
             xSize = (gridConfig.cols[childSc.getGridCol() - 1] * colEqualPart) * xScalePadded;
+            xSize -= bX;
             break;
         case HkSizeType::PercParent:
         case HkSizeType::FitParent:
@@ -135,10 +135,11 @@ void HkConstraintContext::resolveGridContainer(HkTreeStruct& children)
         case HkSizeType::PercCell:
             ySize = (gridConfig.rows[childSc.getGridRow() - 1] * rowEqualPart) * yScalePadded;
             ySize *= vSizeConfig.value;
+            ySize -= bY;
             break;
         case HkSizeType::FitCell:
             ySize = (gridConfig.rows[childSc.getGridRow() - 1] * rowEqualPart) * yScalePadded;
-            ySize -= yScalePadded * (bY / yScalePadded);
+            ySize -= bY;
             break;
         case HkSizeType::PercParent:
         case HkSizeType::FitParent:
@@ -232,15 +233,17 @@ void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children)
     uint32_t rowLastId = 0;
     uint32_t childCount = children.size() - sbCount_;
 
-    int32_t combinedMarginsX = 0;
-    int32_t combinedMarginsY = 0;
+    int32_t combinedPaddingX = 0;
+    int32_t combinedPaddingY = 0;
     for (uint32_t i = 0; i < childCount; i++)
     {
         auto& child = children[i]->getPayload()->node_;
         auto& childSc = child.styleContext;
 
-        combinedMarginsX += childSc.getRightBorder() + childSc.getLeftBorder();
-        combinedMarginsY += childSc.getTopBorder() + childSc.getBottomBorder();
+        combinedPaddingX += childSc.getRightBorder() + childSc.getLeftBorder()
+            + childSc.getRightMargin() + childSc.getLeftMargin();
+        combinedPaddingY += childSc.getTopBorder() + childSc.getBottomBorder()
+            + childSc.getTopMargin() + childSc.getBottomMargin();
     }
 
     for (uint32_t i = 0; i < childCount; i++)
@@ -255,8 +258,8 @@ void HkConstraintContext::resolveHorizontalContainer(HkTreeStruct& children)
         const int32_t bmX = bX + childSc.getRightMargin() + childSc.getLeftMargin();
         const int32_t bmY = bY + childSc.getTopMargin() + childSc.getBottomMargin();
 
-        float parentSizeX = thisTc_->getContentScale().x - combinedMarginsX;
-        float parentSizeY = thisTc_->getContentScale().y - combinedMarginsY;
+        float parentSizeX = thisTc_->getContentScale().x - combinedPaddingX;
+        float parentSizeY = thisTc_->getContentScale().y - combinedPaddingY;
 
         /* Compute child's content scale */
         childTc.setContentScale(
@@ -430,15 +433,17 @@ void HkConstraintContext::resolveVerticalContainer(HkTreeStruct& children)
     int32_t nextYAdvance = 0;
     uint32_t childCount = children.size() - sbCount_;
 
-    int32_t combinedMarginsX = 0;
-    int32_t combinedMarginsY = 0;
+    int32_t combinedPaddingX = 0;
+    int32_t combinedPaddingY = 0;
     for (uint32_t i = 0; i < childCount; i++)
     {
         auto& child = children[i]->getPayload()->node_;
         auto& childSc = child.styleContext;
 
-        combinedMarginsX += childSc.getRightBorder() + childSc.getLeftBorder();
-        combinedMarginsY += childSc.getTopBorder() + childSc.getBottomBorder();
+        combinedPaddingX += childSc.getRightBorder() + childSc.getLeftBorder()
+            + childSc.getRightMargin() + childSc.getLeftMargin();
+        combinedPaddingY += childSc.getTopBorder() + childSc.getBottomBorder()
+            + childSc.getTopMargin() + childSc.getBottomMargin();
     }
 
     for (uint32_t i = 0; i < childCount; i++)
@@ -453,8 +458,8 @@ void HkConstraintContext::resolveVerticalContainer(HkTreeStruct& children)
         const int32_t bmX = bX + childSc.getRightMargin() + childSc.getLeftMargin();
         const int32_t bmY = bY + childSc.getTopMargin() + childSc.getBottomMargin();
 
-        float parentSizeX = thisTc_->getContentScale().x - combinedMarginsX;
-        float parentSizeY = thisTc_->getContentScale().y - combinedMarginsY;
+        float parentSizeX = thisTc_->getContentScale().x - combinedPaddingX;
+        float parentSizeY = thisTc_->getContentScale().y - combinedPaddingY;
 
         /* Compute child's content scale */
         childTc.setContentScale(

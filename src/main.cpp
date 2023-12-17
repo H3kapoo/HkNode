@@ -19,7 +19,7 @@ int main()
     //TODO: Make it the responsability of the window to generate VAO and shader?
     // we need to make it order agnostic
     HkWindowManagerPtr sceneWindow1 = std::make_shared<HkWindowManager>("MyWindowManager",
-        HkWindowManager::HkWindowConfig{ .width = 1920, .height = 1080, .isMaster = true });
+        HkWindowManager::HkWindowConfig{ .width = 1600, .height = 900, .isMaster = true });
     // sceneWindow1->setBackgroundImage("/home/hekapoo/container.jpg");
     // sceneWindow1->setBackgroundImage("/home/hekapoo/Downloads/fbi_wp.jpg");
     // sceneWindow1->setBackgroundImage("/home/hekapoo/container.jpg");
@@ -33,7 +33,7 @@ int main()
 
     HkWindowFramePtr windowFrame = std::make_shared<HkWindowFrame>("MyWindowFrame");
     windowFrame->setWindowMode(HkWindowFrameMode::FullScreenFixed);
-    windowFrame->setWindowMode(HkWindowFrameMode::Grabbable);
+    // windowFrame->setWindowMode(HkWindowFrameMode::Grabbable);
     sceneWindow1->addSubWindow(windowFrame); //NOTE: Needs to be added before adding any children
 
     windowFrame->setSize({ 1280, 720 });
@@ -55,63 +55,54 @@ int main()
     HkButtonPtr button = std::make_shared<HkButton>("MyButton");
     HkButtonPtr button2 = std::make_shared<HkButton>("MyButton2");
 
-    // HkLabelPtr label = std::make_shared<HkLabel>("MYLabel");
-    // label->setText("Pala gateste biban NO CAPS and this is a very bussy string NO CAPS mr.s white carbonara mmmmm....cuvinte GgGPBpbp"
-    //     " Pala gateste biban NO CAPS and this is a very bussy string NO CAPS mr.s white carbonara mmmmm....cuvinte GgGPBpbp");
-    // // label->getStyle().setColor({ 0.0f, 0.0f, 0.0f, 0.0f });
-    // label->getStyle()
-    //     .setVHSizeConfig(
-    //         { .type = HkSizeType::PercParent, .value = 0.5f, .min = 50 },
-    //         { .type = HkSizeType::PercParent, .value = 0.5f, .min = 50 });
-
-    // label->getTextStyle()
-    //     .setMaxRows(2)
-    //     .setWrapAtWord(true)
-    //     .setTextVHAlign(HkTextUserConfig::HkTextVAlign::Center, HkTextUserConfig::HkTextHAlign::Center);
+    const glm::vec4 borderButtonColor = { 0.7647f, 0.8784f, 0.898f, 1.0f };
+    const glm::vec4 hoveredButtonColor = { 0.3451f, 0.5216f, 0.6863f, 1.0f };
+    const glm::vec4 baseButtonColor = { 0.2549f, 0.4471f, 0.6235f, 1.0f };
 
     button->getStyle()
-        .setColor({ 0.4f, 0.7f, 0.0f, 1.0f })
+        .setColor(baseButtonColor)
         .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center)
         .setBorders(10, 10, 10, 10)
-        .setBorderColor({ 0.0f, 0.0f, 1.0f, 1.0f })
+        .setMargins(10, 0, 10, 10)
+        .setBorderColor(borderButtonColor)
         .setVHSizeConfig(
-            { .type = HkSizeType::PercParent, .value = 0.25f, .min = 50 },
-            { .type = HkSizeType::PercParent, .value = 0.25f, .min = 50 });
+            { .type = HkSizeType::PercParent, .value = 0.5f, .min = 50 },
+            { .type = HkSizeType::PercParent, .value = 0.5f, .min = 50 });
 
     button2->getStyle()
-        .setColor({ 0.4f, 0.7f, 0.0f, 1.0f })
+        .setColor(baseButtonColor)
         .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center)
         .setBorders(10, 10, 10, 10)
-        .setBorderColor({ 0.0f, 0.0f, 1.0f, 1.0f })
+        .setMargins(0, 10, 10, 10)
+        .setBorderColor(borderButtonColor)
         .setVHSizeConfig(
-            { .type = HkSizeType::PercParent, .value = 0.25f, .min = 50 },
-            { .type = HkSizeType::PercParent, .value = 0.25f, .min = 50 });
+            { .type = HkSizeType::PercParent, .value = 0.5f, .min = 50 },
+            { .type = HkSizeType::PercParent, .value = 0.5f, .min = 50 });
 
-    button->getEvents().setOnEnterListener([&button]()
+    button->getEvents().setOnEnterListener([&button, &hoveredButtonColor]()
         {
-            button->getStyle().setColor({ 0.4f, 0.7f, 1.0f, 1.0f });
+            button->getStyle().setColor(hoveredButtonColor);
+        });
+    button2->getEvents().setOnEnterListener([&button2, &hoveredButtonColor]()
+        {
+            button2->getStyle().setColor(hoveredButtonColor);
         });
 
-    button->getEvents().setOnExitListener([&button]()
+
+    button->getEvents().setOnExitListener([&button, &baseButtonColor]()
         {
-            button->getStyle().setColor({ 0.4f, 0.7f, 0.0f, 1.0f });
+            button->getStyle().setColor(baseButtonColor);
         });
+    button2->getEvents().setOnExitListener([&button2, &baseButtonColor]()
+        {
+            button2->getStyle().setColor(baseButtonColor);
+        });
+
 
     button->getEvents().setOnClickListener([&button]()
         {
             printf("Clicked on: %s\n", button->getNodeInfo().name.c_str());
         });
-
-    button2->getEvents().setOnEnterListener([&button2]()
-        {
-            button2->getStyle().setColor({ 0.4f, 0.7f, 1.0f, 1.0f });
-        });
-
-    button2->getEvents().setOnExitListener([&button2]()
-        {
-            button2->getStyle().setColor({ 0.4f, 0.7f, 0.0f, 1.0f });
-        });
-
     button2->getEvents().setOnClickListener([&button2]()
         {
             printf("Clicked on: %s\n", button2->getNodeInfo().name.c_str());
@@ -119,21 +110,21 @@ int main()
 
 
     //TODO: Resolve this "2 style" behaviour as it;s very confusing
-    // windowFrame->getStyle()
-    //     .setBorderColor({ 0.6f,0.6f,0.0f,1.0f })
-    //     .setBorders(3, 3, 3, 3);
+    windowFrame->getStyle()
+        .setBorderColor({ 0.6f,0.6f,0.0f,1.0f })
+        .setBorders(3, 3, 3, 3);
     windowFrame->getContainerStyle()
         // .setColor({ .04f, .54f, .34f, 1.0f })
         // .setPadding(10, 10, 10, 10)
         .setOverflowAllowedXY(false)
-        .setLayout(HkLayout::Vertical)
-        // .setPinchConfig({ .enable = true })
+        .setLayout(HkLayout::Horizontal)
+        .setPinchConfig({ .enable = true })
         // .setRowWrapping(true)
         // .setColWrapping(true)
         .setHAlignment(HkHAlignment::Center)
         .setVAlignment(HkVAlignment::Center);
 
-    windowFrame->pushChildren({ button, button2 });
+    // windowFrame->pushChildren({ button, button2 });
     // ctr10->pushChildren({ ctr6, ctr7 });
     // ctr7->pushChildren({ ctr4, ctr5 });
     // ctr5->pushChildren({ ctr12 });
@@ -141,34 +132,41 @@ int main()
     // Providing a seed value
     // srand((unsigned)time(NULL));
 
-    int scale = 1;
+    int scale = 2;
     std::vector<HkNodeBasePtr> ctrs2;
     ctrs2.reserve(scale * scale);
     for (int i = 1; i <= scale; i++) // with O2 works ok 01.09.2023
     {
         for (int j = 1; j <= scale; j++)
         {
-            double r = (rand() % 255) / 255.0f;
-            double g = (rand() % 255) / 255.0f;
-            double b = (rand() % 255) / 255.0f;
+            // double r = (rand() % 255) / 255.0f;
+            // double g = (rand() % 255) / 255.0f;
+            // double b = (rand() % 255) / 255.0f;
 
-            const auto& ct = std::make_shared<HkButton>("MyContauner");
-            ct->getStyle()
-                .setColor((i + j) % 2 == 0 ? glm::vec4{ r,g,b, 1.0f } : glm::vec4{ r,g,b, 1.0f })
-                // .setColor({ 1.0f, 1.0f, 0.6f, 1.0f })
-                .setBorderColor({ 0.22f, 0.65f, 0.9f, 1.0f })
-                // .setBorders(2, 2, 2, 2)
-                // .setBorders(5, 5, 5, 5)
-                // .setMargins(10, 10, 10, 10)
+            const auto btn = std::make_shared<HkButton>("MyContauner");
+            btn->getStyle()
+                .setColor(baseButtonColor)
+                .setBorderColor(borderButtonColor)
                 .setGridRowCol(i, j)
-                // .setVHSizeConfig({ .value = 150 }, { .value = 150 })
-                .setVHSizeConfig({ .type = HkSizeType::FitCell }, { .type = HkSizeType::FitCell })
-                // .setVHSizeConfig({ .type = HkSizeType::PercCell, .value = .5f },
-                //     { .type = HkSizeType::PercCell, .value = .5f })
+                .setBorders(10, 10, 10, 10)
+                // .setMargins(10, 10, 10, 10)
+                // .setVHSizeConfig({ .type = HkSizeType::FitCell }, { .type = HkSizeType::FitCell })
+                .setVHSizeConfig(
+                    { .type = HkSizeType::PercCell, .value = 0.5f },
+                    { .type = HkSizeType::PercCell, .value = 0.5f })
+                // .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left);
                 .setVHAlignment(HkVAlignment::Center, HkHAlignment::Center);
-            // .setVHAlignment(HkVAlignment::Top, HkHAlignment::Left);
 
-            ctrs2.push_back(std::move(ct));
+            btn->getEvents().setOnEnterListener([btn, &hoveredButtonColor]()
+                {
+                    btn->getStyle().setColor(hoveredButtonColor);
+                });
+            btn->getEvents().setOnExitListener([btn, &baseButtonColor]()
+                {
+                    btn->getStyle().setColor(baseButtonColor);
+                });
+            ctrs2.push_back(std::move(btn));
+            // ctrs2.push_back(btn);
         }
     }
 
@@ -181,19 +179,19 @@ int main()
     // ctrs2[3]->getStyle()
     //     .setVHAlignment(HkVAlignment::Bottom, HkHAlignment::Right);
 
-    // std::vector<float> rows, cols;
-    // rows.assign(scale, 1.0f);
-    // cols.assign(scale, 1.0f);
-    // windowFrame->getContainerStyle()
-    //     .setLayout(HkLayout::Grid)
-    //     .setOverflowAllowedXY(true)
-    //     .setPadding(30, 30, 30, 30)
-    //     .setGridConfig(
-    //         HkGridConfig{
-    //             .cols{cols},
-    //             .rows{rows}
-    //         });
-    // windowFrame->pushChildren(ctrs2);
+    std::vector<float> rows, cols;
+    rows.assign(scale, 1.0f);
+    cols.assign(scale, 1.0f);
+    windowFrame->getContainerStyle()
+        .setLayout(HkLayout::Grid)
+        // .setOverflowAllowedXY(true)
+        // .setPadding(30, 30, 30, 30)
+        .setGridConfig(
+            HkGridConfig{
+                .cols{cols},
+                .rows{rows}
+            });
+    windowFrame->pushChildren(ctrs2);
     // windowFrame->printTree();
     // HkImageViewPtr imgView = std::make_shared<HkImageView>("MyImgView");
     // HkImageViewPtr imgView2 = std::make_shared<HkImageView>("MyImgView2");
